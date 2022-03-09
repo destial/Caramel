@@ -5,9 +5,12 @@ import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
 import ch.obermuhlner.scriptengine.java.JavaScriptEngineFactory;
 import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
 import xyz.destiall.caramel.app.Debug;
+import xyz.destiall.caramel.app.events.FileEvent;
 import xyz.destiall.caramel.components.Component;
 import xyz.destiall.caramel.editor.ui.InspectorPanel;
 import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.java.events.EventHandler;
+import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.reflection.Reflect;
 
 import javax.script.ScriptException;
@@ -16,7 +19,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class ScriptManager {
+public class ScriptManager implements Listener {
+    private final FileWatcher watcher;
     private final File scriptsRootFolder;
     private final JavaScriptEngine engine;
     private final HashMap<String, JavaCompiledScript> compiledScripts;
@@ -27,11 +31,19 @@ public class ScriptManager {
         engine = (JavaScriptEngine) new JavaScriptEngineFactory().getScriptEngine();
         engine.setConstructorStrategy((clazz) -> new NullConstructorStrategy());
         compiledScripts = new HashMap<>();
+
+        watcher = new FileWatcher(scriptsRootFolder);
     }
 
     public void reloadAll() {
         if (!scriptsRootFolder.exists()) scriptsRootFolder.mkdir();
         loadScripts(scriptsRootFolder);
+
+        watcher.watch();
+    }
+
+    public void destroy() {
+        watcher.destroy();
     }
 
     public void loadScripts(File folder) {
@@ -95,5 +107,12 @@ public class ScriptManager {
 
     public Collection<String> getScripts() {
         return compiledScripts.keySet();
+    }
+
+    @EventHandler
+    private void onFileModify(FileEvent event) {
+        if (event.getKind() == FileEvent.Kind.MODIFY) {
+            Debug.log("File modified: " + event.getFile());
+        }
     }
 }

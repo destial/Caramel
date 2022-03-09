@@ -122,7 +122,7 @@ public class MouseListener {
         currentX = (currentX / gameViewportSize.x) * 2.0f - 1.0f;
         Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
 
-        EditorCamera camera = Application.getApp().getCurrentScene().getMainCamera();
+        EditorCamera camera = Application.getApp().getCurrentScene().getEditorCamera();
         Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);
@@ -136,7 +136,7 @@ public class MouseListener {
         currentY = -((currentY / gameViewportSize.y) * 2.0f - 1.0f);
         Vector4f tmp = new Vector4f(0, currentY, 0, 1);
 
-        EditorCamera camera = Application.getApp().getCurrentScene().getMainCamera();
+        EditorCamera camera = Application.getApp().getCurrentScene().getEditorCamera();
         Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);

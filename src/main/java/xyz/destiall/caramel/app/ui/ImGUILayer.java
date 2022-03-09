@@ -66,9 +66,9 @@ public class ImGUILayer {
         });
 
         glfwSetCharCallback(glfwWindow, (w, c) -> {
-            if (c != GLFW_KEY_DELETE) {
+            //if (c != GLFW_KEY_DELETE) {
                 io.addInputCharacter(c);
-            }
+            //}
         });
 
         glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {

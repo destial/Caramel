@@ -92,10 +92,10 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     public <C extends Component> C getComponentInChildren(Class<C> clazz) {
-        Component component;
+        Component component = getComponent(clazz);
+        if (component != null) return clazz.cast(component);
         for (GameObject child : children) {
-            component = child.getComponent(clazz);
-            if (component == null) component = child.getComponentInChildren(clazz);
+            component = child.getComponentInChildren(clazz);
             if (component != null) return clazz.cast(component);
         }
         return null;
@@ -115,16 +115,16 @@ public class GameObject implements Update, Render, Cloneable {
         return components.values();
     }
 
+    public <C extends Component> boolean hasComponent(Class<C> clazz) {
+        return components.containsKey(clazz);
+    }
+
     public GameObject findGameObject(String name) {
         return scene.findGameObject(name);
     }
 
     public void destroy(GameObject gameObject) {
         scene.destroy(gameObject);
-    }
-
-    public <C extends Component> boolean hasComponent(Class<C> clazz) {
-        return components.containsKey(clazz);
     }
 
     @Override
@@ -161,5 +161,17 @@ public class GameObject implements Update, Render, Cloneable {
             clone.children.add(ch);
         }
         return clone;
+    }
+
+    protected GameObject instantiate(GameObject prefab, Transform parent) {
+        GameObject clone = prefab.clone();
+        if (parent != null) {
+            clone.scene.addGameObject(clone, parent.gameObject);
+        }
+        return clone;
+    }
+
+    protected GameObject instantiate(GameObject prefab) {
+        return instantiate(prefab, null);
     }
 }

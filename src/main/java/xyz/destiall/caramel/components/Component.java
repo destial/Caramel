@@ -9,6 +9,7 @@ import xyz.destiall.caramel.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.graphics.Mesh;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.HideInEditor;
+import xyz.destiall.caramel.interfaces.ShowInEditor;
 import xyz.destiall.caramel.interfaces.Update;
 import xyz.destiall.caramel.objects.GameObject;
 
@@ -35,7 +36,8 @@ public abstract class Component implements Update {
     public void imguiLayer() {
         for (Field field : getClass().getDeclaredFields()) {
             try {
-                if (!field.isAnnotationPresent(HideInEditor.class)) {
+                if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) continue;
+                if (Modifier.isPublic(field.getModifiers()) || field.isAnnotationPresent(ShowInEditor.class)) {
                     field.setAccessible(true);
                     Class<?> type = field.getType();
                     Object value = field.get(this);
@@ -66,7 +68,7 @@ public abstract class Component implements Update {
                         ImGui.sameLine();
                         ImGui.inputText("##texture", string);
                         ImGui.sameLine();
-                        if (ImGui.button("Apply")) {
+                        if (ImGui.button("apply")) {
                             if (mesh.getTexture() == null || !mesh.getTexture().getPath().equalsIgnoreCase(string.get())) {
                                 Texture texture = new Texture(string.get());
                                 if (texture.isLoaded()) {

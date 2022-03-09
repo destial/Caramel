@@ -11,7 +11,7 @@ public class NewScript extends Component {
 
     @Override
     public void start() {
-
+    teststest
     }
 
     @Override

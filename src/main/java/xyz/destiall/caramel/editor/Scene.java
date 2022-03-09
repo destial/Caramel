@@ -59,21 +59,19 @@ public class Scene implements Update {
         editorCamera.update();
         glEnable(GL_DEPTH_TEST);
         if (playing) {
-
             for (GameObject go : gameObjects) go.update();
             for (GameObject go : gameObjects) go.render();
 
         } else {
-
             for (GameObject go : gameObjects) {
                 go.editorUpdate();
-                if (gameCamera == null && go.hasComponent(Camera.class)) {
-                    gameCamera = go.getComponent(Camera.class);
+                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
+                    gameCamera = go.getComponentInChildren(Camera.class);
                 }
             }
 
             if (Input.isKeyDown(GLFW_KEY_G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            else                             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             for (GameObject go : gameObjects) go.render();
 
@@ -171,8 +169,14 @@ public class Scene implements Update {
     }
 
     public GameObject findGameObject(String name) {
-        for (GameObject go : gameObjects) {
-            if (go.name.equals(name)) return go;
+        return findGameObject(gameObjects, name);
+    }
+
+    private GameObject findGameObject(List<GameObject> children, String name) {
+        for (GameObject child : children) {
+            if (child.name.equals(name)) return child;
+            GameObject o = findGameObject(child.children, name);
+            if (o != null) return o;
         }
         return null;
     }
@@ -181,7 +185,7 @@ public class Scene implements Update {
         return playing;
     }
 
-    public EditorCamera getMainCamera() {
+    public EditorCamera getEditorCamera() {
         return editorCamera;
     }
 

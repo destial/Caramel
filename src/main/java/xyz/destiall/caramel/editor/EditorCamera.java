@@ -113,8 +113,8 @@ public class EditorCamera extends Component {
     }
 
     public Matrix4f getProjection() {
-        float delta = 0.0009f;
         Matrix4f to;
+        float delta = 0.0009f;
         if (perspective) {
             to = new Matrix4f().identity().perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
         } else {
@@ -125,6 +125,7 @@ public class EditorCamera extends Component {
             if (Math.abs(1 - up.y) > delta) up.lerp(new Vector3f(up.x, 1f, up.z), Time.deltaTime);
             else up.y = 1;
         }
+
         if (!projection.equals(to, delta)) projection.lerp(to, Time.deltaTime);
         else projection = to;
 

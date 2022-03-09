@@ -8,6 +8,7 @@ import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.editor.Time;
 import xyz.destiall.caramel.graphics.Framebuffer;
+import xyz.destiall.java.events.EventHandling;
 
 import java.io.*;
 import java.net.URL;
@@ -23,6 +24,7 @@ public class Application {
 
     private final MouseListener mouseListener;
     private final KeyListener keyListener;
+    private final EventHandling eventHandling;
     private ImGUILayer imGui;
     private Framebuffer framebuffer;
     private ScriptManager scriptManager;
@@ -42,6 +44,11 @@ public class Application {
         title = "Caramel";
         mouseListener = new MouseListener();
         keyListener = new KeyListener();
+        eventHandling = new EventHandling();
+    }
+
+    public EventHandling getEventHandler() {
+        return eventHandling;
     }
 
     public static Application getApp() {
@@ -81,59 +88,61 @@ public class Application {
 
         init();
         loop();
-
-        imGui.destroyImGui();
-
-        glfwFreeCallbacks(glfwWindow);
-        glfwDestroyWindow(glfwWindow);
-
-        glfwTerminate();
-        glfwSetErrorCallback(null).free();
+        destroy();
     }
 
     private void init() {
+        // Set GLFW Error callbacks to System console
         GLFWErrorCallback.createPrint(System.err).set();
 
+        // Init GLFW and quit if error
         if (!glfwInit()) throw new IllegalStateException("Unable to initialize GLFW");
 
+        // Set GLFW window hints and setup
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+        // Create GLFW window
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
         if (glfwWindow == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
-        glfwSetKeyCallback(glfwWindow, keyListener::keyCallback);
-        glfwSetCursorPosCallback(glfwWindow, mouseListener::mousePosCallback);
-        glfwSetMouseButtonCallback(glfwWindow, mouseListener::mouseButtonCallback);
-        glfwSetScrollCallback(glfwWindow, mouseListener::mouseScrollCallback);
-
+        // Set resize callbacks.
+        // Input callbacks are set in ImGUI
         glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
-            //glViewport(0, 0, width, height);
-            //framebuffer.resize(width, height);
-
-            // glViewport(0, 0, width, height);
         });
 
+        // Set cursor mode
         if (!editorMode) {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
+
+        // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
 
+        // Some janky stuff with OpenGL
         GL.createCapabilities();
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
-        imGui = new ImGUILayer(this);
-        imGui.initImGui();
+        // Create and setup ImGUI
+        if (editorMode) {
+            imGui = new ImGUILayer(this);
+            imGui.initImGui();
+        }
 
+        // Setup and create framebuffer
         framebuffer = new Framebuffer(this.width, this.height);
 
+        // Setup script manager
         scriptManager = new ScriptManager();
+
+        // Register event listeners
+        eventHandling.registerListener(scriptManager);
     }
 
     private void loop() {
@@ -141,12 +150,15 @@ public class Application {
         float endTime;
         float second = 0;
 
+        // Create the scene
         scene = new Scene();
         scene.init();
 
+        // Load all the scripts
         scriptManager.reloadAll();
 
-        while (!glfwWindowShouldClose(glfwWindow)) {
+        // Main loop
+        while (isRunning()) {
             if (Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
@@ -186,6 +198,30 @@ public class Application {
                 Time.isSecond = false;
             }
         }
+    }
+
+    private void destroy() {
+
+        // Destroy any remaining objects
+        scriptManager.destroy();
+
+        // Unregister any remaining listeners
+        eventHandling.unregisterListener(scriptManager);
+
+        // Destroy ImGUI
+        imGui.destroyImGui();
+
+        // Free GLFW callbacks and destroy the window (if not yet destroyed)
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
+
+        // Terminate the window and free the error callbacks
+        glfwTerminate();
+        glfwSetErrorCallback(null).free();
+    }
+
+    public boolean isRunning() {
+        return !glfwWindowShouldClose(glfwWindow);
     }
 
     public ImGUILayer getImGui() {

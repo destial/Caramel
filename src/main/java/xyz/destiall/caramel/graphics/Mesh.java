@@ -206,7 +206,7 @@ public class Mesh implements Render {
     @Override
     public void render() {
         shader.use();
-        EditorCamera camera = Application.getApp().getCurrentScene().getMainCamera();
+        EditorCamera camera = Application.getApp().getCurrentScene().getEditorCamera();
         if (texture != null) {
             shader.uploadTexture("texSampler", 0);
             glActiveTexture(GL_TEXTURE0);
