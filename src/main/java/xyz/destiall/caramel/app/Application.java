@@ -6,6 +6,7 @@ import xyz.destiall.caramel.app.input.Input;
 import xyz.destiall.caramel.app.scripts.ScriptManager;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.editor.Time;
 import xyz.destiall.caramel.graphics.Framebuffer;
 
 import java.io.*;

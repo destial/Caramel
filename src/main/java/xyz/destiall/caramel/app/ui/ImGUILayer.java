@@ -10,7 +10,7 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import org.joml.Vector2f;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.app.Time;
+import xyz.destiall.caramel.editor.Time;
 
 import static org.lwjgl.glfw.GLFW.*;
 

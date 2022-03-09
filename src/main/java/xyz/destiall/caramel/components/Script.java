@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.components;
 
-import xyz.destiall.caramel.app.Time;
+import xyz.destiall.caramel.editor.Time;
 import xyz.destiall.caramel.objects.GameObject;
 
 public class Script extends Component {

@@ -11,6 +11,14 @@ public class Input {
         return Application.getApp().getMouseListener().isButtonDown(mouse);
     }
 
+    public static boolean isMousePressed(int mouse) {
+        return Application.getApp().getMouseListener().isButtonPressedThisFrame(mouse);
+    }
+
+    public static boolean isKeyPressed(int key) {
+        return Application.getApp().getKeyListener().isKeyPressedThisFrame(key);
+    }
+
     public static float getMouseDeltaX() {
         return Application.getApp().getMouseListener().getDeltaX();
     }

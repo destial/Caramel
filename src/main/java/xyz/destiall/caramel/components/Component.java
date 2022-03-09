@@ -5,7 +5,7 @@ import imgui.type.ImString;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.editor.ImGuiUtils;
+import xyz.destiall.caramel.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.graphics.Mesh;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.HideInEditor;

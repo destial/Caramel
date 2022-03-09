@@ -3,7 +3,6 @@ package xyz.destiall.caramel.editor;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.app.Time;
 import xyz.destiall.caramel.app.input.Input;
 import xyz.destiall.caramel.components.Component;
 import xyz.destiall.caramel.interfaces.HideInEditor;
@@ -14,6 +13,7 @@ import static org.lwjgl.glfw.GLFW.*;
 public class EditorCamera extends Component {
     public Matrix4f projection, view, inverseProjection, inverseView;
     public Vector3f target;
+    private boolean perspective = true;
 
     @HideInEditor
     public Vector3f forward;
@@ -39,6 +39,10 @@ public class EditorCamera extends Component {
         up = new Vector3f(transform.up);
         this.inverseProjection = new Matrix4f();
         this.inverseView = new Matrix4f();
+
+        projection.identity();
+        projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
+        inverseProjection = new Matrix4f(projection).invert();
     }
 
     @Override
@@ -68,16 +72,31 @@ public class EditorCamera extends Component {
                 transform.position.sub(up.mul(Time.deltaTime * (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) ? 5.f : 1), new Vector3f()));
             }
 
-            float mouseX = -Input.getMouseDeltaX();
-            float mouseY = Input.getMouseDeltaY();
+            if (perspective) {
+                float mouseX = -Input.getMouseDeltaX();
+                float mouseY = Input.getMouseDeltaY();
 
-            target.rotateY(mouseX * Time.deltaTime);
-            Vector3f right = up.cross(target, new Vector3f());
-            target.rotateAxis(mouseY * Time.deltaTime, right.x, 0, right.z);
-            forward.set(target.x, 0f, target.z).normalize();
-            up = forward.cross(right.normalize(), new Vector3f());
-            up.y = 1;
+                target.rotateY(mouseX * Time.deltaTime);
+                Vector3f right = up.cross(target, new Vector3f());
+                right.y = 0;
+                right.normalize();
+                target.rotateAxis(mouseY * Time.deltaTime, right.x, 0, right.z);
+
+                forward.set(target.x, 0f, target.z).normalize();
+                up = forward.cross(right.normalize(), new Vector3f());
+                up.y = 1;
+                up.normalize();
+            }
         }
+
+        if (Input.isKeyPressed(GLFW_KEY_C)) {
+            toggleCameraView();
+        }
+    }
+
+    public void toggleCameraView() {
+        perspective = !perspective;
+        // projection.identity();
     }
 
     @Override
@@ -94,8 +113,21 @@ public class EditorCamera extends Component {
     }
 
     public Matrix4f getProjection() {
-        projection.identity();
-        projection = projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far);
+        float delta = 0.0009f;
+        Matrix4f to;
+        if (perspective) {
+            to = new Matrix4f().identity().perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
+        } else {
+            to = new Matrix4f().identity().ortho(-8, 8, -4.5f, 4.5f, near, far, true, new Matrix4f());
+            if (Math.abs(target.y) > delta) target.lerp(new Vector3f(target.x, 0, target.z), Time.deltaTime);
+            else target.y = 0;
+
+            if (Math.abs(1 - up.y) > delta) up.lerp(new Vector3f(up.x, 1f, up.z), Time.deltaTime);
+            else up.y = 1;
+        }
+        if (!projection.equals(to, delta)) projection.lerp(to, Time.deltaTime);
+        else projection = to;
+
         inverseProjection = new Matrix4f(projection).invert();
         return projection;
     }

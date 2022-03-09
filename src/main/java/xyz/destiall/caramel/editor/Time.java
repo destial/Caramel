@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.app;
+package xyz.destiall.caramel.editor;
 
 public class Time {
     public static final float timeStarted = System.nanoTime();

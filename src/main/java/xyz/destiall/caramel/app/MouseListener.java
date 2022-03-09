@@ -11,6 +11,8 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class MouseListener {
     private final boolean[] mouseButtonPressed = new boolean[GLFW_MOUSE_BUTTON_LAST];
+    private final boolean[] mouseButtonPressedThisFrame = new boolean[GLFW_MOUSE_BUTTON_LAST];
+    private final boolean[] mouseButtonReleased = new boolean[GLFW_MOUSE_BUTTON_LAST];
     private final Vector2f gameViewportPos = new Vector2f();
     private final Vector2f gameViewportSize = new Vector2f();
     private double scrollX, scrollY, lastScrollX, lastScrollY;
@@ -29,6 +31,7 @@ public class MouseListener {
         lastScrollX = 0;
         lastScrollY = 0;
         isDragging = false;
+        Arrays.fill(mouseButtonReleased, true);
     }
 
     public void mousePosCallback(long window, double xPos, double yPos) {
@@ -56,8 +59,13 @@ public class MouseListener {
             yPos < Application.getApp().getImGui().getGameWindowPos().y + Application.getApp().getImGui().getGameWindowSize().y) {
             if (action == GLFW_PRESS) {
                 mouseButtonPressed[button] = true;
+                if (mouseButtonReleased[button]) {
+                    mouseButtonPressedThisFrame[button] = true;
+                    mouseButtonReleased[button] = false;
+                }
             } else if (action == GLFW_RELEASE) {
                 mouseButtonPressed[button] = false;
+                mouseButtonReleased[button] = true;
                 isDragging = false;
             }
         }
@@ -76,6 +84,7 @@ public class MouseListener {
         lastScrollX = scrollX;
         lastScrollY = scrollY;
         if (firstFrame) firstFrame = false;
+        Arrays.fill(mouseButtonPressedThisFrame, false);
     }
 
     public float getX() {
@@ -138,6 +147,10 @@ public class MouseListener {
 
     public boolean isButtonDown(int button) {
         return mouseButtonPressed[button];
+    }
+
+    public boolean isButtonPressedThisFrame(int button) {
+        return mouseButtonPressedThisFrame[button];
     }
 
     public void setGameViewportPos(Vector2f vector2f) {
