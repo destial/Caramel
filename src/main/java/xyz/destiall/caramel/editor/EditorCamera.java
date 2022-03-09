@@ -2,9 +2,9 @@ package xyz.destiall.caramel.editor;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.app.input.Input;
-import xyz.destiall.caramel.app.Time;
 import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.app.Time;
+import xyz.destiall.caramel.app.input.Input;
 import xyz.destiall.caramel.components.Component;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.objects.GameObject;
@@ -48,7 +48,7 @@ public class EditorCamera extends Component {
 
     @Override
     public void update() {
-        if (Input.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
+        if (Input.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
             if (Input.isKeyDown(GLFW_KEY_W)) {
                 transform.position.add(target.mul(Time.deltaTime * (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) ? 5.f : 1), new Vector3f()));
             } else if (Input.isKeyDown(GLFW_KEY_S)) {

@@ -1,18 +1,16 @@
 package xyz.destiall.caramel.app.ui;
 
-import imgui.*;
+import imgui.ImGui;
+import imgui.ImGuiIO;
+import imgui.ImVec2;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
-import imgui.flag.ImGuiBackendFlags;
-import imgui.flag.ImGuiCond;
-import imgui.flag.ImGuiConfigFlags;
-import imgui.flag.ImGuiStyleVar;
-import imgui.flag.ImGuiWindowFlags;
+import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import org.joml.Vector2f;
-import xyz.destiall.caramel.app.Time;
 import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.app.Time;
 
 import static org.lwjgl.glfw.GLFW.*;
 

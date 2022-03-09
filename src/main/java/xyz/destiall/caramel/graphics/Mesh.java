@@ -1,15 +1,11 @@
 package xyz.destiall.caramel.graphics;
 
-import org.joml.Matrix4f;
-import org.joml.Quaternionf;
-import org.joml.Vector2f;
-import org.joml.Vector3f;
-import org.joml.Vector4f;
+import org.joml.*;
 import org.lwjgl.BufferUtils;
 import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.components.Transform;
 import xyz.destiall.caramel.editor.EditorCamera;
 import xyz.destiall.caramel.interfaces.Render;
-import xyz.destiall.caramel.components.Transform;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

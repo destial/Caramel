@@ -1,8 +1,8 @@
 package xyz.destiall.caramel.components;
 
 import xyz.destiall.caramel.graphics.Mesh;
-import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.HideInEditor;
+import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.objects.GameObject;
 
 public class MeshRenderer extends Component implements Render {

@@ -9,11 +9,19 @@ import xyz.destiall.caramel.editor.CreateScript;
 import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.objects.GameObject;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 
 public class InspectorPanel extends Panel {
+    public static final Set<Class<?>> COMPONENTS = new HashSet<>();
+    static {
+        COMPONENTS.add(Camera.class);
+        COMPONENTS.add(MeshRenderer.class);
+    }
+
     private final ImString search = new ImString();
-    private static final Class<?>[] components = { Camera.class,  MeshRenderer.class };
     private boolean addingComponents;
     private boolean addingScript;
 
@@ -40,7 +48,7 @@ public class InspectorPanel extends Panel {
                     search.clear();
                     search.set(newInput);
                 }
-                for (Class<?> c : components) {
+                for (Class<?> c : COMPONENTS) {
                     if (scene.selectedGameObject.hasComponent((Class<? extends Component>) c)) continue;
                     if (search.isEmpty() || c.getSimpleName().toLowerCase().contains(search.get().toLowerCase())) {
                         if (ImGui.selectable(c.getSimpleName())) {
@@ -54,7 +62,8 @@ public class InspectorPanel extends Panel {
                 }
                 if (addingScript) {
                     ImString scriptName = new ImString("NewScript");
-                    if (ImGui.inputText("##name", scriptName)) {
+                    ImGui.inputText("##name", scriptName);
+                    if (ImGui.button("Create")) {
                         CreateScript.create(scriptName.get());
                         addingComponents = false;
                     }

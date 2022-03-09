@@ -1,5 +1,7 @@
 package xyz.destiall.caramel.editor;
 
+import xyz.destiall.caramel.app.Application;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -10,6 +12,7 @@ public class CreateScript {
             "package scripts;\n" +
             "\n" +
             "import xyz.destiall.caramel.objects.GameObject;\n" +
+            "import xyz.destiall.caramel.components.Component;\n" +
             "\n" +
             "public class ${name} extends Component {\n" +
             "    public ${name}(GameObject gameObject) {\n" +
@@ -28,7 +31,7 @@ public class CreateScript {
             "}";
 
     public static File create(String className) {
-        File scriptFolder = new File("assets/scripts");
+        File scriptFolder = new File("assets/scripts/");
         if (!scriptFolder.exists()) scriptFolder.mkdir();
         String contents = BASE.replace("${name}", className);
         File scriptFile = new File(scriptFolder, className + ".java");
@@ -38,6 +41,8 @@ public class CreateScript {
             BufferedWriter buffer = new BufferedWriter(write);
             buffer.write(contents);
             buffer.close();
+
+            Application.getApp().getScriptManager().reloadScript(scriptFile);
         } catch (Exception e) {
             e.printStackTrace();
         }

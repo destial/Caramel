@@ -1,15 +1,6 @@
 package xyz.destiall.caramel.graphics;
 
-import com.mokiat.data.front.parser.IOBJParser;
-import com.mokiat.data.front.parser.OBJDataReference;
-import com.mokiat.data.front.parser.OBJFace;
-import com.mokiat.data.front.parser.OBJMesh;
-import com.mokiat.data.front.parser.OBJModel;
-import com.mokiat.data.front.parser.OBJNormal;
-import com.mokiat.data.front.parser.OBJObject;
-import com.mokiat.data.front.parser.OBJParser;
-import com.mokiat.data.front.parser.OBJTexCoord;
-import com.mokiat.data.front.parser.OBJVertex;
+import com.mokiat.data.front.parser.*;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;

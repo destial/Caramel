@@ -15,10 +15,7 @@ import xyz.destiall.caramel.objects.GameObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class HierarchyPanel extends Panel {
     private boolean addingComponentsHierarchy;

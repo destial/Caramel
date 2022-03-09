@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.objects;
 
 import org.joml.Quaternionf;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.components.Component;
 import xyz.destiall.caramel.components.MeshRenderer;
@@ -10,11 +9,7 @@ import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GameObject implements Update, Render, Cloneable {
     private final Map<Class<? extends Component>, Component> components;
