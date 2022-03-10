@@ -6,10 +6,7 @@ import xyz.destiall.caramel.app.input.Input;
 import xyz.destiall.caramel.components.Camera;
 import xyz.destiall.caramel.components.MeshRenderer;
 import xyz.destiall.caramel.components.Script;
-import xyz.destiall.caramel.editor.ui.HierarchyPanel;
-import xyz.destiall.caramel.editor.ui.InspectorPanel;
-import xyz.destiall.caramel.editor.ui.MenuBarPanel;
-import xyz.destiall.caramel.editor.ui.Panel;
+import xyz.destiall.caramel.editor.ui.*;
 import xyz.destiall.caramel.graphics.Mesh;
 import xyz.destiall.caramel.graphics.MeshBuilder;
 import xyz.destiall.caramel.graphics.Texture;
@@ -17,6 +14,7 @@ import xyz.destiall.caramel.interfaces.Update;
 import xyz.destiall.caramel.objects.GameObject;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
 import static org.lwjgl.opengl.GL11.*;
@@ -48,6 +46,7 @@ public class Scene implements Update {
         panels.add(new HierarchyPanel(this));
         panels.add(new InspectorPanel(this));
         panels.add(new MenuBarPanel(this));
+        panels.add(new ConsolePanel(this));
     }
 
     public List<GameObject> getGameObjects() {
@@ -207,5 +206,16 @@ public class Scene implements Update {
 
     public void addGameObject(GameObject gameObject, GameObject parent) {
         toAdd.put(parent, gameObject);
+    }
+
+    public void forEachGameObject(Consumer<GameObject> func) {
+        forEachGameObject(gameObjects, func);
+    }
+
+    private void forEachGameObject(List<GameObject> objects, Consumer<GameObject> func) {
+        for (GameObject gameObject : objects) {
+            if (gameObject.children.size() > 0) forEachGameObject(gameObject.children, func);
+            func.accept(gameObject);
+        }
     }
 }

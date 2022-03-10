@@ -21,6 +21,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Application {
     private final boolean editorMode = true;
+    private boolean running = false;
 
     private final MouseListener mouseListener;
     private final KeyListener keyListener;
@@ -157,14 +158,14 @@ public class Application {
         // Load all the scripts
         scriptManager.reloadAll();
 
+        running = true;
         // Main loop
-        while (isRunning()) {
+        while (!glfwWindowShouldClose(glfwWindow) && running) {
+            glfwPollEvents();
             if (Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
             }
-
-            glfwPollEvents();
 
             glViewport(0, 0, width, height);
             framebuffer.bind();
@@ -198,6 +199,8 @@ public class Application {
                 Time.isSecond = false;
             }
         }
+
+        running = false;
     }
 
     private void destroy() {
@@ -221,7 +224,11 @@ public class Application {
     }
 
     public boolean isRunning() {
-        return !glfwWindowShouldClose(glfwWindow);
+        return running;
+    }
+
+    public void setRunning(boolean run) {
+        this.running = run;
     }
 
     public ImGUILayer getImGui() {
