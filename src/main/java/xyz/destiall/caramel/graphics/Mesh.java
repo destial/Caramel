@@ -15,6 +15,10 @@ import java.util.List;
 import static org.lwjgl.opengl.GL30.*;
 
 public class Mesh implements Render {
+    private final List<Vertex> vertexArray;
+    private final List<Integer> elementArray;
+    private final Matrix4f model;
+
     public int type;
 
     private Shader shader;
@@ -23,10 +27,6 @@ public class Mesh implements Render {
     private int vaoId, vboId;
     private boolean dirty = false;
     private boolean drawArrays = false;
-
-    private final List<Vertex> vertexArray;
-    private final List<Integer> elementArray;
-    private final Matrix4f model;
 
     public Mesh() {
         vertexArray = new ArrayList<>();
@@ -240,9 +240,9 @@ public class Mesh implements Render {
         glBindVertexArray(0);
 
         shader.detach();
-    }
 
-    public int getVaoId() {
-        return vaoId;
+        if (texture != null) {
+            texture.unbind();
+        }
     }
 }
