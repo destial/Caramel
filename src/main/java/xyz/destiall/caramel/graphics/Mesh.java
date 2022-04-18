@@ -1,6 +1,8 @@
 package xyz.destiall.caramel.graphics;
 
-import org.joml.*;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.components.Transform;
@@ -12,12 +14,30 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL30.*;
+import static org.lwjgl.opengl.GL30.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL30.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL30.GL_ELEMENT_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL30.GL_FLOAT;
+import static org.lwjgl.opengl.GL30.GL_STATIC_DRAW;
+import static org.lwjgl.opengl.GL30.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL30.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL30.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL30.glActiveTexture;
+import static org.lwjgl.opengl.GL30.glBindBuffer;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glBufferData;
+import static org.lwjgl.opengl.GL30.glBufferSubData;
+import static org.lwjgl.opengl.GL30.glDisableVertexAttribArray;
+import static org.lwjgl.opengl.GL30.glDrawArrays;
+import static org.lwjgl.opengl.GL30.glDrawElements;
+import static org.lwjgl.opengl.GL30.glEnableVertexAttribArray;
+import static org.lwjgl.opengl.GL30.glGenBuffers;
+import static org.lwjgl.opengl.GL30.glGenVertexArrays;
+import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
-public class Mesh implements Render {
+public class Mesh {
     private final List<Vertex> vertexArray;
     private final List<Integer> elementArray;
-    private final Matrix4f model;
 
     public int type;
 
@@ -31,8 +51,6 @@ public class Mesh implements Render {
     public Mesh() {
         vertexArray = new ArrayList<>();
         elementArray = new ArrayList<>(6);
-        model = new Matrix4f();
-        model.identity();
         type = GL_TRIANGLES;
     }
 
@@ -104,10 +122,12 @@ public class Mesh implements Render {
     }
 
     public void build() {
-        if (texture != null) {
-            shader = Shader.getShader("default");
-        } else {
-            shader = Shader.getShader("color");
+        if (shader == null) {
+            if (texture != null) {
+                shader = Shader.getShader("default");
+            } else {
+                shader = Shader.getShader("color");
+            }
         }
 
         vaoId = glGenVertexArrays();
@@ -191,20 +211,7 @@ public class Mesh implements Render {
         return texture;
     }
 
-    public void transform(Transform transform) {
-        model.identity();
-
-        model.translate(new Vector3f(transform.position).add(transform.localPosition))
-             .rotate(new Quaternionf(transform.rotation).add(transform.localRotation))
-             .scale(new Vector3f(transform.scale).add(transform.localScale));
-
-        //model.translate(new Vector3f(transform.localPosition))
-        //        .rotate(new Quaternionf(transform.localRotation))
-        //        .scale(new Vector3f(transform.localScale));
-    }
-
-    @Override
-    public void render() {
+    public void render(Transform transform) {
         shader.use();
         EditorCamera camera = Application.getApp().getCurrentScene().getEditorCamera();
         if (texture != null) {
@@ -221,7 +228,7 @@ public class Mesh implements Render {
 
         shader.uploadMat4f("uProjection", camera.getProjection());
         shader.uploadMat4f("uView", camera.getView());
-        shader.uploadMat4f("uModel", model);
+        shader.uploadMat4f("uModel", transform.model);
 
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(0);

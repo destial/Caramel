@@ -9,7 +9,13 @@ import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class GameObject implements Update, Render, Cloneable {
     private final Map<Class<? extends Component>, Component> components;
@@ -99,6 +105,23 @@ public class GameObject implements Update, Render, Cloneable {
             if (component != null) return clazz.cast(component);
         }
         return null;
+    }
+
+    public <C extends Component> Set<C> getComponentsInChildren(Class<C> clazz) {
+        Set<C> set = new HashSet<>();
+        C component = getComponent(clazz);
+        if (component != null) set.add(component);
+        getComponentsInChildren(clazz, set);
+        return set;
+    }
+
+    private <C extends Component> void getComponentsInChildren(Class<C> clazz, Set<C> set) {
+        for (GameObject child : children) {
+            if (child.hasComponent(clazz)) {
+                set.add(child.getComponent(clazz));
+            }
+            child.getComponentsInChildren(clazz, set);
+        }
     }
 
     public boolean addComponent(Component component) {

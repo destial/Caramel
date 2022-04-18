@@ -1,6 +1,15 @@
 package xyz.destiall.caramel.graphics;
 
-import com.mokiat.data.front.parser.*;
+import com.mokiat.data.front.parser.IOBJParser;
+import com.mokiat.data.front.parser.OBJDataReference;
+import com.mokiat.data.front.parser.OBJFace;
+import com.mokiat.data.front.parser.OBJMesh;
+import com.mokiat.data.front.parser.OBJModel;
+import com.mokiat.data.front.parser.OBJNormal;
+import com.mokiat.data.front.parser.OBJObject;
+import com.mokiat.data.front.parser.OBJParser;
+import com.mokiat.data.front.parser.OBJTexCoord;
+import com.mokiat.data.front.parser.OBJVertex;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -28,22 +37,28 @@ public class MeshBuilder {
     public static Mesh createCube(Vector4f color, float length) {
         Mesh mesh = new Mesh();
 
-        mesh.pushVertex(0.5f * length, -0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
-        mesh.pushVertex(-0.5f * length, -0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
-        mesh.pushVertex(-0.5f * length, 0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
-        mesh.pushVertex(0.5f * length, 0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
-        mesh.pushVertex(0.5f * length, -0.5f * length, 0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
-        mesh.pushVertex(0.5f * length, 0.5f * length, 0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
-        mesh.pushVertex(-0.5f * length, 0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
         mesh.pushVertex(-0.5f * length, -0.5f * length, 0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(-0.5f * length, -0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(0.5f * length, -0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(0.5f * length, -0.5f * length, 0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(-0.5f * length, 0.5f * length, 0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(-0.5f * length, 0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(-0.5f * length, 0.5f * length, -0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
+        mesh.pushVertex(0.5f * length, 0.5f * length, 0.5f * length,   color.x, color.y, color.z, color.w,   1f, 1f,   0f, 0f, 0f);
 
         mesh.pushIndex(
-                1, 3, 0, 1, 3, 2,
-                0, 5, 4, 0, 5, 3,
-                4, 6, 7, 4, 6, 5,
-                7, 2, 1, 7, 2, 6,
-                6, 3, 2, 6, 3, 5,
-                1, 4, 0, 1, 4, 7
+                0, 1, 2,
+                0, 2, 3,
+                0, 4, 7,
+                0, 7, 3,
+                3, 7, 6,
+                3, 6, 2,
+                2, 6, 5,
+                2, 5, 1,
+                1, 5, 4,
+                1, 4, 0,
+                4, 5, 6,
+                4, 6, 7
         );
 
         return mesh;

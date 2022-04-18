@@ -8,7 +8,16 @@ import xyz.destiall.caramel.components.Component;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.objects.GameObject;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 public class EditorCamera extends Component {
     public Matrix4f projection, view, inverseProjection, inverseView;
@@ -52,7 +61,8 @@ public class EditorCamera extends Component {
 
     @Override
     public void update() {
-        if (Input.isMouseDown(GLFW_MOUSE_BUTTON_2)) {
+        // if (Input.isMouseDown(GLFW_MOUSE_BUTTON_1))
+        {
             if (Input.isKeyDown(GLFW_KEY_W)) {
                 transform.position.add(target.mul(Time.deltaTime * (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) ? 5.f : 1), new Vector3f()));
             } else if (Input.isKeyDown(GLFW_KEY_S)) {
@@ -72,7 +82,8 @@ public class EditorCamera extends Component {
                 transform.position.sub(up.mul(Time.deltaTime * (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) ? 5.f : 1), new Vector3f()));
             }
 
-            if (perspective) {
+            // if (perspective)
+            {
                 float mouseX = -Input.getMouseDeltaX();
                 float mouseY = Input.getMouseDeltaY();
 

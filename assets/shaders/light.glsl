@@ -6,6 +6,8 @@ layout (location=1) in vec4 aColor;
 layout (location=2) in vec2 aTexCoords;
 layout (location=3) in vec3 aNormal;
 
+const int MAX_LIGHTS = 8;
+
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform mat4 uModel;
@@ -27,13 +29,14 @@ void main() {
 
 uniform sampler2D texSampler;
 
+in int MAX_LIGHTS;
 in vec4 fColor;
 in vec2 fTexCoords;
 in vec3 fPos;
 in vec3 fNormal;
 
-out vec4 color;
+out vec4 FragColor;
 
 void main() {
-    color = texture(texSampler, fTexCoords);
+    FragColor = fColor;
 }

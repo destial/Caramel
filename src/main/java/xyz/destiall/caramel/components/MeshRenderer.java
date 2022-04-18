@@ -1,5 +1,7 @@
 package xyz.destiall.caramel.components;
 
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import xyz.destiall.caramel.graphics.Mesh;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.interfaces.Render;
@@ -20,7 +22,11 @@ public class MeshRenderer extends Component implements Render {
 
     @Override
     public void render() {
-        mesh.render();
+        transform.model.identity();
+        transform.model.translate(new Vector3f(transform.position).add(transform.localPosition))
+                .rotate(new Quaternionf(transform.rotation).add(transform.localRotation))
+                .scale(new Vector3f(transform.scale).mul(transform.localScale));
+        mesh.render(transform);
     }
 
     @Override
@@ -35,6 +41,6 @@ public class MeshRenderer extends Component implements Render {
 
     @Override
     public void lateUpdate() {
-        mesh.transform(transform);
+
     }
 }

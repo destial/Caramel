@@ -1,6 +1,7 @@
 package scripts;
 
 import xyz.destiall.caramel.app.Debug;
+import xyz.destiall.caramel.app.input.Input;
 import xyz.destiall.caramel.components.Component;
 import xyz.destiall.caramel.editor.Time;
 import xyz.destiall.caramel.objects.GameObject;
@@ -12,11 +13,11 @@ public class NewScript extends Component {
 
     @Override
     public void start() {
-        Debug.log("testing");
+
     }
 
     @Override
     public void update() {
-        transform.rotation.rotateX(Time.deltaTime);
+        Debug.log(Input.getMouseDeltaX() + " : " + Input.getMouseDeltaY());
     }
 }

@@ -1,6 +1,9 @@
 package xyz.destiall.caramel.app.scripts;
 
-import ch.obermuhlner.scriptengine.java.*;
+import ch.obermuhlner.scriptengine.java.JavaCompiledScript;
+import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
+import ch.obermuhlner.scriptengine.java.JavaScriptEngineFactory;
+import ch.obermuhlner.scriptengine.java.MemoryFileManager;
 import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.Debug;
@@ -13,10 +16,19 @@ import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.reflection.Reflect;
 
 import javax.script.ScriptException;
-import javax.tools.*;
+import javax.tools.DiagnosticCollector;
+import javax.tools.JavaCompiler;
+import javax.tools.JavaFileObject;
+import javax.tools.StandardJavaFileManager;
+import javax.tools.StandardLocation;
+import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
 
 public class ScriptManager implements Listener {
     private final FileWatcher watcher;

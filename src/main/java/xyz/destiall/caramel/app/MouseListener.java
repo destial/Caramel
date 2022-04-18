@@ -7,7 +7,10 @@ import xyz.destiall.caramel.editor.EditorCamera;
 
 import java.util.Arrays;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LAST;
+import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
+import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
 public class MouseListener {
     private final boolean[] mouseButtonPressed = new boolean[GLFW_MOUSE_BUTTON_LAST];

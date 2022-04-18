@@ -1,5 +1,6 @@
 package xyz.destiall.caramel.app.input;
 
+import org.joml.Vector2d;
 import xyz.destiall.caramel.app.Application;
 
 public class Input {
@@ -21,6 +22,10 @@ public class Input {
 
     public static float getMouseDeltaX() {
         return Application.getApp().getMouseListener().getDeltaX();
+    }
+
+    public static Vector2d getMousePosition() {
+        return new Vector2d(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
     }
 
     public static float getMouseDeltaY() {

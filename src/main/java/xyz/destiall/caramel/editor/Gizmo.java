@@ -22,7 +22,6 @@ public class Gizmo implements Render {
     @Override
     public void render() {
         if (target == null) return;
-        mesh.transform(target.transform);
-        mesh.render();
+        mesh.render(target.transform);
     }
 }
