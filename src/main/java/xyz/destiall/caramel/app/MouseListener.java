@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.editor.EditorCamera;
+import xyz.destiall.caramel.editor.ui.GamePanel;
 
 import java.util.Arrays;
 
@@ -45,10 +46,10 @@ public class MouseListener {
             lastY = yPos;
             return;
         }
-        if (xPos > Application.getApp().getImGui().getGameWindowPos().x &&
-                yPos > Application.getApp().getImGui().getGameWindowPos().y &&
-                xPos < Application.getApp().getImGui().getGameWindowPos().x + Application.getApp().getImGui().getGameWindowSize().x &&
-                yPos < Application.getApp().getImGui().getGameWindowPos().y + Application.getApp().getImGui().getGameWindowSize().y) {
+        if (xPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x &&
+                yPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y &&
+                xPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().x &&
+                yPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().y) {
         } else {
             Arrays.fill(mouseButtonPressed, false);
         }
@@ -56,10 +57,10 @@ public class MouseListener {
     }
 
     public void mouseButtonCallback(long window, int button, int action, int mods) {
-        if (xPos > Application.getApp().getImGui().getGameWindowPos().x &&
-            yPos > Application.getApp().getImGui().getGameWindowPos().y &&
-            xPos < Application.getApp().getImGui().getGameWindowPos().x + Application.getApp().getImGui().getGameWindowSize().x &&
-            yPos < Application.getApp().getImGui().getGameWindowPos().y + Application.getApp().getImGui().getGameWindowSize().y) {
+        if (xPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x &&
+            yPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y &&
+            xPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().x &&
+            yPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().y) {
             if (action == GLFW_PRESS) {
                 mouseButtonPressed[button] = true;
                 if (mouseButtonReleased[button]) {

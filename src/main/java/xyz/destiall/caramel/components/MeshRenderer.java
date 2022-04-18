@@ -3,12 +3,10 @@ package xyz.destiall.caramel.components;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.graphics.Mesh;
-import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.objects.GameObject;
 
 public class MeshRenderer extends Component implements Render {
-    @HideInEditor private Transform last;
 
     public Mesh mesh;
 

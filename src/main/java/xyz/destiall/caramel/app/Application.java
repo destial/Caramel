@@ -157,7 +157,7 @@ public class Application {
 
         // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
         glfwShowWindow(glfwWindow);
 
         // Some janky stuff with OpenGL
@@ -222,6 +222,7 @@ public class Application {
             endTime = Time.getElapsedTime();
             Time.deltaTime = endTime - startTime;
             if (Time.deltaTime <= 0) {
+                Debug.log("ouch");
                 Time.deltaTime = 1 / 60f;
             }
             startTime = endTime;
@@ -311,9 +312,9 @@ public class Application {
                         out.close();
                         in.close();
                     }
-                } catch (IOException ex) {
+                } catch (IOException e) {
                     System.err.println("Could not save " + outFile.getName() + " to " + outFile);
-                    ex.printStackTrace();
+                    e.printStackTrace();
                 }
 
             }
@@ -335,7 +336,7 @@ public class Application {
                     connection.setUseCaches(false);
                     return connection.getInputStream();
                 }
-            } catch (IOException var4) {
+            } catch (IOException e) {
                 return null;
             }
         }

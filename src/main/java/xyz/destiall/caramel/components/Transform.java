@@ -37,7 +37,5 @@ public class Transform extends Component {
     @Override
     public void start() {}
 
-    public void update() {
-
-    }
+    public void update() {}
 }

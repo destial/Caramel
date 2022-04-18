@@ -5,12 +5,12 @@ import xyz.destiall.caramel.app.utils.Pair;
 import xyz.destiall.caramel.editor.Scene;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 public class ConsolePanel extends Panel {
-    public static final List<Pair<String, Level>> LOGS = new ArrayList<>();
+    private static final int LOG_LIMIT = 100;
+    public static final CopyOnWriteArrayList<Pair<String, Level>> LOGS = new CopyOnWriteArrayList<>();
 
     public ConsolePanel(Scene scene) {
         super(scene);
@@ -20,6 +20,9 @@ public class ConsolePanel extends Panel {
         String[] split = log.split("\n");
         for (String s : split) {
             LOGS.add(new Pair<>(s, Level.INFO));
+            while (LOGS.size() >= LOG_LIMIT) {
+                LOGS.remove(0);
+            }
         }
     }
 
@@ -27,6 +30,9 @@ public class ConsolePanel extends Panel {
         String[] split = log.split("\n");
         for (String s : split) {
             LOGS.add(new Pair<>(s, Level.WARNING));
+            while (LOGS.size() >= LOG_LIMIT) {
+                LOGS.remove(0);
+            }
         }
     }
 
@@ -34,17 +40,18 @@ public class ConsolePanel extends Panel {
         String[] split = log.split("\n");
         for (String s : split) {
             LOGS.add(new Pair<>(s, Level.SEVERE));
+            while (LOGS.size() >= LOG_LIMIT) {
+                LOGS.remove(0);
+            }
         }
     }
 
     @Override
     public void imguiLayer() {
         ImGui.begin("Console");
-        //ImGui.beginListBox("##logs");
         for (Pair<String, Level> log : LOGS) {
             ImGui.textColored(getColor(log.getValue()), log.getKey());
         }
-        //ImGui.endListBox();
         ImGui.end();
 
     }

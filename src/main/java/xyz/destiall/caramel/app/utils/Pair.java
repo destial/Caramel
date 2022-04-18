@@ -1,6 +1,8 @@
 package xyz.destiall.caramel.app.utils;
 
-public class Pair<K,V> {
+import java.util.Map;
+
+public class Pair<K,V> implements Map.Entry<K, V> {
     private K key;
     private V value;
     public Pair(K key, V value) {
@@ -8,10 +10,12 @@ public class Pair<K,V> {
         this.value = value;
     }
 
+    @Override
     public K getKey() {
         return key;
     }
 
+    @Override
     public V getValue() {
         return value;
     }
@@ -20,7 +24,10 @@ public class Pair<K,V> {
         this.key = key;
     }
 
-    public void setValue(V value) {
+    @Override
+    public V setValue(V value) {
+        V previous = this.value;
         this.value = value;
+        return previous;
     }
 }

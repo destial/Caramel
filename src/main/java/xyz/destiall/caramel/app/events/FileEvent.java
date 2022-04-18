@@ -6,21 +6,22 @@ import java.io.File;
 
 public class FileEvent extends Event {
     private final File file;
-    private final Kind kind;
-    public FileEvent(File file, Kind kind) {
+    private final Type type;
+    public FileEvent(File file, Type type) {
+        super(true);
         this.file = file;
-        this.kind = kind;
+        this.type = type;
     }
 
     public File getFile() {
         return file;
     }
 
-    public Kind getKind() {
-        return kind;
+    public Type getType() {
+        return type;
     }
 
-    public enum Kind {
+    public enum Type {
         CREATE, MODIFY, DELETE
     }
 }

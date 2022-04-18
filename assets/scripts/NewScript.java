@@ -13,11 +13,11 @@ public class NewScript extends Component {
 
     @Override
     public void start() {
-
+        transform.rotation.rotateX((float) Math.toRadians(180));
     }
 
     @Override
     public void update() {
-        Debug.log(Input.getMouseDeltaX() + " : " + Input.getMouseDeltaY());
+        transform.rotation.rotateY(Time.deltaTime * 1.3f);
     }
 }

@@ -24,24 +24,23 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ScriptManager implements Listener {
     private final FileWatcher watcher;
     private final File scriptsRootFolder;
     private final JavaScriptEngine engine;
-    private final HashMap<String, JavaCompiledScript> compiledScripts;
+    private final Map<String, JavaCompiledScript> compiledScripts;
+    private final Set<String> awaitingCompilation;
 
     public ScriptManager() {
         scriptsRootFolder = new File("assets/scripts/");
         scriptsRootFolder.mkdir();
         engine = (JavaScriptEngine) new JavaScriptEngineFactory().getScriptEngine();
         engine.setConstructorStrategy((clazz) -> new NullConstructorStrategy());
-        compiledScripts = new HashMap<>();
+        compiledScripts = new ConcurrentHashMap<>();
+        awaitingCompilation = new HashSet<>();
 
         watcher = new FileWatcher(scriptsRootFolder);
     }
@@ -128,10 +127,12 @@ public class ScriptManager implements Listener {
             File file = new File(scriptsRootFolder, event.getFile().getName());
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             JavaCompiledScript script = compiledScripts.get(scriptName);
-            if (event.getKind() == FileEvent.Kind.MODIFY || event.getKind() == FileEvent.Kind.CREATE) {
+            if (event.getType() == FileEvent.Type.MODIFY || event.getType() == FileEvent.Type.CREATE) {
                 System.out.println("Modified file: " + event.getFile().getName());
-                System.out.println(readScript(file));
-                if (script != null && event.getKind() == FileEvent.Kind.MODIFY) {
+                if (!awaitingCompilation.add(file.getName())) {
+                    return;
+                }
+                if (script != null && event.getType() == FileEvent.Type.MODIFY) {
                     final List<GameObject> reloadedGameobjects = new ArrayList<>();
                     Application.getApp().getCurrentScene().forEachGameObject((go) -> {
                         if (go.removeComponent((Class<? extends Component>) script.getCompiledClass())) {
@@ -140,9 +141,9 @@ public class ScriptManager implements Listener {
                     });
                     compiledScripts.remove(scriptName);
                     InspectorPanel.COMPONENTS.remove(script.getCompiledClass());
-
+                    System.gc();
                     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
-                    DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector();
+                    DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
                     StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
                     try (MemoryFileManager mfm = new MemoryFileManager(standardFileManager, this.getClass().getClassLoader())) {
                         try {
@@ -157,6 +158,7 @@ public class ScriptManager implements Listener {
                                     Component component = (Component) constructor.newInstance(go);
                                     go.addComponent(component);
                                 }
+                                awaitingCompilation.remove(file.getName());
                             } catch (Exception e) {
                                 e.printStackTrace();
                             }
@@ -172,7 +174,8 @@ public class ScriptManager implements Listener {
             } else {
                 if (script != null) {
                     Application.getApp().getCurrentScene().forEachGameObject((go) ->
-                            go.removeComponent((Class<? extends Component>) script.getCompiledClass()));
+                            go.removeComponent((Class<? extends Component>) script.getCompiledClass())
+                    );
                     compiledScripts.remove(scriptName);
                     InspectorPanel.COMPONENTS.remove(script.getCompiledClass());
                 }

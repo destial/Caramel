@@ -28,7 +28,7 @@ public class FileWatcher implements Runnable {
 
     public void watch() {
         if (folder.exists()) {
-           watchTask = scheduler.runTask(this::run);
+           watchTask = scheduler.runTask(this);
         }
     }
 
@@ -55,9 +55,9 @@ public class FileWatcher implements Runnable {
                     WatchEvent.Kind<?> kind = event.kind();
                     Path eventPath = (Path) event.context();
                     FileEvent fileEvent;
-                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) fileEvent = new FileEvent(eventPath.toFile(), FileEvent.Kind.CREATE);
-                    else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) fileEvent = new FileEvent(eventPath.toFile(), FileEvent.Kind.MODIFY);
-                    else fileEvent = new FileEvent(eventPath.toFile(), FileEvent.Kind.DELETE);
+                    if (kind == StandardWatchEventKinds.ENTRY_CREATE) fileEvent = new FileEvent(eventPath.toFile(), FileEvent.Type.CREATE);
+                    else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) fileEvent = new FileEvent(eventPath.toFile(), FileEvent.Type.MODIFY);
+                    else fileEvent = new FileEvent(eventPath.toFile(), FileEvent.Type.DELETE);
                     Application.getApp().getEventHandler().call(fileEvent);
                 }
             }

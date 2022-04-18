@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor;
+package xyz.destiall.caramel.app.utils;
 
 import com.google.common.io.Files;
 

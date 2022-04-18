@@ -2,40 +2,23 @@ package xyz.destiall.caramel.editor;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import xyz.destiall.caramel.app.input.Input;
 import xyz.destiall.caramel.components.Camera;
 import xyz.destiall.caramel.components.Light;
 import xyz.destiall.caramel.components.MeshRenderer;
 import xyz.destiall.caramel.components.Script;
-import xyz.destiall.caramel.editor.ui.ConsolePanel;
-import xyz.destiall.caramel.editor.ui.HierarchyPanel;
-import xyz.destiall.caramel.editor.ui.InspectorPanel;
-import xyz.destiall.caramel.editor.ui.MenuBarPanel;
-import xyz.destiall.caramel.editor.ui.Panel;
+import xyz.destiall.caramel.editor.ui.*;
 import xyz.destiall.caramel.graphics.Mesh;
 import xyz.destiall.caramel.graphics.MeshBuilder;
-import xyz.destiall.caramel.graphics.Shader;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.Update;
 import xyz.destiall.caramel.objects.GameObject;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static org.lwjgl.opengl.GL11.*;
 
 public class Scene implements Update {
     public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
@@ -66,6 +49,11 @@ public class Scene implements Update {
         panels.add(new InspectorPanel(this));
         panels.add(new MenuBarPanel(this));
         panels.add(new ConsolePanel(this));
+        panels.add(new GamePanel(this));
+    }
+
+    public <P extends Panel> P getEditorPanel(Class<P> clazz) {
+        return clazz.cast(panels.stream().filter(p -> p.getClass().isAssignableFrom(clazz)).findFirst().orElse(null));
     }
 
     public List<GameObject> getGameObjects() {
@@ -132,6 +120,7 @@ public class Scene implements Update {
     public void play() {
         if (playing) return;
         playing = true;
+        ConsolePanel.LOGS.clear();
         for (GameObject go : gameObjects) {
             GameObject clone = go.clone();
             defaultGameObjects.add(clone);
@@ -186,16 +175,6 @@ public class Scene implements Update {
         go = new GameObject(this);
         go.addComponent(new EditorCamera(go));
         editorCamera = go.getComponent(EditorCamera.class);
-
-        go = new GameObject(this);
-        go.name = "Light";
-        go.addComponent(new MeshRenderer(go));
-        go.addComponent(new Light(go));
-        mesh = MeshBuilder.createCube(new Vector4f(1, 1, 1, 1), 1);
-        mesh.setShader(Shader.getShader("light"));
-        mesh.build();
-        go.getComponent(MeshRenderer.class).setMesh(mesh);
-        gameObjects.add(go);
 
         gizmo = new Gizmo();
 
