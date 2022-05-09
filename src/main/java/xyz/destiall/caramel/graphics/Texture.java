@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.graphics;
 
 import org.lwjgl.BufferUtils;
-import xyz.destiall.caramel.app.Debug;
+import xyz.destiall.caramel.api.Debug;
 
 import java.io.File;
 import java.nio.ByteBuffer;

@@ -1,4 +1,4 @@
-package xyz.destiall.caramel;
+package xyz.destiall.caramel.app;
 
 import xyz.destiall.caramel.app.Application;
 

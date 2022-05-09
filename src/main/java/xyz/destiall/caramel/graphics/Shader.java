@@ -3,7 +3,7 @@ package xyz.destiall.caramel.graphics;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import xyz.destiall.caramel.app.Debug;
+import xyz.destiall.caramel.api.Debug;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -151,8 +151,6 @@ public class Shader {
     public String getPath() {
         return path;
     }
-
-
 
     private static final HashMap<String, Shader> shaders = new HashMap<>();
 

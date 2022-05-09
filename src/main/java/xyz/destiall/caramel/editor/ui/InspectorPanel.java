@@ -2,12 +2,12 @@ package xyz.destiall.caramel.editor.ui;
 
 import imgui.ImGui;
 import imgui.type.ImString;
-import xyz.destiall.caramel.components.Camera;
-import xyz.destiall.caramel.components.Component;
-import xyz.destiall.caramel.components.MeshRenderer;
+import xyz.destiall.caramel.api.components.Camera;
+import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.editor.CreateScript;
 import xyz.destiall.caramel.editor.Scene;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.GameObject;
 
 import java.util.HashSet;
 import java.util.Set;

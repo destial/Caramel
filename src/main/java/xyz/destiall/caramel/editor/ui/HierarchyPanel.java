@@ -6,12 +6,13 @@ import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector4f;
+import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.components.MeshRenderer;
+import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.editor.Scene;
-import xyz.destiall.caramel.graphics.Mesh;
-import xyz.destiall.caramel.graphics.MeshBuilder;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.mesh.Mesh;
+import xyz.destiall.caramel.api.mesh.MeshBuilder;
+import xyz.destiall.caramel.api.GameObject;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -91,14 +92,23 @@ public class HierarchyPanel extends Panel {
         if (ImGui.beginDragDropTarget()) {
             GameObject payload = ImGui.acceptDragDropPayload(Scene.SCENE_DRAG_DROP_PAYLOAD, GameObject.class);
             if (payload != null && payload != gameObject) {
-                scene.addGameObject(gameObject, payload);
+                Transform parent = payload.parent;
+                boolean canAdd = true;
+                while (parent != null && canAdd) {
+                    if (parent == gameObject.transform) {
+                        canAdd = false;
+                    }
+                    parent = parent.transform;
+
+                }
+                if (canAdd) scene.addGameObject(gameObject, payload);
             }
             ImGui.endDragDropTarget();
         }
 
         if (treeNode) {
             for (GameObject c : gameObject.children) {
-                treeNode(c, index);
+                if (treeNode(c, index)) ImGui.treePop();
             }
         }
 

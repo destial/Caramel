@@ -1,13 +1,13 @@
-package xyz.destiall.caramel.app;
+package xyz.destiall.caramel.api;
 
 import xyz.destiall.caramel.editor.ui.ConsolePanel;
 
-public class Debug {
-    public static void log(Object log) {
+public interface Debug {
+    static void log(Object log) {
         ConsolePanel.addToLog(""+log);
     }
 
-    public static void logError(Object error) {
+    static void logError(Object error) {
         ConsolePanel.addError("ERROR: " + error);
     }
 }

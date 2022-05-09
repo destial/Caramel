@@ -1,8 +1,9 @@
-package xyz.destiall.caramel.components;
+package xyz.destiall.caramel.api.components;
 
-import xyz.destiall.caramel.app.Debug;
-import xyz.destiall.caramel.app.input.Input;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.Input;
+import xyz.destiall.caramel.api.Debug;
+import xyz.destiall.caramel.api.GameObject;
 
 public class Script extends Component {
     public Script(GameObject gameObject) {

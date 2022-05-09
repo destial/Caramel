@@ -2,11 +2,12 @@ package xyz.destiall.caramel.editor;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.Input;
+import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.app.input.Input;
-import xyz.destiall.caramel.components.Component;
+import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.interfaces.HideInEditor;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.GameObject;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
@@ -16,8 +17,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 public class EditorCamera extends Component {
     public Matrix4f projection, view, inverseProjection, inverseView;

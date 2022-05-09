@@ -2,17 +2,17 @@ package xyz.destiall.caramel.editor;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.app.input.Input;
-import xyz.destiall.caramel.components.Camera;
-import xyz.destiall.caramel.components.Light;
-import xyz.destiall.caramel.components.MeshRenderer;
-import xyz.destiall.caramel.components.Script;
+import xyz.destiall.caramel.api.Input;
+import xyz.destiall.caramel.api.components.Camera;
+import xyz.destiall.caramel.api.components.Light;
+import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.components.Script;
 import xyz.destiall.caramel.editor.ui.*;
-import xyz.destiall.caramel.graphics.Mesh;
-import xyz.destiall.caramel.graphics.MeshBuilder;
+import xyz.destiall.caramel.api.mesh.Mesh;
+import xyz.destiall.caramel.api.mesh.MeshBuilder;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.Update;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.GameObject;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -22,7 +22,6 @@ import static org.lwjgl.opengl.GL11.*;
 
 public class Scene implements Update {
     public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
-
 
     private final List<GameObject> gameObjects;
     private final List<GameObject> defaultGameObjects;
@@ -39,8 +38,10 @@ public class Scene implements Update {
     public GameObject selectedGameObject;
     public GameObject selectedPlayingGameObject;
     public GameObject hoveredGameObject;
+    public String name;
 
     public Scene() {
+        name = "Untitled Scene";
         gameObjects = new LinkedList<>();
         defaultGameObjects = new LinkedList<>();
         toAdd = new HashMap<>();
@@ -149,35 +150,11 @@ public class Scene implements Update {
     }
 
     public void init() {
-        Texture floosh = new Texture("assets/textures/floosh-wide.png");
-
         GameObject go = new GameObject(this);
-        go.transform.position.add(0, 0, -11);
-        go.addComponent(new MeshRenderer(go));
-        go.addComponent(new Script(go));
-        Mesh mesh = MeshBuilder.createModel("assets/models/sphere.obj");
-        mesh.setTexture(floosh);
-        mesh.build();
-        go.getComponent(MeshRenderer.class).setMesh(mesh);
-        gameObjects.add(go);
-
-        go = new GameObject(this);
-        go.transform.position.zero();
-        go.addComponent(new MeshRenderer(go));
-        go.name = "Axes";
-        mesh = MeshBuilder.createAxes(1);
-        mesh.build();
-        go.getComponent(MeshRenderer.class).setMesh(mesh);
-        gameObjects.add(go);
-
-        selectedGameObject = gameObjects.get(0);
-
-        go = new GameObject(this);
         go.addComponent(new EditorCamera(go));
         editorCamera = go.getComponent(EditorCamera.class);
 
         gizmo = new Gizmo();
-
     }
 
     public GameObject findGameObject(String name) {

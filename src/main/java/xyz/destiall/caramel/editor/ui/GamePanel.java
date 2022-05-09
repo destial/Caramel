@@ -10,8 +10,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.editor.Scene;
-import xyz.destiall.caramel.editor.Time;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.GameObject;
 
 import static org.lwjgl.glfw.GLFW.*;
 

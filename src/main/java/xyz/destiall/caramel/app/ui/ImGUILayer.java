@@ -8,7 +8,7 @@ import imgui.flag.*;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.editor.Time;
+import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.editor.ui.GamePanel;
 
 import static org.lwjgl.glfw.GLFW.*;

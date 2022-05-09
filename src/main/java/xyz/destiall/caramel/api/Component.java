@@ -1,17 +1,17 @@
-package xyz.destiall.caramel.components;
+package xyz.destiall.caramel.api;
 
 import imgui.ImGui;
 import imgui.type.ImString;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.editor.ui.ImGuiUtils;
-import xyz.destiall.caramel.graphics.Mesh;
+import xyz.destiall.caramel.api.mesh.Mesh;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.interfaces.ShowInEditor;
 import xyz.destiall.caramel.interfaces.Update;
-import xyz.destiall.caramel.objects.GameObject;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -23,6 +23,8 @@ public abstract class Component implements Update {
     @HideInEditor private transient final ImString string = new ImString();
 
     public boolean enabled = true;
+
+    private Component() {}
 
     public Component(GameObject gameObject) {
         this.gameObject = gameObject;

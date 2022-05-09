@@ -11,8 +11,8 @@ public class CreateScript {
     private static final String BASE =
             "package scripts;\n" +
             "\n" +
-            "import xyz.destiall.caramel.objects.GameObject;\n" +
-            "import xyz.destiall.caramel.components.Component;\n" +
+            "import xyz.destiall.caramel.api.GameObject;\n" +
+            "import xyz.destiall.caramel.api.Component;\n" +
             "\n" +
             "public class ${name} extends Component {\n" +
             "    public ${name}(GameObject gameObject) {\n" +

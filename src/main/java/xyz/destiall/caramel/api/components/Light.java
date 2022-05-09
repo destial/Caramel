@@ -1,7 +1,8 @@
-package xyz.destiall.caramel.components;
+package xyz.destiall.caramel.api.components;
 
 import org.joml.Vector3f;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.GameObject;
 
 public class Light extends Component {
     private Vector3f color;

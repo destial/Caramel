@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.graphics;
+package xyz.destiall.caramel.api.mesh;
 
 import com.mokiat.data.front.parser.IOBJParser;
 import com.mokiat.data.front.parser.OBJDataReference;
@@ -13,6 +13,7 @@ import com.mokiat.data.front.parser.OBJVertex;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import xyz.destiall.caramel.graphics.Vertex;
 
 import java.io.FileInputStream;
 import java.io.InputStream;

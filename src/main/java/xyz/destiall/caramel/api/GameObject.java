@@ -1,10 +1,9 @@
-package xyz.destiall.caramel.objects;
+package xyz.destiall.caramel.api;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.components.Component;
-import xyz.destiall.caramel.components.MeshRenderer;
-import xyz.destiall.caramel.components.Transform;
+import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
@@ -37,12 +36,9 @@ public class GameObject implements Update, Render, Cloneable {
     @Override
     public void update() {
         for (GameObject child : children) {
-            Vector3f newPos = new Vector3f(transform.position);
-            Quaternionf newRot = new Quaternionf(transform.rotation);
-            Vector3f newScale = new Vector3f(transform.scale);
-            child.transform.position.set(newPos);
-            child.transform.rotation.set(newRot);
-            child.transform.scale.set(newScale);
+            child.transform.position.set(transform.position);
+            child.transform.rotation.set(transform.rotation);
+            child.transform.scale.set(transform.scale);
             child.update();
         }
 
@@ -55,27 +51,25 @@ public class GameObject implements Update, Render, Cloneable {
             component.update();
         }
         for (Component component : components.values()) {
-            if (!component.enabled) continue;
+            if (!component.enabled || component instanceof MeshRenderer) continue;
             component.lateUpdate();
         }
+
+        MeshRenderer render = getComponent(MeshRenderer.class);
+        if (render != null) render.lateUpdate();
     }
 
     @Override
     public void editorUpdate() {
         for (GameObject child : children) {
-            Vector3f newPos = new Vector3f(transform.position);
-            Quaternionf newRot = new Quaternionf(transform.rotation);
-            Vector3f newScale = new Vector3f(transform.scale);
-            child.transform.position.set(newPos);
-            child.transform.rotation.set(newRot);
-            child.transform.scale.set(newScale);
+            child.transform.position.set(transform.position);
+            child.transform.rotation.set(transform.rotation);
+            child.transform.scale.set(transform.scale);
             child.editorUpdate();
         }
 
         MeshRenderer render = getComponent(MeshRenderer.class);
-        if (render != null) {
-            render.lateUpdate();
-        }
+        if (render != null) render.lateUpdate();
     }
 
     public void setScene(Scene parentScene) {
@@ -165,13 +159,13 @@ public class GameObject implements Update, Render, Cloneable {
     public GameObject clone() {
         GameObject clone = new GameObject(scene);
         clone.name = name;
-        clone.transform.position.set(new Vector3f(transform.position));
-        clone.transform.localPosition.set(new Vector3f(transform.localPosition));
-        clone.transform.rotation.set(new Quaternionf(transform.rotation));
-        clone.transform.localRotation.set(new Quaternionf(transform.localRotation));
-        clone.transform.scale.set(new Vector3f(transform.scale));
-        clone.transform.localScale.set(new Vector3f(transform.localScale));
-        clone.transform.forward.set(new Vector3f(transform.forward));
+        clone.transform.position.set(transform.position);
+        clone.transform.localPosition.set(transform.localPosition);
+        clone.transform.rotation.set(transform.rotation);
+        clone.transform.localRotation.set(transform.localRotation);
+        clone.transform.scale.set(transform.scale);
+        clone.transform.localScale.set(transform.localScale);
+        clone.transform.forward.set(transform.forward);
         clone.transform.enabled = transform.enabled;
         for (Component c : components.values()) {
             if (c instanceof Transform) continue;
@@ -186,7 +180,7 @@ public class GameObject implements Update, Render, Cloneable {
         return clone;
     }
 
-    protected GameObject instantiate(GameObject prefab, Transform parent) {
+    public static GameObject instantiate(GameObject prefab, Transform parent) {
         GameObject clone = prefab.clone();
         if (parent != null) {
             clone.scene.addGameObject(clone, parent.gameObject);
@@ -194,7 +188,7 @@ public class GameObject implements Update, Render, Cloneable {
         return clone;
     }
 
-    protected GameObject instantiate(GameObject prefab) {
+    public static GameObject instantiate(GameObject prefab) {
         return instantiate(prefab, null);
     }
 }

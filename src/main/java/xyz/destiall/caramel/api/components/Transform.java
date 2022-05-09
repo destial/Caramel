@@ -1,10 +1,11 @@
-package xyz.destiall.caramel.components;
+package xyz.destiall.caramel.api.components;
 
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.interfaces.HideInEditor;
-import xyz.destiall.caramel.objects.GameObject;
+import xyz.destiall.caramel.api.GameObject;
 
 public class Transform extends Component {
 

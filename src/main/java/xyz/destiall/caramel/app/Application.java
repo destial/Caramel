@@ -2,11 +2,12 @@ package xyz.destiall.caramel.app;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import xyz.destiall.caramel.app.input.Input;
+import xyz.destiall.caramel.api.Debug;
+import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.app.scripts.ScriptManager;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.editor.Scene;
-import xyz.destiall.caramel.editor.Time;
+import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.graphics.Framebuffer;
 import xyz.destiall.java.events.EventHandling;
 
@@ -17,6 +18,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
@@ -68,7 +71,9 @@ public class Application {
     private int width;
     private int height;
     private String title;
-    private Scene scene;
+
+    private final List<Scene> scenes;
+    private int sceneIndex = 0;
 
     private static Application a;
 
@@ -81,6 +86,7 @@ public class Application {
         mouseListener = new MouseListener();
         keyListener = new KeyListener();
         eventHandling = new EventHandling();
+        scenes = new ArrayList<>();
     }
 
     public EventHandling getEventHandler() {
@@ -105,7 +111,7 @@ public class Application {
     }
 
     public Scene getCurrentScene() {
-        return scene;
+        return scenes.get(sceneIndex);
     }
 
     public void run() {
@@ -187,8 +193,9 @@ public class Application {
         float second = 0;
 
         // Create the scene
-        scene = new Scene();
+        Scene scene = new Scene();
         scene.init();
+        scenes.add(scene);
 
         // Load all the scripts
         scriptManager.reloadAll();
@@ -197,7 +204,7 @@ public class Application {
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
             glfwPollEvents();
-            if (Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
+            if (Input.isKeyDown(GLFW_KEY_ESCAPE) && editorMode) break;
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
             }
@@ -208,13 +215,13 @@ public class Application {
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            if (!editorMode) scene.update();
-            else scene.editorUpdate();
+            if (!editorMode) getCurrentScene().update();
+            else getCurrentScene().editorUpdate();
 
             framebuffer.unbind();
             if (editorMode) imGui.update();
 
-            scene.endFrame();
+            getCurrentScene().endFrame();
             mouseListener.endFrame();
             keyListener.endFrame();
 

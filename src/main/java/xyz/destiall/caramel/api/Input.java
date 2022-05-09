@@ -1,38 +1,38 @@
-package xyz.destiall.caramel.app.input;
+package xyz.destiall.caramel.api;
 
 import org.joml.Vector2d;
 import xyz.destiall.caramel.app.Application;
 
-public class Input {
-    public static boolean isKeyDown(int key) {
+public interface Input {
+    static boolean isKeyDown(int key) {
         return Application.getApp().getKeyListener().isKeyDown(key);
     }
 
-    public static boolean isMouseDown(int mouse) {
+    static boolean isMouseDown(int mouse) {
         return Application.getApp().getMouseListener().isButtonDown(mouse);
     }
 
-    public static boolean isMousePressed(int mouse) {
+    static boolean isMousePressed(int mouse) {
         return Application.getApp().getMouseListener().isButtonPressedThisFrame(mouse);
     }
 
-    public static boolean isKeyPressed(int key) {
+    static boolean isKeyPressed(int key) {
         return Application.getApp().getKeyListener().isKeyPressedThisFrame(key);
     }
 
-    public static float getMouseDeltaX() {
+    static float getMouseDeltaX() {
         return Application.getApp().getMouseListener().getDeltaX();
     }
 
-    public static Vector2d getMousePosition() {
+    static Vector2d getMousePosition() {
         return new Vector2d(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
     }
 
-    public static float getMouseDeltaY() {
+    static float getMouseDeltaY() {
         return Application.getApp().getMouseListener().getDeltaY();
     }
 
-    public static float getMouseScroll() {
+    static float getMouseScroll() {
         return Application.getApp().getMouseListener().getScrollY();
     }
 }
