@@ -2,12 +2,12 @@ package xyz.destiall.caramel.editor;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.interfaces.HideInEditor;
-import xyz.destiall.caramel.api.GameObject;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;

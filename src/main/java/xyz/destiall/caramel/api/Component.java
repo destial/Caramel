@@ -6,8 +6,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.api.mesh.Mesh;
+import xyz.destiall.caramel.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.interfaces.ShowInEditor;
@@ -15,12 +15,17 @@ import xyz.destiall.caramel.interfaces.Update;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Component implements Update {
+    public static final AtomicInteger ENTITY_IDS = new AtomicInteger(0);
+
+    @HideInEditor private final String clazz = getClass().getName();
     @HideInEditor public transient Transform transform;
     @HideInEditor public transient GameObject gameObject;
     @HideInEditor public transient boolean alreadyEnabled = false;
     @HideInEditor private transient final ImString string = new ImString();
+    @HideInEditor public int id;
 
     public boolean enabled = true;
 
@@ -29,6 +34,7 @@ public abstract class Component implements Update {
     public Component(GameObject gameObject) {
         this.gameObject = gameObject;
         this.transform = gameObject.transform;
+        id = ENTITY_IDS.incrementAndGet();
     }
 
     public abstract void start();

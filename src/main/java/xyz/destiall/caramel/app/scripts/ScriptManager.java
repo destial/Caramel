@@ -5,12 +5,13 @@ import ch.obermuhlner.scriptengine.java.JavaScriptEngine;
 import ch.obermuhlner.scriptengine.java.JavaScriptEngineFactory;
 import ch.obermuhlner.scriptengine.java.MemoryFileManager;
 import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
-import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.api.Debug;
-import xyz.destiall.caramel.app.events.FileEvent;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.editor.ui.InspectorPanel;
+import xyz.destiall.caramel.api.Debug;
 import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.app.events.FileEvent;
+import xyz.destiall.caramel.app.utils.FileIO;
+import xyz.destiall.caramel.editor.ui.InspectorPanel;
 import xyz.destiall.java.events.EventHandler;
 import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.reflection.Reflect;
@@ -24,7 +25,12 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ScriptManager implements Listener {
@@ -69,11 +75,15 @@ public class ScriptManager implements Listener {
         }
     }
 
+    public JavaCompiledScript getScript(String name) {
+        return compiledScripts.get(name);
+    }
+
     public JavaCompiledScript reloadScript(File file) {
         if (file.getName().endsWith(".java")) {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             if (compiledScripts.containsKey(scriptName)) return compiledScripts.get(scriptName);
-            String contents = readScript(file);
+            String contents = FileIO.readData(file);
             try {
                 JavaCompiledScript compiledScript = engine.compile(contents);
                 if (compiledScript.getCompiledClass().isAssignableFrom(Component.class)) {
@@ -86,20 +96,6 @@ public class ScriptManager implements Listener {
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
-        }
-        return null;
-    }
-
-    public String readScript(File file) {
-        try {
-            Scanner scanner = new Scanner(file);
-            StringBuilder contents = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                contents.append(scanner.nextLine()).append("\n");
-            }
-            return contents.toString();
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return null;
     }

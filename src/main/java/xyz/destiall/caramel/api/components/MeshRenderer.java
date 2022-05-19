@@ -3,9 +3,9 @@ package xyz.destiall.caramel.api.components;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.mesh.Mesh;
 import xyz.destiall.caramel.interfaces.Render;
-import xyz.destiall.caramel.api.GameObject;
 
 public class MeshRenderer extends Component implements Render {
 

@@ -4,8 +4,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
-import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.api.components.Transform;
+import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.editor.EditorCamera;
 import xyz.destiall.caramel.graphics.Shader;
 import xyz.destiall.caramel.graphics.Texture;
@@ -43,10 +43,10 @@ public class Mesh {
 
     public int type;
 
-    private Shader shader;
+    private String shader;
     private Texture texture;
     private Vector4f color;
-    private int vaoId, vboId;
+    private transient int vaoId, vboId;
     private boolean dirty = false;
     private boolean drawArrays = false;
 
@@ -117,8 +117,8 @@ public class Mesh {
             for (Vertex vertex : vertexArray) {
                 vertex.color.set(color);
             }
-            if (shader != null) shader.detach();
-            shader = Shader.getShader("color");
+            if (shader != null) Shader.getShader(shader).detach();
+            shader = "color";
         }
         dirty = true;
     }
@@ -126,9 +126,9 @@ public class Mesh {
     public void build() {
         if (shader == null) {
             if (texture != null) {
-                shader = Shader.getShader("default");
+                shader = "default";
             } else {
-                shader = Shader.getShader("color");
+                shader = "color";
             }
         }
 
@@ -194,18 +194,18 @@ public class Mesh {
         return vertexBuffer;
     }
 
-    public void setShader(Shader shader) {
+    public void setShader(String shader) {
         this.shader = shader;
     }
 
     public Shader getShader() {
-        return shader;
+        return Shader.getShader(shader);
     }
 
     public void setTexture(Texture texture) {
         this.texture = texture;
-        if (shader != null) shader.detach();
-        shader = Shader.getShader("default");
+        if (shader != null) Shader.getShader(shader).detach();
+        shader = "default";
         this.dirty = true;
     }
 
@@ -214,10 +214,10 @@ public class Mesh {
     }
 
     public void render(Transform transform) {
-        shader.use();
+        Shader.getShader(shader).use();
         EditorCamera camera = Application.getApp().getCurrentScene().getEditorCamera();
         if (texture != null) {
-            shader.uploadTexture("texSampler", 0);
+            Shader.getShader(shader).uploadTexture("texSampler", 0);
             glActiveTexture(GL_TEXTURE0);
             texture.bind();
         }
@@ -228,9 +228,9 @@ public class Mesh {
             dirty = false;
         }
 
-        shader.uploadMat4f("uProjection", camera.getProjection());
-        shader.uploadMat4f("uView", camera.getView());
-        shader.uploadMat4f("uModel", transform.model);
+        Shader.getShader(shader).uploadMat4f("uProjection", camera.getProjection());
+        Shader.getShader(shader).uploadMat4f("uView", camera.getView());
+        Shader.getShader(shader).uploadMat4f("uModel", transform.model);
 
         glBindVertexArray(vaoId);
         glEnableVertexAttribArray(0);
@@ -248,7 +248,7 @@ public class Mesh {
 
         glBindVertexArray(0);
 
-        shader.detach();
+        Shader.getShader(shader).detach();
 
         if (texture != null) {
             texture.unbind();

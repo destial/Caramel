@@ -4,12 +4,16 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import xyz.destiall.caramel.api.Debug;
 import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.app.scripts.ScriptManager;
-import xyz.destiall.caramel.app.ui.ImGUILayer;
-import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.app.scripts.ScriptManager;
+import xyz.destiall.caramel.app.serialize.SceneSerializer;
+import xyz.destiall.caramel.app.ui.ImGUILayer;
+import xyz.destiall.caramel.app.utils.FileIO;
+import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.graphics.Framebuffer;
 import xyz.destiall.java.events.EventHandling;
+import xyz.destiall.java.gson.Gson;
+import xyz.destiall.java.gson.GsonBuilder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,6 +68,7 @@ public class Application {
     private final MouseListener mouseListener;
     private final KeyListener keyListener;
     private final EventHandling eventHandling;
+    private final Gson serializer;
     private ImGUILayer imGui;
     private Framebuffer framebuffer;
     private ScriptManager scriptManager;
@@ -87,6 +92,12 @@ public class Application {
         keyListener = new KeyListener();
         eventHandling = new EventHandling();
         scenes = new ArrayList<>();
+        serializer = new GsonBuilder()
+                .registerTypeAdapter(Scene.class, new SceneSerializer())
+                .serializeNulls()
+                .setPrettyPrinting()
+                .setLenient()
+                .create();
     }
 
     public EventHandling getEventHandler() {
@@ -192,13 +203,15 @@ public class Application {
         float endTime;
         float second = 0;
 
-        // Create the scene
-        Scene scene = new Scene();
-        scene.init();
-        scenes.add(scene);
-
         // Load all the scripts
         scriptManager.reloadAll();
+
+        // Create the scene
+        File file = new File("assets/Untitled Scene.json");
+
+        Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
+        scene.init();
+        scenes.add(scene);
 
         running = true;
         // Main loop
@@ -243,6 +256,9 @@ public class Application {
             }
         }
 
+        String savedScene = serializer.toJson(scene);
+
+        FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
         running = false;
     }
 

@@ -1,7 +1,5 @@
 package xyz.destiall.caramel.api;
 
-import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.editor.Scene;
@@ -18,12 +16,17 @@ import java.util.Set;
 
 public class GameObject implements Update, Render, Cloneable {
     private final Map<Class<? extends Component>, Component> components;
-
     public final List<GameObject> children;
     public Transform transform;
     public Transform parent;
     public String name;
     public Scene scene;
+    public int id;
+
+    private GameObject() {
+        components = new HashMap<>();
+        children = new LinkedList<>();
+    }
 
     public GameObject(Scene parentScene) {
         this.scene = parentScene;
@@ -31,6 +34,7 @@ public class GameObject implements Update, Render, Cloneable {
         components = new HashMap<>();
         children = new LinkedList<>();
         transform = new Transform(this);
+        id = Component.ENTITY_IDS.incrementAndGet();
     }
 
     @Override

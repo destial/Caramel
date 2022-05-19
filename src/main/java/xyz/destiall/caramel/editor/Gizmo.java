@@ -1,10 +1,10 @@
 package xyz.destiall.caramel.editor;
 
 import org.joml.Vector4f;
+import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.mesh.Mesh;
 import xyz.destiall.caramel.api.mesh.MeshBuilder;
 import xyz.destiall.caramel.interfaces.Render;
-import xyz.destiall.caramel.api.GameObject;
 
 public class Gizmo implements Render {
     private final Mesh mesh;

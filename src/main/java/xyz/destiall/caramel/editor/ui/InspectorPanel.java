@@ -2,12 +2,12 @@ package xyz.destiall.caramel.editor.ui;
 
 import imgui.ImGui;
 import imgui.type.ImString;
-import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.components.MeshRenderer;
-import xyz.destiall.caramel.editor.CreateScript;
-import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.components.Camera;
+import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.app.utils.FileIO;
+import xyz.destiall.caramel.editor.Scene;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -64,7 +64,7 @@ public class InspectorPanel extends Panel {
                     ImString scriptName = new ImString("NewScript");
                     ImGui.inputText("##name", scriptName);
                     if (ImGui.button("Create")) {
-                        CreateScript.create(scriptName.get());
+                        FileIO.writeScript(scriptName.get());
                         addingComponents = false;
                     }
                 }

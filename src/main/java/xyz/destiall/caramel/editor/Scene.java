@@ -2,23 +2,34 @@ package xyz.destiall.caramel.editor;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Light;
-import xyz.destiall.caramel.api.components.MeshRenderer;
-import xyz.destiall.caramel.api.components.Script;
-import xyz.destiall.caramel.editor.ui.*;
-import xyz.destiall.caramel.api.mesh.Mesh;
-import xyz.destiall.caramel.api.mesh.MeshBuilder;
-import xyz.destiall.caramel.graphics.Texture;
+import xyz.destiall.caramel.editor.ui.ConsolePanel;
+import xyz.destiall.caramel.editor.ui.GamePanel;
+import xyz.destiall.caramel.editor.ui.HierarchyPanel;
+import xyz.destiall.caramel.editor.ui.InspectorPanel;
+import xyz.destiall.caramel.editor.ui.MenuBarPanel;
+import xyz.destiall.caramel.editor.ui.Panel;
 import xyz.destiall.caramel.interfaces.Update;
-import xyz.destiall.caramel.api.GameObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
+import static org.lwjgl.opengl.GL11.GL_FILL;
+import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
+import static org.lwjgl.opengl.GL11.GL_LINE;
+import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glPolygonMode;
 
 public class Scene implements Update {
     public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
