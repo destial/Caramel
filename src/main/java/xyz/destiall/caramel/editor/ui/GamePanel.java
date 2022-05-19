@@ -8,12 +8,14 @@ import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.editor.Scene;
-import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.GameObject;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_T;
 
 public class GamePanel extends Panel {
     private final Application window;

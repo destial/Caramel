@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.api.components;
 
-import xyz.destiall.caramel.editor.EditorCamera;
 import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.editor.EditorCamera;
 
 public class Camera extends EditorCamera {
     public Camera(GameObject gameObject) {

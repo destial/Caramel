@@ -6,13 +6,13 @@ import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector4f;
-import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.components.MeshRenderer;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.mesh.Mesh;
 import xyz.destiall.caramel.api.mesh.MeshBuilder;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.editor.Scene;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

@@ -1,8 +1,8 @@
 package scripts;
 
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.Time;
 
 public class NewScript extends Component {
     public NewScript(GameObject gameObject) {
