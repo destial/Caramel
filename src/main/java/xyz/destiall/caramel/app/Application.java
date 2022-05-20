@@ -2,14 +2,13 @@ package xyz.destiall.caramel.app;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
-import xyz.destiall.caramel.api.Debug;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.scripts.ScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.FileIO;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.graphics.Framebuffer;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.gson.Gson;
@@ -182,6 +181,12 @@ public class Application {
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
+        // Setup script manager
+        scriptManager = new ScriptManager();
+
+        // Register event listeners
+        eventHandling.registerListener(scriptManager);
+
         // Create and setup ImGUI
         if (editorMode) {
             imGui = new ImGUILayer(this);
@@ -190,26 +195,21 @@ public class Application {
 
         // Setup and create framebuffer
         framebuffer = new Framebuffer(this.width, this.height);
-
-        // Setup script manager
-        scriptManager = new ScriptManager();
-
-        // Register event listeners
-        eventHandling.registerListener(scriptManager);
     }
 
     private void loop() {
+        // Load all the scripts
+        scriptManager.reloadAll();
+
         float startTime = Time.getElapsedTime();
         float endTime;
         float second = 0;
-
-        // Load all the scripts
-        scriptManager.reloadAll();
 
         // Create the scene
         File file = new File("assets/Untitled Scene.json");
 
         Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
+        System.gc();
         scenes.add(scene);
 
         running = true;
@@ -253,6 +253,8 @@ public class Application {
                 Time.isSecond = false;
             }
         }
+
+        if (scene.isPlaying()) scene.stop();
 
         String savedScene = serializer.toJson(scene);
         FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);

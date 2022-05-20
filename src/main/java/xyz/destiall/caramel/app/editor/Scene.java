@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor;
+package xyz.destiall.caramel.app.editor;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
@@ -6,12 +6,14 @@ import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Light;
-import xyz.destiall.caramel.editor.ui.ConsolePanel;
-import xyz.destiall.caramel.editor.ui.GamePanel;
-import xyz.destiall.caramel.editor.ui.HierarchyPanel;
-import xyz.destiall.caramel.editor.ui.InspectorPanel;
-import xyz.destiall.caramel.editor.ui.MenuBarPanel;
-import xyz.destiall.caramel.editor.ui.Panel;
+import xyz.destiall.caramel.app.editor.debug.DebugDraw;
+import xyz.destiall.caramel.app.editor.ui.InspectorPanel;
+import xyz.destiall.caramel.app.editor.ui.MenuBarPanel;
+import xyz.destiall.caramel.app.editor.ui.ConsolePanel;
+import xyz.destiall.caramel.app.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.ui.HierarchyPanel;
+import xyz.destiall.caramel.app.editor.ui.Panel;
+import xyz.destiall.caramel.app.physics.Physics2D;
 import xyz.destiall.caramel.interfaces.Update;
 
 import java.util.HashMap;
@@ -39,6 +41,7 @@ public class Scene implements Update {
 
     private final HashMap<GameObject, GameObject> toAdd;
     private Set<Light> lights;
+    private Physics2D physics2D;
     private EditorCamera editorCamera;
     private Gizmo gizmo;
     private Camera gameCamera;
@@ -67,6 +70,7 @@ public class Scene implements Update {
         GameObject go = new GameObject(this);
         go.addComponent(new EditorCamera(go));
         editorCamera = go.getComponent(EditorCamera.class);
+        physics2D = new Physics2D();
     }
 
     public <P extends Panel> P getEditorPanel(Class<P> clazz) {
@@ -87,8 +91,11 @@ public class Scene implements Update {
 
     @Override
     public void update() {
-        editorCamera.update();
-        lights = gameObjects.stream().map(g -> g.getComponentsInChildren(Light.class)).reduce(new HashSet<>(), (s, l) -> {
+        editorCamera.gameObject.update();
+
+        lights = gameObjects.stream()
+                .map(g -> g.getComponentsInChildren(Light.class))
+                .reduce(new HashSet<>(), (s, l) -> {
             s.addAll(l);
             return s;
         });
@@ -97,8 +104,9 @@ public class Scene implements Update {
 
         if (playing) {
             for (GameObject go : gameObjects) go.update();
-            for (GameObject go : gameObjects) go.render();
+            physics2D.update();
 
+            for (GameObject go : gameObjects) go.render();
         } else {
             for (GameObject go : gameObjects) {
                 go.editorUpdate();
@@ -115,6 +123,7 @@ public class Scene implements Update {
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             gizmo.setTarget(selectedGameObject);
         }
+        DebugDraw.INSTANCE.update();
     }
 
     public void endFrame() {
@@ -134,6 +143,8 @@ public class Scene implements Update {
                 child.parent = parent.transform;
                 child.transform.localPosition.add(child.transform.position.sub(parent.transform.position, new Vector3f()));
             }
+
+            if (playing) physics2D.addGameObject(child);
         }
 
         toAdd.clear();
@@ -154,6 +165,7 @@ public class Scene implements Update {
             if (selectedGameObject == go) {
                 selectedPlayingGameObject = clone;
             }
+            physics2D.addGameObject(go);
         }
     }
 
@@ -165,6 +177,7 @@ public class Scene implements Update {
         selectedPlayingGameObject = null;
         gameObjects.addAll(defaultGameObjects);
         defaultGameObjects.clear();
+        physics2D.reset();
     }
 
     @Override
@@ -177,6 +190,10 @@ public class Scene implements Update {
 
     public void setEditorCamera(EditorCamera camera) {
         editorCamera = camera;
+    }
+
+    public void setGameCamera(Camera camera) {
+        this.gameCamera = camera;
     }
 
     public GameObject findGameObject(String name) {
@@ -210,6 +227,7 @@ public class Scene implements Update {
         } else {
             gameObjects.remove(gameObject);
         }
+        physics2D.removeGameObject(gameObject);
     }
 
     public GameObject getSelectedGameObject() {

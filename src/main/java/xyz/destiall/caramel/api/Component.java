@@ -1,14 +1,14 @@
 package xyz.destiall.caramel.api;
 
 import imgui.ImGui;
-import imgui.type.ImString;
-import org.checkerframework.checker.units.qual.C;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.mesh.Mesh;
-import xyz.destiall.caramel.editor.ui.ImGuiUtils;
+import xyz.destiall.caramel.api.physics.RigidBodyType;
+import xyz.destiall.caramel.app.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.graphics.Texture;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 import xyz.destiall.caramel.interfaces.ShowInEditor;
@@ -78,6 +78,13 @@ public abstract class Component implements Update {
                                 }
                             }
                         }
+                    } else if (type == RigidBodyType.class && this instanceof RigidBody2D) {
+                        for (RigidBodyType bodyType : RigidBodyType.values()) {
+                            boolean original = ((RigidBody2D) this).bodyType == bodyType;
+                            if (original != ImGuiUtils.drawCheckBox(bodyType.name().toLowerCase(), original) && !original) {
+                                ((RigidBody2D) this).bodyType = bodyType;
+                            }
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -86,6 +93,10 @@ public abstract class Component implements Update {
             field.setAccessible(false);
         }
     }
+
+    public void onCollisionEnter(RigidBody2D other) {}
+
+    public void onCollisionExit(RigidBody2D other) {}
 
     public <C extends Component> C getComponent(Class<C> clazz) {
         return gameObject.getComponent(clazz);

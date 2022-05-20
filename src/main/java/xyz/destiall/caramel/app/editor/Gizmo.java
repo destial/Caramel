@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor;
+package xyz.destiall.caramel.app.editor;
 
 import org.joml.Vector4f;
 import xyz.destiall.caramel.api.GameObject;

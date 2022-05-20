@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -13,12 +13,10 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.editor.EditorCamera;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
+import xyz.destiall.caramel.app.editor.EditorCamera;
 
-import java.awt.*;
 import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;

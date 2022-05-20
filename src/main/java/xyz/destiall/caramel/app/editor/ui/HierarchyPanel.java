@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -12,7 +12,7 @@ import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.mesh.Mesh;
 import xyz.destiall.caramel.api.mesh.MeshBuilder;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

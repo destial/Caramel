@@ -3,8 +3,8 @@ package xyz.destiall.caramel.app;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import xyz.destiall.caramel.editor.EditorCamera;
-import xyz.destiall.caramel.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.EditorCamera;
+import xyz.destiall.caramel.app.editor.ui.GamePanel;
 
 import java.util.Arrays;
 

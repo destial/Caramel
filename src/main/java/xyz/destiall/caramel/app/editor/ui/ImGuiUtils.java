@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
@@ -311,5 +311,20 @@ public class ImGuiUtils {
 
         ImGui.popStyleVar();
         ImGui.popID();
+    }
+
+    public static boolean drawCheckBox(String label, boolean value) {
+        ImGui.pushID(label);
+
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, width);
+        ImGui.text(label);
+        ImGui.nextColumn();
+
+        boolean returnValue = ImGui.checkbox("##checkbox", value);
+        ImGui.columns(1);
+        ImGui.popID();
+
+        return returnValue;
     }
 }

@@ -1,11 +1,11 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
 import imgui.flag.ImGuiCond;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
 
 public class MenuBarPanel extends Panel {
     private boolean openFile;

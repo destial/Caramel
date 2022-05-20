@@ -1,8 +1,8 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
+import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.app.utils.Pair;
-import xyz.destiall.caramel.editor.Scene;
 
 import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;

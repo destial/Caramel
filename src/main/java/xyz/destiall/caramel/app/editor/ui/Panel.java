@@ -1,6 +1,6 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
 
 public abstract class Panel {
     protected final Scene scene;

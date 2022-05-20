@@ -12,7 +12,5 @@ public class Light extends Component {
     }
 
     @Override
-    public void start() {
-
-    }
+    public void start() {}
 }

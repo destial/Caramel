@@ -18,8 +18,9 @@ out vec3 fNormal;
 void main() {
     fColor = aColor;
     fTexCoords = aTexCoords;
-    fPos = vec3(uModel * vec4(aPos, 1.0));
-    gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
+    vec4 newAPos = vec4(aPos, 1.0);
+    fPos = vec3(uModel * newAPos);
+    gl_Position = uProjection * uView * uModel * newAPos;
 }
 
 #type fragment

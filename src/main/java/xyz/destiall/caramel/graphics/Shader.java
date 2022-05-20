@@ -3,7 +3,7 @@ package xyz.destiall.caramel.graphics;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import xyz.destiall.caramel.api.Debug;
+import xyz.destiall.caramel.api.debug.Debug;
 
 import java.io.IOException;
 import java.nio.FloatBuffer;
@@ -162,6 +162,7 @@ public class Shader {
         shaders.put("default", new Shader("assets/shaders/default.glsl"));
         shaders.put("color", new Shader("assets/shaders/color.glsl"));
         shaders.put("light", new Shader("assets/shaders/light.glsl"));
+        shaders.put("line", new Shader("assets/shaders/line.glsl"));
         for (Shader shader : shaders.values()) {
             shader.compile();
         }

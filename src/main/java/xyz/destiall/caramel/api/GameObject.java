@@ -2,7 +2,7 @@ package xyz.destiall.caramel.api;
 
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 

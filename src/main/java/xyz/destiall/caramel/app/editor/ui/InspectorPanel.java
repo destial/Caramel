@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.editor.ui;
+package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.type.ImString;
@@ -6,8 +6,10 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.components.RigidBody2D;
+import xyz.destiall.caramel.api.physics.components.Box2DCollider;
 import xyz.destiall.caramel.app.utils.FileIO;
-import xyz.destiall.caramel.editor.Scene;
+import xyz.destiall.caramel.app.editor.Scene;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,6 +21,8 @@ public class InspectorPanel extends Panel {
     static {
         COMPONENTS.add(Camera.class);
         COMPONENTS.add(MeshRenderer.class);
+        COMPONENTS.add(RigidBody2D.class);
+        COMPONENTS.add(Box2DCollider.class);
     }
 
     private final ImString search = new ImString();

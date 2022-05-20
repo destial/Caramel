@@ -32,14 +32,10 @@ public class MeshRenderer extends Component implements Render {
     }
 
     @Override
-    public void start() {
-
-    }
+    public void start() {}
 
     @Override
-    public void update() {
-
-    }
+    public void update() {}
 
     @Override
     public void lateUpdate() {
