@@ -2,6 +2,7 @@ package xyz.destiall.caramel.api;
 
 import imgui.ImGui;
 import imgui.type.ImString;
+import org.checkerframework.checker.units.qual.C;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -24,7 +25,6 @@ public abstract class Component implements Update {
     @HideInEditor public transient Transform transform;
     @HideInEditor public transient GameObject gameObject;
     @HideInEditor public transient boolean alreadyEnabled = false;
-    @HideInEditor private transient final ImString string = new ImString();
     @HideInEditor public int id;
 
     public boolean enabled = true;
@@ -52,13 +52,9 @@ public abstract class Component implements Update {
                     String name = field.getName();
 
                     if (type == int.class) {
-                        int i = (int) value;
-                        int newI = ImGuiUtils.dragInt(name, i);
-                        field.set(this, newI);
+                        field.set(this, ImGuiUtils.dragInt(name, (int) value));
                     } else if (type == float.class) {
-                        float f = (float) value;
-                        float newF = ImGuiUtils.dragFloat(name, f);
-                        field.set(this, newF);
+                        field.set(this, ImGuiUtils.dragFloat(name, (float) value));
                     } else if (type == Vector3f.class) {
                         ImGuiUtils.drawVec3Control(name, (Vector3f) value, 1f);
                     } else if (type == Vector2f.class) {
@@ -69,21 +65,18 @@ public abstract class Component implements Update {
                     } else if (type == Mesh.class) {
                         Mesh mesh = (Mesh) value;
                         ImGui.text("shader: " + mesh.getShader().getPath());
-                        if (mesh.getColor() != null && ImGuiUtils.colorPicker4("color", mesh.getColor())) {
-                            mesh.setColor(mesh.getColor());
+                        if (mesh.getColor() != null) {
+                            ImGuiUtils.colorPicker4("color", mesh.getColor());
                         }
-                        ImGui.text("texture: ");
-                        ImGui.sameLine();
-                        ImGui.inputText("##texture", string);
+                        String string = ImGuiUtils.inputText("texture:", mesh.getTexture() == null ? "" : mesh.getTexture().getPath());
                         ImGui.sameLine();
                         if (ImGui.button("apply")) {
-                            if (mesh.getTexture() == null || !mesh.getTexture().getPath().equalsIgnoreCase(string.get())) {
-                                Texture texture = new Texture(string.get());
+                            if (mesh.getTexture() == null || !mesh.getTexture().getPath().equalsIgnoreCase(string)) {
+                                Texture texture = new Texture(string);
                                 if (texture.isLoaded()) {
                                     mesh.setTexture(texture);
                                 }
                             }
-                            string.clear();
                         }
                     }
                 }
@@ -121,6 +114,8 @@ public abstract class Component implements Update {
     public Component clone(GameObject gameObject) {
         try {
             Component clone = getClass().getConstructor(GameObject.class).newInstance(gameObject);
+            Component.ENTITY_IDS.decrementAndGet();
+            clone.id = id;
             for (Field field : getClass().getDeclaredFields()) {
                 try {
                     field.setAccessible(true);

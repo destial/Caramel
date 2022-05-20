@@ -210,7 +210,6 @@ public class Application {
         File file = new File("assets/Untitled Scene.json");
 
         Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
-        scene.init();
         scenes.add(scene);
 
         running = true;
@@ -242,7 +241,6 @@ public class Application {
             endTime = Time.getElapsedTime();
             Time.deltaTime = endTime - startTime;
             if (Time.deltaTime <= 0) {
-                Debug.log("ouch");
                 Time.deltaTime = 1 / 60f;
             }
             startTime = endTime;
@@ -257,8 +255,8 @@ public class Application {
         }
 
         String savedScene = serializer.toJson(scene);
-
         FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
+
         running = false;
     }
 

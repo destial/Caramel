@@ -17,26 +17,19 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 
 public class EditorCamera extends Component {
     public Matrix4f projection, view, inverseProjection, inverseView;
     public Vector3f target;
     private boolean perspective = true;
 
-    @HideInEditor
-    public Vector3f forward;
-
-    @HideInEditor
-    public Vector3f up;
-
-    @HideInEditor
-    public float fov = 60f;
-
-    @HideInEditor
-    public float near = 0.1f;
-
-    @HideInEditor
-    public float far = 1000f;
+    @HideInEditor public Vector3f forward;
+    @HideInEditor public Vector3f up;
+    @HideInEditor public float fov = 60f;
+    @HideInEditor public float near = 0.1f;
+    @HideInEditor public float far = 1000f;
+    public float sensitivity = 0.5f;
 
     public EditorCamera(GameObject gameObject) {
         super(gameObject);
@@ -82,9 +75,9 @@ public class EditorCamera extends Component {
             }
 
             // if (perspective)
-            {
-                float mouseX = -Input.getMouseDeltaX();
-                float mouseY = Input.getMouseDeltaY();
+            if (Input.isMouseDown(GLFW_MOUSE_BUTTON_1)) {
+                float mouseX = -Input.getMouseDeltaX() * sensitivity;
+                float mouseY = Input.getMouseDeltaY() * sensitivity;
 
                 target.rotateY(mouseX * Time.deltaTime);
                 Vector3f right = up.cross(target, new Vector3f());

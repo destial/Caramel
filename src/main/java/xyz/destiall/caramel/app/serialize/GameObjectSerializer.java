@@ -4,6 +4,7 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
+import xyz.destiall.caramel.api.mesh.Mesh;
 import xyz.destiall.java.gson.JsonArray;
 import xyz.destiall.java.gson.JsonDeserializationContext;
 import xyz.destiall.java.gson.JsonDeserializer;
@@ -27,16 +28,25 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
 
         JsonArray components = object.get("components").getAsJsonArray();
         for (JsonElement c : components) {
+            if (!c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
-            if (component instanceof Transform) {
-                Reflect.setDeclaredField(gameObject, "transform", component);
-            }
+            Reflect.setDeclaredField(gameObject, "transform", component);
+            Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, component.id));
+            gameObject.addComponent(component);
+            break;
+        }
+
+        for (JsonElement c : components) {
+            if (c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
+            Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
             if (component instanceof MeshRenderer) {
-                ((MeshRenderer) component).mesh.build();
+                Mesh mesh = ((MeshRenderer) component).mesh;
+                if (mesh != null) mesh.build();
             }
             Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, component.id));
             gameObject.addComponent(component);
         }
+        Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, gameObject.id));
 
         JsonArray children = object.get("children").getAsJsonArray();
         for (JsonElement c : children) {
@@ -44,7 +54,7 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
             child.parent = gameObject.transform;
             gameObject.children.add(child);
         }
-        Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, gameObject.id));
+
         return gameObject;
     }
 
@@ -62,7 +72,6 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         object.add("components", components);
         object.add("children", children);
         object.addProperty("name", gameObject.name);
-        object.addProperty("scene", gameObject.scene.name);
         object.addProperty("id", gameObject.id);
         return object;
     }

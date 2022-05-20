@@ -3,15 +3,23 @@ package xyz.destiall.caramel.editor.ui;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
+import imgui.extension.imguizmo.flag.Mode;
 import imgui.extension.imguizmo.flag.Operation;
 import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiWindowFlags;
+import imgui.type.ImBoolean;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.editor.EditorCamera;
 import xyz.destiall.caramel.editor.Scene;
+
+import java.awt.*;
+import java.util.Arrays;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
@@ -25,6 +33,7 @@ public class GamePanel extends Panel {
     private float previousDt;
     private float leftX, rightX, topY, bottomY;
     private int gizmoOperation;
+    private ImBoolean showImGuizmoWindow = new ImBoolean(true);
 
     public GamePanel(Scene scene) {
         super(scene);
@@ -57,10 +66,31 @@ public class GamePanel extends Panel {
         topY = topLeft.y + gameWindowSize.y;
 
         int texId = window.getFramebuffer().getTexture().getTexId();
-        ImGui.image(texId, gameWindowSize.x, gameWindowSize.y, 0, 1, 1, 0);
 
         window.getMouseListener().setGameViewportPos(new Vector2f(topLeft.x, topLeft.y));
         window.getMouseListener().setGameViewportSize(new Vector2f(gameWindowSize.x, gameWindowPos.y));
+
+        ImGui.image(texId, gameWindowSize.x, gameWindowSize.y, 0, 1, 1, 0);
+
+        GameObject selected = window.getCurrentScene().getSelectedGameObject();
+
+        if (selected != null && false) {
+            ImGuizmo.beginFrame();
+            ImGuizmo.setOrthographic(false);
+            ImGuizmo.setDrawList();
+            ImGuizmo.setRect(ImGui.getWindowPosX(), ImGui.getWindowPosY(), ImGui.getWindowWidth(), ImGui.getWindowHeight());
+
+            EditorCamera camera = scene.getEditorCamera();
+            Matrix4f cameraProjection = new Matrix4f(camera.projection);
+            Matrix4f cameraView = new Matrix4f(camera.transform.model);
+
+            Matrix4f transform = selected.transform.model;
+            float[] floats = transform.get(new float[16]);
+            ImGuizmo.manipulate(cameraView.get(new float[16]), cameraProjection.get(new float[16]), floats, Operation.TRANSLATE, Mode.LOCAL);
+            if (ImGuizmo.isUsing()) {
+                selected.transform.position.set(Arrays.copyOf(floats, 3));
+            }
+        }
 
         ImGui.end();
     }
@@ -97,7 +127,7 @@ public class GamePanel extends Panel {
         return new ImVec2(aspectWidth, aspectHeight);
     }
 
-    private void editTransform() {
+    private void editTransform(ImBoolean showImGuizmoWindow) {
         if (ImGui.isKeyPressed(GLFW_KEY_T)) {
             gizmoOperation = Operation.TRANSLATE;
         } else if (ImGui.isKeyPressed(GLFW_KEY_R)) {
@@ -107,6 +137,8 @@ public class GamePanel extends Panel {
         }
 
         GameObject selected = window.getCurrentScene().getSelectedGameObject();
+        if (selected == null) return;
+
         float[] model = selected.transform.model.get(new float[16]);
         float[] position = {
                 selected.transform.position.x + selected.transform.localPosition.x,
@@ -129,16 +161,15 @@ public class GamePanel extends Panel {
             ImGuizmo.decomposeMatrixToComponents(model, position, rotation, scale);
         }
 
-        ImGui.inputFloat3("Tr", position, "%.3f", ImGuiInputTextFlags.ReadOnly);
-        ImGui.inputFloat3("Rt", rotation, "%.3f", ImGuiInputTextFlags.ReadOnly);
-        ImGui.inputFloat3("Sc", scale, "%.3f", ImGuiInputTextFlags.ReadOnly);
+        ImGui.inputFloat3("Tr", position, "%.3f", ImGuiInputTextFlags.None);
+        ImGui.inputFloat3("Rt", rotation, "%.3f", ImGuiInputTextFlags.None);
+        ImGui.inputFloat3("Sc", scale, "%.3f", ImGuiInputTextFlags.None);
 
         if (ImGuizmo.isUsing()) {
             ImGuizmo.recomposeMatrixFromComponents(model, position, rotation, scale);
-            selected.transform.model.set(model);
             selected.transform.position.set(position);
-            selected.transform.position.set(position);
-            selected.transform.position.set(position);
+            // selected.transform.rotation.rotation);
+            selected.transform.scale.set(scale);
         }
     }
 

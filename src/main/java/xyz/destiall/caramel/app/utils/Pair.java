@@ -30,4 +30,11 @@ public class Pair<K,V> implements Map.Entry<K, V> {
         this.value = value;
         return previous;
     }
+
+    @Override
+    public String toString() {
+        return "{" + key +
+                "=" + value +
+                '}';
+    }
 }

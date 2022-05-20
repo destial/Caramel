@@ -162,6 +162,8 @@ public class GameObject implements Update, Render, Cloneable {
     @Override
     public GameObject clone() {
         GameObject clone = new GameObject(scene);
+        Component.ENTITY_IDS.decrementAndGet();
+        clone.id = id;
         clone.name = name;
         clone.transform.position.set(transform.position);
         clone.transform.localPosition.set(transform.localPosition);
@@ -184,15 +186,15 @@ public class GameObject implements Update, Render, Cloneable {
         return clone;
     }
 
-    public static GameObject instantiate(GameObject prefab, Transform parent) {
+    public GameObject instantiate(GameObject prefab, Transform parent) {
         GameObject clone = prefab.clone();
         if (parent != null) {
-            clone.scene.addGameObject(clone, parent.gameObject);
+            scene.addGameObject(clone, parent.gameObject);
         }
         return clone;
     }
 
-    public static GameObject instantiate(GameObject prefab) {
+    public GameObject instantiate(GameObject prefab) {
         return instantiate(prefab, null);
     }
 }

@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.serialize;
 
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.editor.EditorCamera;
 import xyz.destiall.caramel.editor.Scene;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
@@ -37,6 +38,9 @@ public class SceneSerializer implements JsonSerializer<Scene>, JsonDeserializer<
             scene.getGameObjects().add(gameObject);
         }
         scene.name = jsonElement.getAsJsonObject().get("name").getAsString();
+
+        EditorCamera camera = GAME_OBJECT_SERIALIZER.deserialize(jsonElement.getAsJsonObject().get("editorCamera"), GameObject.class, jsonDeserializationContext).getComponent(EditorCamera.class);
+        scene.setEditorCamera(camera);
         return scene;
     }
 
@@ -49,6 +53,9 @@ public class SceneSerializer implements JsonSerializer<Scene>, JsonDeserializer<
         }
         object.addProperty("name", scene.name);
         object.add("gameObjects", array);
+
+        JsonElement editorCamera = GAME_OBJECT_SERIALIZER.serialize(scene.getEditorCamera().gameObject, GameObject.class, jsonSerializationContext);
+        object.add("editorCamera", editorCamera);
         return object;
     }
 }

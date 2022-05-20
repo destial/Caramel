@@ -9,14 +9,14 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
 public class ConsolePanel extends Panel {
-    private static final int LOG_LIMIT = 100;
+    private static final int LOG_LIMIT = 50;
     public static final CopyOnWriteArrayList<Pair<String, Level>> LOGS = new CopyOnWriteArrayList<>();
 
     public ConsolePanel(Scene scene) {
         super(scene);
     }
 
-    public static void addToLog(String log) {
+    public static void addLog(String log) {
         String[] split = log.split("\n");
         for (String s : split) {
             LOGS.add(new Pair<>(s, Level.INFO));

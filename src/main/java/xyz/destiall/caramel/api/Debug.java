@@ -4,7 +4,7 @@ import xyz.destiall.caramel.editor.ui.ConsolePanel;
 
 public interface Debug {
     static void log(Object log) {
-        ConsolePanel.addToLog(""+log);
+        ConsolePanel.addLog(""+log);
     }
 
     static void logError(Object error) {

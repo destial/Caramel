@@ -14,7 +14,6 @@ import xyz.destiall.caramel.editor.ui.MenuBarPanel;
 import xyz.destiall.caramel.editor.ui.Panel;
 import xyz.destiall.caramel.interfaces.Update;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,7 +35,7 @@ public class Scene implements Update {
 
     private final List<GameObject> gameObjects;
     private final List<GameObject> defaultGameObjects;
-    private final List<Panel> panels;
+    private final Map<Class<?>, Panel> panels;
 
     private final HashMap<GameObject, GameObject> toAdd;
     private Set<Light> lights;
@@ -45,6 +44,7 @@ public class Scene implements Update {
     private Camera gameCamera;
 
     private boolean playing = false;
+    private boolean saved = true;
 
     public GameObject selectedGameObject;
     public GameObject selectedPlayingGameObject;
@@ -56,16 +56,29 @@ public class Scene implements Update {
         gameObjects = new LinkedList<>();
         defaultGameObjects = new LinkedList<>();
         toAdd = new HashMap<>();
-        panels = new ArrayList<>();
-        panels.add(new HierarchyPanel(this));
-        panels.add(new InspectorPanel(this));
-        panels.add(new MenuBarPanel(this));
-        panels.add(new ConsolePanel(this));
-        panels.add(new GamePanel(this));
+        panels = new HashMap<>();
+        panels.put(HierarchyPanel.class, new HierarchyPanel(this));
+        panels.put(InspectorPanel.class, new InspectorPanel(this));
+        panels.put(MenuBarPanel.class, new MenuBarPanel(this));
+        panels.put(ConsolePanel.class, new ConsolePanel(this));
+        panels.put(GamePanel.class, new GamePanel(this));
+        gizmo = new Gizmo();
+
+        GameObject go = new GameObject(this);
+        go.addComponent(new EditorCamera(go));
+        editorCamera = go.getComponent(EditorCamera.class);
     }
 
     public <P extends Panel> P getEditorPanel(Class<P> clazz) {
-        return clazz.cast(panels.stream().filter(p -> p.getClass().isAssignableFrom(clazz)).findFirst().orElse(null));
+        return clazz.cast(panels.get(clazz));
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 
     public List<GameObject> getGameObjects() {
@@ -79,7 +92,9 @@ public class Scene implements Update {
             s.addAll(l);
             return s;
         });
+
         glEnable(GL_DEPTH_TEST);
+
         if (playing) {
             for (GameObject go : gameObjects) go.update();
             for (GameObject go : gameObjects) go.render();
@@ -154,18 +169,14 @@ public class Scene implements Update {
 
     @Override
     public void imguiLayer() {
-        for (Panel panel : panels) {
+        for (Panel panel : panels.values()) {
             panel.imguiLayer();
         }
         ImGui.showDemoWindow();
     }
 
-    public void init() {
-        GameObject go = new GameObject(this);
-        go.addComponent(new EditorCamera(go));
-        editorCamera = go.getComponent(EditorCamera.class);
-
-        gizmo = new Gizmo();
+    public void setEditorCamera(EditorCamera camera) {
+        editorCamera = camera;
     }
 
     public GameObject findGameObject(String name) {

@@ -1,6 +1,8 @@
 package xyz.destiall.caramel.app;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
@@ -31,6 +33,22 @@ public class KeyListener {
 
     public boolean isKeyPressedThisFrame(int key) {
         return keysPressedThisFrame[key];
+    }
+
+    public List<Integer> getKeysPressed() {
+        List<Integer> keysPressed = new ArrayList<>(keys.length);
+        for (int i = 0; i < keys.length; i++) {
+            if (keys[i]) keysPressed.add(i);
+        }
+        return keysPressed;
+    }
+
+    public List<Integer> getKeysPressedThisFrame() {
+        List<Integer> keysPressed = new ArrayList<>(keysPressedThisFrame.length);
+        for (int i = 0; i < keysPressedThisFrame.length; i++) {
+            if (keysPressedThisFrame[i]) keysPressed.add(i);
+        }
+        return keysPressed;
     }
 
     public void endFrame() {

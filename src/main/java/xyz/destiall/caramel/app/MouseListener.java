@@ -46,31 +46,38 @@ public class MouseListener {
             lastY = yPos;
             return;
         }
-        if (xPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x &&
-                yPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y &&
-                xPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().x &&
-                yPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().y) {
-        } else {
-            Arrays.fill(mouseButtonPressed, false);
+        GamePanel panel = Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class);
+        if (panel != null) {
+            if (xPos > panel.getGameWindowPos().x &&
+                    yPos > panel.getGameWindowPos().y &&
+                    xPos < panel.getGameWindowPos().x + panel.getGameWindowSize().x &&
+                    yPos < panel.getGameWindowPos().y + panel.getGameWindowSize().y) {
+            } else {
+                Arrays.fill(mouseButtonPressed, false);
+            }
         }
+
         isDragging = mouseButtonPressed[GLFW_MOUSE_BUTTON_1];
     }
 
     public void mouseButtonCallback(long window, int button, int action, int mods) {
-        if (xPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x &&
-            yPos > Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y &&
-            xPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().x + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().x &&
-            yPos < Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowPos().y + Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class).getGameWindowSize().y) {
-            if (action == GLFW_PRESS) {
-                mouseButtonPressed[button] = true;
-                if (mouseButtonReleased[button]) {
-                    mouseButtonPressedThisFrame[button] = true;
-                    mouseButtonReleased[button] = false;
+        GamePanel panel = Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class);
+        if (panel != null) {
+            if (xPos > panel.getGameWindowPos().x &&
+                    yPos > panel.getGameWindowPos().y &&
+                    xPos < panel.getGameWindowPos().x + panel.getGameWindowSize().x &&
+                    yPos < panel.getGameWindowPos().y + panel.getGameWindowSize().y) {
+                if (action == GLFW_PRESS) {
+                    mouseButtonPressed[button] = true;
+                    if (mouseButtonReleased[button]) {
+                        mouseButtonPressedThisFrame[button] = true;
+                        mouseButtonReleased[button] = false;
+                    }
+                } else if (action == GLFW_RELEASE) {
+                    mouseButtonPressed[button] = false;
+                    mouseButtonReleased[button] = true;
+                    isDragging = false;
                 }
-            } else if (action == GLFW_RELEASE) {
-                mouseButtonPressed[button] = false;
-                mouseButtonReleased[button] = true;
-                isDragging = false;
             }
         }
     }

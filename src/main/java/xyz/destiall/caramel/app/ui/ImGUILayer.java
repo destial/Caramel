@@ -37,6 +37,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetClipboardString;
+import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
@@ -118,6 +119,11 @@ public class ImGUILayer {
 
             if (!io.getWantCaptureMouse() || (gamePanel != null && gamePanel.isMouseOnScene()))
                 window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
+        });
+
+        glfwSetCursorPosCallback(glfwWindow, (w, x, y) -> {
+            io.setMousePos((float) x, (float) y);
+            window.getMouseListener().mousePosCallback(w, x, y);
         });
 
         io.setSetClipboardTextFn(new ImStrConsumer() {
