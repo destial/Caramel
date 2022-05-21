@@ -187,6 +187,11 @@
             <artifactId>jbox2d-library</artifactId>
             <version>2.2.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.ode4j</groupId>
+            <artifactId>core</artifactId>
+            <version>0.4.0</version>
+        </dependency>
     </dependencies>
 
     <repositories>

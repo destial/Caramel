@@ -7,6 +7,7 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.RigidBody2D;
+import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.debug.Debug;
 
 public class NewScript extends Component {
@@ -23,18 +24,15 @@ public class NewScript extends Component {
 
     @Override
     public void update() {
-        RigidBody2D rb = getComponent(RigidBody2D.class);
-        if (rb == null) return;
+        RigidBody3D rb = getComponent(RigidBody3D.class);
+        if (rb == null || rb.rawBody == null) return;
+
+        Debug.log("gay lmao");
 
         Debug.drawLine(other.transform.position, transform.position, new Vector3f(255, 0, 0));
 
         if (Input.isKeyPressed(Input.Key.SPACE)) {
-            rb.rawBody.setLinearVelocity(new Vec2(rb.rawBody.m_linearVelocity.x, 5));
-        }
-        if (Input.isKeyDown(Input.Key.D)) {
-            rb.rawBody.setLinearVelocity(new Vec2(-0.1f, rb.rawBody.m_linearVelocity.y));
-        } else if (Input.isKeyDown(Input.Key.A)) {
-            rb.rawBody.setLinearVelocity(new Vec2(0.1f, rb.rawBody.m_linearVelocity.y));
+            rb.rawBody.setLinearVel(rb.rawBody.getLinearVel().get0(), 5, rb.rawBody.getLinearVel().get2());
         }
     }
 }

@@ -9,9 +9,8 @@ import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
-import xyz.destiall.caramel.interfaces.Update;
 
-public class Physics2D implements Update {
+public class Physics2D implements Physics {
     private final Vec2 gravity = new Vec2(0, -1f);
     private final float physicsTimeStep = 1.f / 60.f;
     private final int velocityIterations = 8;
@@ -19,6 +18,7 @@ public class Physics2D implements Update {
 
     private World world = new World(gravity);
 
+    @Override
     public void addGameObject(GameObject gameObject) {
         RigidBody2D rigidBody = gameObject.getComponent(RigidBody2D.class);
         if (rigidBody == null || rigidBody.rawBody != null) return;
@@ -58,6 +58,7 @@ public class Physics2D implements Update {
         rigidBody.rawBody.createFixture(shape, rigidBody.mass);
     }
 
+    @Override
     public void removeGameObject(GameObject gameObject) {
         RigidBody2D rigidBody = gameObject.getComponent(RigidBody2D.class);
         if (rigidBody == null || rigidBody.rawBody == null) return;
@@ -65,6 +66,7 @@ public class Physics2D implements Update {
         rigidBody.rawBody = null;
     }
 
+    @Override
     public void reset() {
         //physicsTime = 0;
         world = new World(gravity);

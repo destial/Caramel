@@ -13,7 +13,9 @@ import xyz.destiall.caramel.app.editor.ui.ConsolePanel;
 import xyz.destiall.caramel.app.editor.ui.GamePanel;
 import xyz.destiall.caramel.app.editor.ui.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
+import xyz.destiall.caramel.app.physics.Physics;
 import xyz.destiall.caramel.app.physics.Physics2D;
+import xyz.destiall.caramel.app.physics.Physics3D;
 import xyz.destiall.caramel.interfaces.Update;
 
 import java.util.HashMap;
@@ -38,16 +40,18 @@ public class Scene implements Update {
     private final List<GameObject> gameObjects;
     private final List<GameObject> defaultGameObjects;
     private final Map<Class<?>, Panel> panels;
-
+    private final Map<Physics.Mode, Physics> physics;
     private final HashMap<GameObject, GameObject> toAdd;
+
     private Set<Light> lights;
-    private Physics2D physics2D;
+
     private EditorCamera editorCamera;
     private Gizmo gizmo;
     private Camera gameCamera;
 
     private boolean playing = false;
     private boolean saved = true;
+    private Physics.Mode physicsMode = Physics.Mode._3D;
 
     public GameObject selectedGameObject;
     public GameObject selectedPlayingGameObject;
@@ -70,7 +74,9 @@ public class Scene implements Update {
         GameObject go = new GameObject(this);
         go.addComponent(new EditorCamera(go));
         editorCamera = go.getComponent(EditorCamera.class);
-        physics2D = new Physics2D();
+        physics = new HashMap<>();
+        physics.put(Physics.Mode._2D, new Physics2D());
+        physics.put(Physics.Mode._3D, new Physics3D());
     }
 
     public <P extends Panel> P getEditorPanel(Class<P> clazz) {
@@ -104,7 +110,7 @@ public class Scene implements Update {
 
         if (playing) {
             for (GameObject go : gameObjects) go.update();
-            physics2D.update();
+            physics.get(physicsMode).update();
 
             for (GameObject go : gameObjects) go.render();
         } else {
@@ -144,10 +150,18 @@ public class Scene implements Update {
                 child.transform.localPosition.add(child.transform.position.sub(parent.transform.position, new Vector3f()));
             }
 
-            if (playing) physics2D.addGameObject(child);
+            if (playing) physics.get(physicsMode).addGameObject(child);
         }
 
         toAdd.clear();
+    }
+
+    public void setPhysicsMode(Physics.Mode physicsMode) {
+        if (!playing) this.physicsMode = physicsMode;
+    }
+
+    public Physics.Mode getPhysicsMode() {
+        return physicsMode;
     }
 
     @Override
@@ -165,19 +179,21 @@ public class Scene implements Update {
             if (selectedGameObject == go) {
                 selectedPlayingGameObject = clone;
             }
-            physics2D.addGameObject(go);
+            physics.get(physicsMode).addGameObject(go);
         }
     }
 
     public void stop() {
         if (!playing) return;
-        playing = false;
         gameObjects.clear();
         selectedGameObject = selectedPlayingGameObject;
         selectedPlayingGameObject = null;
         gameObjects.addAll(defaultGameObjects);
         defaultGameObjects.clear();
-        physics2D.reset();
+        for (Physics p : physics.values()) {
+            p.reset();
+        }
+        playing = false;
     }
 
     @Override
@@ -227,7 +243,7 @@ public class Scene implements Update {
         } else {
             gameObjects.remove(gameObject);
         }
-        physics2D.removeGameObject(gameObject);
+        physics.get(physicsMode).removeGameObject(gameObject);
     }
 
     public GameObject getSelectedGameObject() {

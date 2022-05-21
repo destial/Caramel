@@ -1,42 +1,52 @@
 package xyz.destiall.caramel.api.components;
 
-import org.jbox2d.dynamics.Body;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.ode4j.ode.DBody;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.debug.Debug;
-import xyz.destiall.caramel.api.physics.components.Box2DCollider;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
+import xyz.destiall.caramel.api.physics.components.Box3DCollider;
 
-public class RigidBody2D extends Component {
-    public final Vector2f velocity = new Vector2f();
+public class RigidBody3D extends Component {
+    public final Vector3f velocity = new Vector3f();
     public float angularDamping = 0.8f;
     public float linearDamping = 0.9f;
     public float mass = 0f;
     public RigidBodyType bodyType = RigidBodyType.DYNAMIC;
 
     public boolean fixedRotation = false;
-    public boolean continuousCollision = true;
+    public DBody rawBody = null;
+    public Box3DCollider collider;
 
-    public transient Body rawBody = null;
-    public transient Box2DCollider collider;
-
-    public RigidBody2D(GameObject gameObject) {
+    public RigidBody3D(GameObject gameObject) {
         super(gameObject);
     }
 
     @Override
     public void start() {
-        collider = getComponent(Box2DCollider.class);
+        collider = getComponent(Box3DCollider.class);
     }
 
     @Override
     public void update() {
         if (rawBody != null) {
-            transform.position.x = rawBody.getPosition().x;
-            transform.position.y = rawBody.getPosition().y;
-            velocity.set(rawBody.m_linearVelocity.x, rawBody.m_linearVelocity.y);
+            velocity.set(
+                    rawBody.getLinearVel().get0(),
+                    rawBody.getLinearVel().get1(),
+                    rawBody.getLinearVel().get2()
+            );
+            transform.position.set(
+                    rawBody.getPosition().get0(),
+                    rawBody.getPosition().get1(),
+                    rawBody.getPosition().get2()
+            );
+            transform.rotation.set(
+                    (float) rawBody.getRotation().get00(),
+                    (float) rawBody.getRotation().get01(),
+                    (float) rawBody.getRotation().get02(),
+                    transform.rotation.w
+            );
 
             Debug.drawBox(new Vector3f(
                             transform.position.x - (collider.halfSize.x * 0.5f),

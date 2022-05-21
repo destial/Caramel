@@ -26,6 +26,8 @@ public class SceneSerializer implements JsonSerializer<Scene>, JsonDeserializer<
             .registerTypeAdapter(GameObject.class, GAME_OBJECT_SERIALIZER)
             .registerTypeAdapter(Component.class, COMPONENT_SERIALIZER)
             .setPrettyPrinting()
+            .serializeSpecialFloatingPointValues()
+            .enableComplexMapKeySerialization()
             .serializeNulls()
             .create();
 
