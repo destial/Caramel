@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.physics;
 
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
@@ -9,6 +10,9 @@ import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
+import xyz.destiall.caramel.api.physics.listeners.ContactListener;
+import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.app.editor.Scene;
 
 public class Physics2D implements Physics {
     private final Vec2 gravity = new Vec2(0, -1f);
@@ -16,7 +20,13 @@ public class Physics2D implements Physics {
     private final int velocityIterations = 8;
     private final int positionInterations = 3;
 
-    private World world = new World(gravity);
+    private World world;
+    private final Scene scene;
+
+    public Physics2D(Scene scene) {
+        this.scene = scene;
+        reset();
+    }
 
     @Override
     public void addGameObject(GameObject gameObject) {
@@ -70,6 +80,7 @@ public class Physics2D implements Physics {
     public void reset() {
         //physicsTime = 0;
         world = new World(gravity);
+        world.setContactListener(new ContactListener(scene));
     }
 
     @Override

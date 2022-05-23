@@ -9,34 +9,58 @@ import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.debug.Debug;
+import xyz.destiall.caramel.api.physics.components.Collider;
+import xyz.destiall.caramel.api.physics.listeners.Contactable2D;
+import xyz.destiall.caramel.app.editor.EditorCamera;
+import xyz.destiall.caramel.interfaces.ShowInEditor;
 
-public class NewScript extends Component {
+public class NewScript extends Component implements Contactable2D {
     public NewScript(GameObject gameObject) {
         super(gameObject);
     }
 
-    private transient GameObject other;
+    @ShowInEditor
+    public float force = 100f;
+    @ShowInEditor
+    public String data = "floo";
+    private transient Vector3f spawnPos;
 
     @Override
     public void start() {
-        other = gameObject.scene.getGameObjects().stream().filter(g -> g != gameObject).findFirst().get();
+        spawnPos = new Vector3f(transform.position);
     }
 
     @Override
     public void update() {
-        RigidBody2D rb = getComponent(RigidBody2D.class);
-        if (rb == null || rb.rawBody == null) return;
+        if (data.equalsIgnoreCase("spike")) return;
 
-        Debug.drawLine(other.transform.position, transform.position, new Vector3f(255, 0, 0));
+        if (data.equalsIgnoreCase("player")) {
+            RigidBody2D rb = getComponent(RigidBody2D.class);
+            if (rb == null || rb.rawBody == null) return;
+            if (Input.isKeyPressed(Input.Key.SPACE)) {
+                rb.rawBody.applyForceToCenter(new Vec2(0, force));
+            }
+            if (Input.isKeyDown(Input.Key.A)) {
+                rb.rawBody.applyForceToCenter(new Vec2(-1, 0));
+            }
+            if (Input.isKeyDown(Input.Key.D)) {
+                rb.rawBody.applyForceToCenter(new Vec2(1, 0));
+            }
+            EditorCamera camera = gameObject.scene.getEditorCamera();
+            camera.transform.position.x = transform.position.x;
+        }
+    }
 
-        if (Input.isKeyPressed(Input.Key.SPACE)) {
-            rb.rawBody.applyForceToCenter(new Vec2(0, 10));
-        }
-        if (Input.isKeyDown(Input.Key.A)) {
-            rb.rawBody.applyForceToCenter(new Vec2(-1, 0));
-        }
-        if (Input.isKeyDown(Input.Key.D)) {
-            rb.rawBody.applyForceToCenter(new Vec2(1, 0));
+    @Override
+    public void onCollisionEnter(RigidBody2D other) {
+        if (other.gameObject.hasComponent(NewScript.class)) {
+            String data = other.getComponent(NewScript.class).data;
+            if (data.equalsIgnoreCase("spike")) {
+                RigidBody2D rb = getComponent(RigidBody2D.class);
+                if (rb == null || rb.rawBody == null) return;
+
+                // rb.rawBody.applyForceToCenter(new Vec2(0, 250f));
+            }
         }
     }
 }

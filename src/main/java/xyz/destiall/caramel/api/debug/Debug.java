@@ -6,10 +6,12 @@ import xyz.destiall.caramel.app.editor.ui.ConsolePanel;
 
 public abstract class Debug {
     public static void log(Object log) {
+        System.out.println(log);
         ConsolePanel.addLog(""+log);
     }
 
     public static void logError(Object error) {
+        System.out.println(error);
         ConsolePanel.addError("ERROR: " + error);
     }
 

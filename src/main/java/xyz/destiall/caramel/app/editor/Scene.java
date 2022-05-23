@@ -75,8 +75,8 @@ public class Scene implements Update {
         go.addComponent(new EditorCamera(go));
         editorCamera = go.getComponent(EditorCamera.class);
         physics = new HashMap<>();
-        physics.put(Physics.Mode._2D, new Physics2D());
-        physics.put(Physics.Mode._3D, new Physics3D());
+        physics.put(Physics.Mode._2D, new Physics2D(this));
+        physics.put(Physics.Mode._3D, new Physics3D(this));
     }
 
     public <P extends Panel> P getEditorPanel(Class<P> clazz) {

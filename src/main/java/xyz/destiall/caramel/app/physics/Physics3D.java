@@ -10,14 +10,18 @@ import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;
+import xyz.destiall.caramel.app.editor.Scene;
 
 public class Physics3D implements Physics {
     private final DVector3 gravity = new DVector3(0, -1f, 0);
     private final float physicsTimeStep = 1.f / 60.f;
 
-    private DWorld world = OdeHelper.createWorld();
+    private DWorld world;
+    private final Scene scene;
 
-    public Physics3D() {
+    public Physics3D(Scene scene) {
+        this.scene = scene;
+        world = OdeHelper.createWorld();
         world.setGravity(gravity);
     }
 

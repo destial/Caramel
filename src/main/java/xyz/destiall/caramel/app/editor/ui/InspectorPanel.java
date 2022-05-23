@@ -108,10 +108,9 @@ public class InspectorPanel extends Panel {
                     addingScript = !addingScript;
                 }
                 if (addingScript) {
-                    ImString scriptName = new ImString("NewScript");
-                    ImGui.inputText("##name", scriptName);
+                    String scriptName = ImGuiUtils.inputText("##newScript", "NewScript");
                     if (ImGui.button("Create")) {
-                        FileIO.writeScript(scriptName.get());
+                        FileIO.writeScript(scriptName);
                         addingComponents = false;
                     }
                 }

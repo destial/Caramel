@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app.editor.ui;
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
+import imgui.type.ImBoolean;
 import imgui.type.ImString;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
@@ -321,10 +322,11 @@ public class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        boolean returnValue = ImGui.checkbox("##checkbox", value);
+        ImBoolean imBoolean = new ImBoolean(value);
+        ImGui.checkbox("##checkbox", imBoolean);
         ImGui.columns(1);
         ImGui.popID();
 
-        return returnValue;
+        return imBoolean.get();
     }
 }

@@ -27,7 +27,7 @@ public abstract class Component implements Update {
     @HideInEditor public transient boolean alreadyEnabled = false;
     @HideInEditor public int id;
 
-    public boolean enabled = true;
+    @HideInEditor public boolean enabled = true;
 
     private Component() {}
 
@@ -42,7 +42,7 @@ public abstract class Component implements Update {
 
     @Override
     public void imguiLayer() {
-        for (Field field : getClass().getDeclaredFields()) {
+        for (Field field : getClass().getFields()) {
             try {
                 if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) continue;
                 if (Modifier.isPublic(field.getModifiers()) || field.isAnnotationPresent(ShowInEditor.class)) {
@@ -51,10 +51,14 @@ public abstract class Component implements Update {
                     Object value = field.get(this);
                     String name = field.getName();
 
-                    if (type == int.class) {
-                        field.set(this, ImGuiUtils.dragInt(name, (int) value));
+                    if (type == boolean.class) {
+                        field.setBoolean(this, ImGuiUtils.drawCheckBox(name, (boolean) value));
+                    } else if (type == int.class) {
+                        field.setInt(this, ImGuiUtils.dragInt(name, (int) value));
                     } else if (type == float.class) {
-                        field.set(this, ImGuiUtils.dragFloat(name, (float) value));
+                        field.setFloat(this, ImGuiUtils.dragFloat(name, (float) value));
+                    } else if (type == String.class) {
+                        field.set(this, ImGuiUtils.inputText(name, (String) value));
                     } else if (type == Vector3f.class) {
                         ImGuiUtils.drawVec3Control(name, (Vector3f) value, 1f);
                     } else if (type == Vector2f.class) {
@@ -90,7 +94,6 @@ public abstract class Component implements Update {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            field.setAccessible(false);
         }
     }
 

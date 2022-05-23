@@ -25,6 +25,8 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -124,23 +126,18 @@ public class ScriptManager implements Listener {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             JavaCompiledScript script = compiledScripts.get(scriptName);
             if (event.getType() == FileEvent.Type.MODIFY || event.getType() == FileEvent.Type.CREATE) {
-                System.out.println("Modified file: " + event.getFile().getName());
+                Debug.log("Modified file: " + event.getFile().getName());
                 if (!awaitingCompilation.add(file.getName())) {
                     return;
                 }
                 if (script != null && event.getType() == FileEvent.Type.MODIFY) {
-                    final List<GameObject> reloadedGameobjects = new ArrayList<>();
-                    Application.getApp().getCurrentScene().forEachGameObject((go) -> {
-                        if (go.removeComponent((Class<? extends Component>) script.getCompiledClass())) {
-                            reloadedGameobjects.add(go);
-                        }
-                    });
                     compiledScripts.remove(scriptName);
                     InspectorPanel.COMPONENTS.remove(script.getCompiledClass());
                     System.gc();
                     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
                     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
                     StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
+                    standardFileManager.getClassLoader(StandardLocation.CLASS_OUTPUT);
                     try (MemoryFileManager mfm = new MemoryFileManager(standardFileManager, this.getClass().getClassLoader())) {
                         try {
                             ClassLoader cl = mfm.getClassLoader(StandardLocation.CLASS_OUTPUT);
@@ -150,9 +147,22 @@ public class ScriptManager implements Listener {
                             try {
                                 Constructor<?> constructor = newScriptClass.getConstructor(GameObject.class);
                                 Debug.log(constructor);
-                                for (GameObject go : reloadedGameobjects) {
-                                    Component component = (Component) constructor.newInstance(go);
-                                    go.addComponent(component);
+                                for (GameObject go : Application.getApp().getCurrentScene().getGameObjects()) {
+                                    if (go.hasComponent((Class<? extends Component>) script.getCompiledClass())) {
+                                        Field[] fields = script.getCompiledClass().getDeclaredFields();
+                                        if (go.removeComponent((Class<? extends Component>) script.getCompiledClass())) {
+                                            Component component = (Component) constructor.newInstance(go);
+                                            for (Field field : fields) {
+                                                if (Modifier.isTransient(field.getModifiers())) continue;
+                                                Field newField = component.getClass().getDeclaredField(field.getName());
+                                                if (newField.getType() == field.getType()) {
+                                                    newField.setAccessible(true);
+                                                    newField.set(component, field.get(script.getCompiledInstance()));
+                                                }
+                                            }
+                                            go.addComponent(component);
+                                        }
+                                    }
                                 }
                                 awaitingCompilation.remove(file.getName());
                             } catch (Exception e) {
@@ -166,6 +176,7 @@ public class ScriptManager implements Listener {
                     }
                 } else {
                     reloadScript(file);
+                    System.gc();
                 }
             } else {
                 if (script != null) {
