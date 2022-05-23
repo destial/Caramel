@@ -24,15 +24,19 @@ public class NewScript extends Component {
 
     @Override
     public void update() {
-        RigidBody3D rb = getComponent(RigidBody3D.class);
+        RigidBody2D rb = getComponent(RigidBody2D.class);
         if (rb == null || rb.rawBody == null) return;
-
-        Debug.log("gay lmao");
 
         Debug.drawLine(other.transform.position, transform.position, new Vector3f(255, 0, 0));
 
         if (Input.isKeyPressed(Input.Key.SPACE)) {
-            rb.rawBody.setLinearVel(rb.rawBody.getLinearVel().get0(), 5, rb.rawBody.getLinearVel().get2());
+            rb.rawBody.applyForceToCenter(new Vec2(0, 10));
+        }
+        if (Input.isKeyDown(Input.Key.A)) {
+            rb.rawBody.applyForceToCenter(new Vec2(-1, 0));
+        }
+        if (Input.isKeyDown(Input.Key.D)) {
+            rb.rawBody.applyForceToCenter(new Vec2(1, 0));
         }
     }
 }

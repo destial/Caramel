@@ -49,6 +49,8 @@ public class ConsolePanel extends Panel {
     @Override
     public void imguiLayer() {
         ImGui.begin("Console");
+        Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
+        Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         for (Pair<String, Level> log : LOGS) {
             ImGui.textColored(getColor(log.getValue()), log.getKey());
         }

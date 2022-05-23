@@ -4,7 +4,6 @@ import org.joml.Vector3f;
 import org.ode4j.ode.DBody;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.GameObject;
-import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;
 
@@ -46,17 +45,6 @@ public class RigidBody3D extends Component {
                     (float) rawBody.getRotation().get01(),
                     (float) rawBody.getRotation().get02(),
                     transform.rotation.w
-            );
-
-            Debug.drawBox(new Vector3f(
-                            transform.position.x - (collider.halfSize.x * 0.5f),
-                            transform.position.y - (collider.halfSize.y * 0.5f),
-                            transform.position.z - (transform.scale.z * 0.5f)),
-                    new Vector3f(
-                            transform.position.x + (collider.halfSize.x * 0.5f),
-                            transform.position.y + (collider.halfSize.y * 0.5f),
-                            transform.position.z + (transform.scale.z * 0.5f)),
-                    new Vector3f(0, 255, 0)
             );
         }
     }

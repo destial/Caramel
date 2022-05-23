@@ -1,5 +1,6 @@
 package xyz.destiall.caramel.app.editor;
 
+import imgui.ImGui;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
@@ -7,6 +8,8 @@ import xyz.destiall.caramel.api.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
+import xyz.destiall.caramel.app.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.ui.Panel;
 import xyz.destiall.caramel.interfaces.HideInEditor;
 
 public class EditorCamera extends Component {
@@ -33,7 +36,8 @@ public class EditorCamera extends Component {
         up = new Vector3f(transform.up);
 
         projection.identity();
-        projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
+        //projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
+        projection = new Matrix4f().identity().ortho(-8, 8, -4.5f, 4.5f, near, far, true, new Matrix4f());
     }
 
     @Override
@@ -43,14 +47,15 @@ public class EditorCamera extends Component {
 
     @Override
     public void update() {
-        if (Input.isMouseDown(Input.Mouse.LEFT)) {
-            //if (perspective) {
+        perspective = false;
+        if (Panel.isWindowHovered(GamePanel.class) && ImGui.isMouseDown(Input.Mouse.RIGHT)) {
+            if (perspective) {
                 if (Input.isKeyDown(Input.Key.W)) {
                     transform.position.add(target.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
                 } else if (Input.isKeyDown(Input.Key.S)) {
                     transform.position.sub(target.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
                 }
-            //}
+            }
             if (Input.isKeyDown(Input.Key.A)) {
                 Vector3f left = up.cross(target, new Vector3f());
                 transform.position.add(left.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
@@ -65,7 +70,7 @@ public class EditorCamera extends Component {
                 transform.position.sub(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
             }
 
-            if (perspective && Input.isMouseDown(Input.Mouse.LEFT)) {
+            if (perspective && ImGui.isMouseDown(Input.Mouse.LEFT)) {
                 float mouseX = -Input.getMouseDeltaX() * sensitivity;
                 float mouseY = Input.getMouseDeltaY() * sensitivity;
 
@@ -82,12 +87,12 @@ public class EditorCamera extends Component {
             }
         }
 
-        if (Input.isKeyPressed(Input.Key.C)) {
-            toggleCameraView();
-        }
+        //if (Input.isKeyPressed(Input.Key.C)) {
+        //    toggleCameraView();
+        //}
     }
 
-    public void toggleCameraView() {
+    private void toggleCameraView() {
         perspective = !perspective;
         // projection.identity();
     }
@@ -104,26 +109,29 @@ public class EditorCamera extends Component {
     }
 
     public Matrix4f getProjection() {
-        Matrix4f to;
+        //Matrix4f to;
+        //if (perspective) {
+        //    to = new Matrix4f().identity().perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
+        //} else
+        //{
+            //projection = new Matrix4f().identity().ortho(-8, 8, -4.5f, 4.5f, near, far, true, new Matrix4f());
 
-        if (perspective) {
-            to = new Matrix4f().identity().perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
-        } else {
-            to = new Matrix4f().identity().ortho(-8, 8, -4.5f, 4.5f, near, far, true, new Matrix4f());
-            if (Math.abs(target.z) > DELTA_ERROR)
-                target.lerp(new Vector3f(0, 0, -1), Time.deltaTime);
-            else {
-                target.y = 0;
-                target.x = 0;
-                target.z = -1;
-            }
+            //if (Math.abs(target.z) > DELTA_ERROR)
+            //    target.lerp(new Vector3f(0, 0, -1), Time.deltaTime);
+            //else {
+            //    target.y = 0;
+            //    target.x = 0;
+            //    target.z = -1;
+            //}
 
-            if (Math.abs(1 - up.y) > DELTA_ERROR) up.lerp(new Vector3f(up.x, 1f, up.z), Time.deltaTime);
-            else up.y = 1;
-        }
+            //if (Math.abs(1 - up.y) > DELTA_ERROR) up.lerp(new Vector3f(up.x, 1f, up.z), Time.deltaTime);
+            //else up.y = 1;
+        //}
 
-        if (!projection.equals(to, DELTA_ERROR)) projection.lerp(to, Time.deltaTime);
-        else projection = to;
+        //if (!projection.equals(to, DELTA_ERROR)) projection.lerp(to, Time.deltaTime);
+        //else projection = to;
+
+
 
         return projection;
     }

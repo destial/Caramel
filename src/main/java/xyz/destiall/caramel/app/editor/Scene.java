@@ -51,7 +51,7 @@ public class Scene implements Update {
 
     private boolean playing = false;
     private boolean saved = true;
-    private Physics.Mode physicsMode = Physics.Mode._3D;
+    private Physics.Mode physicsMode = Physics.Mode._2D;
 
     public GameObject selectedGameObject;
     public GameObject selectedPlayingGameObject;
@@ -128,6 +128,7 @@ public class Scene implements Update {
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             gizmo.setTarget(selectedGameObject);
+            gizmo.render();
         }
         DebugDraw.INSTANCE.update();
     }

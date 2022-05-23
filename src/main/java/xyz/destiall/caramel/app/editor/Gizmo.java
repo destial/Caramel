@@ -11,7 +11,7 @@ public class Gizmo implements Render {
     private GameObject target;
 
     public Gizmo() {
-        mesh = MeshBuilder.createCircle(new Vector4f(1f, 1f, 1f, 1f), 0.1f, 18);
+        mesh = MeshBuilder.createCircle(new Vector4f(1f, 0f, 0f, 1f), 0.1f, 18);
         mesh.build();
     }
 

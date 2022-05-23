@@ -54,6 +54,8 @@ public class InspectorPanel extends Panel {
     @Override
     public void imguiLayer() {
         ImGui.begin("Inspector");
+        Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
+        Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         if (scene.selectedGameObject != null) {
             Component removing = null;
             for (Component component : scene.selectedGameObject.getComponents()) {

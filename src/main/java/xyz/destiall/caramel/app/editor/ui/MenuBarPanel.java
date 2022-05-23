@@ -17,6 +17,8 @@ public class MenuBarPanel extends Panel {
     @Override
     public void imguiLayer() {
         ImGui.beginMainMenuBar();
+        Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
+        Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         if (ImGui.button("File")) {
             openFile = !openFile;
         }

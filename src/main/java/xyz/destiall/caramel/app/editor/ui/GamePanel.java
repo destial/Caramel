@@ -12,6 +12,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.Scene;
@@ -47,6 +48,9 @@ public class GamePanel extends Panel {
         }
         ImGui.text("FPS: " + previousFps);
         ImGui.text("Delta: " + previousDt + "ms");
+
+        Panel.setPanelFocused(GamePanel.class, ImGui.isWindowFocused());
+        Panel.setPanelHovered(GamePanel.class, ImGui.isWindowHovered());
 
         gameWindowSize = getLargestSizeForViewport();
         gameWindowPos = getCenteredPositionForViewport(gameWindowSize);
@@ -87,6 +91,12 @@ public class GamePanel extends Panel {
             ImGuizmo.manipulate(cameraView.get(new float[16]), cameraProjection.get(new float[16]), floats, Operation.TRANSLATE, Mode.LOCAL);
             if (ImGuizmo.isUsing()) {
                 selected.transform.position.set(Arrays.copyOf(floats, 3));
+            }
+        }
+
+        if (ImGui.isWindowHovered()) {
+            if (Input.isKeyPressed(Input.Key.F)) {
+
             }
         }
 

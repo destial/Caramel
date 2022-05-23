@@ -14,6 +14,7 @@ import imgui.type.ImBoolean;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.ui.Panel;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
@@ -190,6 +191,7 @@ public class ImGUILayer {
 
         glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         ImGui.newFrame();
+        Panel.reset();
     }
 
     private void endFrame() {
