@@ -2,7 +2,7 @@ package xyz.destiall.caramel.app.serialize;
 
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.java.gson.JsonArray;
@@ -24,14 +24,14 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         JsonObject object = jsonElement.getAsJsonObject();
         GameObject gameObject = (GameObject) Reflect.newInstance(GameObject.class);
         gameObject.name = object.get("name").getAsString();
-        gameObject.id = object.get("id").getAsInt();
+        // gameObject.id = object.get("id").getAsInt();
 
         JsonArray components = object.get("components").getAsJsonArray();
         for (JsonElement c : components) {
             if (!c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
             Reflect.setDeclaredField(gameObject, "transform", component);
-            Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, component.id));
+            // Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, component.id));
             gameObject.addComponent(component);
             break;
         }
@@ -49,10 +49,8 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
                 Mesh mesh = ((MeshRenderer) component).mesh;
                 if (mesh != null) mesh.build();
             }
-            Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, component.id));
             gameObject.addComponent(component);
         }
-        Component.ENTITY_IDS.updateAndGet((i) -> Math.max(i, gameObject.id));
 
         JsonArray children = object.get("children").getAsJsonArray();
         for (JsonElement c : children) {
@@ -83,7 +81,7 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         object.add("children", children);
         object.add("tags", tags);
         object.addProperty("name", gameObject.name);
-        object.addProperty("id", gameObject.id);
+        // object.addProperty("id", gameObject.id);
         return object;
     }
 }

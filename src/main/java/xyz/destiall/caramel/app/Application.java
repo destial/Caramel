@@ -123,11 +123,18 @@ public class Application {
     }
 
     public void run() {
+        loadAssets();
+        init();
+        loop();
+        destroy();
+    }
+
+    private void loadAssets() {
         try {
             File assets = new File("assets");
             if (assets.mkdir()) {
-                saveResource("/assets/shaders/color.glsl", false);
-                saveResource("/assets/shaders/default.glsl", false);
+                saveResource("assets/shaders/color.glsl", false);
+                saveResource("assets/shaders/default.glsl", false);
                 saveResource("caramel_logo.png", false);
 
                 wait(1000);
@@ -135,10 +142,6 @@ public class Application {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        init();
-        loop();
-        destroy();
     }
 
     private void init() {
@@ -162,8 +165,6 @@ public class Application {
         glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
-            // glViewport(0, 0, width, height);
-            //process();
         });
 
         // Set cursor mode

@@ -11,7 +11,7 @@ import xyz.destiall.caramel.app.editor.ui.Panel;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
 public class EditorCamera extends Camera {
-    @HideInEditor private transient static final float DELTA_ERROR = 0.0009f;
+    @HideInEditor private static final float DELTA_ERROR = 0.0009f;
     private boolean perspective = true;
     public float sensitivity = 0.5f;
 
@@ -55,9 +55,9 @@ public class EditorCamera extends Camera {
             float mouseX = -Input.getMouseDeltaX() * sensitivity;
             float mouseY = Input.getMouseDeltaY() * sensitivity;
 
-            transform.position.add(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5f : 2f) * mouseY, new Vector3f()));
+            transform.position.add(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
             Vector3f right = target.cross(up, new Vector3f());
-            transform.position.add(right.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5f : 2f) * mouseX));
+            transform.position.add(right.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseX));
         }
 
         //if (Input.isKeyPressed(Input.Key.C)) {
@@ -97,8 +97,6 @@ public class EditorCamera extends Camera {
 
         //if (!projection.equals(to, DELTA_ERROR)) projection.lerp(to, Time.deltaTime);
         //else projection = to;
-
-
 
         //return projection;
     //}

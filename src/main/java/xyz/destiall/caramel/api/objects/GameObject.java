@@ -2,25 +2,24 @@ package xyz.destiall.caramel.api.objects;
 
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.Camera;
-import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
+import xyz.destiall.caramel.api.render.Renderer;
 import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GameObject implements Update, Render, Cloneable {
-    private final Map<Class<? extends Component>, Component> components;
-    public final List<GameObject> children;
-    public final List<String> tags;
+    private final HashSet<Component> components;
+    public final LinkedList<GameObject> children;
+    public final ArrayList<String> tags;
     public Transform transform;
     public Transform parent;
     public String name;
@@ -28,7 +27,7 @@ public class GameObject implements Update, Render, Cloneable {
     public int id;
 
     private GameObject() {
-        components = new HashMap<>();
+        components = new HashSet<>();
         children = new LinkedList<>();
         tags = new ArrayList<>();
     }
@@ -36,7 +35,7 @@ public class GameObject implements Update, Render, Cloneable {
     public GameObject(Scene parentScene) {
         this.scene = parentScene;
         name = "GameObject";
-        components = new HashMap<>();
+        components = new HashSet<>();
         children = new LinkedList<>();
         tags = new ArrayList<>();
         transform = new Transform(this);
@@ -52,7 +51,7 @@ public class GameObject implements Update, Render, Cloneable {
             child.update();
         }
 
-        for (Component component : components.values()) {
+        for (Component component : components) {
             if (!component.enabled) continue;
             if (!component.alreadyEnabled) {
                 component.start();
@@ -60,13 +59,15 @@ public class GameObject implements Update, Render, Cloneable {
             }
             component.update();
         }
-        for (Component component : components.values()) {
+        for (Component component : components) {
             if (!component.enabled || component instanceof MeshRenderer) continue;
             component.lateUpdate();
         }
 
-        MeshRenderer render = getComponent(MeshRenderer.class);
-        if (render != null) render.lateUpdate();
+        Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
+        for (Renderer render : renderers) {
+            render.lateUpdate();
+        }
     }
 
     @Override
@@ -78,8 +79,10 @@ public class GameObject implements Update, Render, Cloneable {
             child.editorUpdate();
         }
 
-        MeshRenderer render = getComponent(MeshRenderer.class);
-        if (render != null) render.lateUpdate();
+        Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
+        for (Renderer render : renderers) {
+            render.lateUpdate();
+        }
     }
 
     public void setScene(Scene parentScene) {
@@ -91,7 +94,12 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     public <C extends Component> C getComponent(Class<C> clazz) {
-        return clazz.cast(components.get(clazz));
+        Component component = components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
+        return clazz.cast(component);
+    }
+
+    public <C extends Component> Set<C> getComponents(Class<C> clazz) {
+        return (Set<C>) components.stream().filter(c -> clazz.isAssignableFrom(clazz)).collect(Collectors.toSet());
     }
 
     public <C extends Component> C getComponentInParent(Class<C> clazz) {
@@ -133,14 +141,15 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     public boolean addComponent(Component component) {
-        if (components.containsKey(component.getClass())) return false;
-        components.put(component.getClass(), component);
+        if (hasComponent(component.getClass())) return false;
+        components.add(component);
         return true;
     }
 
     public <C extends Component> boolean removeComponent(Class<C> clazz) {
-        Component component = components.remove(clazz);
+        Component component = getComponent(clazz);
         if (component == null) return false;
+        components.remove(component);
         if (component instanceof Camera && component == scene.getGameCamera()) {
             scene.setGameCamera(null);
         }
@@ -148,11 +157,11 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     public Collection<Component> getComponents() {
-        return components.values();
+        return components;
     }
 
     public <C extends Component> boolean hasComponent(Class<C> clazz) {
-        return components.containsKey(clazz);
+        return components.stream().anyMatch(c -> clazz.isAssignableFrom(c.getClass()));
     }
 
     public GameObject findGameObject(String name) {
@@ -165,7 +174,7 @@ public class GameObject implements Update, Render, Cloneable {
 
     @Override
     public void render(Camera camera) {
-        for (Component component : components.values()) {
+        for (Component component : components) {
             if (component instanceof Render)
                 ((Render) component).render(camera);
         }
@@ -188,7 +197,7 @@ public class GameObject implements Update, Render, Cloneable {
         clone.transform.localScale.set(transform.localScale);
         clone.transform.forward.set(transform.forward);
         clone.transform.enabled = transform.enabled;
-        for (Component c : components.values()) {
+        for (Component c : components) {
             if (c instanceof Transform) continue;
             Component cl = c.clone(clone);
             clone.addComponent(cl);

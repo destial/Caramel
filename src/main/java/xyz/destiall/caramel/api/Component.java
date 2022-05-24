@@ -86,8 +86,8 @@ public abstract class Component implements Update {
     public Component clone(GameObject gameObject) {
         try {
             Component clone = getClass().getConstructor(GameObject.class).newInstance(gameObject);
-            Component.ENTITY_IDS.decrementAndGet();
-            clone.id = id;
+            // Component.ENTITY_IDS.decrementAndGet();
+            // clone.id = id;
             for (Field field : getClass().getFields()) {
                 try {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;

@@ -8,7 +8,7 @@ import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.texture.MeshBuilder;

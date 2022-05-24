@@ -27,13 +27,11 @@ public class Camera extends Component {
 
         projection.identity();
         //projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
-        // projection.ortho(-8, 8, -4.5f, 4.5f, near, far, true);
+        //projection.ortho(-8, 8, -4.5f, 4.5f, near, far, true);
     }
 
     @Override
-    public void start() {
-
-    }
+    public void start() {}
 
     @Override
     public void update() {}
@@ -45,7 +43,6 @@ public class Camera extends Component {
         float ratio = Application.getApp().getWidth() / (float) Application.getApp().getHeight();
         projection.identity();
         projection.ortho(-4.5f * ratio, 4.5f * ratio, -2.5f * ratio, 2.5f * ratio, near, far, true);
-        // projection.ortho(-8, 8, -4.5f, 4.5f, near, far, true);
         return projection;
     }
 

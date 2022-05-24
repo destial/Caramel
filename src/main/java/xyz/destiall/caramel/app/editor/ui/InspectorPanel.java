@@ -5,10 +5,10 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.components.SpriteRenderer;
+import xyz.destiall.caramel.api.render.SpriteRenderer;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.Camera;
-import xyz.destiall.caramel.api.components.MeshRenderer;
+import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.components.Transform;
@@ -55,6 +55,7 @@ public class InspectorPanel extends Panel {
         if (scene.selectedGameObject != null) {
             Component removing = null;
             for (Component component : scene.selectedGameObject.getComponents()) {
+
                 if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
                     component.imguiLayer();
                     if (component instanceof Transform) continue;
@@ -76,6 +77,7 @@ public class InspectorPanel extends Panel {
                         ImGui.end();
                     }
                 }
+                
             }
             if (removing != null) {
                 scene.selectedGameObject.removeComponent(removing.getClass());
