@@ -9,6 +9,13 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.texture.Mesh;
+import xyz.destiall.caramel.api.physics.RigidBodyType;
+import xyz.destiall.caramel.graphics.Texture;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 public class ImGuiUtils {
 
@@ -156,7 +163,7 @@ public class ImGuiUtils {
         ImGui.pushID(label);
 
         ImGui.columns(2);
-        ImGui.setColumnWidth(0, 5 * label.length());
+        ImGui.setColumnWidth(0, width);
         ImGui.text(label);
         ImGui.nextColumn();
 
@@ -173,12 +180,12 @@ public class ImGuiUtils {
         ImGui.pushID(label);
 
         ImGui.columns(2);
-        ImGui.setColumnWidth(0, 5 * label.length());
+        ImGui.setColumnWidth(0, width);
         ImGui.text(label);
         ImGui.nextColumn();
 
         int[] valArr = {value};
-        ImGui.dragInt("##dragFloat", valArr, 0.1f);
+        ImGui.dragInt("##dragInt", valArr, 0.1f);
 
         ImGui.columns(1);
         ImGui.popID();
@@ -328,5 +335,73 @@ public class ImGuiUtils {
         ImGui.popID();
 
         return imBoolean.get();
+    }
+
+    public static void imguiLayer(Field field, Component component) {
+        try {
+            Class<?> type = field.getType();
+            Object value = field.get(component);
+            String name = field.getName();
+
+            if (type == boolean.class) {
+                field.setBoolean(component, ImGuiUtils.drawCheckBox(name, (boolean) value));
+
+            } else if (type == int.class) {
+                field.setInt(component, ImGuiUtils.dragInt(name, (int) value));
+
+            } else if (type == float.class) {
+                field.setFloat(component, ImGuiUtils.dragFloat(name, (float) value));
+
+            } else if (type == String.class) {
+                field.set(component, ImGuiUtils.inputText(name, (String) value));
+
+            } else if (type == Vector3f.class) {
+                ImGuiUtils.drawVec3Control(name, (Vector3f) value, 1f);
+
+            } else if (type == Vector2f.class) {
+                ImGuiUtils.drawVec2Control(name, (Vector2f) value);
+
+            } else if (type == Quaternionf.class) {
+                Quaternionf quat = (Quaternionf) value;
+                ImGuiUtils.drawQuatControl(name, quat, 0.f);
+
+            } else if (type == Mesh.class) {
+                Mesh mesh = (Mesh) value;
+                ImGui.text("shader: " + mesh.getShader().getPath());
+                if (mesh.getColor() != null) {
+                    ImGuiUtils.colorPicker4("color", mesh.getColor());
+                }
+                String string = ImGuiUtils.inputText("texture:", mesh.getTexture() == null ? "" : mesh.getTexture().getPath());
+                ImGui.sameLine();
+                if (ImGui.button("apply")) {
+                    if (mesh.getTexture() == null || !mesh.getTexture().getPath().equalsIgnoreCase(string)) {
+                        Texture texture = new Texture(string);
+                        texture.buildTexture();
+                        if (texture.isLoaded()) {
+                            mesh.setTexture(texture);
+                        }
+                    }
+                }
+            } else if (type == RigidBodyType.class) {
+                for (RigidBodyType bodyType : RigidBodyType.values()) {
+                    if (ImGuiUtils.drawCheckBox(bodyType.name().toLowerCase(), field.get(component) == bodyType)) {
+                        field.set(component, bodyType);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void imguiLayer(Method method, Component component) {
+        try {
+            String name = method.getName();
+            if (ImGui.button(name)) {
+                method.invoke(component);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

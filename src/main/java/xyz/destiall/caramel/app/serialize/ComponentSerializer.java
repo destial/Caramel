@@ -46,8 +46,8 @@ public class ComponentSerializer implements JsonSerializer<Component>, JsonDeser
             e.printStackTrace();
             return gsonComponent;
         }
-        for (Field field : gsonComponent.getClass().getDeclaredFields()) {
-            if (Modifier.isTransient(field.getModifiers())) continue;
+        for (Field field : gsonComponent.getClass().getFields()) {
+            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
             boolean accessible = field.isAccessible();
             if (!accessible) field.setAccessible(true);
             try {

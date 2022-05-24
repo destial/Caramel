@@ -5,7 +5,7 @@ import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.interfaces.HideInEditor;
+import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
 public class Camera extends Component {
     public Matrix4f projection, view;

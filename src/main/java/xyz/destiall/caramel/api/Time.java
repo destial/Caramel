@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.api;
 
-import java.awt.*;
+import java.awt.GraphicsEnvironment;
 
 public abstract class Time {
     public static long timeStarted = System.currentTimeMillis();

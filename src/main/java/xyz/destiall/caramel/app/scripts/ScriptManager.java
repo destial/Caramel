@@ -147,17 +147,18 @@ public class ScriptManager implements Listener {
                                 Constructor<?> constructor = newScriptClass.getConstructor(GameObject.class);
                                 Debug.log(constructor);
                                 for (GameObject go : Application.getApp().getCurrentScene().getGameObjects()) {
-                                    if (go.hasComponent((Class<? extends Component>) script.getCompiledClass())) {
-                                        Field[] fields = script.getCompiledClass().getDeclaredFields();
+                                    Component instance;
+                                    if ((instance = go.getComponent((Class<? extends Component>) script.getCompiledClass())) != null) {
+                                        Field[] fields = script.getCompiledClass().getFields();
                                         if (go.removeComponent((Class<? extends Component>) script.getCompiledClass())) {
                                             Component component = (Component) constructor.newInstance(go);
                                             for (Field field : fields) {
-                                                if (Modifier.isTransient(field.getModifiers())) continue;
-                                                Field newField = component.getClass().getDeclaredField(field.getName());
+                                                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
+                                                Field newField = component.getClass().getField(field.getName());
                                                 if (newField.getType() == field.getType()) {
                                                     newField.setAccessible(true);
                                                     try {
-                                                        newField.set(component, field.get(script.getCompiledInstance()));
+                                                        newField.set(component, field.get(instance));
                                                     } catch (Exception e) {
                                                         e.printStackTrace();
                                                     }

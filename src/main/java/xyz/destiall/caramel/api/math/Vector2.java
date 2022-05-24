@@ -9,6 +9,26 @@ public class Vector2 {
     private final Vec2 jbox2d;
     private final ImVec2 imgui;
 
+    public Vector2() {
+        this(0);
+    }
+
+    public Vector2(Vector2f vect) {
+        this(vect.x, vect.y);
+    }
+
+    public Vector2(Vec2 vect) {
+        this(vect.x, vect.y);
+    }
+
+    public Vector2(ImVec2 vect) {
+        this(vect.x, vect.y);
+    }
+
+    public Vector2(float i) {
+        this(i, i);
+    }
+
     public Vector2(float x, float y) {
         joml = new Vector2f(x, y);
         jbox2d = new Vec2(x, y);
@@ -22,7 +42,11 @@ public class Vector2 {
     }
 
     public float x() {
-        return joml.x;
+        return joml.y();
+    }
+
+    public float distanceSquared(Vector2 other) {
+        return joml.distanceSquared(other.joml);
     }
 
     public float y() {
@@ -30,6 +54,7 @@ public class Vector2 {
     }
 
     public ImVec2 getImgui() {
+        imgui.set(joml.x, joml.y);
         return imgui;
     }
 
@@ -39,5 +64,10 @@ public class Vector2 {
 
     public Vec2 getJbox2d() {
         return jbox2d;
+    }
+
+    @Override
+    public String toString() {
+        return joml.toString();
     }
 }

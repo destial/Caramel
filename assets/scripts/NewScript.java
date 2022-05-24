@@ -1,14 +1,14 @@
 package scripts;
 
-import org.jbox2d.common.Vec2;
-import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.math.Vector2;
+import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.listeners.Contactable2D;
-import xyz.destiall.caramel.interfaces.ShowInEditor;
+import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 
 public class NewScript extends Component implements Contactable2D {
     public NewScript(GameObject gameObject) {
@@ -18,12 +18,12 @@ public class NewScript extends Component implements Contactable2D {
     @ShowInEditor
     public float force = 100f;
     @ShowInEditor
-    public String data = "floo";
-    private transient Vector3f spawnPos;
+    public String data = "floor";
+    private transient Vector3 spawnPos;
 
     @Override
     public void start() {
-        spawnPos = new Vector3f(transform.position);
+        spawnPos = new Vector3(transform.position);
     }
 
     @Override
@@ -34,13 +34,13 @@ public class NewScript extends Component implements Contactable2D {
             RigidBody2D rb = getComponent(RigidBody2D.class);
             if (rb == null || rb.rawBody == null) return;
             if (Input.isKeyPressed(Input.Key.SPACE)) {
-                rb.rawBody.applyForceToCenter(new Vec2(0, force));
+                rb.addForce(new Vector2(0, force));
             }
             if (Input.isKeyDown(Input.Key.A)) {
-                rb.rawBody.applyForceToCenter(new Vec2(-1, 0));
+                rb.addForce(new Vector2(-1, 0));
             }
             if (Input.isKeyDown(Input.Key.D)) {
-                rb.rawBody.applyForceToCenter(new Vec2(1, 0));
+                rb.addForce(new Vector2(1, 0));
             }
             Camera camera = gameObject.scene.getGameCamera();
             if (camera == null) return;

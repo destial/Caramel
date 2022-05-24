@@ -26,14 +26,23 @@ import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
 public class Texture {
+    private transient boolean loaded = false;
     private int width, height;
-    private File path;
+    private String path;
     private int texId;
-    private boolean loaded = false;
 
     public Texture(int width, int height) {
         this.width = width;
         this.height = height;
+
+        loaded = true;
+    }
+
+    public Texture(String path) {
+        this.path = path;
+    }
+
+    public void buildEmpty() {
         texId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texId);
 
@@ -41,13 +50,12 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-        loaded = true;
     }
 
-    public Texture(String path) {
-        this.path = new File(path);
-        if (!this.path.exists()) {
-            Debug.logError("Texture file does not exist: " + this.path.getPath());
+    public void buildTexture() {
+        File file = new File(path);
+        if (!file.exists()) {
+            Debug.logError("Texture file does not exist: " + file.getPath());
             return;
         }
 
@@ -113,6 +121,6 @@ public class Texture {
     }
 
     public String getPath() {
-        return path.getPath();
+        return path;
     }
 }

@@ -8,7 +8,7 @@ import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
-import xyz.destiall.caramel.interfaces.HideInEditor;
+import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
 public class EditorCamera extends Camera {
     @HideInEditor private transient static final float DELTA_ERROR = 0.0009f;

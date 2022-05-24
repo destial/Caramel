@@ -3,7 +3,7 @@ package xyz.destiall.caramel.app.serialize;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.mesh.Mesh;
+import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.Prefab;
 import xyz.destiall.java.gson.JsonArray;

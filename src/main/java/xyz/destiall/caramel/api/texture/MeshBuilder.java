@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.api.mesh;
+package xyz.destiall.caramel.api.texture;
 
 import com.mokiat.data.front.parser.IOBJParser;
 import com.mokiat.data.front.parser.OBJDataReference;

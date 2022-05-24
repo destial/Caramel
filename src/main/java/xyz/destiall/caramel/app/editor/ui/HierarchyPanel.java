@@ -10,8 +10,8 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.mesh.Mesh;
-import xyz.destiall.caramel.api.mesh.MeshBuilder;
+import xyz.destiall.caramel.api.texture.Mesh;
+import xyz.destiall.caramel.api.texture.MeshBuilder;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.Scene;
 

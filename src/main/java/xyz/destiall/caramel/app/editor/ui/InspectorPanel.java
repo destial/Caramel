@@ -5,6 +5,7 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.components.SpriteRenderer;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.MeshRenderer;
@@ -29,6 +30,7 @@ public class InspectorPanel extends Panel {
     static {
         COMPONENTS.add(Camera.class);
         COMPONENTS.add(MeshRenderer.class);
+        COMPONENTS.add(SpriteRenderer.class);
         COMPONENTS.add(RigidBody2D.class);
         COMPONENTS.add(RigidBody3D.class);
         COMPONENTS.add(Box2DCollider.class);
@@ -78,6 +80,7 @@ public class InspectorPanel extends Panel {
             if (removing != null) {
                 scene.selectedGameObject.removeComponent(removing.getClass());
             }
+            ImGui.separator();
             if (ImGui.button("Add Component")) {
                 addingComponents = !addingComponents;
             }
