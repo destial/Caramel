@@ -4,6 +4,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
+import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.EditorCamera;
@@ -213,9 +214,8 @@ public class Mesh {
         return texture;
     }
 
-    public void render(Transform transform) {
+    public void render(Transform transform, Camera camera) {
         Shader.getShader(shader).use();
-        EditorCamera camera = Application.getApp().getCurrentScene().getEditorCamera();
         if (texture != null) {
             Shader.getShader(shader).uploadTexture("texSampler", 0);
             glActiveTexture(GL_TEXTURE0);

@@ -3,7 +3,7 @@ package xyz.destiall.caramel.api.components;
 import org.jbox2d.dynamics.Body;
 import org.joml.Vector2f;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
 

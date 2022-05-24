@@ -54,10 +54,7 @@ public class Framebuffer {
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
-        texture.bind();
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.getTexId(), 0);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-        texture.unbind();
+        texture.resize(width, height);
 
         bind();
         glBindRenderbuffer(GL_RENDERBUFFER, rboId);

@@ -6,7 +6,7 @@ import org.ode4j.ode.DBox;
 import org.ode4j.ode.DMass;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;

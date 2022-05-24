@@ -6,7 +6,7 @@ import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector4f;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;

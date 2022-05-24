@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.ScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
@@ -61,7 +62,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Application {
-    private final boolean editorMode = true;
+    public final boolean EDITOR_MODE = true;
     private boolean running = false;
 
     private final MouseListener mouseListener;
@@ -69,7 +70,7 @@ public class Application {
     private final EventHandling eventHandling;
     private final Gson serializer;
     private ImGUILayer imGui;
-    private Framebuffer framebuffer;
+    private Framebuffer[] framebuffer;
     private ScriptManager scriptManager;
 
     private int width;
@@ -164,10 +165,12 @@ public class Application {
         glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
+            // glViewport(0, 0, width, height);
+            //process();
         });
 
         // Set cursor mode
-        if (!editorMode) {
+        if (!EDITOR_MODE) {
             glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         }
 
@@ -188,13 +191,15 @@ public class Application {
         eventHandling.registerListener(scriptManager);
 
         // Create and setup ImGUI
-        if (editorMode) {
+        if (EDITOR_MODE) {
             imGui = new ImGUILayer(this);
             imGui.initImGui();
         }
 
         // Setup and create framebuffer
-        framebuffer = new Framebuffer(this.width, this.height);
+        framebuffer = new Framebuffer[2];
+        framebuffer[0] = new Framebuffer(this.width, this.height);
+        framebuffer[1] = new Framebuffer(this.width, this.height);
     }
 
     private void loop() {
@@ -215,29 +220,13 @@ public class Application {
         running = true;
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
-            glfwPollEvents();
-            if (Input.isKeyDown(GLFW_KEY_ESCAPE) && editorMode) break;
+            if (Input.isKeyDown(GLFW_KEY_ESCAPE) && EDITOR_MODE) break;
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
             }
 
-            glViewport(0, 0, width, height);
-            framebuffer.bind();
+            if (process()) break;
 
-            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-            if (!editorMode) getCurrentScene().update();
-            else getCurrentScene().editorUpdate();
-
-            framebuffer.unbind();
-            if (editorMode) imGui.update();
-
-            getCurrentScene().endFrame();
-            mouseListener.endFrame();
-            keyListener.endFrame();
-
-            glfwSwapBuffers(glfwWindow);
             endTime = Time.getElapsedTime();
             Time.deltaTime = endTime - startTime;
             if (Time.deltaTime <= 0) {
@@ -260,6 +249,38 @@ public class Application {
         FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
 
         running = false;
+    }
+
+    private boolean process() {
+        glfwPollEvents();
+
+        if (!EDITOR_MODE) getCurrentScene().update();
+        else getCurrentScene().editorUpdate();
+        glViewport(0, 0, width, height);
+
+        getSceneViewFramebuffer().bind();
+        glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        getCurrentScene().render(getCurrentScene().getEditorCamera());
+        DebugDraw.INSTANCE.render(getCurrentScene().getEditorCamera());
+        getSceneViewFramebuffer().unbind();
+
+        if (getCurrentScene().getGameCamera() != null) {
+            getGameViewFramebuffer().bind();
+            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            getCurrentScene().render(getCurrentScene().getGameCamera());
+            getGameViewFramebuffer().unbind();
+        }
+
+        if (EDITOR_MODE) imGui.update();
+
+        getCurrentScene().endFrame();
+        mouseListener.endFrame();
+        keyListener.endFrame();
+
+        glfwSwapBuffers(glfwWindow);
+        return false;
     }
 
     private void destroy() {
@@ -294,8 +315,12 @@ public class Application {
         return imGui;
     }
 
-    public Framebuffer getFramebuffer() {
-        return framebuffer;
+    public Framebuffer getSceneViewFramebuffer() {
+        return framebuffer[0];
+    }
+
+    public Framebuffer getGameViewFramebuffer() {
+        return framebuffer[1];
     }
 
     public KeyListener getKeyListener() {

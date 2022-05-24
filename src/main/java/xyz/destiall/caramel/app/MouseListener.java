@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.app.editor.EditorCamera;
-import xyz.destiall.caramel.app.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 
 import java.util.Arrays;
 
@@ -46,7 +46,7 @@ public class MouseListener {
             lastY = yPos;
             return;
         }
-        GamePanel panel = Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class);
+        ScenePanel panel = Application.getApp().getCurrentScene().getEditorPanel(ScenePanel.class);
         if (panel != null) {
             if (xPos > panel.getGameWindowPos().x &&
                     yPos > panel.getGameWindowPos().y &&
@@ -61,7 +61,7 @@ public class MouseListener {
     }
 
     public void mouseButtonCallback(long window, int button, int action, int mods) {
-        GamePanel panel = Application.getApp().getCurrentScene().getEditorPanel(GamePanel.class);
+        ScenePanel panel = Application.getApp().getCurrentScene().getEditorPanel(ScenePanel.class);
         if (panel != null) {
             if (xPos > panel.getGameWindowPos().x &&
                     yPos > panel.getGameWindowPos().y &&

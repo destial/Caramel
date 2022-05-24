@@ -1,17 +1,13 @@
 package scripts;
 
-import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
+import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.RigidBody2D;
-import xyz.destiall.caramel.api.components.RigidBody3D;
-import xyz.destiall.caramel.api.debug.Debug;
-import xyz.destiall.caramel.api.physics.components.Collider;
 import xyz.destiall.caramel.api.physics.listeners.Contactable2D;
-import xyz.destiall.caramel.app.editor.EditorCamera;
 import xyz.destiall.caramel.interfaces.ShowInEditor;
 
 public class NewScript extends Component implements Contactable2D {
@@ -46,7 +42,8 @@ public class NewScript extends Component implements Contactable2D {
             if (Input.isKeyDown(Input.Key.D)) {
                 rb.rawBody.applyForceToCenter(new Vec2(1, 0));
             }
-            EditorCamera camera = gameObject.scene.getEditorCamera();
+            Camera camera = gameObject.scene.getGameCamera();
+            if (camera == null) return;
             camera.transform.position.x = transform.position.x;
         }
     }

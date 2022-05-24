@@ -13,7 +13,7 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.app.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
@@ -47,7 +47,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 public class ImGUILayer {
     private final Application window;
     private final long glfwWindow;
-    private GamePanel gamePanel;
+    private ScenePanel scenePanel;
 
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
@@ -106,9 +106,9 @@ public class ImGUILayer {
                 ImGui.setWindowFocus(null);
             }
 
-            if (gamePanel == null) gamePanel = window.getCurrentScene().getEditorPanel(GamePanel.class);
+            if (scenePanel == null) scenePanel = window.getCurrentScene().getEditorPanel(ScenePanel.class);
 
-            if (!io.getWantCaptureMouse() || (gamePanel != null && gamePanel.isMouseOnScene()))
+            if (!io.getWantCaptureMouse() || (scenePanel != null && scenePanel.isMouseOnScene()))
                 window.getMouseListener().mouseButtonCallback(w, button, action, mods);
         });
 
@@ -116,9 +116,9 @@ public class ImGUILayer {
             io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
 
-            if (gamePanel == null) gamePanel = window.getCurrentScene().getEditorPanel(GamePanel.class);
+            if (scenePanel == null) scenePanel = window.getCurrentScene().getEditorPanel(ScenePanel.class);
 
-            if (!io.getWantCaptureMouse() || (gamePanel != null && gamePanel.isMouseOnScene()))
+            if (!io.getWantCaptureMouse() || (scenePanel != null && scenePanel.isMouseOnScene()))
                 window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
         });
 

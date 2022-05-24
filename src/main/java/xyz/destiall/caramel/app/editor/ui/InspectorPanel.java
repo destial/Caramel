@@ -4,29 +4,23 @@ import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
-import org.joml.Vector4f;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.mesh.Mesh;
-import xyz.destiall.caramel.api.mesh.MeshBuilder;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.utils.FileIO;
 import xyz.destiall.caramel.app.editor.Scene;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DELETE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 

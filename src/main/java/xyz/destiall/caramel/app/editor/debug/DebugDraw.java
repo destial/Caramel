@@ -2,8 +2,10 @@ package xyz.destiall.caramel.app.editor.debug;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.graphics.Shader;
+import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
 import java.util.ArrayList;
@@ -26,7 +28,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class DebugDraw implements Update {
+public class DebugDraw implements Update, Render {
     public static DebugDraw INSTANCE = new DebugDraw();
 
     private final List<DebugLine> lines = new ArrayList<>();
@@ -90,13 +92,16 @@ public class DebugDraw implements Update {
                 index += 6;
             }
         }
+    }
 
+    @Override
+    public void render(Camera camera) {
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
         glBufferSubData(GL_ARRAY_BUFFER, 0, Arrays.copyOfRange(vertexArray, 0, lines.size() * 6 * 2));
 
         shader.use();
-        shader.uploadMat4f("uProjection", Application.getApp().getCurrentScene().getEditorCamera().getProjection());
-        shader.uploadMat4f("uView", Application.getApp().getCurrentScene().getEditorCamera().getView());
+        shader.uploadMat4f("uProjection", camera.getProjection());
+        shader.uploadMat4f("uView", camera.getView());
 
         glBindVertexArray(vaoID);
         glEnableVertexAttribArray(0);

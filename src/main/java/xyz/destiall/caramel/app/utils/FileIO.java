@@ -15,7 +15,7 @@ public final class FileIO {
     private static final String BASE =
             "package scripts;\n" +
             "\n" +
-            "import xyz.destiall.caramel.api.GameObject;\n" +
+            "import xyz.destiall.caramel.api.objects.GameObject;\n" +
             "import xyz.destiall.caramel.api.Component;\n" +
             "\n" +
             "public class ${name} extends Component {\n" +

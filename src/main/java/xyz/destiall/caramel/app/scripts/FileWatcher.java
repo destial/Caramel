@@ -78,7 +78,6 @@ public class FileWatcher implements Runnable {
                 } catch (InterruptedException e) {
                     return;
                 }
-                System.out.println("watching scripts");
                 Path eventDir = keyMap.get(watchKey);
                 if (eventDir == null || !eventDir.toFile().exists()) return;
                 for (WatchEvent<?> event : watchKey.pollEvents()) {

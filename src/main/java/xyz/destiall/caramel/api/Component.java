@@ -7,6 +7,7 @@ import org.joml.Vector3f;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.mesh.Mesh;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
 import xyz.destiall.caramel.app.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.graphics.Texture;

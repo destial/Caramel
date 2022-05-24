@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.serialize;
 
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;

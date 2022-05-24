@@ -7,7 +7,7 @@ import ch.obermuhlner.scriptengine.java.MemoryFileManager;
 import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.debug.Debug;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.events.FileEvent;
 import xyz.destiall.caramel.app.utils.FileIO;
@@ -27,10 +27,8 @@ import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -157,7 +155,11 @@ public class ScriptManager implements Listener {
                                                 Field newField = component.getClass().getDeclaredField(field.getName());
                                                 if (newField.getType() == field.getType()) {
                                                     newField.setAccessible(true);
-                                                    newField.set(component, field.get(script.getCompiledInstance()));
+                                                    try {
+                                                        newField.set(component, field.get(script.getCompiledInstance()));
+                                                    } catch (Exception e) {
+                                                        e.printStackTrace();
+                                                    }
                                                 }
                                             }
                                             go.addComponent(component);

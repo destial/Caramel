@@ -82,6 +82,12 @@ public class Texture {
         stbi_image_free(image);
     }
 
+    public void resize(int width, int height) {
+        bind();
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        unbind();
+    }
+
     public boolean isLoaded() {
         return loaded;
     }

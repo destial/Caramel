@@ -3,7 +3,7 @@ package xyz.destiall.caramel.api.components;
 import org.joml.Vector3f;
 import org.ode4j.ode.DBody;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;
 

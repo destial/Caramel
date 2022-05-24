@@ -1,11 +1,14 @@
-package xyz.destiall.caramel.api;
+package xyz.destiall.caramel.api.objects;
 
+import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +20,7 @@ import java.util.Set;
 public class GameObject implements Update, Render, Cloneable {
     private final Map<Class<? extends Component>, Component> components;
     public final List<GameObject> children;
+    public final List<String> tags;
     public Transform transform;
     public Transform parent;
     public String name;
@@ -26,6 +30,7 @@ public class GameObject implements Update, Render, Cloneable {
     private GameObject() {
         components = new HashMap<>();
         children = new LinkedList<>();
+        tags = new ArrayList<>();
     }
 
     public GameObject(Scene parentScene) {
@@ -33,6 +38,7 @@ public class GameObject implements Update, Render, Cloneable {
         name = "GameObject";
         components = new HashMap<>();
         children = new LinkedList<>();
+        tags = new ArrayList<>();
         transform = new Transform(this);
         id = Component.ENTITY_IDS.incrementAndGet();
     }
@@ -122,6 +128,10 @@ public class GameObject implements Update, Render, Cloneable {
         }
     }
 
+    public boolean hasTag(String tag) {
+        return tags.contains(tag);
+    }
+
     public boolean addComponent(Component component) {
         if (components.containsKey(component.getClass())) return false;
         components.put(component.getClass(), component);
@@ -129,7 +139,12 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     public <C extends Component> boolean removeComponent(Class<C> clazz) {
-        return components.remove(clazz) != null;
+        Component component = components.remove(clazz);
+        if (component == null) return false;
+        if (component instanceof Camera && component == scene.getGameCamera()) {
+            scene.setGameCamera(null);
+        }
+        return true;
     }
 
     public Collection<Component> getComponents() {
@@ -149,13 +164,13 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     @Override
-    public void render() {
+    public void render(Camera camera) {
         for (Component component : components.values()) {
             if (component instanceof Render)
-                ((Render) component).render();
+                ((Render) component).render(camera);
         }
         for (GameObject ch : children) {
-            ch.render();
+            ch.render(camera);
         }
     }
 

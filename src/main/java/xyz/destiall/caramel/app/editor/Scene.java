@@ -2,22 +2,28 @@ package xyz.destiall.caramel.app.editor;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.api.GameObject;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Light;
+import xyz.destiall.caramel.api.objects.Prefab;
+import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
+import xyz.destiall.caramel.app.editor.ui.GamePanel;
 import xyz.destiall.caramel.app.editor.ui.InspectorPanel;
 import xyz.destiall.caramel.app.editor.ui.MenuBarPanel;
 import xyz.destiall.caramel.app.editor.ui.ConsolePanel;
-import xyz.destiall.caramel.app.editor.ui.GamePanel;
+import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 import xyz.destiall.caramel.app.editor.ui.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
 import xyz.destiall.caramel.app.physics.Physics;
 import xyz.destiall.caramel.app.physics.Physics2D;
 import xyz.destiall.caramel.app.physics.Physics3D;
+import xyz.destiall.caramel.app.utils.Pair;
+import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,14 +40,15 @@ import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPolygonMode;
 
-public class Scene implements Update {
+public class Scene implements Update, Render {
     public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
 
     private final List<GameObject> gameObjects;
+    private final List<Prefab> prefabs;
     private final List<GameObject> defaultGameObjects;
     private final Map<Class<?>, Panel> panels;
     private final Map<Physics.Mode, Physics> physics;
-    private final HashMap<GameObject, GameObject> toAdd;
+    private final List<Pair<GameObject, GameObject>> toAdd;
 
     private Set<Light> lights;
 
@@ -61,14 +68,18 @@ public class Scene implements Update {
     public Scene() {
         name = "Untitled Scene";
         gameObjects = new LinkedList<>();
+        prefabs = new LinkedList<>();
         defaultGameObjects = new LinkedList<>();
-        toAdd = new HashMap<>();
+        toAdd = new ArrayList<>();
         panels = new HashMap<>();
-        panels.put(HierarchyPanel.class, new HierarchyPanel(this));
-        panels.put(InspectorPanel.class, new InspectorPanel(this));
-        panels.put(MenuBarPanel.class, new MenuBarPanel(this));
-        panels.put(ConsolePanel.class, new ConsolePanel(this));
-        panels.put(GamePanel.class, new GamePanel(this));
+        if (Application.getApp().EDITOR_MODE) {
+            panels.put(HierarchyPanel.class, new HierarchyPanel(this));
+            panels.put(InspectorPanel.class, new InspectorPanel(this));
+            panels.put(MenuBarPanel.class, new MenuBarPanel(this));
+            panels.put(ConsolePanel.class, new ConsolePanel(this));
+            panels.put(ScenePanel.class, new ScenePanel(this));
+            panels.put(GamePanel.class, new GamePanel(this));
+        }
         gizmo = new Gizmo();
 
         GameObject go = new GameObject(this);
@@ -95,6 +106,10 @@ public class Scene implements Update {
         return gameObjects;
     }
 
+    public List<Prefab> getPrefabs() {
+        return prefabs;
+    }
+
     @Override
     public void update() {
         editorCamera.gameObject.update();
@@ -112,7 +127,6 @@ public class Scene implements Update {
             for (GameObject go : gameObjects) go.update();
             physics.get(physicsMode).update();
 
-            for (GameObject go : gameObjects) go.render();
         } else {
             for (GameObject go : gameObjects) {
                 go.editorUpdate();
@@ -120,21 +134,29 @@ public class Scene implements Update {
                     gameCamera = go.getComponentInChildren(Camera.class);
                 }
             }
-
-            if (Input.isKeyDown(GLFW_KEY_G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-            for (GameObject go : gameObjects) go.render();
-
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
             gizmo.setTarget(selectedGameObject);
-            gizmo.render();
         }
         DebugDraw.INSTANCE.update();
     }
 
+    @Override
+    public void render(Camera camera) {
+        if (playing) {
+            for (GameObject go : gameObjects) go.render(camera);
+        } else {
+            if (Input.isKeyDown(GLFW_KEY_G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+            for (GameObject go : gameObjects) go.render(camera);
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+            gizmo.render(camera);
+        }
+    }
+
     public void endFrame() {
-        for (Map.Entry<GameObject, GameObject> entry : toAdd.entrySet()) {
+        for (Pair<GameObject, GameObject> entry : toAdd) {
             GameObject parent = entry.getKey();
             GameObject child = entry.getValue();
             if (child.parent != null) {
@@ -148,6 +170,7 @@ public class Scene implements Update {
             } else {
                 parent.children.add(child);
                 child.parent = parent.transform;
+                child.scene = parent.scene;
                 child.transform.localPosition.add(child.transform.position.sub(parent.transform.position, new Vector3f()));
             }
 
@@ -244,6 +267,10 @@ public class Scene implements Update {
         } else {
             gameObjects.remove(gameObject);
         }
+        Camera camera;
+        if ((camera = gameObject.getComponentInChildren(Camera.class)) != null) {
+            if (camera == gameCamera) gameCamera = null;
+        }
         physics.get(physicsMode).removeGameObject(gameObject);
     }
 
@@ -256,11 +283,11 @@ public class Scene implements Update {
     }
 
     public void addGameObject(GameObject gameObject) {
-        toAdd.put(null, gameObject);
+        toAdd.add(new Pair<>(null, gameObject));
     }
 
     public void addGameObject(GameObject gameObject, GameObject parent) {
-        toAdd.put(parent, gameObject);
+        toAdd.add(new Pair<>(parent, gameObject));
     }
 
     public void forEachGameObject(Consumer<GameObject> func) {
