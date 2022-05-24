@@ -1,14 +1,13 @@
 package xyz.destiall.caramel.api;
 
+import java.awt.*;
+
 public abstract class Time {
-    public static final float timeStarted = System.nanoTime();
+    public static long timeStarted = System.currentTimeMillis();
     public static float deltaTime = 1f / 60f;
+    public static final float minDeltaTime = 1f / GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDisplayMode().getRefreshRate();
     public static boolean isSecond = false;
     public static float getFPS() {
-        return 1f/ deltaTime;
-    }
-
-    public static float getElapsedTime() {
-        return (float) ((System.nanoTime() - timeStarted) * 1E-9);
+        return 1f / deltaTime;
     }
 }

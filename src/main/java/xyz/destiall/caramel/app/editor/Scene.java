@@ -112,35 +112,19 @@ public class Scene implements Update, Render {
 
     @Override
     public void update() {
-        editorCamera.gameObject.update();
-
         lights = gameObjects.stream()
                 .map(g -> g.getComponentsInChildren(Light.class))
                 .reduce(new HashSet<>(), (s, l) -> {
-            s.addAll(l);
-            return s;
-        });
-
-        glEnable(GL_DEPTH_TEST);
-
-        if (playing) {
-            for (GameObject go : gameObjects) go.update();
-            physics.get(physicsMode).update();
-
-        } else {
-            for (GameObject go : gameObjects) {
-                go.editorUpdate();
-                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
-                    gameCamera = go.getComponentInChildren(Camera.class);
-                }
-            }
-            gizmo.setTarget(selectedGameObject);
-        }
-        DebugDraw.INSTANCE.update();
+                    s.addAll(l);
+                    return s;
+                });
+        for (GameObject go : gameObjects) go.update();
+        physics.get(physicsMode).update();
     }
 
     @Override
     public void render(Camera camera) {
+        glEnable(GL_DEPTH_TEST);
         if (playing) {
             for (GameObject go : gameObjects) go.render(camera);
         } else {
@@ -190,7 +174,28 @@ public class Scene implements Update, Render {
 
     @Override
     public void editorUpdate() {
-       update();
+        editorCamera.gameObject.update();
+        lights = gameObjects.stream()
+                .map(g -> g.getComponentsInChildren(Light.class))
+                .reduce(new HashSet<>(), (s, l) -> {
+                    s.addAll(l);
+                    return s;
+                });
+
+        if (playing) {
+            for (GameObject go : gameObjects) go.update();
+            physics.get(physicsMode).update();
+
+        } else {
+            for (GameObject go : gameObjects) {
+                go.editorUpdate();
+                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
+                    gameCamera = go.getComponentInChildren(Camera.class);
+                }
+            }
+            gizmo.setTarget(selectedGameObject);
+        }
+        DebugDraw.INSTANCE.update();
     }
 
     public void play() {

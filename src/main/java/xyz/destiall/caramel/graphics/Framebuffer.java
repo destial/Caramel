@@ -1,7 +1,10 @@
 package xyz.destiall.caramel.graphics;
 
 import xyz.destiall.caramel.api.debug.Debug;
+import xyz.destiall.caramel.app.Application;
 
+import static org.lwjgl.opengl.GL11C.glBindTexture;
+import static org.lwjgl.opengl.GL11C.glEnable;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_COMPONENT32;

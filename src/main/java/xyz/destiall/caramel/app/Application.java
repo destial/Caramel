@@ -15,6 +15,7 @@ import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -57,6 +58,7 @@ import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glDrawBuffer;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -170,9 +172,9 @@ public class Application {
         });
 
         // Set cursor mode
-        if (!EDITOR_MODE) {
-            glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        }
+        //if (!EDITOR_MODE) {
+        //    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //}
 
         // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
@@ -188,13 +190,14 @@ public class Application {
         scriptManager = new ScriptManager();
 
         // Register event listeners
-        eventHandling.registerListener(scriptManager);
+        if (EDITOR_MODE) {
+            eventHandling.registerListener(scriptManager);
+        }
 
         // Create and setup ImGUI
-        if (EDITOR_MODE) {
-            imGui = new ImGUILayer(this);
-            imGui.initImGui();
-        }
+        imGui = new ImGUILayer(this);
+        imGui.initImGui();
+
 
         // Setup and create framebuffer
         framebuffer = new Framebuffer[2];
@@ -206,32 +209,34 @@ public class Application {
         // Load all the scripts
         scriptManager.reloadAll();
 
-        float startTime = Time.getElapsedTime();
-        float endTime;
+        Time.timeStarted = System.currentTimeMillis();
+        long startTime = Time.timeStarted;
+        long endTime;
         float second = 0;
 
         // Create the scene
         File file = new File("assets/Untitled Scene.json");
 
         Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
-        System.gc();
         scenes.add(scene);
 
         running = true;
+
+        if (!EDITOR_MODE) scene.play();
+
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
-            if (Input.isKeyDown(GLFW_KEY_ESCAPE) && EDITOR_MODE) break;
+            if (Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
+
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
             }
 
             if (process()) break;
 
-            endTime = Time.getElapsedTime();
-            Time.deltaTime = endTime - startTime;
-            if (Time.deltaTime <= 0) {
-                Time.deltaTime = 1 / 60f;
-            }
+            endTime = System.currentTimeMillis();
+            Time.deltaTime = (endTime - startTime) / 1000f;
+            Time.deltaTime = Math.max(Time.deltaTime, Time.minDeltaTime);
             startTime = endTime;
 
             second += Time.deltaTime;
@@ -245,32 +250,36 @@ public class Application {
 
         if (scene.isPlaying()) scene.stop();
 
-        String savedScene = serializer.toJson(scene);
-        FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
-
+        if (EDITOR_MODE) {
+            String savedScene = serializer.toJson(scene);
+            FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
+        }
         running = false;
     }
 
     private boolean process() {
         glfwPollEvents();
 
-        if (!EDITOR_MODE) getCurrentScene().update();
-        else getCurrentScene().editorUpdate();
+        if (EDITOR_MODE) getCurrentScene().editorUpdate();
+        else getCurrentScene().update();
+
         glViewport(0, 0, width, height);
 
-        getSceneViewFramebuffer().bind();
-        glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        getCurrentScene().render(getCurrentScene().getEditorCamera());
-        DebugDraw.INSTANCE.render(getCurrentScene().getEditorCamera());
-        getSceneViewFramebuffer().unbind();
+        if (EDITOR_MODE) {
+            getSceneViewFramebuffer().bind();
+            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            getCurrentScene().render(getCurrentScene().getEditorCamera());
+            DebugDraw.INSTANCE.render(getCurrentScene().getEditorCamera());
+            getSceneViewFramebuffer().unbind();
+        }
 
         if (getCurrentScene().getGameCamera() != null) {
-            getGameViewFramebuffer().bind();
+            if (EDITOR_MODE) getGameViewFramebuffer().bind();
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             getCurrentScene().render(getCurrentScene().getGameCamera());
-            getGameViewFramebuffer().unbind();
+            if (EDITOR_MODE) getGameViewFramebuffer().unbind();
         }
 
         if (EDITOR_MODE) imGui.update();

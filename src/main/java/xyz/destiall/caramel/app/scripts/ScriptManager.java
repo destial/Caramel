@@ -34,11 +34,11 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ScriptManager implements Listener {
-    private final FileWatcher watcher;
     private final File scriptsRootFolder;
     private final JavaScriptEngine engine;
     private final Map<String, JavaCompiledScript> compiledScripts;
     private final Set<String> awaitingCompilation;
+    private FileWatcher watcher;
 
     public ScriptManager() {
         scriptsRootFolder = new File("assets/scripts/");
@@ -48,18 +48,19 @@ public class ScriptManager implements Listener {
         compiledScripts = new ConcurrentHashMap<>();
         awaitingCompilation = new HashSet<>();
 
-        watcher = new FileWatcher(scriptsRootFolder);
+        if (Application.getApp().EDITOR_MODE)
+            watcher = new FileWatcher(scriptsRootFolder);
     }
 
     public void reloadAll() {
         if (!scriptsRootFolder.exists()) scriptsRootFolder.mkdir();
         loadScripts(scriptsRootFolder);
 
-        watcher.watch();
+        if (watcher != null) watcher.watch();
     }
 
     public void destroy() {
-        watcher.destroy();
+        if (watcher != null) watcher.destroy();
     }
 
     public void loadScripts(File folder) {
