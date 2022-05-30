@@ -19,7 +19,30 @@ public abstract class Debug {
         DebugDraw.INSTANCE.addLine(from, to, color);
     }
 
-    public static void drawBox(Vector3f from, Vector3f to, Vector3f color) {
+    public static void drawBox2D(Vector3f center, Vector3f offset, Vector3f color) {
+        DebugDraw.INSTANCE.addLine(
+                new Vector3f(center.x - offset.x * 0.5f, center.y + offset.y * 0.5f, center.z),
+                new Vector3f(center.x + offset.x * 0.5f, center.y + offset.y * 0.5f, center.z),
+                color
+        );
+        DebugDraw.INSTANCE.addLine(
+                new Vector3f(center.x - offset.x * 0.5f, center.y - offset.y * 0.5f, center.z),
+                new Vector3f(center.x - offset.x * 0.5f, center.y + offset.y * 0.5f, center.z),
+                color
+        );
+        DebugDraw.INSTANCE.addLine(
+                new Vector3f(center.x - offset.x * 0.5f, center.y - offset.y * 0.5f, center.z),
+                new Vector3f(center.x + offset.x * 0.5f, center.y - offset.y * 0.5f, center.z),
+                color
+        );
+        DebugDraw.INSTANCE.addLine(
+                new Vector3f(center.x + offset.x * 0.5f, center.y - offset.y * 0.5f, center.z),
+                new Vector3f(center.x + offset.x * 0.5f, center.y + offset.y * 0.5f, center.z),
+                color
+        );
+    }
+
+    public static void drawBox3D(Vector3f from, Vector3f to, Vector3f color) {
         DebugDraw.INSTANCE.addLine(from, new Vector3f(from.x, to.y, from.z), color);
         DebugDraw.INSTANCE.addLine(from, new Vector3f(from.x, from.y, to.z), color);
         DebugDraw.INSTANCE.addLine(from, new Vector3f(to.x, from.y, from.z), color);

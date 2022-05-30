@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.editor;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
@@ -194,6 +195,10 @@ public class Scene implements Update, Render {
                 }
             }
             gizmo.setTarget(selectedGameObject);
+        }
+
+        if (selectedGameObject != null) {
+            Debug.drawBox2D(selectedGameObject.transform.position, selectedGameObject.transform.scale, new Vector3f(1, 0, 0));
         }
         DebugDraw.INSTANCE.update();
     }

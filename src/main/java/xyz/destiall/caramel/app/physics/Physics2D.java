@@ -13,8 +13,8 @@ import xyz.destiall.caramel.api.physics.listeners.ContactListener;
 import xyz.destiall.caramel.app.editor.Scene;
 
 public class Physics2D implements Physics {
-    private final Vec2 gravity = new Vec2(0, -1f);
-    private final float physicsTimeStep = 1.f / 60.f;
+    private final Vec2 gravity = new Vec2(0, -9f);
+    private final float physicsTimeStep = Time.deltaTime;
     private final int velocityIterations = 8;
     private final int positionInterations = 3;
 

@@ -14,10 +14,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public class GameObject implements Update, Render, Cloneable {
-    private final HashSet<Component> components;
+    private final Set<Component> components;
     public final LinkedList<GameObject> children;
     public final ArrayList<String> tags;
     public Transform transform;
@@ -27,7 +28,7 @@ public class GameObject implements Update, Render, Cloneable {
     public int id;
 
     private GameObject() {
-        components = new HashSet<>();
+        components = ConcurrentHashMap.newKeySet();
         children = new LinkedList<>();
         tags = new ArrayList<>();
     }
@@ -35,7 +36,7 @@ public class GameObject implements Update, Render, Cloneable {
     public GameObject(Scene parentScene) {
         this.scene = parentScene;
         name = "GameObject";
-        components = new HashSet<>();
+        components = ConcurrentHashMap.newKeySet();
         children = new LinkedList<>();
         tags = new ArrayList<>();
         transform = new Transform(this);

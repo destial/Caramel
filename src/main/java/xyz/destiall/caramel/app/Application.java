@@ -174,7 +174,7 @@ public class Application {
 
         // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
 
         // Some janky stuff with OpenGL

@@ -34,13 +34,13 @@ public class NewScript extends Component implements Contactable2D {
             RigidBody2D rb = getComponent(RigidBody2D.class);
             if (rb == null || rb.rawBody == null) return;
             if (Input.isKeyPressed(Input.Key.SPACE)) {
-                rb.addForce(new Vector2(0, force));
+                rb.addForce(new Vector2(0, force * 3));
             }
             if (Input.isKeyDown(Input.Key.A)) {
-                rb.addForce(new Vector2(-1, 0));
+                rb.addForce(new Vector2(-force / 10, 0));
             }
             if (Input.isKeyDown(Input.Key.D)) {
-                rb.addForce(new Vector2(1, 0));
+                rb.addForce(new Vector2(force / 10, 0));
             }
             Camera camera = gameObject.scene.getGameCamera();
             if (camera == null) return;
