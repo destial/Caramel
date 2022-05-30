@@ -24,8 +24,10 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.HashSet;
@@ -95,6 +97,7 @@ public class ScriptManager implements Listener {
                 InspectorPanel.COMPONENTS.add(compiledScript.getCompiledClass());
                 return compiledScript;
             } catch (ScriptException e) {
+                Debug.logError(e.getLocalizedMessage());
                 e.printStackTrace();
             }
         }
@@ -125,7 +128,7 @@ public class ScriptManager implements Listener {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             JavaCompiledScript script = compiledScripts.get(scriptName);
             if (event.getType() == FileEvent.Type.MODIFY || event.getType() == FileEvent.Type.CREATE) {
-                Debug.log("Modified file: " + event.getFile().getName());
+                System.out.println("Modified file: " + event.getFile().getName());
                 if (!awaitingCompilation.add(file.getName())) {
                     return;
                 }
@@ -138,44 +141,37 @@ public class ScriptManager implements Listener {
                     StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
                     standardFileManager.getClassLoader(StandardLocation.CLASS_OUTPUT);
                     try (MemoryFileManager mfm = new MemoryFileManager(standardFileManager, this.getClass().getClassLoader())) {
-                        try {
-                            ClassLoader cl = mfm.getClassLoader(StandardLocation.CLASS_OUTPUT);
-                            engine.setExecutionClassLoader(cl);
-                            JavaCompiledScript newScript = reloadScript(file);
-                            Class<?> newScriptClass = newScript.getCompiledClass();
-                            try {
-                                Constructor<?> constructor = newScriptClass.getConstructor(GameObject.class);
-                                Debug.log(constructor);
-                                for (GameObject go : Application.getApp().getCurrentScene().getGameObjects()) {
-                                    Component instance;
-                                    if ((instance = go.getComponent((Class<? extends Component>) script.getCompiledClass())) != null) {
-                                        Field[] fields = script.getCompiledClass().getFields();
-                                        if (go.removeComponent((Class<? extends Component>) script.getCompiledClass())) {
-                                            Component component = (Component) constructor.newInstance(go);
-                                            for (Field field : fields) {
-                                                if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
-                                                Field newField = component.getClass().getField(field.getName());
-                                                if (newField.getType() == field.getType()) {
-                                                    newField.setAccessible(true);
-                                                    try {
-                                                        newField.set(component, field.get(instance));
-                                                    } catch (Exception e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
+                        ClassLoader cl = mfm.getClassLoader(StandardLocation.CLASS_OUTPUT);
+                        engine.setExecutionClassLoader(cl);
+                        JavaCompiledScript newScript = reloadScript(file);
+                        Class<?> newScriptClass = newScript.getCompiledClass();
+                        Constructor<?> constructor = newScriptClass.getConstructor(GameObject.class);
+                        for (GameObject go : Application.getApp().getCurrentScene().getGameObjects()) {
+                            Component instance;
+                            if ((instance = go.getComponent((Class<? extends Component>) script.getCompiledClass())) != null) {
+                                Field[] fields = script.getCompiledClass().getFields();
+                                if (go.removeComponent((Class<? extends Component>) script.getCompiledClass())) {
+                                    Component component = (Component) constructor.newInstance(go);
+                                    for (Field field : fields) {
+                                        if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
+                                        Field newField = component.getClass().getField(field.getName());
+                                        if (newField.getType() == field.getType()) {
+                                            newField.setAccessible(true);
+                                            try {
+                                                newField.set(component, field.get(instance));
+                                            } catch (IllegalAccessException e) {
+                                                Debug.logError(e.getMessage());
+                                                e.printStackTrace();
                                             }
-                                            go.addComponent(component);
                                         }
                                     }
+                                    go.addComponent(component);
                                 }
-                                awaitingCompilation.remove(file.getName());
-                            } catch (Exception e) {
-                                e.printStackTrace();
                             }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
-                    } catch (Exception e) {
+                        awaitingCompilation.remove(file.getName());
+                    } catch (IllegalAccessException | InstantiationException | InvocationTargetException | IOException | NoSuchFieldException | NoSuchMethodException e) {
+                        Debug.logError(e.getLocalizedMessage());
                         e.printStackTrace();
                     }
                 } else {

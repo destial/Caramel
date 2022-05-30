@@ -4,8 +4,15 @@
     {
       "components": [
         {
+          "force": 161.2,
+          "data": "player",
+          "clazz": "scripts.NewScript",
+          "id": 8,
+          "enabled": true
+        },
+        {
           "position": {
-            "x": 0.0,
+            "x": -77.7,
             "y": 1.3,
             "z": 0.0
           },
@@ -49,7 +56,7 @@
             "m21": 0.0,
             "m22": 1.0,
             "m23": 0.0,
-            "m30": 0.0,
+            "m30": -77.7,
             "m31": 1.3,
             "m32": 0.0,
             "m33": 1.0,
@@ -66,7 +73,7 @@
             "z": 0.0
           },
           "clazz": "xyz.destiall.caramel.api.components.Transform",
-          "id": 22,
+          "id": 150,
           "enabled": true
         },
         {
@@ -91,7 +98,7 @@
           "continuousCollision": true,
           "bodyType": "DYNAMIC",
           "clazz": "xyz.destiall.caramel.api.components.RigidBody2D",
-          "id": 5,
+          "id": 6,
           "enabled": true
         },
         {
@@ -99,6 +106,7 @@
             "x": 1.0,
             "y": 1.0
           },
+          "useScale": false,
           "offset": {
             "x": 0.0,
             "y": 0.0,
@@ -106,19 +114,12 @@
           },
           "collisionRender": false,
           "clazz": "xyz.destiall.caramel.api.physics.components.Box2DCollider",
-          "id": 6,
-          "enabled": true
-        },
-        {
-          "force": 161.2,
-          "data": "player",
-          "clazz": "scripts.NewScript",
           "id": 7,
           "enabled": true
         },
         {
           "pos": {
-            "x": 0.0,
+            "x": -77.7,
             "y": 1.3,
             "z": 0.0
           },
@@ -245,7 +246,7 @@
             "drawArrays": false
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
-          "id": 8,
+          "id": 5,
           "enabled": true
         }
       ],
@@ -268,7 +269,7 @@
             "w": 1.0
           },
           "sca": {
-            "x": 8.1,
+            "x": 156.8,
             "y": 0.2,
             "z": 1.0
           },
@@ -384,13 +385,31 @@
             "drawArrays": false
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
-          "id": 11,
+          "id": 12,
           "enabled": true
         },
         {
-          "force": 160.0,
-          "data": "spike",
-          "clazz": "scripts.NewScript",
+          "velocity": {
+            "joml": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "jbox2d": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "imgui": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          "angularDamping": 0.8,
+          "linearDamping": 0.9,
+          "mass": 0.0,
+          "fixedRotation": false,
+          "continuousCollision": true,
+          "bodyType": "STATIC",
+          "clazz": "xyz.destiall.caramel.api.components.RigidBody2D",
           "id": 10,
           "enabled": true
         },
@@ -399,6 +418,7 @@
             "x": 8.4,
             "y": 0.4
           },
+          "useScale": true,
           "offset": {
             "x": 0.0,
             "y": 0.0,
@@ -406,7 +426,7 @@
           },
           "collisionRender": false,
           "clazz": "xyz.destiall.caramel.api.physics.components.Box2DCollider",
-          "id": 13,
+          "id": 11,
           "enabled": true
         },
         {
@@ -433,7 +453,7 @@
             "w": 0.0
           },
           "scale": {
-            "x": 8.1,
+            "x": 156.8,
             "y": 0.2,
             "z": 1.0
           },
@@ -443,7 +463,7 @@
             "z": 1.0
           },
           "model": {
-            "m00": 8.1,
+            "m00": 156.8,
             "m01": 0.0,
             "m02": 0.0,
             "m03": 0.0,
@@ -472,7 +492,230 @@
             "z": 0.0
           },
           "clazz": "xyz.destiall.caramel.api.components.Transform",
-          "id": 27,
+          "id": 155,
+          "enabled": true
+        }
+      ],
+      "children": [],
+      "tags": [],
+      "name": "GameObject"
+    },
+    {
+      "components": [
+        {
+          "position": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "localPosition": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "localRotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "localScale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "model": {
+            "m00": 1.0,
+            "m01": 0.0,
+            "m02": 0.0,
+            "m03": 0.0,
+            "m10": 0.0,
+            "m11": 1.0,
+            "m12": 0.0,
+            "m13": 0.0,
+            "m20": 0.0,
+            "m21": 0.0,
+            "m22": 1.0,
+            "m23": 0.0,
+            "m30": 0.0,
+            "m31": 0.0,
+            "m32": 0.0,
+            "m33": 1.0,
+            "properties": 30
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "clazz": "xyz.destiall.caramel.api.components.Transform",
+          "id": 159,
+          "enabled": true
+        },
+        {
+          "projection": {
+            "m00": 0.125,
+            "m01": 0.0,
+            "m02": 0.0,
+            "m03": 0.0,
+            "m10": 0.0,
+            "m11": 0.225,
+            "m12": 0.0,
+            "m13": 0.0,
+            "m20": 0.0,
+            "m21": 0.0,
+            "m22": -0.0010000999,
+            "m23": 0.0,
+            "m30": -0.0,
+            "m31": -0.0,
+            "m32": -1.0001E-4,
+            "m33": 1.0,
+            "properties": 2
+          },
+          "view": {
+            "m00": 1.0,
+            "m01": 0.0,
+            "m02": 0.0,
+            "m03": 0.0,
+            "m10": 0.0,
+            "m11": 1.0,
+            "m12": 0.0,
+            "m13": 0.0,
+            "m20": 0.0,
+            "m21": 0.0,
+            "m22": 1.0,
+            "m23": 0.0,
+            "m30": 76.264984,
+            "m31": -0.0,
+            "m32": -0.0,
+            "m33": 1.0,
+            "properties": 18
+          },
+          "target": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "fov": 60.0,
+          "near": 0.1,
+          "far": 1000.0,
+          "clazz": "xyz.destiall.caramel.api.components.Camera",
+          "id": 14,
+          "enabled": true
+        }
+      ],
+      "children": [],
+      "tags": [],
+      "name": "GameObject"
+    },
+    {
+      "components": [
+        {
+          "halfSize": {
+            "x": 1.0,
+            "y": 1.0
+          },
+          "useScale": true,
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "collisionRender": true,
+          "clazz": "xyz.destiall.caramel.api.physics.components.Box2DCollider",
+          "id": 18,
+          "enabled": true
+        },
+        {
+          "position": {
+            "x": -75.7,
+            "y": 0.6,
+            "z": 0.0
+          },
+          "localPosition": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "localRotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 0.0
+          },
+          "scale": {
+            "x": 0.1,
+            "y": 1.1,
+            "z": 1.0
+          },
+          "localScale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "model": {
+            "m00": 0.1,
+            "m01": 0.0,
+            "m02": 0.0,
+            "m03": 0.0,
+            "m10": 0.0,
+            "m11": 1.1,
+            "m12": 0.0,
+            "m13": 0.0,
+            "m20": 0.0,
+            "m21": 0.0,
+            "m22": 1.0,
+            "m23": 0.0,
+            "m30": -75.7,
+            "m31": 0.6,
+            "m32": 0.0,
+            "m33": 1.0,
+            "properties": 2
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "clazz": "xyz.destiall.caramel.api.components.Transform",
+          "id": 161,
           "enabled": true
         },
         {
@@ -497,20 +740,20 @@
           "continuousCollision": true,
           "bodyType": "STATIC",
           "clazz": "xyz.destiall.caramel.api.components.RigidBody2D",
-          "id": 12,
+          "id": 21,
           "enabled": true
-        }
-      ],
-      "children": [],
-      "tags": [],
-      "name": "GameObject"
-    },
-    {
-      "components": [
+        },
+        {
+          "force": 100.0,
+          "data": "spike",
+          "clazz": "scripts.NewScript",
+          "id": 16,
+          "enabled": true
+        },
         {
           "pos": {
-            "x": 7.1,
-            "y": 0.8,
+            "x": -75.7,
+            "y": 0.6,
             "z": 0.0
           },
           "rot": {
@@ -520,8 +763,8 @@
             "w": 1.0
           },
           "sca": {
-            "x": 8.1,
-            "y": 0.2,
+            "x": 0.1,
+            "y": 1.1,
             "z": 1.0
           },
           "mesh": {
@@ -638,246 +881,6 @@
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 17,
           "enabled": true
-        },
-        {
-          "position": {
-            "x": 7.1,
-            "y": 0.8,
-            "z": 0.0
-          },
-          "localPosition": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "rotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "localRotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 0.0
-          },
-          "scale": {
-            "x": 8.1,
-            "y": 0.2,
-            "z": 1.0
-          },
-          "localScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "model": {
-            "m00": 8.1,
-            "m01": 0.0,
-            "m02": 0.0,
-            "m03": 0.0,
-            "m10": 0.0,
-            "m11": 0.2,
-            "m12": 0.0,
-            "m13": 0.0,
-            "m20": 0.0,
-            "m21": 0.0,
-            "m22": 1.0,
-            "m23": 0.0,
-            "m30": 7.1,
-            "m31": 0.8,
-            "m32": 0.0,
-            "m33": 1.0,
-            "properties": 2
-          },
-          "forward": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0
-          },
-          "up": {
-            "x": 0.0,
-            "y": 1.0,
-            "z": 0.0
-          },
-          "clazz": "xyz.destiall.caramel.api.components.Transform",
-          "id": 32,
-          "enabled": true
-        },
-        {
-          "velocity": {
-            "joml": {
-              "x": 0.0,
-              "y": 0.0
-            },
-            "jbox2d": {
-              "x": 0.0,
-              "y": 0.0
-            },
-            "imgui": {
-              "x": 0.0,
-              "y": 0.0
-            }
-          },
-          "angularDamping": 0.8,
-          "linearDamping": 0.9,
-          "mass": 0.0,
-          "fixedRotation": false,
-          "continuousCollision": true,
-          "bodyType": "STATIC",
-          "clazz": "xyz.destiall.caramel.api.components.RigidBody2D",
-          "id": 16,
-          "enabled": true
-        },
-        {
-          "halfSize": {
-            "x": 8.4,
-            "y": 0.4
-          },
-          "offset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "collisionRender": false,
-          "clazz": "xyz.destiall.caramel.api.physics.components.Box2DCollider",
-          "id": 15,
-          "enabled": true
-        }
-      ],
-      "children": [],
-      "tags": [],
-      "name": "GameObject"
-    },
-    {
-      "components": [
-        {
-          "position": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "localPosition": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "rotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "localRotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 0.0
-          },
-          "scale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "localScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "model": {
-            "m00": 1.0,
-            "m01": 0.0,
-            "m02": 0.0,
-            "m03": 0.0,
-            "m10": 0.0,
-            "m11": 1.0,
-            "m12": 0.0,
-            "m13": 0.0,
-            "m20": 0.0,
-            "m21": 0.0,
-            "m22": 1.0,
-            "m23": 0.0,
-            "m30": 0.0,
-            "m31": 0.0,
-            "m32": 0.0,
-            "m33": 1.0,
-            "properties": 30
-          },
-          "forward": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0
-          },
-          "up": {
-            "x": 0.0,
-            "y": 1.0,
-            "z": 0.0
-          },
-          "clazz": "xyz.destiall.caramel.api.components.Transform",
-          "id": 36,
-          "enabled": true
-        },
-        {
-          "projection": {
-            "m00": 0.125,
-            "m01": 0.0,
-            "m02": 0.0,
-            "m03": 0.0,
-            "m10": 0.0,
-            "m11": 0.225,
-            "m12": 0.0,
-            "m13": 0.0,
-            "m20": 0.0,
-            "m21": 0.0,
-            "m22": -0.0010000999,
-            "m23": 0.0,
-            "m30": -0.0,
-            "m31": -0.0,
-            "m32": -1.0001E-4,
-            "m33": 1.0,
-            "properties": 2
-          },
-          "view": {
-            "m00": 1.0,
-            "m01": 0.0,
-            "m02": 0.0,
-            "m03": 0.0,
-            "m10": 0.0,
-            "m11": 1.0,
-            "m12": 0.0,
-            "m13": 0.0,
-            "m20": 0.0,
-            "m21": 0.0,
-            "m22": 1.0,
-            "m23": 0.0,
-            "m30": -2.9426374,
-            "m31": -0.0,
-            "m32": -0.0,
-            "m33": 1.0,
-            "properties": 18
-          },
-          "target": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0
-          },
-          "forward": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0
-          },
-          "up": {
-            "x": 0.0,
-            "y": 1.0,
-            "z": 0.0
-          },
-          "fov": 60.0,
-          "near": 0.1,
-          "far": 1000.0,
-          "clazz": "xyz.destiall.caramel.api.components.Camera",
-          "id": 19,
-          "enabled": true
         }
       ],
       "children": [],
@@ -922,8 +925,8 @@
           "m21": 0.0,
           "m22": 1.0,
           "m23": 0.0,
-          "m30": -4.741996,
-          "m31": -1.246011,
+          "m30": 74.54239,
+          "m31": 0.43310058,
           "m32": -0.0,
           "m33": 1.0,
           "properties": 18
@@ -947,13 +950,13 @@
         "near": 0.1,
         "far": 1000.0,
         "clazz": "xyz.destiall.caramel.app.editor.EditorCamera",
-        "id": 21,
+        "id": 20,
         "enabled": true
       },
       {
         "position": {
-          "x": 4.741996,
-          "y": 1.246011,
+          "x": -74.54239,
+          "y": -0.43310058,
           "z": 0.0
         },
         "localPosition": {
@@ -1013,7 +1016,7 @@
           "z": 0.0
         },
         "clazz": "xyz.destiall.caramel.api.components.Transform",
-        "id": 20,
+        "id": 19,
         "enabled": true
       }
     ],

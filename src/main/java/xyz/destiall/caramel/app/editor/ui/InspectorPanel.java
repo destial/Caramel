@@ -53,6 +53,8 @@ public class InspectorPanel extends Panel {
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         if (scene.selectedGameObject != null) {
+            scene.selectedGameObject.active = ImGuiUtils.drawCheckBox("active", scene.selectedGameObject.active);
+
             Component removing = null;
             for (Component component : scene.selectedGameObject.getComponents()) {
 

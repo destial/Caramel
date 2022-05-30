@@ -25,10 +25,11 @@ public class GameObject implements Update, Render, Cloneable {
     public Transform parent;
     public String name;
     public Scene scene;
+    public boolean active = true;
     public int id;
 
     private GameObject() {
-        components = ConcurrentHashMap.newKeySet();
+        components = ConcurrentHashMap.newKeySet(3);
         children = new LinkedList<>();
         tags = new ArrayList<>();
     }
@@ -36,7 +37,7 @@ public class GameObject implements Update, Render, Cloneable {
     public GameObject(Scene parentScene) {
         this.scene = parentScene;
         name = "GameObject";
-        components = ConcurrentHashMap.newKeySet();
+        components = ConcurrentHashMap.newKeySet(3);
         children = new LinkedList<>();
         tags = new ArrayList<>();
         transform = new Transform(this);
@@ -45,6 +46,7 @@ public class GameObject implements Update, Render, Cloneable {
 
     @Override
     public void update() {
+        if (!active) return;
         for (GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
@@ -73,6 +75,7 @@ public class GameObject implements Update, Render, Cloneable {
 
     @Override
     public void editorUpdate() {
+        if (!active) return;
         for (GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
@@ -175,6 +178,7 @@ public class GameObject implements Update, Render, Cloneable {
 
     @Override
     public void render(Camera camera) {
+        if (!active) return;
         for (Component component : components) {
             if (component instanceof Render)
                 ((Render) component).render(camera);
@@ -198,6 +202,7 @@ public class GameObject implements Update, Render, Cloneable {
         clone.transform.localScale.set(transform.localScale);
         clone.transform.forward.set(transform.forward);
         clone.transform.enabled = transform.enabled;
+        clone.active = active;
         for (Component c : components) {
             if (c instanceof Transform) continue;
             Component cl = c.clone(clone);

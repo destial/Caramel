@@ -1,6 +1,8 @@
 package scripts;
 
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.math.Vector2;
 import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.objects.GameObject;
@@ -28,19 +30,17 @@ public class NewScript extends Component implements Contactable2D {
 
     @Override
     public void update() {
-        if (data.equalsIgnoreCase("spike")) return;
-
         if (data.equalsIgnoreCase("player")) {
             RigidBody2D rb = getComponent(RigidBody2D.class);
             if (rb == null || rb.rawBody == null) return;
-            if (Input.isKeyPressed(Input.Key.SPACE)) {
-                rb.addForce(new Vector2(0, force * 3));
+            if (rb.isOnGround() && Input.isKeyDown(Input.Key.SPACE)) {
+                rb.addForce(new Vector2(0, force));
             }
             if (Input.isKeyDown(Input.Key.A)) {
-                rb.addForce(new Vector2(-force / 10, 0));
+                rb.addVelocity(-10f * Time.deltaTime, 0);
             }
             if (Input.isKeyDown(Input.Key.D)) {
-                rb.addForce(new Vector2(force / 10, 0));
+                rb.addVelocity(10f * Time.deltaTime, 0);
             }
             Camera camera = gameObject.scene.getGameCamera();
             if (camera == null) return;
@@ -55,8 +55,8 @@ public class NewScript extends Component implements Contactable2D {
             if (data.equalsIgnoreCase("spike")) {
                 RigidBody2D rb = getComponent(RigidBody2D.class);
                 if (rb == null || rb.rawBody == null) return;
-
-                // rb.rawBody.applyForceToCenter(new Vec2(0, 250f));
+                Debug.log("sad");
+                rb.rawBody.getPosition().set(spawnPos.x(), spawnPos.y());
             }
         }
     }

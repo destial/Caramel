@@ -5,6 +5,7 @@ import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.interfaces.FunctionButton;
 import xyz.destiall.caramel.api.objects.GameObject;
+import xyz.destiall.caramel.api.physics.listeners.ContactPoint2D;
 import xyz.destiall.caramel.app.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
@@ -58,6 +59,10 @@ public abstract class Component implements Update {
     public void onCollisionEnter(RigidBody2D other) {}
 
     public void onCollisionExit(RigidBody2D other) {}
+
+    public void onCollisionEnterRaw(ContactPoint2D point2D) {}
+
+    public void onCollisionExitRaw(ContactPoint2D point2D) {}
 
     public <C extends Component> C getComponent(Class<C> clazz) {
         return gameObject.getComponent(clazz);

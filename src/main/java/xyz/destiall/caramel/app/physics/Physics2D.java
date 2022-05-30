@@ -12,11 +12,9 @@ import xyz.destiall.caramel.api.physics.components.Box2DCollider;
 import xyz.destiall.caramel.api.physics.listeners.ContactListener;
 import xyz.destiall.caramel.app.editor.Scene;
 
+
 public class Physics2D implements Physics {
-    private final Vec2 gravity = new Vec2(0, -9f);
-    private final float physicsTimeStep = Time.deltaTime;
-    private final int velocityIterations = 8;
-    private final int positionInterations = 3;
+    private final Vec2 gravity = new Vec2(0, -10f);
 
     private World world;
     private final Scene scene;
@@ -55,7 +53,7 @@ public class Physics2D implements Physics {
 
         if (gameObject.hasComponent(Box2DCollider.class)) {
             Box2DCollider collider = gameObject.getComponent(Box2DCollider.class);
-            shape.setAsBox(collider.halfSize.x * 0.5f, collider.halfSize.y * 0.5f);
+            shape.setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.halfSize.x * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.halfSize.y * 0.5f);
             Vec2 pos = bodyDef.position;
             float x = pos.x + collider.offset.x;
             float y = pos.y + collider.offset.y;
@@ -85,7 +83,9 @@ public class Physics2D implements Physics {
     public void update() {
         if (Time.deltaTime >= 0.f) {
             world.setAutoClearForces(true);
-            world.step(physicsTimeStep, velocityIterations, positionInterations);
+            int positionInterations = 3;
+            int velocityIterations = 8;
+            world.step(Time.deltaTime, velocityIterations, positionInterations);
         }
     }
 }
