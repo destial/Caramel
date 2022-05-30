@@ -16,6 +16,11 @@ public class RigidBody3D extends RigidBody {
     }
 
     @Override
+    public void _setPosition(float x, float y, float z) {
+
+    }
+
+    @Override
     public void start() {
         collider = getComponent(Box3DCollider.class);
     }

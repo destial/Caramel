@@ -4,6 +4,7 @@ import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Time;
@@ -61,7 +62,8 @@ public class Physics2D implements Physics {
         }
 
         rigidBody.rawBody = world.createBody(bodyDef);
-        rigidBody.rawBody.createFixture(shape, rigidBody.mass);
+        Fixture fixture = rigidBody.rawBody.createFixture(shape, rigidBody.mass);
+        fixture.setSensor(rigidBody.isTrigger);
     }
 
     @Override
@@ -74,9 +76,11 @@ public class Physics2D implements Physics {
 
     @Override
     public void reset() {
-        //physicsTime = 0;
         world = new World(gravity);
         world.setContactListener(new ContactListener(scene));
+        world.setAllowSleep(true);
+        world.setAutoClearForces(true);
+        world.setSubStepping(true);
     }
 
     @Override

@@ -27,7 +27,7 @@ public class Box2DCollider extends Collider {
 
     @Override
     public void update() {
-        if (rigidBody.rawBody == null) return;
+        if (rigidBody == null || rigidBody.rawBody == null) return;
         PolygonShape shape = (PolygonShape) rigidBody.rawBody.m_fixtureList.getShape();
         if (useScale) {
             shape.setAsBox(transform.scale.x * 0.5f, transform.scale.y * 0.5f);

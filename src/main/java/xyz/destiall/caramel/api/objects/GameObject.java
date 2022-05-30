@@ -62,6 +62,10 @@ public class GameObject implements Update, Render, Cloneable {
             }
             component.update();
         }
+    }
+
+    @Override
+    public void lateUpdate() {
         for (Component component : components) {
             if (!component.enabled || component instanceof MeshRenderer) continue;
             component.lateUpdate();

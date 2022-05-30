@@ -26,6 +26,7 @@ public class NewScript extends Component implements Contactable2D {
     @Override
     public void start() {
         spawnPos = new Vector3(transform.position);
+        Debug.log("" + spawnPos.x() + ", " + spawnPos.y());
     }
 
     @Override
@@ -55,8 +56,8 @@ public class NewScript extends Component implements Contactable2D {
             if (data.equalsIgnoreCase("spike")) {
                 RigidBody2D rb = getComponent(RigidBody2D.class);
                 if (rb == null || rb.rawBody == null) return;
-                Debug.log("sad");
-                rb.rawBody.getPosition().set(spawnPos.x(), spawnPos.y());
+                rb._setPosition(spawnPos.x(), spawnPos.y(), transform.position.z);
+                Debug.log("" + rb.rawBody.getTransform().p.x + ", " + rb.rawBody.getTransform().p.y);
             }
         }
     }

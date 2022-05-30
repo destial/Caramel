@@ -55,7 +55,7 @@ public class Vector3 {
     }
 
     public float z() {
-        return joml.z();
+        return joml.z;
     }
 
     public DVector3 getOde() {

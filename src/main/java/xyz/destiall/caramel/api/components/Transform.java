@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
@@ -33,6 +34,14 @@ public class Transform extends Component {
         up = new Vector3f(0, 1, 0);
         model = new Matrix4f().identity();
         gameObject.addComponent(this);
+    }
+
+    public void setPosition(float x, float y, float z) {
+        position.set(x, y, z);
+        RigidBody rb = getComponent(RigidBody.class);
+        if (rb != null) {
+            rb._setPosition(x, y, z);
+        }
     }
 
     @Override

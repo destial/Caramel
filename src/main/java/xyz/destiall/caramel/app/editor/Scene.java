@@ -186,6 +186,7 @@ public class Scene implements Update, Render {
         if (playing) {
             for (GameObject go : gameObjects) go.update();
             physics.get(physicsMode).update();
+            for (GameObject go : gameObjects) go.lateUpdate();
 
         } else {
             for (GameObject go : gameObjects) {
@@ -196,6 +197,8 @@ public class Scene implements Update, Render {
             }
             gizmo.setTarget(selectedGameObject);
         }
+        editorCamera.gameObject.lateUpdate();
+
 
         if (selectedGameObject != null) {
             Debug.drawBox2D(selectedGameObject.transform.position, selectedGameObject.transform.scale, new Vector3f(1, 0, 0));
