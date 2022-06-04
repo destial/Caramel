@@ -85,6 +85,11 @@ public class Application {
 
     public long glfwWindow;
 
+    public static Application getApp() {
+        if (a == null) a = new Application();
+        return a;
+    }
+
     private Application() {
         this.width = 1280;
         this.height = 720;
@@ -103,11 +108,6 @@ public class Application {
 
     public EventHandling getEventHandler() {
         return eventHandling;
-    }
-
-    public static Application getApp() {
-        if (a == null) a = new Application();
-        return a;
     }
 
     public void setTitle(String title) {
