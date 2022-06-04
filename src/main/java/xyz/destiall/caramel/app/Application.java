@@ -4,6 +4,7 @@ import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.ScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
@@ -28,6 +29,9 @@ import java.util.List;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -222,7 +226,7 @@ public class Application {
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
-            if (Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
+            if (!EDITOR_MODE && Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
 
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
@@ -279,6 +283,18 @@ public class Application {
         }
 
         if (EDITOR_MODE) imGui.update();
+
+
+        if (EDITOR_MODE) {
+            if ((Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Input.isKeyDown(GLFW_KEY_RIGHT_CONTROL)) &&
+                    Input.isKeyPressed(GLFW_KEY_S)) {
+                if (getCurrentScene().isPlaying()) getCurrentScene().stop();
+
+                String savedScene = serializer.toJson(getCurrentScene());
+                FileIO.writeData(new File("assets/" + getCurrentScene().name + ".json"), savedScene);
+                Debug.log("Saved scene " + getCurrentScene().name);
+            }
+        }
 
         getCurrentScene().endFrame();
         mouseListener.endFrame();

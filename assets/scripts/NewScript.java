@@ -22,11 +22,11 @@ public class NewScript extends Component implements Contactable2D {
     @ShowInEditor
     public String data = "floor";
     private transient Vector3 spawnPos;
+    private boolean tp = false;
 
     @Override
     public void start() {
         spawnPos = new Vector3(transform.position);
-        Debug.log("" + spawnPos.x() + ", " + spawnPos.y());
     }
 
     @Override
@@ -34,14 +34,9 @@ public class NewScript extends Component implements Contactable2D {
         if (data.equalsIgnoreCase("player")) {
             RigidBody2D rb = getComponent(RigidBody2D.class);
             if (rb == null || rb.rawBody == null) return;
+            rb.setVelocity(5f, rb.getVelocity().y());
             if (rb.isOnGround() && Input.isKeyDown(Input.Key.SPACE)) {
-                rb.addForce(new Vector2(0, force));
-            }
-            if (Input.isKeyDown(Input.Key.A)) {
-                rb.addVelocity(-10f * Time.deltaTime, 0);
-            }
-            if (Input.isKeyDown(Input.Key.D)) {
-                rb.addVelocity(10f * Time.deltaTime, 0);
+                rb.addVelocity(0, force * Time.deltaTime);
             }
             Camera camera = gameObject.scene.getGameCamera();
             if (camera == null) return;
@@ -50,14 +45,23 @@ public class NewScript extends Component implements Contactable2D {
     }
 
     @Override
+    public void lateUpdate() {
+        if (tp) {
+            transform.setPosition(spawnPos.x(), spawnPos.y(), transform.position.z);
+            Camera camera = gameObject.scene.getGameCamera();
+            if (camera != null) {
+                camera.transform.position.x = transform.position.x;
+            }
+            tp = false;
+        }
+    }
+
+    @Override
     public void onCollisionEnter(RigidBody2D other) {
         if (other.gameObject.hasComponent(NewScript.class)) {
             String data = other.getComponent(NewScript.class).data;
             if (data.equalsIgnoreCase("spike")) {
-                RigidBody2D rb = getComponent(RigidBody2D.class);
-                if (rb == null || rb.rawBody == null) return;
-                rb._setPosition(spawnPos.x(), spawnPos.y(), transform.position.z);
-                Debug.log("" + rb.rawBody.getTransform().p.x + ", " + rb.rawBody.getTransform().p.y);
+                tp = true;
             }
         }
     }

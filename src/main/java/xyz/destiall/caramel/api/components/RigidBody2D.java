@@ -21,6 +21,7 @@ public class RigidBody2D extends RigidBody {
     public void _setPosition(float x, float y, float z) {
         if (rawBody == null) return;
         rawBody.setTransform(new Vec2(x, y), rawBody.getAngle());
+        // transform.setPosition(x, y, z);
     }
 
     @Override
