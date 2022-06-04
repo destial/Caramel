@@ -6,6 +6,7 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.RigidBody2D;
@@ -86,10 +87,7 @@ public class Physics2D implements Physics {
     @Override
     public void update() {
         if (Time.deltaTime >= 0.f) {
-            world.setAutoClearForces(true);
-            int positionInterations = 3;
-            int velocityIterations = 8;
-            world.step(Time.deltaTime, velocityIterations, positionInterations);
+            world.step(Time.deltaTime, 8, 3);
         }
     }
 }

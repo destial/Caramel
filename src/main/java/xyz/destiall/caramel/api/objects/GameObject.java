@@ -5,6 +5,7 @@ import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.render.Renderer;
+import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;

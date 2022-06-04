@@ -22,11 +22,12 @@ public class NewScript extends Component implements Contactable2D {
     @ShowInEditor
     public String data = "floor";
     private transient Vector3 spawnPos;
-    private boolean tp = false;
+    private transient boolean tp = false;
 
     @Override
     public void start() {
         spawnPos = new Vector3(transform.position);
+        tp = false;
     }
 
     @Override

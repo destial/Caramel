@@ -119,8 +119,11 @@ public class Scene implements Update, Render {
                     s.addAll(l);
                     return s;
                 });
+
         for (GameObject go : gameObjects) go.update();
+
         physics.get(physicsMode).update();
+        for (GameObject go : gameObjects) go.lateUpdate();
     }
 
     @Override
@@ -199,7 +202,6 @@ public class Scene implements Update, Render {
         }
         editorCamera.gameObject.lateUpdate();
 
-
         if (selectedGameObject != null) {
             Debug.drawBox2D(selectedGameObject.transform.position, selectedGameObject.transform.scale, new Vector3f(1, 0, 0));
         }
@@ -211,10 +213,12 @@ public class Scene implements Update, Render {
         playing = true;
         ConsolePanel.LOGS.clear();
         for (GameObject go : gameObjects) {
-            GameObject clone = go.clone();
-            defaultGameObjects.add(clone);
-            if (selectedGameObject == go) {
-                selectedPlayingGameObject = clone;
+            if (Application.getApp().EDITOR_MODE) {
+                GameObject clone = go.clone();
+                defaultGameObjects.add(clone);
+                if (selectedGameObject == go) {
+                    selectedPlayingGameObject = clone;
+                }
             }
             physics.get(physicsMode).addGameObject(go);
         }
@@ -222,15 +226,17 @@ public class Scene implements Update, Render {
 
     public void stop() {
         if (!playing) return;
-        gameObjects.clear();
-        selectedGameObject = selectedPlayingGameObject;
-        selectedPlayingGameObject = null;
-        gameObjects.addAll(defaultGameObjects);
-        defaultGameObjects.clear();
-        for (Physics p : physics.values()) {
-            p.reset();
-        }
         playing = false;
+        if (Application.getApp().EDITOR_MODE) {
+            gameObjects.clear();
+            selectedGameObject = selectedPlayingGameObject;
+            selectedPlayingGameObject = null;
+            gameObjects.addAll(defaultGameObjects);
+            defaultGameObjects.clear();
+            for (Physics p : physics.values()) {
+                p.reset();
+            }
+        }
     }
 
     @Override

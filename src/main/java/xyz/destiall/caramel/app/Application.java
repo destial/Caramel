@@ -63,7 +63,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Application {
-    public final boolean EDITOR_MODE = true;
+    public final boolean EDITOR_MODE = false;
     private boolean running = false;
 
     private final MouseListener mouseListener;
@@ -222,7 +222,10 @@ public class Application {
 
         running = true;
 
-        if (!EDITOR_MODE) scene.play();
+        if (!EDITOR_MODE) {
+            scene.play();
+            setTitle(scene.name);
+        }
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
@@ -254,6 +257,7 @@ public class Application {
             String savedScene = serializer.toJson(scene);
             FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
         }
+
         running = false;
     }
 
@@ -284,19 +288,17 @@ public class Application {
 
         if (EDITOR_MODE) imGui.update();
 
+        getCurrentScene().endFrame();
 
-        if (EDITOR_MODE) {
-            if ((Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Input.isKeyDown(GLFW_KEY_RIGHT_CONTROL)) &&
-                    Input.isKeyPressed(GLFW_KEY_S)) {
-                if (getCurrentScene().isPlaying()) getCurrentScene().stop();
+        if (EDITOR_MODE && (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Input.isKeyDown(GLFW_KEY_RIGHT_CONTROL)) &&
+                Input.isKeyPressed(GLFW_KEY_S)) {
+            if (getCurrentScene().isPlaying()) getCurrentScene().stop();
 
-                String savedScene = serializer.toJson(getCurrentScene());
-                FileIO.writeData(new File("assets/" + getCurrentScene().name + ".json"), savedScene);
-                Debug.log("Saved scene " + getCurrentScene().name);
-            }
+            String savedScene = serializer.toJson(getCurrentScene());
+            FileIO.writeData(new File("assets/" + getCurrentScene().name + ".json"), savedScene);
+            Debug.log("Saved scene " + getCurrentScene().name);
         }
 
-        getCurrentScene().endFrame();
         mouseListener.endFrame();
         keyListener.endFrame();
 
