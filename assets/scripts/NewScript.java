@@ -9,6 +9,7 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.RigidBody2D;
+import xyz.destiall.caramel.api.physics.components.Collider;
 import xyz.destiall.caramel.api.physics.listeners.Contactable2D;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 
@@ -59,9 +60,19 @@ public class NewScript extends Component implements Contactable2D {
 
     @Override
     public void onCollisionEnter(RigidBody2D other) {
-        if (other.gameObject.hasComponent(this.getClass())) {
-            String data = other.getComponent(this.getClass()).data;
+        if (other.gameObject.hasComponent(NewScript.class)) {
+            String data = other.getComponent(NewScript.class).data;
             if (data.equalsIgnoreCase("spike")) {
+                tp = true;
+            }
+        }
+    }
+
+    @Override
+    public void onCollisionTrigger(Collider other) {
+        if (other.gameObject.hasComponent(NewScript.class)) {
+            String data = other.getComponent(NewScript.class).data;
+            if (data.equalsIgnoreCase("win")) {
                 tp = true;
             }
         }

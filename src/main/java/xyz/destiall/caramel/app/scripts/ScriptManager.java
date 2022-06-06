@@ -126,7 +126,9 @@ public class ScriptManager implements Listener {
         if (event.getFile().getName().endsWith(".java")) {
             File file = new File(scriptsRootFolder, event.getFile().getName());
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
+
             JavaCompiledScript script = compiledScripts.get(scriptName);
+
             if (event.getType() == FileEvent.Type.MODIFY || event.getType() == FileEvent.Type.CREATE) {
                 System.out.println("Modified file: " + event.getFile().getName());
                 if (!awaitingCompilation.add(file.getName())) {
@@ -135,6 +137,7 @@ public class ScriptManager implements Listener {
                 if (script != null && event.getType() == FileEvent.Type.MODIFY) {
                     compiledScripts.remove(scriptName);
                     InspectorPanel.COMPONENTS.remove(script.getCompiledClass());
+                    //
                     System.gc();
                     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
                     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
@@ -146,6 +149,8 @@ public class ScriptManager implements Listener {
                         JavaCompiledScript newScript = reloadScript(file);
                         Class<?> newScriptClass = newScript.getCompiledClass();
                         Constructor<?> constructor = newScriptClass.getConstructor(GameObject.class);
+                        //
+
                         for (GameObject go : Application.getApp().getCurrentScene().getGameObjects()) {
                             Component instance;
                             if ((instance = go.getComponent((Class<? extends Component>) script.getCompiledClass())) != null) {

@@ -20,9 +20,7 @@ import xyz.destiall.caramel.app.editor.EditorCamera;
 
 import java.util.Arrays;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_T;
+import static org.lwjgl.glfw.GLFW.*;
 
 public class ScenePanel extends Panel {
     private final Application window;
@@ -76,6 +74,13 @@ public class ScenePanel extends Panel {
 
         GameObject selected = window.getCurrentScene().getSelectedGameObject();
 
+        if (Input.isKeyPressed(GLFW_KEY_F) && selected != null &&
+            (Panel.isWindowFocused(ScenePanel.class) || Panel.isWindowFocused(HierarchyPanel.class))) {
+            scene.getEditorCamera().transform.position.x = selected.transform.position.x;
+            scene.getEditorCamera().transform.position.y = selected.transform.position.y;
+        }
+
+        /**
         if (selected != null && false) {
             ImGuizmo.beginFrame();
             ImGuizmo.setOrthographic(false);
@@ -92,13 +97,7 @@ public class ScenePanel extends Panel {
             if (ImGuizmo.isUsing()) {
                 selected.transform.position.set(Arrays.copyOf(floats, 3));
             }
-        }
-
-        if (ImGui.isWindowHovered()) {
-            if (Input.isKeyPressed(Input.Key.F)) {
-
-            }
-        }
+        }**/
 
         ImGui.end();
     }

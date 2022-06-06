@@ -9,6 +9,7 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.RigidBody2D;
+import xyz.destiall.caramel.api.physics.components.Collider;
 import xyz.destiall.caramel.api.physics.listeners.Contactable2D;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 
@@ -22,11 +23,12 @@ public class NewScript extends Component implements Contactable2D {
     @ShowInEditor
     public String data = "floor";
     private transient Vector3 spawnPos;
-    private boolean tp = false;
+    private transient boolean tp = false;
 
     @Override
     public void start() {
         spawnPos = new Vector3(transform.position);
+        tp = false;
     }
 
     @Override
@@ -61,6 +63,16 @@ public class NewScript extends Component implements Contactable2D {
         if (other.gameObject.hasComponent(NewScript.class)) {
             String data = other.getComponent(NewScript.class).data;
             if (data.equalsIgnoreCase("spike")) {
+                tp = true;
+            }
+        }
+    }
+
+    @Override
+    public void onCollisionTrigger(Collider other) {
+        if (other.gameObject.hasComponent(NewScript.class)) {
+            String data = other.getComponent(NewScript.class).data;
+            if (data.equalsIgnoreCase("win")) {
                 tp = true;
             }
         }

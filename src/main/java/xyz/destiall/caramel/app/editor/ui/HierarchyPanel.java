@@ -5,6 +5,7 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
+import imgui.type.ImString;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
@@ -19,7 +20,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class HierarchyPanel extends Panel {
     private boolean addingComponentsHierarchy;
+    private boolean editingGameObject;
+    private int nodeId;
     private ImVec2 popupMousePos;
+    private GameObject editingGo;
 
     public HierarchyPanel(Scene scene) {
         super(scene);
@@ -36,12 +40,14 @@ public class HierarchyPanel extends Panel {
             if (treeNode(gameObject, index)) ImGui.treePop();
         }
         if (ImGui.isWindowHovered()) {
-            if (ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
+            if (scene.hoveredGameObject == null && !editingGameObject && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
                 addingComponentsHierarchy = !addingComponentsHierarchy;
+                editingGameObject = false;
                 if (addingComponentsHierarchy)
                     popupMousePos = new ImVec2(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
             } else if (ImGui.isMouseClicked(Input.Mouse.LEFT)) {
                 addingComponentsHierarchy = false;
+                editingGameObject = false;
             }
         }
         if (ImGui.isWindowFocused() && scene.selectedGameObject != null) {
@@ -54,7 +60,18 @@ public class HierarchyPanel extends Panel {
                 scene.selectedGameObject = dupe;
             }
         }
-        if (addingComponentsHierarchy) {
+        if (editingGameObject) {
+            ImGui.begin("Edit GameObject", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
+            ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
+            if (ImGui.selectable("Rename")) {
+                
+                editingGameObject = false;
+            } else if (ImGui.selectable("Delete")) {
+                scene.destroy(editingGo);
+                editingGameObject = false;
+            }
+            ImGui.end();
+        } else if (addingComponentsHierarchy) {
             ImGui.begin("Add GameObject", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
             ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
             if (ImGui.selectable("Add GameObject")) {
@@ -62,8 +79,9 @@ public class HierarchyPanel extends Panel {
                 Mesh quad = MeshBuilder.createQuad(1);
                 quad.setColor(new Vector4f(1f, 1f, 1f, 1f));
                 quad.build();
-                go.addComponent(new MeshRenderer(go));
-                go.getComponent(MeshRenderer.class).setMesh(quad);
+                MeshRenderer renderer = new MeshRenderer(go);
+                renderer.setMesh(quad);
+                go.addComponent(renderer);
                 scene.addGameObject(go);
                 addingComponentsHierarchy = false;
             }
@@ -73,21 +91,34 @@ public class HierarchyPanel extends Panel {
     }
 
     private boolean treeNode(GameObject gameObject, AtomicInteger index) {
-        ImGui.pushID(index.getAndIncrement());
+
+        ImString gameObjectName = new ImString(gameObject.name);
+
         if (scene.selectedGameObject == gameObject) {
             ImGui.pushStyleColor(ImGuiCol.Text, 0.5f, 0.5f, 0.5f, 1.0f);
         }
-        boolean treeNode = ImGui.treeNodeEx("" + index, ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.FramePadding, gameObject.name);
+
+        boolean treeNode = ImGui.treeNodeEx(index.incrementAndGet(), ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.FramePadding, gameObjectName.get());
         if (scene.selectedGameObject == gameObject) {
             ImGui.popStyleColor();
         }
+
         if (ImGui.isItemClicked()) {
             scene.selectedGameObject = gameObject;
         }
+
         if (ImGui.isItemHovered()) {
             scene.hoveredGameObject = gameObject;
         }
-        ImGui.popID();
+
+        if (ImGui.isMouseClicked(Input.Mouse.RIGHT) && ImGui.isItemHovered()) {
+            addingComponentsHierarchy = false;
+            editingGameObject = true;
+            editingGo = gameObject;
+            popupMousePos = new ImVec2(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
+            scene.selectedGameObject = gameObject;
+            nodeId = index.get();
+        }
 
         if (ImGui.beginDragDropSource()) {
             ImGui.setDragDropPayload(Scene.SCENE_DRAG_DROP_PAYLOAD, gameObject);

@@ -254,8 +254,7 @@ public class Application {
         if (scene.isPlaying()) scene.stop();
 
         if (EDITOR_MODE) {
-            String savedScene = serializer.toJson(scene);
-            FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
+            saveAllScenes();
         }
 
         running = false;
@@ -293,10 +292,7 @@ public class Application {
         if (EDITOR_MODE && (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Input.isKeyDown(GLFW_KEY_RIGHT_CONTROL)) &&
                 Input.isKeyPressed(GLFW_KEY_S)) {
             if (getCurrentScene().isPlaying()) getCurrentScene().stop();
-
-            String savedScene = serializer.toJson(getCurrentScene());
-            FileIO.writeData(new File("assets/" + getCurrentScene().name + ".json"), savedScene);
-            Debug.log("Saved scene " + getCurrentScene().name);
+            saveCurrentScene();
         }
 
         mouseListener.endFrame();
@@ -304,6 +300,20 @@ public class Application {
 
         glfwSwapBuffers(glfwWindow);
         return false;
+    }
+
+    public void saveCurrentScene() {
+        String savedScene = serializer.toJson(getCurrentScene());
+        FileIO.writeData(new File("assets/" + getCurrentScene().name + ".json"), savedScene);
+        Debug.log("Saved scene " + getCurrentScene().name);
+    }
+
+    public void saveAllScenes() {
+        for (Scene scene : scenes) {
+            String savedScene = serializer.toJson(scene);
+            FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
+            Debug.log("Saved scene " + scene.name);
+        }
     }
 
     private void destroy() {
