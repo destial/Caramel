@@ -59,8 +59,8 @@ public class NewScript extends Component implements Contactable2D {
 
     @Override
     public void onCollisionEnter(RigidBody2D other) {
-        if (other.gameObject.hasComponent(NewScript.class)) {
-            String data = other.getComponent(NewScript.class).data;
+        if (other.gameObject.hasComponent(this.getClass())) {
+            String data = other.getComponent(this.getClass()).data;
             if (data.equalsIgnoreCase("spike")) {
                 tp = true;
             }

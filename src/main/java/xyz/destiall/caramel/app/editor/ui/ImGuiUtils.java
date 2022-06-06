@@ -10,6 +10,8 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.math.Vector2;
+import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
 import xyz.destiall.caramel.graphics.Texture;
@@ -358,12 +360,17 @@ public class ImGuiUtils {
             } else if (type == Vector3f.class) {
                 ImGuiUtils.drawVec3Control(name, (Vector3f) value, 1f);
 
+            } else if (type == Vector3.class) {
+                ImGuiUtils.drawVec3Control(name, ((Vector3) value).getJoml(), 1f);
+
             } else if (type == Vector2f.class) {
-                ImGuiUtils.drawVec2Control(name, (Vector2f) value);
+                ImGuiUtils.drawVec2Control(name, (Vector2f) value, 1f);
+
+            } else if (type == Vector2.class) {
+                ImGuiUtils.drawVec2Control(name, ((Vector2) value).getJoml(), 1f);
 
             } else if (type == Quaternionf.class) {
-                Quaternionf quat = (Quaternionf) value;
-                ImGuiUtils.drawQuatControl(name, quat, 0.f);
+                ImGuiUtils.drawQuatControl(name, (Quaternionf) value, 0.f);
 
             } else if (type == Mesh.class) {
                 Mesh mesh = (Mesh) value;

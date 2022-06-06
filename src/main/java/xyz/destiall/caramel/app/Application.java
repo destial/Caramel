@@ -63,7 +63,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public class Application {
-    public final boolean EDITOR_MODE = false;
+    public final boolean EDITOR_MODE = true;
     private boolean running = false;
 
     private final MouseListener mouseListener;
