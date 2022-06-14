@@ -5,7 +5,7 @@ import org.jbox2d.dynamics.Body;
 import xyz.destiall.caramel.api.math.Vector2;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
-import xyz.destiall.caramel.api.physics.listeners.RaycastInfo2D;
+import xyz.destiall.caramel.api.physics.info.RaycastInfo2D;
 
 public class RigidBody2D extends RigidBody {
     public final Vector2 velocity = new Vector2();

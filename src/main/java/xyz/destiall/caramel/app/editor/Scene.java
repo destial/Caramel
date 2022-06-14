@@ -21,8 +21,8 @@ import xyz.destiall.caramel.app.physics.Physics;
 import xyz.destiall.caramel.app.physics.Physics2D;
 import xyz.destiall.caramel.app.physics.Physics3D;
 import xyz.destiall.caramel.app.utils.Pair;
-import xyz.destiall.caramel.interfaces.Render;
-import xyz.destiall.caramel.interfaces.Update;
+import xyz.destiall.caramel.api.interfaces.Render;
+import xyz.destiall.caramel.api.interfaces.Update;
 
 import java.util.ArrayList;
 import java.util.HashMap;

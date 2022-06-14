@@ -6,12 +6,11 @@ import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
-import xyz.destiall.caramel.app.scripts.ScriptManager;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.FileIO;
 import xyz.destiall.caramel.app.editor.Scene;
-import xyz.destiall.caramel.graphics.Framebuffer;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
@@ -72,7 +71,7 @@ public class Application {
     private final Gson serializer;
     private ImGUILayer imGui;
     private Framebuffer[] framebuffer;
-    private ScriptManager scriptManager;
+    private EditorScriptManager scriptManager;
 
     private int width;
     private int height;
@@ -187,9 +186,9 @@ public class Application {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
         // Setup script manager
-        scriptManager = new ScriptManager();
+        scriptManager = new EditorScriptManager();
 
-        // Register event listeners
+        // Register event internals
         if (EDITOR_MODE) {
             eventHandling.registerListener(scriptManager);
         }
@@ -321,7 +320,7 @@ public class Application {
         // Destroy any remaining objects
         scriptManager.destroy();
 
-        // Unregister any remaining listeners
+        // Unregister any remaining internals
         eventHandling.unregisterListener(scriptManager);
 
         // Destroy ImGUI
@@ -364,7 +363,7 @@ public class Application {
         return mouseListener;
     }
 
-    public ScriptManager getScriptManager() {
+    public EditorScriptManager getScriptManager() {
         return scriptManager;
     }
 

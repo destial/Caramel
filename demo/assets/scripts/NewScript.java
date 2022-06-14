@@ -10,7 +10,7 @@ import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Collider;
-import xyz.destiall.caramel.api.physics.listeners.Contactable2D;
+import xyz.destiall.caramel.api.physics.internals.Contactable2D;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 
 public class NewScript extends Component implements Contactable2D {

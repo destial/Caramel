@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.graphics;
+package xyz.destiall.caramel.api.render;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;

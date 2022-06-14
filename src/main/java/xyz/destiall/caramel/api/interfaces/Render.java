@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.interfaces;
+package xyz.destiall.caramel.api.interfaces;
 
 import xyz.destiall.caramel.api.components.Camera;
 

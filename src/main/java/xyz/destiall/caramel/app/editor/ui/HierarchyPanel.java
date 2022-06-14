@@ -39,6 +39,7 @@ public class HierarchyPanel extends Panel {
         for (GameObject gameObject : scene.getGameObjects()) {
             if (treeNode(gameObject, index)) ImGui.treePop();
         }
+
         if (ImGui.isWindowHovered()) {
             if (scene.hoveredGameObject == null && !editingGameObject && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
                 addingComponentsHierarchy = !addingComponentsHierarchy;
@@ -50,6 +51,7 @@ public class HierarchyPanel extends Panel {
                 editingGameObject = false;
             }
         }
+
         if (ImGui.isWindowFocused() && scene.selectedGameObject != null) {
             if (Input.isKeyDown(Input.Key.BACKSPACE) || Input.isKeyDown(Input.Key.DELETE)) {
                 scene.destroy(scene.selectedGameObject);
@@ -60,6 +62,7 @@ public class HierarchyPanel extends Panel {
                 scene.selectedGameObject = dupe;
             }
         }
+
         if (editingGameObject) {
             ImGui.begin("Edit GameObject", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
             ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
@@ -91,7 +94,6 @@ public class HierarchyPanel extends Panel {
     }
 
     private boolean treeNode(GameObject gameObject, AtomicInteger index) {
-
         ImString gameObjectName = new ImString(gameObject.name);
 
         if (scene.selectedGameObject == gameObject) {

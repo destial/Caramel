@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.api.physics.listeners;
+package xyz.destiall.caramel.api.physics.internals;
 
 import org.jbox2d.callbacks.ContactImpulse;
 import org.jbox2d.collision.Manifold;
@@ -6,6 +6,8 @@ import org.jbox2d.dynamics.contacts.Contact;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Collider;
+import xyz.destiall.caramel.api.physics.components.Contactable2D;
+import xyz.destiall.caramel.api.physics.info.ContactPoint2D;
 import xyz.destiall.caramel.app.editor.Scene;
 
 public class ContactListener implements org.jbox2d.callbacks.ContactListener {

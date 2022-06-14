@@ -32,7 +32,7 @@ public class MenuBarPanel extends Panel {
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
                 ImGui.endMenu();
             }
-            if (ImGui.menuItem("Save", "CTRL+S")) {
+            if (ImGui.menuItem("Save", "Ctrl + S")) {
                 if (scene.isPlaying()) scene.stop();
                 Application.getApp().saveCurrentScene();
             }
@@ -43,6 +43,9 @@ public class MenuBarPanel extends Panel {
                         ImGui.text("Filter: " + filter);
                     }
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
+            }
+            if (ImGui.menuItem("Build", "Ctrl + B")) {
+
             }
 
             ImGui.endMenu();

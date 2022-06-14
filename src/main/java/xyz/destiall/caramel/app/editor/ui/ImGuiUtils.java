@@ -14,7 +14,7 @@ import xyz.destiall.caramel.api.math.Vector2;
 import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.physics.RigidBodyType;
-import xyz.destiall.caramel.graphics.Texture;
+import xyz.destiall.caramel.api.texture.Texture;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;

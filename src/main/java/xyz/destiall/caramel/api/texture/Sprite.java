@@ -4,7 +4,6 @@ import org.joml.Vector2f;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.graphics.Texture;
 
 public class Sprite {
     private Vector4f color;

@@ -1,7 +1,8 @@
-package xyz.destiall.caramel.api.physics.listeners;
+package xyz.destiall.caramel.api.physics.components;
 
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Collider;
+import xyz.destiall.caramel.api.physics.info.ContactPoint2D;
 
 public interface Contactable2D {
     default void onCollisionEnter(RigidBody2D other) {}

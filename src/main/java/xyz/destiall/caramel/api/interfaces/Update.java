@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.interfaces;
+package xyz.destiall.caramel.api.interfaces;
 
 public interface Update {
     default void update() {}
