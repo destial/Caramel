@@ -15,41 +15,23 @@ import xyz.destiall.caramel.graphics.Framebuffer;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
+import xyz.destiall.java.gson.JsonObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
-import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
-import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
-import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
-import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwInit;
-import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
-import static org.lwjgl.glfw.GLFW.glfwShowWindow;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
-import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
-import static org.lwjgl.glfw.GLFW.glfwTerminate;
-import static org.lwjgl.glfw.GLFW.glfwWindowHint;
-import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -76,10 +58,13 @@ public class Application {
 
     private int width;
     private int height;
+    private int winPosX;
+    private int winPosY;
+    private String lastScene;
     private String title;
 
     private final List<Scene> scenes;
-    private int sceneIndex = 0;
+    private int sceneIndex = -1;
 
     private static Application a;
 
@@ -91,8 +76,6 @@ public class Application {
     }
 
     private Application() {
-        this.width = 1280;
-        this.height = 720;
         title = "Caramel";
         mouseListener = new MouseListener();
         keyListener = new KeyListener();
@@ -128,6 +111,7 @@ public class Application {
 
     public void run() {
         loadAssets();
+        loadSettings();
         init();
         loop();
         destroy();
@@ -137,11 +121,34 @@ public class Application {
         try {
             File assets = new File("assets");
             if (assets.mkdir()) {
-                saveResource("assets/shaders/color.glsl", false);
-                saveResource("assets/shaders/default.glsl", false);
-                saveResource("caramel_logo.png", false);
-
+                saveResource("assets");
                 wait(1000);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadSettings() {
+        try {
+            File settings = new File("settings.json");
+            JsonObject object = new JsonObject();
+            if (settings.createNewFile()) {
+                object.addProperty("width", width = 1280);
+                object.addProperty("height", height = 720);
+                object.addProperty("windowPosX", winPosX = 50);
+                object.addProperty("windowPosY", winPosY = 50);
+                object.addProperty("lastScene", lastScene = "assets/Untitled Scene.json");
+                try (FileWriter writer = new FileWriter(settings)) {
+                    writer.write(serializer.toJson(object));
+                }
+            } else {
+                object = serializer.fromJson(new FileReader(settings), JsonObject.class);
+                width = object.get("width").getAsInt();
+                height = object.get("height").getAsInt();
+                winPosX = object.get("windowPosX").getAsInt();
+                winPosY = object.get("windowPosY").getAsInt();
+                lastScene = object.get("lastScene").getAsString();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -170,6 +177,13 @@ public class Application {
             this.width = width;
             this.height = height;
         });
+
+        glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
+            this.winPosX = x;
+            this.winPosY = y;
+        });
+
+        glfwSetWindowPos(glfwWindow, winPosX, winPosY);
 
         // Set cursor mode
         //if (!EDITOR_MODE) {
@@ -205,6 +219,14 @@ public class Application {
         framebuffer[1] = new Framebuffer(this.width, this.height);
     }
 
+    public Scene loadScene(File file) {
+        Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
+        scenes.add(scene);
+        sceneIndex++;
+        scene.setFile(file);
+        return scene;
+    }
+
     private void loop() {
         // Load all the scripts
         scriptManager.reloadAll();
@@ -215,10 +237,8 @@ public class Application {
         float second = 0;
 
         // Create the scene
-        File file = new File("assets/Untitled Scene.json");
-
-        Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
-        scenes.add(scene);
+        File file = new File(lastScene);
+        Scene scene = loadScene(file);
 
         running = true;
 
@@ -232,7 +252,7 @@ public class Application {
             if (!EDITOR_MODE && Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
 
             if (Time.isSecond) {
-                glfwSetWindowTitle(glfwWindow, title + " | FPS: " + (int) (Time.getFPS()));
+                glfwSetWindowTitle(glfwWindow, "Caramel | " + title + " | FPS: " + (int) (Time.getFPS()));
             }
 
             if (process()) break;
@@ -261,10 +281,11 @@ public class Application {
     }
 
     private boolean process() {
+        Scene scene = getCurrentScene();
         glfwPollEvents();
 
-        if (EDITOR_MODE) getCurrentScene().editorUpdate();
-        else getCurrentScene().update();
+        if (EDITOR_MODE) scene.editorUpdate();
+        else scene.update();
 
         glViewport(0, 0, width, height);
 
@@ -272,26 +293,26 @@ public class Application {
             getSceneViewFramebuffer().bind();
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            getCurrentScene().render(getCurrentScene().getEditorCamera());
-            DebugDraw.INSTANCE.render(getCurrentScene().getEditorCamera());
+            scene.render(scene.getEditorCamera());
+            DebugDraw.INSTANCE.render(scene.getEditorCamera());
             getSceneViewFramebuffer().unbind();
         }
 
-        if (getCurrentScene().getGameCamera() != null) {
+        if (scene.getGameCamera() != null) {
             if (EDITOR_MODE) getGameViewFramebuffer().bind();
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            getCurrentScene().render(getCurrentScene().getGameCamera());
+            scene.render(scene.getGameCamera());
             if (EDITOR_MODE) getGameViewFramebuffer().unbind();
         }
 
         if (EDITOR_MODE) imGui.update();
 
-        getCurrentScene().endFrame();
+        scene.endFrame();
 
         if (EDITOR_MODE && (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Input.isKeyDown(GLFW_KEY_RIGHT_CONTROL)) &&
                 Input.isKeyPressed(GLFW_KEY_S)) {
-            if (getCurrentScene().isPlaying()) getCurrentScene().stop();
+            if (scene.isPlaying()) scene.stop();
             saveCurrentScene();
         }
 
@@ -303,16 +324,20 @@ public class Application {
     }
 
     public void saveCurrentScene() {
-        String savedScene = serializer.toJson(getCurrentScene());
-        FileIO.writeData(new File("assets/" + getCurrentScene().name + ".json"), savedScene);
+        Scene scene = getCurrentScene();
+        saveScene(scene, scene.getFile());
+    }
+
+    public void saveScene(Scene scene, File file) {
+        scene.setFile(file);
+        String savedScene = serializer.toJson(scene);
+        FileIO.writeData(file, savedScene);
         Debug.log("Saved scene " + getCurrentScene().name);
     }
 
     public void saveAllScenes() {
         for (Scene scene : scenes) {
-            String savedScene = serializer.toJson(scene);
-            FileIO.writeData(new File("assets/" + scene.name + ".json"), savedScene);
-            Debug.log("Saved scene " + scene.name);
+            saveScene(scene, scene.getFile());
         }
     }
 
@@ -327,13 +352,25 @@ public class Application {
         // Destroy ImGUI
         imGui.destroyImGui();
 
+        File settings = new File("settings.json");
+        JsonObject object = new JsonObject();
+        object.addProperty("width", width);
+        object.addProperty("height", height);
+        object.addProperty("windowPosX", winPosX);
+        object.addProperty("windowPosY", winPosY);
+        object.addProperty("lastScene", getCurrentScene().getFile().getPath());
+        try (FileWriter writer = new FileWriter(settings)) {
+            writer.write(serializer.toJson(object));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         // Free GLFW callbacks and destroy the window (if not yet destroyed)
         glfwFreeCallbacks(glfwWindow);
         glfwDestroyWindow(glfwWindow);
 
-        // Terminate the window and free the error callbacks
+        // Terminate the window
         glfwTerminate();
-        glfwSetErrorCallback(null).free();
     }
 
     public boolean isRunning() {
@@ -368,58 +405,37 @@ public class Application {
         return scriptManager;
     }
 
-    public void saveResource(String resourcePath, boolean replace) {
-        if (resourcePath != null && !resourcePath.equals("")) {
-            resourcePath = resourcePath.replace('\\', '/');
-            InputStream in = this.getResource(resourcePath);
-            if (in == null) {
-                throw new IllegalArgumentException("The embedded resource '" + resourcePath + "' cannot be found!");
-            } else {
-                File outFile = new File(resourcePath);
-                int lastIndex = resourcePath.lastIndexOf(47);
-                File outDir = new File(resourcePath.substring(0, Math.max(lastIndex, 0)));
-                if (!outDir.exists()) outDir.mkdirs();
+    public void saveResource(String resourcePath) {
+        try {
+            CodeSource src = this.getClass().getProtectionDomain().getCodeSource();
+            if (src != null) {
+                URL jar = src.getLocation();
+                ZipInputStream zip = new ZipInputStream(jar.openStream());
+                while (true) {
+                    ZipEntry e = zip.getNextEntry();
+                    if (e == null) break;
 
-                try {
-                    if (outFile.exists() && !replace) {
-                        System.err.println("Could not save " + outFile.getName() + " to " + outFile + " because " + outFile.getName() + " already exists.");
-                    } else {
-                        OutputStream out = new FileOutputStream(outFile);
-                        byte[] buf = new byte[1024];
-                        int len;
-                        while((len = in.read(buf)) > 0) {
-                            out.write(buf, 0, len);
+                    String name = e.getName();
+                    if (name.startsWith(resourcePath)) {
+                        System.out.println(name);
+                        File file = new File(name);
+                        if (file.isDirectory()) {
+                            file.mkdirs();
+                            continue;
                         }
-                        out.close();
-                        in.close();
+                        try (InputStream input = this.getClass().getResourceAsStream("/" + name)) {
+                            if (input == null) continue;
+                            System.out.println("Writing " + name);
+                            if (!file.exists()) {
+                                file.createNewFile();
+                            }
+                            Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        }
                     }
-                } catch (IOException e) {
-                    System.err.println("Could not save " + outFile.getName() + " to " + outFile);
-                    e.printStackTrace();
                 }
-
             }
-        } else {
-            throw new IllegalArgumentException("ResourcePath cannot be null or empty");
-        }
-    }
-
-    public InputStream getResource(String filename) {
-        if (filename == null) {
-            throw new IllegalArgumentException("Filename cannot be null");
-        } else {
-            try {
-                URL url = getClass().getClassLoader().getResource(filename);
-                if (url == null) {
-                    return null;
-                } else {
-                    URLConnection connection = url.openConnection();
-                    connection.setUseCaches(false);
-                    return connection.getInputStream();
-                }
-            } catch (IOException e) {
-                return null;
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

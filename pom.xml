@@ -63,6 +63,9 @@
                 <directory>assets</directory>
                 <filtering>true</filtering>
                 <targetPath>assets</targetPath>
+                <excludes>
+                    <exclude>*.json</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>

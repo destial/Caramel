@@ -24,6 +24,7 @@ import xyz.destiall.caramel.app.utils.Pair;
 import xyz.destiall.caramel.interfaces.Render;
 import xyz.destiall.caramel.interfaces.Update;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,6 +57,8 @@ public class Scene implements Update, Render {
     private EditorCamera editorCamera;
     private Gizmo gizmo;
     private Camera gameCamera;
+
+    private File file;
 
     private boolean playing = false;
     private boolean saved = true;
@@ -266,6 +269,14 @@ public class Scene implements Update, Render {
             if (o != null) return o;
         }
         return null;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    public void setFile(File file) {
+        this.file = file;
     }
 
     public boolean isPlaying() {

@@ -5,8 +5,11 @@ import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
 import imgui.flag.ImGuiCond;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.Scene;
+
+import java.io.File;
 
 public class MenuBarPanel extends Panel {
     private boolean openFile;
@@ -21,37 +24,46 @@ public class MenuBarPanel extends Panel {
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         if (ImGui.beginMenu("File")) {
-            if (ImGui.beginMenu("Open Script")) {
-                ImGui.setNextWindowSize(800, 200, ImGuiCond.Once);
-                ImGui.setNextWindowPos(ImGui.getMainViewport().getPosX() + 100, ImGui.getMainViewport().getPosY() + 100, ImGuiCond.Once);
-                ImGuiFileDialog.openModal("open-script", "Choose File", ".java", ".", new ImGuiFileDialogPaneFun() {
+            if (ImGui.menuItem("Open Scene")) {
+                ImGuiFileDialog.openModal("open-scene", "Open Scene", ".json", ".", new ImGuiFileDialogPaneFun() {
                     @Override
-                    public void paneFun(String filter, long userDatas, boolean canContinue) {
-                        ImGui.text("Filter: " + filter);
-                    }
+                    public void paneFun(String filter, long userDatas, boolean canContinue) {}
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
-                ImGui.endMenu();
             }
+
             if (ImGui.menuItem("Save", "CTRL+S")) {
                 if (scene.isPlaying()) scene.stop();
                 Application.getApp().saveCurrentScene();
             }
+
             if (ImGui.menuItem("Save As")) {
                 ImGuiFileDialog.openModal("save-scene", "Save Scene As", ".json", ".", new ImGuiFileDialogPaneFun() {
                     @Override
-                    public void paneFun(String filter, long userDatas, boolean canContinue) {
-                        ImGui.text("Filter: " + filter);
-                    }
+                    public void paneFun(String filter, long userDatas, boolean canContinue) {}
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
             }
 
             ImGui.endMenu();
         }
 
-        if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 200, 400, 800, 600)) {
+        if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
             if (ImGuiFileDialog.isOk()) {
-                System.out.println(ImGuiFileDialog.getSelection());
-                System.out.println(ImGuiFileDialog.getUserDatas());
+                String fileName = ImGuiFileDialog.getCurrentFileName();
+                String sceneName = fileName.substring(0, ImGuiFileDialog.getCurrentFilter().length());
+                File file = new File(ImGuiFileDialog.getFilePathName());
+                scene.name = sceneName;
+                Application.getApp().saveScene(scene, file);
+                Application.getApp().setTitle(scene.name);
+            }
+            ImGuiFileDialog.close();
+        } else if (ImGuiFileDialog.display("open-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
+            File file = new File(ImGuiFileDialog.getFilePathName());
+            if (!file.exists()) {
+                Debug.logError(file.getPath() + " does not exist!");
+            } else {
+                if (scene.isPlaying()) scene.stop();
+                Scene s = Application.getApp().loadScene(file);
+                Application.getApp().setTitle(s.name);
             }
             ImGuiFileDialog.close();
         }
