@@ -1,12 +1,10 @@
 package xyz.destiall.caramel.app.editor.debug;
 
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.components.Camera;
-import xyz.destiall.caramel.app.Application;
-import xyz.destiall.caramel.graphics.Shader;
-import xyz.destiall.caramel.interfaces.Render;
-import xyz.destiall.caramel.interfaces.Update;
+import xyz.destiall.caramel.api.render.Shader;
+import xyz.destiall.caramel.api.interfaces.Render;
+import xyz.destiall.caramel.api.interfaces.Update;
 
 import java.util.ArrayList;
 import java.util.Arrays;

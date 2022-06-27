@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.graphics;
+package xyz.destiall.caramel.api.texture;
 
 import org.lwjgl.BufferUtils;
 import xyz.destiall.caramel.api.debug.Debug;

@@ -2,8 +2,7 @@ package xyz.destiall.caramel.api.texture;
 
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.graphics.Texture;
-import xyz.destiall.caramel.interfaces.Update;
+import xyz.destiall.caramel.api.interfaces.Update;
 
 import java.util.ArrayList;
 import java.util.List;

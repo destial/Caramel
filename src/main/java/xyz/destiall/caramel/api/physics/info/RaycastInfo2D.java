@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.api.physics.listeners;
+package xyz.destiall.caramel.api.physics.info;
 
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Vec2;

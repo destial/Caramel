@@ -2,14 +2,11 @@ package xyz.destiall.caramel.api.render;
 
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.interfaces.FunctionButton;
-import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.texture.Spritesheet;
-import xyz.destiall.caramel.interfaces.Render;
 
 public class SpriteRenderer extends Renderer {
 

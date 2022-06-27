@@ -8,6 +8,7 @@ import ch.obermuhlner.scriptengine.java.constructor.NullConstructorStrategy;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
+import xyz.destiall.caramel.api.scripts.ScriptManager;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.events.FileEvent;
 import xyz.destiall.caramel.app.utils.FileIO;
@@ -35,14 +36,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class ScriptManager implements Listener {
+public class EditorScriptManager implements ScriptManager, Listener {
     private final File scriptsRootFolder;
     private final JavaScriptEngine engine;
     private final Map<String, JavaCompiledScript> compiledScripts;
     private final Set<String> awaitingCompilation;
     private FileWatcher watcher;
 
-    public ScriptManager() {
+    public EditorScriptManager() {
         scriptsRootFolder = new File("assets/scripts/");
         scriptsRootFolder.mkdir();
         engine = (JavaScriptEngine) new JavaScriptEngineFactory().getScriptEngine();

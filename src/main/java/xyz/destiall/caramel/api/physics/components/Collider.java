@@ -3,7 +3,7 @@ package xyz.destiall.caramel.api.physics.components;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.interfaces.Render;
+import xyz.destiall.caramel.api.interfaces.Render;
 
 public abstract class Collider extends Component implements Render {
     public Vector3f offset = new Vector3f(0);

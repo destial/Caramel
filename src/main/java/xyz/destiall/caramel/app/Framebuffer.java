@@ -1,6 +1,7 @@
-package xyz.destiall.caramel.graphics;
+package xyz.destiall.caramel.app;
 
 import xyz.destiall.caramel.api.debug.Debug;
+import xyz.destiall.caramel.api.texture.Texture;
 
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;

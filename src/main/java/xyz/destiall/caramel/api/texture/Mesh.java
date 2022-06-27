@@ -6,9 +6,8 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.graphics.Shader;
-import xyz.destiall.caramel.graphics.Texture;
-import xyz.destiall.caramel.graphics.Vertex;
+import xyz.destiall.caramel.api.render.Shader;
+import xyz.destiall.caramel.api.math.Vertex;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;

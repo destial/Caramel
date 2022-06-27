@@ -6,12 +6,11 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
-import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
-import xyz.destiall.caramel.api.physics.listeners.ContactListener;
+import xyz.destiall.caramel.api.physics.internals.ContactListener;
 import xyz.destiall.caramel.app.editor.Scene;
 
 

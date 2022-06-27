@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.api.physics.listeners;
+package xyz.destiall.caramel.api.physics.info;
 
 import org.jbox2d.dynamics.contacts.Contact;
 import xyz.destiall.caramel.api.components.RigidBody2D;

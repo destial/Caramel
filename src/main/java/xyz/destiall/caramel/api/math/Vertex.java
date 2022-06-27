@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.graphics;
+package xyz.destiall.caramel.api.math;
 
 import org.joml.Vector2f;
 import org.joml.Vector3f;

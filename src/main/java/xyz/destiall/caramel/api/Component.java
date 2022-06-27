@@ -5,11 +5,11 @@ import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.interfaces.FunctionButton;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.physics.listeners.ContactPoint2D;
+import xyz.destiall.caramel.api.physics.info.ContactPoint2D;
 import xyz.destiall.caramel.app.editor.ui.ImGuiUtils;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
-import xyz.destiall.caramel.interfaces.Update;
+import xyz.destiall.caramel.api.interfaces.Update;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
