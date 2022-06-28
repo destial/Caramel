@@ -7,6 +7,7 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import org.joml.Vector4f;
+import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.render.MeshRenderer;
@@ -58,6 +59,10 @@ public class HierarchyPanel extends Panel {
                 scene.selectedGameObject = null;
             } else if ((Input.isKeyDown(Input.Key.L_CONTROL) || Input.isKeyDown(Input.Key.R_CONTROL)) && Input.isKeyPressed(Input.Key.D)) {
                 GameObject dupe = scene.selectedGameObject.clone();
+                dupe.id = Component.ENTITY_IDS.incrementAndGet();
+                while (!scene.entityIdExists(dupe.id)) {
+                    dupe.id = Component.ENTITY_IDS.incrementAndGet();
+                }
                 scene.addGameObject(dupe);
                 scene.selectedGameObject = dupe;
             }

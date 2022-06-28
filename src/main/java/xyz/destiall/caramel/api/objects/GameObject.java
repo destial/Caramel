@@ -2,6 +2,7 @@ package xyz.destiall.caramel.api.objects;
 
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.Camera;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.render.Renderer;
@@ -9,11 +10,7 @@ import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.api.interfaces.Render;
 import xyz.destiall.caramel.api.interfaces.Update;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -42,6 +39,9 @@ public class GameObject implements Update, Render, Cloneable {
         tags = new ArrayList<>();
         transform = new Transform(this);
         id = Component.ENTITY_IDS.incrementAndGet();
+        while (!scene.entityIdExists(id)) {
+            id = Component.ENTITY_IDS.incrementAndGet();
+        }
     }
 
     @Override
@@ -57,10 +57,18 @@ public class GameObject implements Update, Render, Cloneable {
         for (Component component : components) {
             if (!component.enabled) continue;
             if (!component.alreadyEnabled) {
-                component.start();
+                try {
+                    component.start();
+                } catch (Exception e) {
+                    Debug.logError(e.getLocalizedMessage());
+                }
                 component.alreadyEnabled = true;
             }
-            component.update();
+            try {
+                component.update();
+            } catch (Exception e) {
+                Debug.logError(e.getLocalizedMessage());
+            }
         }
     }
 
@@ -68,12 +76,20 @@ public class GameObject implements Update, Render, Cloneable {
     public void lateUpdate() {
         for (Component component : components) {
             if (!component.enabled || component instanceof MeshRenderer) continue;
-            component.lateUpdate();
+            try {
+                component.lateUpdate();
+            } catch (Exception e) {
+                Debug.logError(e.getLocalizedMessage());
+            }
         }
 
         Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
         for (Renderer render : renderers) {
-            render.lateUpdate();
+            try {
+                render.lateUpdate();
+            } catch (Exception e) {
+                Debug.logError(e.getLocalizedMessage());
+            }
         }
     }
 
@@ -89,7 +105,11 @@ public class GameObject implements Update, Render, Cloneable {
 
         Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
         for (Renderer render : renderers) {
-            render.lateUpdate();
+            try {
+                render.lateUpdate();
+            } catch (Exception e) {
+                Debug.logError(e.getLocalizedMessage());
+            }
         }
     }
 
@@ -195,7 +215,6 @@ public class GameObject implements Update, Render, Cloneable {
     @Override
     public GameObject clone() {
         GameObject clone = new GameObject(scene);
-        Component.ENTITY_IDS.decrementAndGet();
         clone.id = id;
         clone.name = name;
         clone.transform.position.set(transform.position);
