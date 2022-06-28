@@ -17,7 +17,7 @@ import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class Component implements Update {
-    public static final AtomicInteger ENTITY_IDS = new AtomicInteger(0);
+
 
     @HideInEditor private final String clazz = getClass().getName();
     @HideInEditor public transient Transform transform;
@@ -32,7 +32,7 @@ public abstract class Component implements Update {
     public Component(GameObject gameObject) {
         this.gameObject = gameObject;
         this.transform = gameObject.transform;
-        id = ENTITY_IDS.incrementAndGet();
+        id = gameObject.scene.generateId();
     }
 
     public abstract void start();
@@ -40,6 +40,7 @@ public abstract class Component implements Update {
 
     @Override
     public void imguiLayer() {
+        ImGui.text("id: " + id);
         for (Field field : getClass().getFields()) {
             if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) continue;
             if (Modifier.isPublic(field.getModifiers()) || field.isAnnotationPresent(ShowInEditor.class)) {

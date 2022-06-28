@@ -5,32 +5,47 @@ import org.lwjgl.opengl.GL;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.debug.Debug;
+import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.FileIO;
-import xyz.destiall.caramel.app.editor.Scene;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
 
-import java.io.*;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.security.CodeSource;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipInputStream;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_CONTROL;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
+import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
+import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
+import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
+import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
+import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwInit;
+import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
+import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowTitle;
+import static org.lwjgl.glfw.GLFW.glfwShowWindow;
+import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
+import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
+import static org.lwjgl.glfw.GLFW.glfwTerminate;
+import static org.lwjgl.glfw.GLFW.glfwWindowHint;
+import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -43,7 +58,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class Application {
+public class Application implements Runnable {
     public final boolean EDITOR_MODE = true;
     private boolean running = false;
 
@@ -108,14 +123,15 @@ public class Application {
         return scenes.get(sceneIndex);
     }
 
+    @Override
     public void run() {
-        loadSettings();
+        loadFiles();
         init();
         loop();
         destroy();
     }
 
-    private void loadSettings() {
+    private void loadFiles() {
         try {
             File settings = new File("settings.json");
             JsonObject object = new JsonObject();
@@ -125,11 +141,10 @@ public class Application {
                 object.addProperty("windowPosX", winPosX = 50);
                 object.addProperty("windowPosY", winPosY = 50);
                 object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.json");
-                try (FileWriter writer = new FileWriter(settings)) {
-                    writer.write(serializer.toJson(object));
-                }
+                FileIO.writeData(settings, serializer.toJson(object));
+
             } else {
-                object = serializer.fromJson(new FileReader(settings), JsonObject.class);
+                object = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
                 width = object.get("width").getAsInt();
                 height = object.get("height").getAsInt();
                 winPosX = object.get("windowPosX").getAsInt();
@@ -144,9 +159,13 @@ public class Application {
                 new File(assets, "textures" + File.separator).mkdirs();
                 new File(assets, "shaders" + File.separator).mkdirs();
                 new File(assets, "scenes" + File.separator).mkdirs();
-                FileIO.saveResource("imgui.ini", "imgui.ini");
-                Thread.sleep(1000);
             }
+            File imgui = new File("imgui.ini");
+            if (!imgui.exists()) {
+                FileIO.saveResource("imgui.ini", "imgui.ini");
+            }
+
+            Thread.sleep(1000);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -175,11 +194,13 @@ public class Application {
             this.height = height;
         });
 
+        // Set position callbacks.
         glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
             this.winPosX = x;
             this.winPosY = y;
         });
 
+        // Set window position from settings.
         glfwSetWindowPos(glfwWindow, winPosX, winPosY);
 
         // Set cursor mode
@@ -192,7 +213,7 @@ public class Application {
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
 
-        // Some janky stuff with OpenGL
+        // Some stuff with OpenGL
         GL.createCapabilities();
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
@@ -200,7 +221,7 @@ public class Application {
         // Setup script manager
         scriptManager = new EditorScriptManager();
 
-        // Register event internals
+        // Register event listeners
         if (EDITOR_MODE) {
             eventHandling.registerListener(scriptManager);
         }
@@ -208,7 +229,6 @@ public class Application {
         // Create and setup ImGUI
         imGui = new ImGUILayer(this);
         imGui.initImGui();
-
 
         // Setup and create framebuffer
         framebuffer = new Framebuffer[2];
@@ -218,14 +238,12 @@ public class Application {
 
     public Scene loadScene(File file) {
         Scene scene = file.exists() ? serializer.fromJson(FileIO.readData(file), Scene.class) : new Scene();
+        if (!scenes.removeIf(s -> s.name.equals(scene.name))) {
+            sceneIndex++;
+        }
         scenes.add(scene);
-        sceneIndex++;
         scene.setFile(file);
         return scene;
-    }
-
-    public List<Scene> getScenes() {
-        return scenes;
     }
 
     private void loop() {
@@ -245,15 +263,16 @@ public class Application {
 
         if (!EDITOR_MODE) {
             scene.play();
-            setTitle(scene.name);
         }
+
+        setTitle(scene.name);
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
             if (!EDITOR_MODE && Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
 
             if (Time.isSecond) {
-                glfwSetWindowTitle(glfwWindow, "Caramel | " + title + " | FPS: " + (int) (Time.getFPS()));
+                glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
             }
 
             if (process()) break;
@@ -272,7 +291,7 @@ public class Application {
             }
         }
 
-        if (scene.isPlaying()) scene.stop();
+        if (getCurrentScene().isPlaying()) getCurrentScene().stop();
 
         if (EDITOR_MODE) {
             saveAllScenes();
@@ -343,16 +362,18 @@ public class Application {
     }
 
     private void destroy() {
-
         // Destroy any remaining objects
+
+        // Destroy and clear up any script class loaders
         scriptManager.destroy();
 
-        // Unregister any remaining internals
+        // Unregister any remaining listeners
         eventHandling.unregisterListener(scriptManager);
 
         // Destroy ImGUI
         imGui.destroyImGui();
 
+        // Save settings
         File settings = new File("settings.json");
         JsonObject object = new JsonObject();
         object.addProperty("width", width);
@@ -360,11 +381,7 @@ public class Application {
         object.addProperty("windowPosX", winPosX);
         object.addProperty("windowPosY", winPosY);
         object.addProperty("lastScene", getCurrentScene().getFile().getPath());
-        try (FileWriter writer = new FileWriter(settings)) {
-            writer.write(serializer.toJson(object));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        FileIO.writeData(settings, serializer.toJson(object));
 
         // Free GLFW callbacks and destroy the window (if not yet destroyed)
         glfwFreeCallbacks(glfwWindow);

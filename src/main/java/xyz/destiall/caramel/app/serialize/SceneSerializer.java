@@ -52,7 +52,7 @@ public class SceneSerializer implements JsonSerializer<Scene>, JsonDeserializer<
 
         JsonArray array = object.get("gameObjects").getAsJsonArray();
         for (JsonElement element : array) {
-            GameObject gameObject = GAME_OBJECT_SERIALIZER.deserialize(element, GameObject.class, jsonDeserializationContext);
+            GameObject gameObject = GAME_OBJECT_SERIALIZER.deserialize(scene, element);
             gameObject.scene = scene;
             scene.getGameObjects().add(gameObject);
 
@@ -63,8 +63,10 @@ public class SceneSerializer implements JsonSerializer<Scene>, JsonDeserializer<
 
         scene.name = object.get("name").getAsString();
 
-        EditorCamera camera = GAME_OBJECT_SERIALIZER.deserialize(object.get("editorCamera"), GameObject.class, jsonDeserializationContext).getComponent(EditorCamera.class);
+        EditorCamera camera = GAME_OBJECT_SERIALIZER.deserialize(scene, object.get("editorCamera")).getComponent(EditorCamera.class);
         scene.setEditorCamera(camera);
+
+        scene.entityIds.set(GAME_OBJECT_SERIALIZER.maxId);
         return scene;
     }
 

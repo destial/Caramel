@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
@@ -44,7 +45,7 @@ import static org.lwjgl.opengl.GL11.glPolygonMode;
 
 public class Scene implements Update, Render {
     public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
-
+    public final AtomicInteger entityIds = new AtomicInteger(0);
     private final List<GameObject> gameObjects;
     private final List<Prefab> prefabs;
     private final List<GameObject> defaultGameObjects;
@@ -113,6 +114,10 @@ public class Scene implements Update, Render {
 
     public List<Prefab> getPrefabs() {
         return prefabs;
+    }
+
+    public int generateId() {
+        return entityIds.incrementAndGet();
     }
 
     @Override

@@ -58,6 +58,7 @@ public class HierarchyPanel extends Panel {
                 scene.selectedGameObject = null;
             } else if ((Input.isKeyDown(Input.Key.L_CONTROL) || Input.isKeyDown(Input.Key.R_CONTROL)) && Input.isKeyPressed(Input.Key.D)) {
                 GameObject dupe = scene.selectedGameObject.clone();
+                dupe.id = scene.generateId();
                 scene.addGameObject(dupe);
                 scene.selectedGameObject = dupe;
             }
@@ -94,7 +95,7 @@ public class HierarchyPanel extends Panel {
     }
 
     private boolean treeNode(GameObject gameObject, AtomicInteger index) {
-        ImString gameObjectName = new ImString(gameObject.name);
+        ImString gameObjectName = new ImString(gameObject.name + "(" + gameObject.id + ")");
 
         if (scene.selectedGameObject == gameObject) {
             ImGui.pushStyleColor(ImGuiCol.Text, 0.5f, 0.5f, 0.5f, 1.0f);

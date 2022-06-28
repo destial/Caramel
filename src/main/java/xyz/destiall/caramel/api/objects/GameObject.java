@@ -41,7 +41,7 @@ public class GameObject implements Update, Render, Cloneable {
         children = new LinkedList<>();
         tags = new ArrayList<>();
         transform = new Transform(this);
-        id = Component.ENTITY_IDS.incrementAndGet();
+        id = scene.generateId();
     }
 
     @Override
@@ -195,7 +195,6 @@ public class GameObject implements Update, Render, Cloneable {
     @Override
     public GameObject clone() {
         GameObject clone = new GameObject(scene);
-        Component.ENTITY_IDS.decrementAndGet();
         clone.id = id;
         clone.name = name;
         clone.transform.position.set(transform.position);

@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app.serialize;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
+import xyz.destiall.caramel.api.render.Renderer;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.Prefab;
@@ -18,6 +19,7 @@ import xyz.destiall.java.reflection.Reflect;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.LinkedList;
 
 public class PrefabSerializer implements JsonSerializer<Prefab>, JsonDeserializer<Prefab> {
 
@@ -33,7 +35,6 @@ public class PrefabSerializer implements JsonSerializer<Prefab>, JsonDeserialize
             if (!c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, prefab);
             Reflect.setDeclaredField(prefab, "transform", component);
-            Component.ENTITY_IDS.updateAndGet(i -> Math.max(i, component.id));
             prefab.addComponent(component);
             break;
         }
@@ -42,13 +43,11 @@ public class PrefabSerializer implements JsonSerializer<Prefab>, JsonDeserialize
             if (c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, prefab);
             if (component instanceof MeshRenderer) {
-                Mesh mesh = ((MeshRenderer) component).mesh;
-                if (mesh != null) mesh.build();
+                MeshRenderer renderer = (MeshRenderer) component;
+                if (renderer.mesh != null) renderer.mesh.build();
             }
-            Component.ENTITY_IDS.updateAndGet(i -> Math.max(i, component.id));
             prefab.addComponent(component);
         }
-        Component.ENTITY_IDS.updateAndGet(i -> Math.max(i, prefab.id));
 
         JsonArray children = object.get("children").getAsJsonArray();
         for (JsonElement c : children) {
