@@ -29,8 +29,9 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
     }
 
     public GameObject deserialize(Scene scene, JsonElement jsonElement) throws JsonParseException {
-        JsonObject object = jsonElement.getAsJsonObject();
         GameObject gameObject = new GameObject(scene);
+
+        JsonObject object = jsonElement.getAsJsonObject();
         gameObject.name = object.get("name").getAsString();
         gameObject.id = object.has("id") ? object.get("id").getAsInt() : ++maxId;
 
@@ -38,11 +39,12 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         for (JsonElement c : components) {
             if (!c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
+            if (component == null) continue;
             Reflect.setDeclaredField(gameObject, "transform", component);
+            gameObject.addComponent(component);
             if (maxId < component.id) {
                 maxId = component.id;
             }
-            gameObject.addComponent(component);
 
             break;
         }
@@ -56,14 +58,15 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         for (JsonElement c : components) {
             if (c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
+            if (component == null) continue;
             if (component instanceof MeshRenderer) {
                 MeshRenderer renderer = (MeshRenderer) component;
                 if (renderer.mesh != null) renderer.mesh.build();
             }
+            gameObject.addComponent(component);
             if (maxId < component.id) {
                 maxId = component.id;
             }
-            gameObject.addComponent(component);
         }
 
         JsonArray children = object.get("children").getAsJsonArray();
@@ -83,7 +86,8 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
     public JsonElement serialize(GameObject gameObject, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonArray components = new JsonArray();
         for (Component component : gameObject.getComponents()) {
-            components.add(SceneSerializer.GSON.toJsonTree(component));
+            JsonElement element = SceneSerializer.COMPONENT_SERIALIZER.serialize(component, component.getClass(), jsonSerializationContext);
+            components.add(element);
         }
         JsonArray tags = new JsonArray();
         for (String tag : gameObject.tags) {
@@ -91,7 +95,8 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         }
         JsonArray children = new JsonArray();
         for (GameObject child : gameObject.children) {
-            children.add(SceneSerializer.GSON.toJsonTree(child));
+            JsonElement element = SceneSerializer.GAME_OBJECT_SERIALIZER.serialize(child, child.getClass(), jsonSerializationContext);
+            children.add(element);
         }
         JsonObject object = new JsonObject();
         object.add("components", components);

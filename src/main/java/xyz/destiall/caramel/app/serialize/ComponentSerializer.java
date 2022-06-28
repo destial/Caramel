@@ -32,12 +32,14 @@ public class ComponentSerializer implements JsonSerializer<Component>, JsonDeser
             String[] split = clazz.split("\\.");
             String scriptName = split[split.length - 1];
             c = Application.getApp().getScriptManager().getScript(scriptName).getCompiledClass();
+            if (c == null) return null;
         }
         return defaultGson.fromJson(jsonElement, c);
     }
 
     public Component deserialize(JsonElement jsonElement, GameObject gameObject) throws JsonParseException {
         Component gsonComponent = deserialize(jsonElement, null, null);
+        if (gsonComponent == null) return null;
         Constructor<Component> constructor = (Constructor<Component>) Reflect.getConstructor(gsonComponent.getClass(), GameObject.class);
         Component component;
         try {

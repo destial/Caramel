@@ -53,7 +53,6 @@ public class SceneSerializer implements JsonSerializer<Scene>, JsonDeserializer<
         JsonArray array = object.get("gameObjects").getAsJsonArray();
         for (JsonElement element : array) {
             GameObject gameObject = GAME_OBJECT_SERIALIZER.deserialize(scene, element);
-            gameObject.scene = scene;
             scene.getGameObjects().add(gameObject);
 
             if (gameObject.hasComponent(Camera.class)) {
