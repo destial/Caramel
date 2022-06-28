@@ -28,12 +28,6 @@ public class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFileManag
     private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new HashMap<>();
     private final ClassLoader parentClassLoader;
 
-    /**
-     * Creates a MemoryJavaFileManager.
-     *
-     * @param fileManager the {@link JavaFileManager}
-     * @param parentClassLoader the parent {@link ClassLoader}
-     */
     public ScriptMemoryManager(JavaFileManager fileManager, ClassLoader parentClassLoader) {
         super(fileManager);
 
@@ -44,7 +38,7 @@ public class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFileManag
         return mapNameToClasses.values();
     }
 
-    public JavaFileObject createSourceFileObject(Object origin, String name, String code) {
+    public ScriptMemoryJavaObject createSourceFileObject(Object origin, String name, String code) {
         return new ScriptMemoryJavaObject(origin, name, JavaFileObject.Kind.SOURCE, code);
     }
 

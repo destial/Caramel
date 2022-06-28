@@ -19,8 +19,9 @@ public class ScriptClassLoader extends URLClassLoader {
     private final Map<String, byte[]> mapClassBytes;
     private final File file;
     public final Script script;
+    private ScriptMemoryManager.ScriptMemoryJavaObject source;
 
-    public ScriptClassLoader(ScriptLoader loader, Map<String, byte[]> mapNameToBytes, ClassLoader parent, File file, String fullClassName, String simpleClassName) throws ScriptException, MalformedURLException {
+    ScriptClassLoader(ScriptLoader loader, Map<String, byte[]> mapNameToBytes, ClassLoader parent, File file, String fullClassName, String simpleClassName) throws ScriptException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
         this.mapClassBytes = mapNameToBytes;
         try {
@@ -39,6 +40,14 @@ public class ScriptClassLoader extends URLClassLoader {
         } catch (ClassNotFoundException e) {
             throw new ScriptException(e);
         }
+    }
+
+    public ScriptMemoryManager.ScriptMemoryJavaObject getSource() {
+        return source;
+    }
+
+    public void setSource(ScriptMemoryManager.ScriptMemoryJavaObject source) {
+        this.source = source;
     }
 
     public File getFile() {

@@ -14,7 +14,7 @@ import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
-import java.util.Collections;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -82,10 +82,14 @@ public class ScriptLoader {
 
         String fullClassName = nameStrategy.getFullName(code);
         String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
+        loaders.remove(fullClassName);
+        removeClass(fullClassName);
 
-        JavaFileObject scriptSource = scriptMemoryManager.createSourceFileObject(null, simpleClassName, code);
+        ScriptMemoryManager.ScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(null, simpleClassName, code);
         System.out.println(getClasses());
-        JavaCompiler.CompilationTask task = compiler.getTask(null, scriptMemoryManager, diagnostics, null, null, Collections.singletonList(scriptSource));
+        Collection<ScriptMemoryManager.ScriptMemoryJavaObject> otherScripts = loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList());
+        otherScripts.add(scriptSource);
+        JavaCompiler.CompilationTask task = compiler.getTask(null, scriptMemoryManager, diagnostics, null, null, otherScripts);
 
         if (!task.call()) {
             String message = diagnostics.getDiagnostics().stream()
@@ -95,7 +99,8 @@ public class ScriptLoader {
         }
         System.out.println("Loading " + file.getName());
         ScriptClassLoader loader = scriptMemoryManager.getClassLoader(this, file, fullClassName, simpleClassName);
-        loaders.put(loader.script.getName(), loader);
+        loader.setSource(scriptSource);
+        loaders.put(fullClassName, loader);
         setClass(fullClassName, loader.script.getCompiledClass());
         return loader.script;
     }

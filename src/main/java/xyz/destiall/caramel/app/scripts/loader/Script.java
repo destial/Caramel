@@ -11,7 +11,7 @@ public class Script {
     private final String name;
     private final Class<?> compiledClass;
 
-    public Script(String name, Class<?> compiledClass) {
+    Script(String name, Class<?> compiledClass) {
         this.name = name;
         this.compiledClass = compiledClass;
     }
