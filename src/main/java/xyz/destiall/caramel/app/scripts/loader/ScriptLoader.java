@@ -86,7 +86,6 @@ public class ScriptLoader {
         removeClass(fullClassName);
 
         ScriptMemoryManager.ScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(null, simpleClassName, code);
-        System.out.println(getClasses());
         Collection<ScriptMemoryManager.ScriptMemoryJavaObject> otherScripts = loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList());
         otherScripts.add(scriptSource);
         JavaCompiler.CompilationTask task = compiler.getTask(null, scriptMemoryManager, diagnostics, null, null, otherScripts);

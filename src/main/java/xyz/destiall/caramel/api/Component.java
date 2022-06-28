@@ -14,7 +14,9 @@ import xyz.destiall.caramel.api.interfaces.Update;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public abstract class Component implements Update {
 
@@ -91,12 +93,14 @@ public abstract class Component implements Update {
 
     public Component clone(GameObject gameObject) {
         try {
-            Component clone = getClass().getConstructor(GameObject.class).newInstance(gameObject);
+            Component clone = getClass().getDeclaredConstructor(GameObject.class).newInstance(gameObject);
             for (Field field : getClass().getFields()) {
                 try {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
+                    boolean prev = field.isAccessible();
                     field.setAccessible(true);
                     field.set(clone, field.get(this));
+                    field.setAccessible(prev);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -106,5 +110,53 @@ public abstract class Component implements Update {
             e.printStackTrace();
         }
         return null;
+    }
+
+    static class IDGetter extends AtomicInteger {
+        private final AtomicInteger id;
+
+        public IDGetter(int initialValue) {
+            super(initialValue);
+            id = new AtomicInteger(initialValue);
+        }
+
+        public IDGetter() {
+            this(0);
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+
+        @Override
+        public int intValue() {
+            return super.intValue();
+        }
+
+        @Override
+        public long longValue() {
+            return super.longValue();
+        }
+
+        @Override
+        public float floatValue() {
+            return super.floatValue();
+        }
+
+        @Override
+        public double doubleValue() {
+            return super.doubleValue();
+        }
+
+        @Override
+        public byte byteValue() {
+            return super.byteValue();
+        }
+
+        @Override
+        public short shortValue() {
+            return super.shortValue();
+        }
     }
 }

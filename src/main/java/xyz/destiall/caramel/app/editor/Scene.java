@@ -336,4 +336,13 @@ public class Scene implements Update, Render {
             func.accept(gameObject);
         }
     }
+
+    public boolean entityIdExists(int id) {
+        return entityIdExists(getGameObjects(), id);
+
+    }
+
+    private boolean entityIdExists(List<GameObject> list, int id) {
+        return list.stream().anyMatch(g -> g.id == id || g.getComponents().stream().anyMatch(c -> c.id == id) || entityIdExists(g.children, id));
+    }
 }

@@ -21,9 +21,9 @@ public final class FileIO {
             "package scripts;\n" +
             "\n" +
             "import xyz.destiall.caramel.api.objects.GameObject;\n" +
-            "import xyz.destiall.caramel.api.Component;\n" +
+            "import xyz.destiall.caramel.api.scripts.Script;\n" +
             "\n" +
-            "public class ${name} extends Component {\n" +
+            "public class ${name} extends Script {\n" +
             "    public ${name}(GameObject gameObject) {\n" +
             "        super(gameObject);\n" +
             "    }\n" +

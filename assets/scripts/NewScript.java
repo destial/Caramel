@@ -1,7 +1,7 @@
 package scripts;
 
-import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.Input;
@@ -11,7 +11,7 @@ import xyz.destiall.caramel.api.physics.components.Collider;
 import xyz.destiall.caramel.api.physics.components.Contactable2D;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 
-public class NewScript extends Component implements Contactable2D {
+public class NewScript extends Script implements Contactable2D {
     public NewScript(GameObject gameObject) {
         super(gameObject);
     }
