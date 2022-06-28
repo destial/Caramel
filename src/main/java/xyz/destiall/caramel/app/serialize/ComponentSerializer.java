@@ -31,7 +31,7 @@ public class ComponentSerializer implements JsonSerializer<Component>, JsonDeser
         } catch (ClassNotFoundException e) {
             String[] split = clazz.split("\\.");
             String scriptName = split[split.length - 1];
-            c = (Class<? extends Component>) Application.getApp().getScriptManager().getScript(scriptName).getCompiledClass();
+            c = Application.getApp().getScriptManager().getScript(scriptName).getCompiledClass();
         }
         return defaultGson.fromJson(jsonElement, c);
     }

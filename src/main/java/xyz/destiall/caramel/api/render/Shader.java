@@ -4,10 +4,18 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import xyz.destiall.caramel.api.debug.Debug;
+import xyz.destiall.caramel.app.utils.FileIO;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.FloatBuffer;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 
@@ -44,6 +52,8 @@ public class Shader {
     private Shader(String filePath) {
         this.path = filePath;
         String source = null;
+        String path = "assets/shaders/" + filePath;
+        FileIO.saveResource(filePath, path);
         try {
             source = new String(Files.readAllBytes(Paths.get(path)));
         } catch (IOException e) {
@@ -159,10 +169,10 @@ public class Shader {
     }
 
     static {
-        shaders.put("default", new Shader("assets/shaders/default.glsl"));
-        shaders.put("color", new Shader("assets/shaders/color.glsl"));
-        shaders.put("light", new Shader("assets/shaders/light.glsl"));
-        shaders.put("line", new Shader("assets/shaders/line.glsl"));
+        shaders.put("default", new Shader("default.glsl"));
+        shaders.put("color", new Shader("color.glsl"));
+        shaders.put("light", new Shader("light.glsl"));
+        shaders.put("line", new Shader("line.glsl"));
         for (Shader shader : shaders.values()) {
             shader.compile();
         }

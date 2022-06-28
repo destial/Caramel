@@ -5,8 +5,13 @@ import xyz.destiall.caramel.app.Application;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 public final class FileIO {
@@ -65,6 +70,30 @@ public final class FileIO {
             e.printStackTrace();
         }
         return false;
+    }
+
+    public static void saveResource(String path, String targetPath) {
+        Path p = Paths.get(targetPath);
+        try {
+            if (!java.nio.file.Files.exists(p)) {
+                File f = p.toFile();
+                f.createNewFile();
+                InputStream stream = Application.getApp().getClass().getResourceAsStream("/" + path);
+                if (stream == null) return;
+                System.out.println("Writing resource file " + path);
+                OutputStream outputStream = new FileOutputStream(f);
+                byte[] b = new byte[8 * 1024];
+                int bytesRead;
+                while ((bytesRead = stream.read(b)) > 0) {
+                    outputStream.write(b, 0, bytesRead);
+                }
+                outputStream.flush();
+                stream.close();
+                outputStream.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static String readData(File file) {

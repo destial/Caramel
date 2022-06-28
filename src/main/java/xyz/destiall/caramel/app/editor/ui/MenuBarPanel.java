@@ -4,7 +4,6 @@ import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
-import imgui.flag.ImGuiCond;
 import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.app.Application;
 import xyz.destiall.caramel.app.editor.Scene;
@@ -12,8 +11,6 @@ import xyz.destiall.caramel.app.editor.Scene;
 import java.io.File;
 
 public class MenuBarPanel extends Panel {
-    private boolean openFile;
-
     public MenuBarPanel(Scene scene) {
         super(scene);
     }
@@ -50,10 +47,10 @@ public class MenuBarPanel extends Panel {
 
         if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
             if (ImGuiFileDialog.isOk()) {
-                String fileName = ImGuiFileDialog.getCurrentFileName();
-                String sceneName = fileName.substring(0, ImGuiFileDialog.getCurrentFilter().length());
                 File file = new File(ImGuiFileDialog.getFilePathName());
-                scene.name = sceneName;
+
+                String fileName = ImGuiFileDialog.getCurrentFileName();
+                scene.name = fileName.substring(0, ImGuiFileDialog.getCurrentFilter().length());
                 Application.getApp().saveScene(scene, file);
                 Application.getApp().setTitle(scene.name);
             }

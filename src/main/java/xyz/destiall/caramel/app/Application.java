@@ -109,23 +109,10 @@ public class Application {
     }
 
     public void run() {
-        loadAssets();
         loadSettings();
         init();
         loop();
         destroy();
-    }
-
-    private void loadAssets() {
-        try {
-            File assets = new File("assets");
-            if (assets.mkdir()) {
-                saveResource("assets");
-                wait(1000);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void loadSettings() {
@@ -137,7 +124,7 @@ public class Application {
                 object.addProperty("height", height = 720);
                 object.addProperty("windowPosX", winPosX = 50);
                 object.addProperty("windowPosY", winPosY = 50);
-                object.addProperty("lastScene", lastScene = "assets/Untitled Scene.json");
+                object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.json");
                 try (FileWriter writer = new FileWriter(settings)) {
                     writer.write(serializer.toJson(object));
                 }
@@ -149,7 +136,18 @@ public class Application {
                 winPosY = object.get("windowPosY").getAsInt();
                 lastScene = object.get("lastScene").getAsString();
             }
-        } catch (Exception e) {
+
+            File assets = new File("assets" + File.separator);
+            if (!assets.exists()) {
+                assets.mkdirs();
+                new File(assets, "models" + File.separator).mkdirs();
+                new File(assets, "textures" + File.separator).mkdirs();
+                new File(assets, "shaders" + File.separator).mkdirs();
+                new File(assets, "scenes" + File.separator).mkdirs();
+                FileIO.saveResource("imgui.ini", "imgui.ini");
+                Thread.sleep(1000);
+            }
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -224,6 +222,10 @@ public class Application {
         sceneIndex++;
         scene.setFile(file);
         return scene;
+    }
+
+    public List<Scene> getScenes() {
+        return scenes;
     }
 
     private void loop() {
@@ -331,7 +333,7 @@ public class Application {
         scene.setFile(file);
         String savedScene = serializer.toJson(scene);
         FileIO.writeData(file, savedScene);
-        Debug.log("Saved scene " + getCurrentScene().name);
+        Debug.log("Saved scene " + scene.name);
     }
 
     public void saveAllScenes() {
@@ -402,39 +404,5 @@ public class Application {
 
     public EditorScriptManager getScriptManager() {
         return scriptManager;
-    }
-
-    public void saveResource(String resourcePath) {
-        try {
-            CodeSource src = this.getClass().getProtectionDomain().getCodeSource();
-            if (src != null) {
-                URL jar = src.getLocation();
-                ZipInputStream zip = new ZipInputStream(jar.openStream());
-                while (true) {
-                    ZipEntry e = zip.getNextEntry();
-                    if (e == null) break;
-
-                    String name = e.getName();
-                    if (name.startsWith(resourcePath)) {
-                        System.out.println(name);
-                        File file = new File(name);
-                        if (file.isDirectory()) {
-                            file.mkdirs();
-                            continue;
-                        }
-                        try (InputStream input = this.getClass().getResourceAsStream("/" + name)) {
-                            if (input == null) continue;
-                            System.out.println("Writing " + name);
-                            if (!file.exists()) {
-                                file.createNewFile();
-                            }
-                            Files.copy(input, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

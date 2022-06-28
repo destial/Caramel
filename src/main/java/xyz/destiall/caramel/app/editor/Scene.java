@@ -71,6 +71,7 @@ public class Scene implements Update, Render {
 
     public Scene() {
         name = "Untitled Scene";
+        file = new File("assets/scenes", name + ".json");
         gameObjects = new LinkedList<>();
         prefabs = new LinkedList<>();
         defaultGameObjects = new LinkedList<>();

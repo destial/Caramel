@@ -16,10 +16,9 @@ public class NewScript extends Component implements Contactable2D {
         super(gameObject);
     }
 
-    @ShowInEditor
-    public float force = 100f;
-    @ShowInEditor
-    public String data = "floor";
+    @ShowInEditor public float force = 100f;
+    @ShowInEditor public String data = "floor";
+
     private transient Vector3 spawnPos;
     private transient boolean tp = false;
 
@@ -27,6 +26,7 @@ public class NewScript extends Component implements Contactable2D {
     public void start() {
         spawnPos = new Vector3(transform.position);
         tp = false;
+        int i = 0;
     }
 
     @Override
