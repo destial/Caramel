@@ -223,7 +223,7 @@ public class Scene implements Update, Render {
         ConsolePanel.LOGS.clear();
         for (GameObject go : gameObjects) {
             if (Application.getApp().EDITOR_MODE) {
-                GameObject clone = go.clone();
+                GameObject clone = go.clone(true);
                 defaultGameObjects.add(clone);
                 if (selectedGameObject == go) {
                     selectedPlayingGameObject = clone;
@@ -343,6 +343,6 @@ public class Scene implements Update, Render {
     }
 
     private boolean entityIdExists(List<GameObject> list, int id) {
-        return list.stream().anyMatch(g -> g.id == id || g.getComponents().stream().anyMatch(c -> c.id == id) || entityIdExists(g.children, id));
+        return list.stream().anyMatch(g -> g.id == id || g.getMutableComponents().stream().anyMatch(c -> c.id == id) || entityIdExists(g.children, id));
     }
 }

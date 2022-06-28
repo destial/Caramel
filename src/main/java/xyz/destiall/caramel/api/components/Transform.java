@@ -17,7 +17,7 @@ public class Transform extends Component {
     public final Vector3f scale;
     public final Vector3f localScale;
 
-    @HideInEditor public final Matrix4f model;
+    @HideInEditor public transient final Matrix4f model;
     @HideInEditor public final Vector3f forward;
     @HideInEditor public final Vector3f up;
 

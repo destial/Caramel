@@ -29,7 +29,8 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
     }
 
     public GameObject deserialize(Scene scene, JsonElement jsonElement) throws JsonParseException {
-        GameObject gameObject = new GameObject(scene);
+        GameObject gameObject = new GameObject();
+        gameObject.scene = scene;
 
         JsonObject object = jsonElement.getAsJsonObject();
         gameObject.name = object.get("name").getAsString();
@@ -40,8 +41,8 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
             if (!c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
             if (component == null) continue;
-            Reflect.setDeclaredField(gameObject, "transform", component);
-            gameObject.addComponent(component);
+            gameObject.transform = (Transform) component;
+            gameObject.addComponent(gameObject.transform);
             if (maxId < component.id) {
                 maxId = component.id;
             }
@@ -57,6 +58,7 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
 
         for (JsonElement c : components) {
             if (c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
+
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
             if (component == null) continue;
             if (component instanceof MeshRenderer) {
@@ -79,6 +81,7 @@ public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDes
         if (maxId < gameObject.id) {
             maxId = gameObject.id;
         }
+
         return gameObject;
     }
 

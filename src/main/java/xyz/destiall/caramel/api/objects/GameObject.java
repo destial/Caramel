@@ -13,11 +13,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class GameObject implements Update, Render, Cloneable {
+public class GameObject implements Update, Render {
     private final Set<Component> components;
     public final LinkedList<GameObject> children;
     public final ArrayList<String> tags;
@@ -28,7 +29,7 @@ public class GameObject implements Update, Render, Cloneable {
     public boolean active = true;
     public int id;
 
-    private GameObject() {
+    public GameObject() {
         components = ConcurrentHashMap.newKeySet(3);
         children = new LinkedList<>();
         tags = new ArrayList<>();
@@ -96,7 +97,7 @@ public class GameObject implements Update, Render, Cloneable {
     public void setScene(Scene parentScene) {
         if (parentScene != null) {
             destroy(this);
-            this.scene = parentScene;
+            scene = parentScene;
             scene.addGameObject(this);
         }
     }
@@ -164,11 +165,17 @@ public class GameObject implements Update, Render, Cloneable {
         return true;
     }
 
-    public Collection<Component> getComponents() {
+    public Collection<Component> getMutableComponents() {
         return components;
     }
 
-    public <C extends Component> boolean hasComponent(Class<C> clazz) {
+    public Collection<Component> getComponents() {
+        List<Component> immutable = new ArrayList<>(components);
+        immutable.sort((a, b) -> b.id - a.id);
+        return immutable;
+    }
+
+    public <K extends Component> boolean hasComponent(Class<K> clazz) {
         return components.stream().anyMatch(c -> clazz.isAssignableFrom(c.getClass()));
     }
 
@@ -192,10 +199,18 @@ public class GameObject implements Update, Render, Cloneable {
         }
     }
 
-    @Override
-    public GameObject clone() {
-        GameObject clone = new GameObject(scene);
-        clone.id = id;
+    public GameObject clone(boolean copyId) {
+        GameObject clone;
+        if (copyId) {
+            clone = new GameObject();
+            clone.scene = scene;
+            clone.id = id;
+            clone.transform = new Transform(clone);
+            clone.transform.id = transform.id;
+            scene.entityIds.decrementAndGet();
+        } else {
+            clone = new GameObject(scene);
+        }
         clone.name = name;
         clone.transform.position.set(transform.position);
         clone.transform.localPosition.set(transform.localPosition);
@@ -208,11 +223,11 @@ public class GameObject implements Update, Render, Cloneable {
         clone.active = active;
         for (Component c : components) {
             if (c instanceof Transform) continue;
-            Component cl = c.clone(clone);
+            Component cl = c.clone(clone, copyId);
             clone.addComponent(cl);
         }
         for (GameObject c : children) {
-            GameObject ch = c.clone();
+            GameObject ch = c.clone(copyId);
             ch.parent = clone.transform;
             clone.children.add(ch);
         }
@@ -220,7 +235,7 @@ public class GameObject implements Update, Render, Cloneable {
     }
 
     public GameObject instantiate(GameObject prefab, Transform parent) {
-        GameObject clone = prefab.clone();
+        GameObject clone = prefab.clone(false);
         if (parent != null) {
             scene.addGameObject(clone, parent.gameObject);
         }

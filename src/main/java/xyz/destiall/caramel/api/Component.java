@@ -19,8 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public abstract class Component implements Update {
-
-
     @HideInEditor private final String clazz = getClass().getName();
     @HideInEditor public transient Transform transform;
     @HideInEditor public transient GameObject gameObject;
@@ -29,7 +27,7 @@ public abstract class Component implements Update {
 
     @HideInEditor public boolean enabled = true;
 
-    private Component() {}
+    protected Component() {}
 
     public Component(GameObject gameObject) {
         this.gameObject = gameObject;
@@ -91,7 +89,7 @@ public abstract class Component implements Update {
         gameObject.destroy(gameObject);
     }
 
-    public Component clone(GameObject gameObject) {
+    public Component clone(GameObject gameObject, boolean copyId) {
         try {
             Component clone = getClass().getDeclaredConstructor(GameObject.class).newInstance(gameObject);
             for (Field field : getClass().getFields()) {
@@ -105,58 +103,14 @@ public abstract class Component implements Update {
                     e.printStackTrace();
                 }
             }
+            if (copyId) {
+                gameObject.scene.entityIds.decrementAndGet();
+                clone.id = id;
+            }
             return clone;
         } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    static class IDGetter extends AtomicInteger {
-        private final AtomicInteger id;
-
-        public IDGetter(int initialValue) {
-            super(initialValue);
-            id = new AtomicInteger(initialValue);
-        }
-
-        public IDGetter() {
-            this(0);
-        }
-
-        @Override
-        public String toString() {
-            return super.toString();
-        }
-
-        @Override
-        public int intValue() {
-            return super.intValue();
-        }
-
-        @Override
-        public long longValue() {
-            return super.longValue();
-        }
-
-        @Override
-        public float floatValue() {
-            return super.floatValue();
-        }
-
-        @Override
-        public double doubleValue() {
-            return super.doubleValue();
-        }
-
-        @Override
-        public byte byteValue() {
-            return super.byteValue();
-        }
-
-        @Override
-        public short shortValue() {
-            return super.shortValue();
-        }
     }
 }

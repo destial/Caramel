@@ -57,7 +57,7 @@ public class HierarchyPanel extends Panel {
                 scene.destroy(scene.selectedGameObject);
                 scene.selectedGameObject = null;
             } else if ((Input.isKeyDown(Input.Key.L_CONTROL) || Input.isKeyDown(Input.Key.R_CONTROL)) && Input.isKeyPressed(Input.Key.D)) {
-                GameObject dupe = scene.selectedGameObject.clone();
+                GameObject dupe = scene.selectedGameObject.clone(false);
                 dupe.id = scene.generateId();
                 scene.addGameObject(dupe);
                 scene.selectedGameObject = dupe;

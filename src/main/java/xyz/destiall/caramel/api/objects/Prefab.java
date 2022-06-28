@@ -18,13 +18,13 @@ public class Prefab extends GameObject {
     }
 
     public GameObject instantiate(Scene scene, Transform parent) {
-        GameObject clone = this.clone();
+        GameObject clone = this.clone(false);
         clone.setScene(scene);
         return super.instantiate(clone, parent);
     }
 
     public GameObject instantiate(Scene scene) {
-        GameObject clone = this.clone();
+        GameObject clone = this.clone(false);
         clone.setScene(scene);
         return super.instantiate(clone);
     }

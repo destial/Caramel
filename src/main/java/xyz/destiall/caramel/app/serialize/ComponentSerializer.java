@@ -48,7 +48,6 @@ public class ComponentSerializer implements JsonSerializer<Component>, JsonDeser
             e.printStackTrace();
             return gsonComponent;
         }
-        int id = component.id;
         for (Field field : gsonComponent.getClass().getFields()) {
             if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
             boolean accessible = field.isAccessible();
@@ -60,7 +59,7 @@ public class ComponentSerializer implements JsonSerializer<Component>, JsonDeser
             }
             if (!accessible) field.setAccessible(false);
         }
-        component.id = id;
+        component.id = gsonComponent.id;
         return component;
     }
 
