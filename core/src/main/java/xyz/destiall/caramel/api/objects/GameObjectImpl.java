@@ -6,7 +6,7 @@ import xyz.destiall.caramel.api.interfaces.Render;
 import xyz.destiall.caramel.api.interfaces.Update;
 import xyz.destiall.caramel.app.utils.StringWrapperImpl;
 
-public class GameObjectImpl extends GameObject implements Update, Render {
+public final class GameObjectImpl extends GameObject implements Update, Render {
 
     public GameObjectImpl() {
         name = new StringWrapperImpl();

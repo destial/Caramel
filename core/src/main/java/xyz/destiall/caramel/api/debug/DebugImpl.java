@@ -4,7 +4,7 @@ import org.joml.Vector3f;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.editor.ui.ConsolePanel;
 
-public class DebugImpl extends Debug {
+public final class DebugImpl extends Debug {
     static {
         inst = new DebugImpl();
     }

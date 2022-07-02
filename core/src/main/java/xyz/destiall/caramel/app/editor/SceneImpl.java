@@ -38,7 +38,7 @@ import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPolygonMode;
 
-public class SceneImpl extends Scene {
+public final class SceneImpl extends Scene {
     public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
     private final Map<Physics.Mode, Physics> physics;
     private final Map<Class<?>, Panel> panels;

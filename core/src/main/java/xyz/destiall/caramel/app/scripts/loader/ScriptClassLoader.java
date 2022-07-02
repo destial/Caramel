@@ -13,7 +13,7 @@ import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.Map;
 
-public class ScriptClassLoader extends URLClassLoader {
+public final class ScriptClassLoader extends URLClassLoader {
     private final ScriptLoader loader;
     public static final String MEMORY_CLASS_URL = "http://ch.obermuhlner/ch.obermuhlner.scriptengine.java/memory-class";
 

@@ -53,7 +53,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 
-public class ImGUILayer {
+public final class ImGUILayer {
     private final ApplicationImpl window;
     private final long glfwWindow;
     private final Map<Font, ImFont> fonts;
@@ -89,7 +89,6 @@ public class ImGUILayer {
 
         final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
         rangesBuilder.addRanges(fontAtlas.getGlyphRangesDefault());
-        rangesBuilder.addRanges(fontAtlas.getGlyphRangesCyrillic());
         rangesBuilder.addRanges(FontIcons._IconRange);
 
         final ImFontConfig fontConfig = new ImFontConfig();
@@ -174,11 +173,7 @@ public class ImGUILayer {
             @Override
             public String get() {
                 final String clipboardString = glfwGetClipboardString(glfwWindow);
-                if (clipboardString != null) {
-                    return clipboardString;
-                } else {
-                    return "";
-                }
+                return clipboardString != null ? clipboardString : "";
             }
         });
 

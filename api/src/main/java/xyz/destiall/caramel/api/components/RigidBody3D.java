@@ -5,7 +5,7 @@ import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;
 
-public class RigidBody3D extends RigidBody {
+public final class RigidBody3D extends RigidBody {
     public final Vector3 velocity = new Vector3();
 
     public DBody rawBody = null;

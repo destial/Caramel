@@ -14,7 +14,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_LAST;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
-public class MouseListenerImpl implements MouseListener {
+public final class MouseListenerImpl implements MouseListener {
     private final boolean[] mouseButtonPressed = new boolean[GLFW_MOUSE_BUTTON_LAST];
     private final boolean[] mouseButtonPressedThisFrame = new boolean[GLFW_MOUSE_BUTTON_LAST];
     private final boolean[] mouseButtonReleased = new boolean[GLFW_MOUSE_BUTTON_LAST];
@@ -26,7 +26,7 @@ public class MouseListenerImpl implements MouseListener {
 
     private boolean firstFrame = true;
 
-    protected MouseListenerImpl() {
+    MouseListenerImpl() {
         scrollX = 0;
         scrollY = 0;
         xPos = 0;

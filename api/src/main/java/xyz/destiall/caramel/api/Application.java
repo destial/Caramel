@@ -31,6 +31,10 @@ public abstract class Application implements Runnable {
 
     public abstract void saveAllScenes();
 
+    public abstract boolean isRunning();
+
+    public abstract void setRunning(boolean run);
+
     public abstract ScriptManager getScriptManager();
 
     public abstract MouseListener getMouseListener();

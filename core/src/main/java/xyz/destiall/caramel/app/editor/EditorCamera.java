@@ -10,7 +10,7 @@ import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
-public class EditorCamera extends Camera {
+public final class EditorCamera extends Camera {
     @HideInEditor private static final float DELTA_ERROR = 0.0009f;
     private boolean perspective = true;
     public float sensitivity = 0.5f;

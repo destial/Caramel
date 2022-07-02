@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.app.serialize;
 
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.ComponentImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.render.MeshRenderer;
@@ -18,7 +17,7 @@ import xyz.destiall.java.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-public class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDeserializer<GameObject> {
+public final class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDeserializer<GameObject> {
     public int maxId = 0;
 
     @Override

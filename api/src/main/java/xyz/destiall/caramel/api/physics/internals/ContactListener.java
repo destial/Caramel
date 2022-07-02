@@ -10,7 +10,7 @@ import xyz.destiall.caramel.api.physics.components.Collider;
 import xyz.destiall.caramel.api.physics.components.Contactable2D;
 import xyz.destiall.caramel.api.physics.info.ContactPoint2D;
 
-public class ContactListener implements org.jbox2d.callbacks.ContactListener {
+public final class ContactListener implements org.jbox2d.callbacks.ContactListener {
     private final Scene scene;
 
     public ContactListener(Scene scene) {

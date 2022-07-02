@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL30.glGenFramebuffers;
 import static org.lwjgl.opengl.GL30.glGenRenderbuffers;
 import static org.lwjgl.opengl.GL30.glRenderbufferStorage;
 
-public class Framebuffer {
+public final class Framebuffer {
     private final int fboId;
     private final int rboId;
     private final Texture texture;

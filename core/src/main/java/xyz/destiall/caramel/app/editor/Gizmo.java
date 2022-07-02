@@ -7,7 +7,7 @@ import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.texture.MeshBuilder;
 import xyz.destiall.caramel.api.interfaces.Render;
 
-public class Gizmo implements Render {
+public final class Gizmo implements Render {
     private final Mesh mesh;
     private GameObject target;
 

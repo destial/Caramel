@@ -4,7 +4,7 @@ import org.jbox2d.common.Vec3;
 import org.joml.Vector3f;
 import org.ode4j.math.DVector3;
 
-public class Vector3 {
+public final class Vector3 {
     private final Vector3f joml;
     private final Vec3 jbox2d;
     private final DVector3 ode;

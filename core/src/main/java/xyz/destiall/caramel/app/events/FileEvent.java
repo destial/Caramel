@@ -4,7 +4,7 @@ import xyz.destiall.java.events.Event;
 
 import java.io.File;
 
-public class FileEvent extends Event {
+public final class FileEvent extends Event {
     private final File file;
     private final Type type;
     public FileEvent(File file, Type type) {

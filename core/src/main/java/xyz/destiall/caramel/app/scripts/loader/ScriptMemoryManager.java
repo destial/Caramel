@@ -23,7 +23,7 @@ import java.util.Set;
 
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
-public class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFileManager> {
+public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFileManager> {
 
     private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new HashMap<>();
     private final ClassLoader parentClassLoader;

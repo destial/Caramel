@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.utils;
 
-public class FontIcons {
+public final class FontIcons {
     public static final short _IconRangeMin = (short) 0xe005;
     public static final short _IconRangeMax = (short) 0xf8ff;
     public static final short[] _IconRange = new short[]{_IconRangeMin, _IconRangeMax, 0};

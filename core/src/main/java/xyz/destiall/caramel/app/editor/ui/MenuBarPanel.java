@@ -10,7 +10,7 @@ import xyz.destiall.caramel.app.editor.SceneImpl;
 
 import java.io.File;
 
-public class MenuBarPanel extends Panel {
+public final class MenuBarPanel extends Panel {
     public MenuBarPanel(SceneImpl scene) {
         super(scene);
     }

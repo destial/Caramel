@@ -6,7 +6,6 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.objects.Prefab;
 import xyz.destiall.caramel.api.objects.PrefabImpl;
-import xyz.destiall.caramel.api.objects.Scene;
 import xyz.destiall.caramel.app.editor.EditorCamera;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 import xyz.destiall.caramel.api.utils.FileIO;
@@ -24,12 +23,12 @@ import xyz.destiall.java.gson.JsonSerializer;
 import java.io.File;
 import java.lang.reflect.Type;
 
-public class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDeserializer<SceneImpl> {
-    protected static final GameObjectSerializer GAME_OBJECT_SERIALIZER = new GameObjectSerializer();
-    protected static final PrefabSerializer PREFAB_SERIALIZER = new PrefabSerializer();
-    protected static final ComponentSerializer COMPONENT_SERIALIZER = new ComponentSerializer();
+public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDeserializer<SceneImpl> {
+    static final GameObjectSerializer GAME_OBJECT_SERIALIZER = new GameObjectSerializer();
+    private static final PrefabSerializer PREFAB_SERIALIZER = new PrefabSerializer();
+    static final ComponentSerializer COMPONENT_SERIALIZER = new ComponentSerializer();
 
-    protected static final Gson GSON = new GsonBuilder()
+    static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(GameObjectImpl.class, GAME_OBJECT_SERIALIZER)
             .registerTypeAdapter(PrefabImpl.class, PREFAB_SERIALIZER)
             .registerTypeAdapter(ComponentImpl.class, COMPONENT_SERIALIZER)

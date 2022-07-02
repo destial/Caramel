@@ -8,8 +8,7 @@ import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
-public class Transform extends Component {
-
+public final class Transform extends Component {
     public final Vector3f position;
     public final Vector3f localPosition;
     public final Quaternionf rotation;

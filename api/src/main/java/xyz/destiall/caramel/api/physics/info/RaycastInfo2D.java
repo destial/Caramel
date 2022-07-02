@@ -6,7 +6,7 @@ import org.jbox2d.dynamics.Fixture;
 import org.joml.Vector2f;
 import xyz.destiall.caramel.api.objects.GameObject;
 
-public class RaycastInfo2D implements RayCastCallback {
+public final class RaycastInfo2D implements RayCastCallback {
     public Fixture fixture;
     public Vector2f point;
     public Vector2f normal;

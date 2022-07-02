@@ -21,7 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ScriptLoader {
+public final class ScriptLoader {
     private final ScriptManager scriptManager;
     private final Map<String, Class<?>> classes = new HashMap<>();
     private final Map<String, ScriptClassLoader> loaders = new LinkedHashMap<>();

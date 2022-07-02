@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.app.serialize;
 
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.ComponentImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.Prefab;
 import xyz.destiall.caramel.api.render.MeshRenderer;
@@ -21,7 +20,7 @@ import xyz.destiall.java.reflection.Reflect;
 import java.io.File;
 import java.lang.reflect.Type;
 
-public class PrefabSerializer implements JsonSerializer<Prefab>, JsonDeserializer<Prefab> {
+public final class PrefabSerializer implements JsonSerializer<Prefab>, JsonDeserializer<Prefab> {
 
     @Override
     public Prefab deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {

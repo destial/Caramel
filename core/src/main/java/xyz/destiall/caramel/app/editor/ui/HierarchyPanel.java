@@ -20,7 +20,7 @@ import xyz.destiall.caramel.app.utils.StringWrapperImpl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class HierarchyPanel extends Panel {
+public final class HierarchyPanel extends Panel {
     private boolean addingComponentsHierarchy;
     private boolean editingGameObject;
     private int nodeId;
@@ -81,7 +81,7 @@ public class HierarchyPanel extends Panel {
             ImGui.begin("Add GameObject", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
             ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
             if (ImGui.selectable("Add GameObject")) {
-                GameObjectImpl go = new GameObjectImpl(scene);
+                GameObject go = new GameObjectImpl(scene);
                 Mesh quad = MeshBuilder.createQuad(1);
                 quad.setColor(new Vector4f(1f, 1f, 1f, 1f));
                 quad.build();
@@ -132,7 +132,7 @@ public class HierarchyPanel extends Panel {
         }
 
         if (ImGui.beginDragDropTarget()) {
-            GameObjectImpl payload = ImGui.acceptDragDropPayload(SceneImpl.SCENE_DRAG_DROP_PAYLOAD, GameObjectImpl.class);
+            GameObject payload = ImGui.acceptDragDropPayload(SceneImpl.SCENE_DRAG_DROP_PAYLOAD, GameObject.class);
             if (payload != null && payload != gameObject) {
                 Transform parent = payload.parent;
                 boolean canAdd = true;

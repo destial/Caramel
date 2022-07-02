@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EditorScriptManager implements ScriptManager, Listener {
+public final class EditorScriptManager implements ScriptManager, Listener {
     private final File scriptsRootFolder;
     private final Map<String, InternalScript> compiledScripts;
     private final Set<String> awaitingCompilation;

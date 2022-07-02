@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 
-public class ConsolePanel extends Panel {
+public final class ConsolePanel extends Panel {
     private static final int LOG_LIMIT = 50;
     public static final CopyOnWriteArrayList<Pair<String, Level>> LOGS = new CopyOnWriteArrayList<>();
 

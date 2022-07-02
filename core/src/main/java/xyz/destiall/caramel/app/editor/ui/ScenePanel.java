@@ -12,13 +12,12 @@ import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class ScenePanel extends Panel {
+public final class ScenePanel extends Panel {
     private final ApplicationImpl window;
     private ImVec2 gameWindowSize;
     private ImVec2 gameWindowPos;

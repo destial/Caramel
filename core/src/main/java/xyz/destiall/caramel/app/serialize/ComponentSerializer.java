@@ -3,7 +3,6 @@ package xyz.destiall.caramel.app.serialize;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.ComponentImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
@@ -22,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
-public class ComponentSerializer implements JsonSerializer<Component>, JsonDeserializer<Component> {
+public final class ComponentSerializer implements JsonSerializer<Component>, JsonDeserializer<Component> {
     private final Gson defaultGson = new GsonBuilder().setPrettyPrinting().create();
     @Override
     public Component deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {

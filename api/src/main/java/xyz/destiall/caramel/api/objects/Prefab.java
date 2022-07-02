@@ -4,7 +4,7 @@ import xyz.destiall.caramel.api.components.Transform;
 
 import java.io.File;
 
-public class Prefab extends GameObject {
+public abstract class Prefab extends GameObject {
     protected final File file;
 
     public Prefab(File file) {

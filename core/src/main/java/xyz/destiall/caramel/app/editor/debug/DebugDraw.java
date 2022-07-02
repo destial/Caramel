@@ -26,7 +26,7 @@ import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
-public class DebugDraw implements Update, Render {
+public final class DebugDraw implements Update, Render {
     public static DebugDraw INSTANCE = new DebugDraw();
 
     private final List<DebugLine> lines = new ArrayList<>();

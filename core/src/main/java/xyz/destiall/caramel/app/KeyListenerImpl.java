@@ -9,11 +9,11 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 
-public class KeyListenerImpl implements KeyListener {
+public final class KeyListenerImpl implements KeyListener {
     private final boolean[] keys = new boolean[350];
     private final boolean[] keysPressedThisFrame = new boolean[350];
     private final boolean[] keysReleased = new boolean[350];
-    protected KeyListenerImpl() {
+    KeyListenerImpl() {
         Arrays.fill(keysReleased, true);
     }
 

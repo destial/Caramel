@@ -22,7 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 
-public class FileWatcher implements Runnable {
+public final class FileWatcher implements Runnable {
     private final Map<WatchKey, Path> keyMap = new HashMap<>();
     private final File folder;
     private final Scheduler scheduler;

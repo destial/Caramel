@@ -3,7 +3,7 @@ package xyz.destiall.caramel.app.editor.debug;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
-public class DebugLine {
+public final class DebugLine {
     public Vector3f from;
     public Vector3f to;
     public Vector3f color;

@@ -7,7 +7,7 @@ import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 
-public class Box3DCollider extends Collider {
+public final class Box3DCollider extends Collider {
     public Vector3f halfSize = new Vector3f(0.5f);
     private transient final Vector3f debugColor = new Vector3f(0, 255, 0);
 

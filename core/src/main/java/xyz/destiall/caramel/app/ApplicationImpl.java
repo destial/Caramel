@@ -60,7 +60,7 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class ApplicationImpl extends Application {
+public final class ApplicationImpl extends Application {
     public final boolean EDITOR_MODE = true;
     private boolean running = false;
 
@@ -101,26 +101,6 @@ public class ApplicationImpl extends Application {
                 .setPrettyPrinting()
                 .setLenient()
                 .create();
-    }
-
-    public EventHandling getEventHandler() {
-        return eventHandling;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public SceneImpl getCurrentScene() {
-        return scenes.get(sceneIndex);
     }
 
     @Override
@@ -236,16 +216,6 @@ public class ApplicationImpl extends Application {
         framebuffer[1] = new Framebuffer(this.width, this.height);
     }
 
-    public SceneImpl loadScene(File file) {
-        SceneImpl scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
-        if (!scenes.removeIf(s -> s.name.equals(scene.name))) {
-            sceneIndex++;
-        }
-        scenes.add(scene);
-        scene.setFile(file);
-        return scene;
-    }
-
     private void loop() {
         // Load all the scripts
         scriptManager.reloadAll();
@@ -343,24 +313,6 @@ public class ApplicationImpl extends Application {
         return false;
     }
 
-    public void saveCurrentScene() {
-        SceneImpl scene = getCurrentScene();
-        saveScene(scene, scene.getFile());
-    }
-
-    public void saveScene(Scene scene, File file) {
-        scene.setFile(file);
-        String savedScene = serializer.toJson(scene);
-        FileIO.writeData(file, savedScene);
-        DebugImpl.log("Saved scene " + scene.name);
-    }
-
-    public void saveAllScenes() {
-        for (SceneImpl scene : scenes) {
-            saveScene(scene, scene.getFile());
-        }
-    }
-
     private void destroy() {
         // Destroy any remaining objects
 
@@ -391,14 +343,6 @@ public class ApplicationImpl extends Application {
         glfwTerminate();
     }
 
-    public boolean isRunning() {
-        return running;
-    }
-
-    public void setRunning(boolean run) {
-        this.running = run;
-    }
-
     public ImGUILayer getImGui() {
         return imGui;
     }
@@ -411,14 +355,84 @@ public class ApplicationImpl extends Application {
         return framebuffer[1];
     }
 
+    @Override
+    public EventHandling getEventHandler() {
+        return eventHandling;
+    }
+
+    @Override
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public int getHeight() {
+        return height;
+    }
+
+    @Override
+    public int getWidth() {
+        return width;
+    }
+
+    @Override
+    public SceneImpl getCurrentScene() {
+        return scenes.get(sceneIndex);
+    }
+
+    @Override
+    public SceneImpl loadScene(File file) {
+        SceneImpl scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
+        if (!scenes.removeIf(s -> s.name.equals(scene.name))) {
+            sceneIndex++;
+        }
+        scenes.add(scene);
+        scene.setFile(file);
+        return scene;
+    }
+
+    @Override
+    public void saveCurrentScene() {
+        SceneImpl scene = getCurrentScene();
+        saveScene(scene, scene.getFile());
+    }
+
+    @Override
+    public void saveScene(Scene scene, File file) {
+        scene.setFile(file);
+        String savedScene = serializer.toJson(scene);
+        FileIO.writeData(file, savedScene);
+        DebugImpl.log("Saved scene " + scene.name);
+    }
+
+    @Override
+    public void saveAllScenes() {
+        for (SceneImpl scene : scenes) {
+            saveScene(scene, scene.getFile());
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
+    }
+
+    @Override
+    public void setRunning(boolean run) {
+        this.running = run;
+    }
+
+    @Override
     public KeyListenerImpl getKeyListener() {
         return keyListener;
     }
 
+    @Override
     public MouseListenerImpl getMouseListener() {
         return mouseListener;
     }
 
+    @Override
     public EditorScriptManager getScriptManager() {
         return scriptManager;
     }

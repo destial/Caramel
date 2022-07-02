@@ -28,7 +28,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
-public class InspectorPanel extends Panel {
+public final class InspectorPanel extends Panel {
     public static final Set<Class<?>> COMPONENTS = new HashSet<>();
     static {
         COMPONENTS.add(Camera.class);

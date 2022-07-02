@@ -19,8 +19,7 @@ import xyz.destiall.caramel.api.texture.Texture;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class ImGuiUtils {
-
+public final class ImGuiUtils {
     private static final float width = 110f;
 
     public static void drawVec2Control(String label, Vector2f values) {

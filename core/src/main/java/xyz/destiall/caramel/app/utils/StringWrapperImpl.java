@@ -5,7 +5,7 @@ import xyz.destiall.caramel.api.interfaces.StringWrapper;
 
 import java.util.Objects;
 
-public class StringWrapperImpl implements StringWrapper {
+public final class StringWrapperImpl implements StringWrapper {
     private final ImString imString;
 
     public StringWrapperImpl(String s) {

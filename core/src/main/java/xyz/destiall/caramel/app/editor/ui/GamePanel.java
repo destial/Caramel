@@ -6,7 +6,7 @@ import imgui.flag.ImGuiWindowFlags;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 
-public class GamePanel extends Panel {
+public final class GamePanel extends Panel {
     private final ApplicationImpl window;
     private ImVec2 gameWindowSize;
     private ImVec2 gameWindowPos;

@@ -7,7 +7,8 @@ import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.debug.Debug;
-public class Box2DCollider extends Collider {
+
+public final class Box2DCollider extends Collider {
     public Vector2f halfSize = new Vector2f(1f);
     public boolean useScale = false;
     private transient final Vector3f debugColor = new Vector3f(0, 255, 0);

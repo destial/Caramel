@@ -4,7 +4,7 @@ import imgui.ImVec2;
 import org.jbox2d.common.Vec2;
 import org.joml.Vector2f;
 
-public class Vector2 {
+public final class Vector2 {
     private final Vector2f joml;
     private final Vec2 jbox2d;
     private final ImVec2 imgui;
