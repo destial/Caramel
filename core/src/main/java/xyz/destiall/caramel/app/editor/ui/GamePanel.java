@@ -18,7 +18,7 @@ public final class GamePanel extends Panel {
     }
 
     @Override
-    public void imguiLayer() {
+    public void __imguiLayer() {
         ImGui.begin("Game", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
         Panel.setPanelFocused(GamePanel.class, ImGui.isWindowFocused());
         Panel.setPanelHovered(GamePanel.class, ImGui.isWindowHovered());

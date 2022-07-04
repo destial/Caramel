@@ -5,11 +5,12 @@ import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.ComponentImpl;
 import xyz.destiall.caramel.api.components.Camera;
+import xyz.destiall.caramel.api.interfaces.FunctionButton;
+import xyz.destiall.caramel.api.interfaces.HideInEditor;
+import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.render.SpriteRenderer;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.RigidBody3D;
@@ -19,8 +20,12 @@ import xyz.destiall.caramel.api.physics.components.Box3DCollider;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.caramel.app.utils.StringWrapperImpl;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,17 +34,6 @@ import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
 import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 public final class InspectorPanel extends Panel {
-    public static final Set<Class<?>> COMPONENTS = new HashSet<>();
-    static {
-        COMPONENTS.add(Camera.class);
-        COMPONENTS.add(MeshRenderer.class);
-        COMPONENTS.add(SpriteRenderer.class);
-        COMPONENTS.add(RigidBody2D.class);
-        COMPONENTS.add(RigidBody3D.class);
-        COMPONENTS.add(Box2DCollider.class);
-        COMPONENTS.add(Box3DCollider.class);
-    }
-
     private final ImString search = new ImString();
     private boolean addingComponents;
     private boolean addingScript;
@@ -51,18 +45,33 @@ public final class InspectorPanel extends Panel {
     }
 
     @Override
-    public void imguiLayer() {
+    public void __imguiLayer() {
         ImGui.begin("Inspector");
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
-        if (scene.selectedGameObject != null) {
-            scene.selectedGameObject.active = ImGuiUtils.drawCheckBox("active", scene.selectedGameObject.active);
-            ImGuiUtils.inputText("name", ((StringWrapperImpl) scene.selectedGameObject.name).imString());
+        GameObject selected = scene.getSelectedGameObject().stream().findFirst().orElse(null);
+        if (selected != null) {
+            selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
+            ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
             Component removing = null;
-            for (Component component : scene.selectedGameObject.getComponents()) {
-
+            for (Component component : selected.getComponents()) {
                 if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
-                    component.__imguiLayer();
+                    ImGui.text("id: " + component.id);
+                    for (Field field : component.getClass().getFields()) {
+                        if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) continue;
+                        if (Modifier.isPublic(field.getModifiers()) || field.isAnnotationPresent(ShowInEditor.class)) {
+                            field.setAccessible(true);
+                            ImGuiUtils.imguiLayer(field, component);
+                        }
+                    }
+                    ImGui.separator();
+                    for (Method method : component.getClass().getMethods()) {
+                        if (method.isAnnotationPresent(FunctionButton.class)) {
+                            method.setAccessible(true);
+                            ImGuiUtils.imguiLayer(method, component);
+                        }
+                    }
+
                     if (component instanceof Transform) continue;
                     if (ImGui.isWindowHovered()) {
                         if (ImGui.isMouseClicked(GLFW_MOUSE_BUTTON_2)) {
@@ -85,7 +94,7 @@ public final class InspectorPanel extends Panel {
                 
             }
             if (removing != null) {
-                scene.selectedGameObject.removeComponent(removing.getClass());
+                selected.removeComponent(removing.getClass());
             }
             ImGui.separator();
             if (ImGui.button("Add Component")) {
@@ -99,11 +108,11 @@ public final class InspectorPanel extends Panel {
                     search.clear();
                     search.set(newInput);
                 }
-                for (Class<?> c : COMPONENTS) {
-                    if (scene.selectedGameObject.hasComponent((Class<? extends ComponentImpl>) c)) continue;
+                for (Class<?> c : Payload.COMPONENTS) {
+                    if (selected.hasComponent((Class<? extends Component>) c)) continue;
                     if (search.isEmpty() || c.getSimpleName().toLowerCase().contains(search.get().toLowerCase())) {
                         if (ImGui.selectable(c.getSimpleName())) {
-                            addComponent(scene.selectedGameObject, c);
+                            addComponent(selected, c);
                             addingComponents = false;
                         }
                     }
@@ -132,7 +141,7 @@ public final class InspectorPanel extends Panel {
         if (Component.class.isAssignableFrom(componentClass)) {
             try {
                 Object instance = componentClass.getConstructor(GameObject.class).newInstance(gameObject);
-                gameObject.addComponent((ComponentImpl) instance);
+                gameObject.addComponent((Component) instance);
             } catch (Exception e) {
                 e.printStackTrace();
             }

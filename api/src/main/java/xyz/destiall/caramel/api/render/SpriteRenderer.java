@@ -8,7 +8,7 @@ import xyz.destiall.caramel.api.interfaces.FunctionButton;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.texture.Spritesheet;
 
-public class SpriteRenderer extends Renderer {
+public final class SpriteRenderer extends Renderer {
 
     private final Vector3f pos;
     private final Quaternionf rot;

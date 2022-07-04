@@ -11,11 +11,6 @@ public abstract class Script extends Component {
         super(gameObject);
     }
 
-    @Override
-    public void __imguiLayer() {
-        super.__imguiLayer();
-    }
-
     protected GameObject findGameObject(String name) {
         return gameObject.scene.findGameObject(name);
     }

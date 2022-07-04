@@ -9,6 +9,7 @@ import xyz.destiall.caramel.api.utils.Pair;
 import java.io.File;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -24,10 +25,15 @@ public abstract class Scene implements Update, Render {
     protected boolean playing = false;
     protected boolean saved = true;
 
-    public GameObject selectedGameObject;
-    public GameObject selectedPlayingGameObject;
+    protected final Set<GameObject> selectedGameObject;
+    protected final Set<GameObject> selectedPlayingGameObject;
     public GameObject hoveredGameObject;
     public String name;
+
+    public Scene() {
+        selectedGameObject = ConcurrentHashMap.newKeySet();
+        selectedPlayingGameObject = ConcurrentHashMap.newKeySet();
+    }
 
     public boolean isSaved() {
         return saved;
@@ -49,8 +55,6 @@ public abstract class Scene implements Update, Render {
         return entityIds.incrementAndGet();
     }
 
-    public abstract void play();
-    public abstract void stop();
     public abstract void destroy(GameObject gameObject);
 
     public File getFile() {
@@ -65,7 +69,7 @@ public abstract class Scene implements Update, Render {
         return playing;
     }
 
-    public GameObject getSelectedGameObject() {
+    public Set<GameObject> getSelectedGameObject() {
         return selectedGameObject;
     }
 
@@ -76,6 +80,8 @@ public abstract class Scene implements Update, Render {
     public Camera getGameCamera() {
         return gameCamera;
     }
+
+    public abstract Camera getEditorCamera();
 
     public GameObject findGameObject(String name) {
         return findGameObject(gameObjects, name);

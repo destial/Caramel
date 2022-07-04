@@ -16,7 +16,7 @@ public final class MenuBarPanel extends Panel {
     }
 
     @Override
-    public void imguiLayer() {
+    public void __imguiLayer() {
         ImGui.beginMainMenuBar();
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
@@ -32,14 +32,11 @@ public final class MenuBarPanel extends Panel {
                 ApplicationImpl.getApp().saveCurrentScene();
             }
 
-            if (ImGui.menuItem("Save As")) {
+            if (ImGui.menuItem("Save As", "Ctrl + Shift + S")) {
                 ImGuiFileDialog.openModal("save-scene", "Save Scene As", ".caramel", ".", new ImGuiFileDialogPaneFun() {
                     @Override
                     public void paneFun(String filter, long userDatas, boolean canContinue) {}
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
-            }
-            if (ImGui.menuItem("Build", "Ctrl + B")) {
-
             }
 
             ImGui.endMenu();

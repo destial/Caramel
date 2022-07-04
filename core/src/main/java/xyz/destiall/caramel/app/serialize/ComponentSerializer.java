@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.app.serialize;
 
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.ComponentImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.java.gson.Gson;
@@ -28,7 +27,7 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
         String clazz = jsonElement.getAsJsonObject().get("clazz").getAsString();
         Class<? extends Component> c;
         try {
-            c = (Class<? extends ComponentImpl>) Class.forName(clazz);
+            c = (Class<? extends Component>) Class.forName(clazz);
         } catch (ClassNotFoundException e) {
             String[] split = clazz.split("\\.");
             String scriptName = split[split.length - 1];

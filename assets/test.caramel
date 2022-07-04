@@ -67,22 +67,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -77.7,
-            "y": 1.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -192,6 +176,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -77.7,
+            "y": 1.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 7,
@@ -286,22 +286,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -1.7,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 156.8,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -411,6 +395,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -1.7,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 156.8,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 12,
@@ -680,22 +680,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -71.1,
-            "y": 0.4,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -805,6 +789,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -71.1,
+            "y": 0.4,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 16,
@@ -866,22 +866,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -63.2,
-            "y": 0.4,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -991,6 +975,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -63.2,
+            "y": 0.4,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 24,
@@ -1101,22 +1101,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -53.3,
-            "y": 0.4,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -1226,6 +1210,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -53.3,
+            "y": 0.4,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 29,
@@ -1362,22 +1362,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -32.4,
-            "y": 0.8,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 13.3,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -1487,6 +1471,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -32.4,
+            "y": 0.8,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 13.3,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 32,
@@ -1590,22 +1590,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -19.1,
-            "y": 1.6,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 13.3,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -1715,6 +1699,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -19.1,
+            "y": 1.6,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 13.3,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 36,
@@ -1841,22 +1841,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -13.1,
-            "y": 1.9,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -1966,6 +1950,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -13.1,
+            "y": 1.9,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 39,
@@ -2027,22 +2027,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -11.8,
-            "y": 0.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -2152,6 +2136,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -11.8,
+            "y": 0.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 47,
@@ -2295,22 +2295,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -25.7,
-            "y": 1.2,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -2420,6 +2404,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -25.7,
+            "y": 1.2,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 50,
@@ -2497,22 +2497,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -4.1,
-            "y": 0.6,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 4.1,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -2622,6 +2606,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -4.1,
+            "y": 0.6,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 4.1,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 56,
@@ -2758,22 +2758,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -6.1,
-            "y": 0.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -2883,6 +2867,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -6.1,
+            "y": 0.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 59,
@@ -2960,22 +2960,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -2.1,
-            "y": 0.9,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -3085,6 +3069,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -2.1,
+            "y": 0.9,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 66,
@@ -3195,22 +3195,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 1.6,
-            "y": 1.1,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 4.1,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -3320,6 +3304,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 1.6,
+            "y": 1.1,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 4.1,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 70,
@@ -3423,22 +3423,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 6.2,
-            "y": 2.1,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 4.1,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -3548,6 +3532,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 6.2,
+            "y": 2.1,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 4.1,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 74,
@@ -3684,22 +3684,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -0.4,
-            "y": 0.6,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -3809,6 +3793,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": -0.4,
+            "y": 0.6,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 77,
@@ -3935,22 +3935,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 4.2,
-            "y": 1.6,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -4060,6 +4044,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 4.2,
+            "y": 1.6,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 81,
@@ -4128,22 +4128,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 9.0,
-            "y": 0.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -4253,6 +4237,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 9.0,
+            "y": 0.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 88,
@@ -4398,22 +4398,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 9.6,
-            "y": 0.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -4523,6 +4507,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 9.6,
+            "y": 0.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 92,
@@ -4640,22 +4640,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 10.2,
-            "y": 0.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -4765,6 +4749,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 10.2,
+            "y": 0.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 96,
@@ -4842,22 +4842,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 10.8,
-            "y": 0.3,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -4967,6 +4951,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 10.8,
+            "y": 0.3,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 103,
@@ -5066,22 +5066,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": 14.8,
-            "y": 1.0,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 4.1,
-            "y": 0.2,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -5191,6 +5175,22 @@
             },
             "dirty": false,
             "drawArrays": false
+          },
+          "pos": {
+            "x": 14.8,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 4.1,
+            "y": 0.2,
+            "z": 1.0
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 108,
@@ -5294,22 +5294,6 @@
           "enabled": true
         },
         {
-          "pos": {
-            "x": -39.0,
-            "y": 0.4,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 0.1,
-            "y": 0.7,
-            "z": 1.0
-          },
           "mesh": {
             "vertexArray": [
               {
@@ -5420,6 +5404,22 @@
             "dirty": false,
             "drawArrays": false
           },
+          "pos": {
+            "x": -39.0,
+            "y": 0.4,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 0.1,
+            "y": 0.7,
+            "z": 1.0
+          },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 29,
           "enabled": true
@@ -5478,6 +5478,192 @@
       "tags": [],
       "name": "Obstacle",
       "id": 221
+    },
+    {
+      "components": [
+        {
+          "mesh": {
+            "vertexArray": [
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              }
+            ],
+            "elementArray": [
+              2,
+              1,
+              0,
+              0,
+              1,
+              3
+            ],
+            "type": 4,
+            "shader": "color",
+            "color": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0,
+              "w": 1.0
+            },
+            "dirty": false,
+            "drawArrays": false
+          },
+          "pos": {
+            "x": -8.2,
+            "y": 1.5,
+            "z": 0.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "sca": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
+          "id": 224,
+          "enabled": true
+        },
+        {
+          "position": {
+            "x": -8.2,
+            "y": 1.5,
+            "z": 0.0
+          },
+          "localPosition": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 1.0
+          },
+          "localRotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0,
+            "w": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "localScale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "clazz": "xyz.destiall.caramel.api.components.Transform",
+          "id": 222,
+          "enabled": true
+        }
+      ],
+      "children": [],
+      "tags": [],
+      "name": "GameObject",
+      "id": 223
     }
   ],
   "editorCamera": {
@@ -5517,8 +5703,8 @@
           "m21": 0.0,
           "m22": 1.0,
           "m23": 0.0,
-          "m30": 41.105,
-          "m31": -0.24499993,
+          "m30": 4.021,
+          "m31": -0.219,
           "m32": -0.0,
           "m33": 1.0,
           "properties": 18
@@ -5548,8 +5734,8 @@
       },
       {
         "position": {
-          "x": -41.105,
-          "y": 0.24499993,
+          "x": -4.021,
+          "y": 0.219,
           "z": 0.0
         },
         "localPosition": {

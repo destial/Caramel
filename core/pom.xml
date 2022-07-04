@@ -57,6 +57,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.10.2</version>
+        </dependency>
+        <dependency>
             <groupId>xyz.destiall.gameengine</groupId>
             <artifactId>api</artifactId>
             <version>1.0-SNAPSHOT</version>

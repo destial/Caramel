@@ -2,17 +2,21 @@ package xyz.destiall.caramel.app;
 
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.opengl.GL;
+import org.reflections.Reflections;
 import xyz.destiall.caramel.api.Application;
+import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.objects.Scene;
+import xyz.destiall.caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
-import xyz.destiall.caramel.api.utils.FileIO;
+import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
@@ -20,15 +24,13 @@ import xyz.destiall.java.gson.JsonObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT_CONTROL;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -111,6 +113,7 @@ public final class ApplicationImpl extends Application {
         destroy();
     }
 
+    @SuppressWarnings("all")
     private void loadFiles() {
         try {
             File settings = new File("settings.json");
@@ -220,6 +223,14 @@ public final class ApplicationImpl extends Application {
         // Load all the scripts
         scriptManager.reloadAll();
 
+        Reflections reflections = new Reflections("xyz.destiall.caramel.api");
+        Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
+        for (Class<? extends Component> c : set) {
+            if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
+            if (c == Transform.class) continue;
+            Payload.COMPONENTS.add(c);
+        }
+
         Time.timeStarted = System.currentTimeMillis();
         long startTime = Time.timeStarted;
         long endTime;
@@ -239,7 +250,7 @@ public final class ApplicationImpl extends Application {
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
-            if (!EDITOR_MODE && Input.isKeyDown(GLFW_KEY_ESCAPE)) break;
+            if (!EDITOR_MODE && Input.isKeyDown(Input.Key.ESCAPE)) break;
 
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
@@ -288,7 +299,7 @@ public final class ApplicationImpl extends Application {
             getSceneViewFramebuffer().unbind();
         }
 
-        if (scene.getGameCamera() != null) {
+        if (scene.getGameCamera() != null && scene.getGameCamera().gameObject.active) {
             if (EDITOR_MODE) getGameViewFramebuffer().bind();
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -300,8 +311,7 @@ public final class ApplicationImpl extends Application {
 
         scene.endFrame();
 
-        if (EDITOR_MODE && (Input.isKeyDown(GLFW_KEY_LEFT_CONTROL) || Input.isKeyDown(GLFW_KEY_RIGHT_CONTROL)) &&
-                Input.isKeyPressed(GLFW_KEY_S)) {
+        if (EDITOR_MODE && Input.isControlPressedAnd(Input.Key.S)) {
             if (scene.isPlaying()) scene.stop();
             saveCurrentScene();
         }

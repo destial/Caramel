@@ -25,7 +25,6 @@ public final class GameObjectImpl extends GameObject implements Update, Render {
             clone.id = id;
             clone.transform = new Transform(clone);
             clone.transform.id = transform.id;
-            scene.entityIds.decrementAndGet();
         } else {
             clone = new GameObjectImpl(scene);
         }

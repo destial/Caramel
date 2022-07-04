@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.app.scripts;
 
 import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.ComponentImpl;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
@@ -11,6 +10,7 @@ import xyz.destiall.caramel.app.events.FileEvent;
 import xyz.destiall.caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.app.scripts.loader.ScriptLoader;
 import xyz.destiall.caramel.app.editor.ui.InspectorPanel;
+import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandler;
 import xyz.destiall.java.events.Listener;
 
@@ -96,12 +96,12 @@ public final class EditorScriptManager implements ScriptManager, Listener {
             if (compiledScripts.containsKey(scriptName)) return compiledScripts.get(scriptName);
             try {
                 InternalScript compiledScript = loader.compile(file);
-                if (compiledScript.getCompiledClass().isAssignableFrom(ComponentImpl.class)) {
+                if (compiledScript.getCompiledClass().isAssignableFrom(Component.class)) {
                     DebugImpl.logError("Script " + scriptName + " does not inherit Component class!");
                     return null;
                 }
                 compiledScripts.put(scriptName, compiledScript);
-                InspectorPanel.COMPONENTS.add(compiledScript.getCompiledClass());
+                Payload.COMPONENTS.add(compiledScript.getCompiledClass());
                 return compiledScript;
             } catch (Exception e) {
                 DebugImpl.logError(e.getLocalizedMessage());
@@ -147,7 +147,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 if (script != null && event.getType() == FileEvent.Type.MODIFY) {
                     System.out.println("Modified file: " + event.getFile().getName());
                     compiledScripts.remove(scriptName);
-                    InspectorPanel.COMPONENTS.remove(script.getCompiledClass());
+                    Payload.COMPONENTS.remove(script.getCompiledClass());
 
                     System.gc();
                     try {
@@ -189,7 +189,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 if (script != null) {
                     ApplicationImpl.getApp().getCurrentScene().forEachGameObject(go -> go.removeComponent(script.getCompiledClass()));
                     compiledScripts.remove(scriptName);
-                    InspectorPanel.COMPONENTS.remove(script.getCompiledClass());
+                    Payload.COMPONENTS.remove(script.getCompiledClass());
                 }
             }
         }

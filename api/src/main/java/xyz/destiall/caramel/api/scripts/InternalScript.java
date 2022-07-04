@@ -7,7 +7,7 @@ import xyz.destiall.java.reflection.Reflect;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-public class InternalScript {
+public final class InternalScript {
     private final String name;
     private final Class<?> compiledClass;
 

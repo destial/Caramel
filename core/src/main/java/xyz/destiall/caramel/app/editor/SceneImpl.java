@@ -39,7 +39,6 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPolygonMode;
 
 public final class SceneImpl extends Scene {
-    public static final String SCENE_DRAG_DROP_PAYLOAD = "SceneDragDropPayloadGameObject";
     private final Map<Physics.Mode, Physics> physics;
     private final Map<Class<?>, Panel> panels;
     private Gizmo gizmo;
@@ -164,12 +163,12 @@ public final class SceneImpl extends Scene {
                     gameCamera = go.getComponentInChildren(Camera.class);
                 }
             }
-            gizmo.setTarget(selectedGameObject);
         }
         editorCamera.gameObject.lateUpdate();
 
-        if (selectedGameObject != null) {
-            DebugImpl.drawBox2D(selectedGameObject.transform.position, selectedGameObject.transform.scale, new Vector3f(1, 0, 0));
+        for (GameObject selected : selectedGameObject) {
+            DebugImpl.drawBox2D(selected.transform.position, selected.transform.scale, new Vector3f(1, 0, 0));
+
         }
         DebugDraw.INSTANCE.update();
     }
@@ -182,8 +181,8 @@ public final class SceneImpl extends Scene {
             if (ApplicationImpl.getApp().EDITOR_MODE) {
                 GameObject clone = go.clone(true);
                 defaultGameObjects.add(clone);
-                if (selectedGameObject == go) {
-                    selectedPlayingGameObject = clone;
+                if (selectedGameObject.contains(go)) {
+                    selectedPlayingGameObject.add(go);
                 }
             }
             physics.get(physicsMode).addGameObject(go);
@@ -195,8 +194,9 @@ public final class SceneImpl extends Scene {
         playing = false;
         if (ApplicationImpl.getApp().EDITOR_MODE) {
             gameObjects.clear();
-            selectedGameObject = selectedPlayingGameObject;
-            selectedPlayingGameObject = null;
+            selectedGameObject.clear();
+            selectedGameObject.addAll(selectedPlayingGameObject);
+            selectedPlayingGameObject.clear();
             gameObjects.addAll(defaultGameObjects);
             defaultGameObjects.clear();
             for (Physics p : physics.values()) {
@@ -205,10 +205,9 @@ public final class SceneImpl extends Scene {
         }
     }
 
-    @Override
     public void __imguiLayer() {
         for (Panel panel : panels.values()) {
-            panel.imguiLayer();
+            panel.__imguiLayer();
         }
         ImGui.showDemoWindow();
     }

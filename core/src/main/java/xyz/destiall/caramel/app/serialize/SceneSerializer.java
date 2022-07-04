@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.serialize;
 
-import xyz.destiall.caramel.api.ComponentImpl;
+import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
@@ -29,9 +29,9 @@ public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDes
     static final ComponentSerializer COMPONENT_SERIALIZER = new ComponentSerializer();
 
     static final Gson GSON = new GsonBuilder()
-            .registerTypeAdapter(GameObjectImpl.class, GAME_OBJECT_SERIALIZER)
-            .registerTypeAdapter(PrefabImpl.class, PREFAB_SERIALIZER)
-            .registerTypeAdapter(ComponentImpl.class, COMPONENT_SERIALIZER)
+            .registerTypeAdapter(GameObject.class, GAME_OBJECT_SERIALIZER)
+            .registerTypeAdapter(Prefab.class, PREFAB_SERIALIZER)
+            .registerTypeAdapter(Component.class, COMPONENT_SERIALIZER)
             .setPrettyPrinting()
             .serializeSpecialFloatingPointValues()
             .enableComplexMapKeySerialization()

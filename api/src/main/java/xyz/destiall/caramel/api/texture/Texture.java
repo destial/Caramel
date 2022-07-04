@@ -42,6 +42,12 @@ public class Texture {
         loaded = true;
     }
 
+    public Texture(int width, int height, ByteBuffer buffer) {
+        this.width = width;
+        this.height = height;
+
+    }
+
     public Texture getReference() {
         return reference;
     }

@@ -9,7 +9,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import xyz.destiall.caramel.api.ComponentImpl;
+import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.math.Vector2;
 import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.texture.Mesh;
@@ -355,7 +355,7 @@ public final class ImGuiUtils {
         return imBoolean.get();
     }
 
-    public static void imguiLayer(Field field, ComponentImpl component) {
+    public static void imguiLayer(Field field, Component component) {
         try {
             Class<?> type = field.getType();
             Object value = field.get(component);
@@ -417,7 +417,7 @@ public final class ImGuiUtils {
         }
     }
 
-    public static void imguiLayer(Method method, ComponentImpl component) {
+    public static void imguiLayer(Method method, Component component) {
         try {
             String name = method.getName();
             if (ImGui.button(name)) {

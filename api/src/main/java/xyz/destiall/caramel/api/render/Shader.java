@@ -35,7 +35,7 @@ import static org.lwjgl.opengl.GL20.glUniform3f;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
-public class Shader {
+public final class Shader {
     private final String path;
     private String vertexShaderSrc = "";
     private String fragmentShaderSrc = "";
@@ -166,6 +166,7 @@ public class Shader {
         shaders.put("color", new Shader("color.glsl"));
         shaders.put("light", new Shader("light.glsl"));
         shaders.put("line", new Shader("line.glsl"));
+        shaders.put("text", new Shader("text.glsl"));
         for (Shader shader : shaders.values()) {
             shader.compile();
         }

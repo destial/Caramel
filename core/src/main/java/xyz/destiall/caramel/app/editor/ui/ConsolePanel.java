@@ -47,7 +47,7 @@ public final class ConsolePanel extends Panel {
     }
 
     @Override
-    public void imguiLayer() {
+    public void __imguiLayer() {
         ImGui.begin("Console");
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());

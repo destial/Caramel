@@ -11,7 +11,7 @@ public abstract class Panel {
         this.scene = scene;
     }
 
-    public abstract void imguiLayer();
+    public abstract void __imguiLayer();
 
     private static final Map<Class<? extends Panel>, Boolean> hovered = new ConcurrentHashMap<>();
     private static final Map<Class<? extends Panel>, Boolean> focused = new ConcurrentHashMap<>();

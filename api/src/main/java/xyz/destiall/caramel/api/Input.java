@@ -6,9 +6,6 @@ import java.util.List;
 import static org.lwjgl.glfw.GLFW.*;
 
 public interface Input {
-    static boolean isKeyDown(int key) {
-        return Application.getApp().getKeyListener().isKeyDown(key);
-    }
 
     static boolean isMouseDown(int mouse) {
         return Application.getApp().getMouseListener().isButtonDown(mouse);
@@ -18,7 +15,35 @@ public interface Input {
         return Application.getApp().getMouseListener().isButtonPressedThisFrame(mouse);
     }
 
+    static boolean isControlPressedAnd(int key) {
+        return Input.isKeyDown(Key.CONTROL) && Input.isKeyPressed(key);
+    }
+
+    static boolean isAltPressedAnd(int key) {
+        return Input.isKeyDown(Key.ALT) && Input.isKeyPressed(key);
+    }
+
+    static boolean isCtrlAltPressedAnd(int key) {
+        return Input.isKeyDown(Key.CONTROL) && Input.isKeyDown(Key.ALT) && Input.isKeyPressed(key);
+    }
+
+    static boolean isKeyDown(int key) {
+        if (key == Key.ALT) {
+            return Input.isKeyDown(Key.L_ALT) || Input.isKeyDown(Key.R_ALT);
+        }
+        if (key == Key.CONTROL) {
+            return Input.isKeyDown(Key.L_CONTROL) || Input.isKeyDown(Key.R_CONTROL);
+        }
+        return Application.getApp().getKeyListener().isKeyDown(key);
+    }
+
     static boolean isKeyPressed(int key) {
+        if (key == Key.ALT) {
+            return Input.isKeyPressed(Key.L_ALT) || Input.isKeyPressed(Key.R_ALT);
+        }
+        if (key == Key.CONTROL) {
+            return Input.isKeyPressed(Key.L_CONTROL) || Input.isKeyPressed(Key.R_CONTROL);
+        }
         return Application.getApp().getKeyListener().isKeyPressedThisFrame(key);
     }
 
@@ -177,8 +202,10 @@ public interface Input {
         int R_SHIFT = GLFW_KEY_RIGHT_SHIFT;
         int L_ALT = GLFW_KEY_LEFT_ALT;
         int R_ALT = GLFW_KEY_RIGHT_ALT;
+        int ALT = L_ALT + R_ALT;
         int L_CONTROL = GLFW_KEY_LEFT_CONTROL;
         int R_CONTROL = GLFW_KEY_RIGHT_CONTROL;
+        int CONTROL = L_CONTROL + R_CONTROL;
         int PAGE_UP = GLFW_KEY_PAGE_UP;
         int PAGE_DOWN = GLFW_KEY_PAGE_DOWN;
         int HOME = GLFW_KEY_HOME;

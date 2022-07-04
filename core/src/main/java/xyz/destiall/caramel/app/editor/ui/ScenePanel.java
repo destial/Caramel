@@ -15,8 +15,6 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 
-import static org.lwjgl.glfw.GLFW.*;
-
 public final class ScenePanel extends Panel {
     private final ApplicationImpl window;
     private ImVec2 gameWindowSize;
@@ -33,7 +31,7 @@ public final class ScenePanel extends Panel {
     }
 
     @Override
-    public void imguiLayer() {
+    public void __imguiLayer() {
         ImGui.begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
         if (Time.isSecond) {
             previousFps = Time.getFPS();
@@ -67,9 +65,9 @@ public final class ScenePanel extends Panel {
 
         ImGui.image(texId, gameWindowSize.x, gameWindowSize.y, 0, 1, 1, 0);
 
-        GameObject selected = window.getCurrentScene().getSelectedGameObject();
+        GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
 
-        if (Input.isKeyPressed(GLFW_KEY_F) && selected != null &&
+        if (Input.isKeyPressed(Input.Key.F) && selected != null &&
             (Panel.isWindowFocused(ScenePanel.class) || Panel.isWindowFocused(HierarchyPanel.class))) {
             scene.getEditorCamera().transform.position.x = selected.transform.position.x;
             scene.getEditorCamera().transform.position.y = selected.transform.position.y;
@@ -130,15 +128,15 @@ public final class ScenePanel extends Panel {
     }
 
     private void editTransform(ImBoolean showImGuizmoWindow) {
-        if (ImGui.isKeyPressed(GLFW_KEY_T)) {
+        if (ImGui.isKeyPressed(Input.Key.T)) {
             gizmoOperation = Operation.TRANSLATE;
-        } else if (ImGui.isKeyPressed(GLFW_KEY_R)) {
+        } else if (ImGui.isKeyPressed(Input.Key.R)) {
             gizmoOperation = Operation.ROTATE;
-        } else if (ImGui.isKeyPressed(GLFW_KEY_S)) {
+        } else if (ImGui.isKeyPressed(Input.Key.S)) {
             gizmoOperation = Operation.SCALE;
         }
 
-        GameObject selected = window.getCurrentScene().getSelectedGameObject();
+        GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
         if (selected == null) return;
 
         float[] model = selected.transform.model.get(new float[16]);
