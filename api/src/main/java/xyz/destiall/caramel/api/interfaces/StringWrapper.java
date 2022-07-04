@@ -44,4 +44,56 @@ public interface StringWrapper extends CharSequence, Comparable<String>, Seriali
     default int compareTo(String o) {
         return get().compareTo(o);
     }
+
+    default String toLowerCase() {
+        return get().toLowerCase();
+    }
+
+    default String toUpperCase() {
+        return get().toUpperCase();
+    }
+
+    default String trim() {
+        return get().trim();
+    }
+
+    default String[] split(String regex) {
+        return get().split(regex);
+    }
+
+    default String[] split(String regex, int limit) {
+        return get().split(regex, limit);
+    }
+
+    default String replace(CharSequence replace, CharSequence target) {
+        return get().replace(replace, target);
+    }
+
+    default String replaceAll(String regex, String replace) {
+        return get().replaceAll(regex, replace);
+    }
+
+    default boolean isEmpty() {
+        return get().isEmpty();
+    }
+
+    default boolean contains(CharSequence substring) {
+        return get().contains(substring);
+    }
+
+    default boolean equalsIgnoreCase(String anotherString) {
+        return get().equalsIgnoreCase(anotherString);
+    }
+
+    default boolean endsWith(String suffix) {
+        return get().endsWith(suffix);
+    }
+
+    default boolean startsWith(String prefix) {
+        return get().startsWith(prefix);
+    }
+
+    default byte[] getBytes() {
+        return get().getBytes();
+    }
 }
