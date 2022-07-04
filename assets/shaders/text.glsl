@@ -8,11 +8,13 @@ out vec2 fTexCoords;
 out vec3 fColor;
 
 uniform mat4 uProjection;
+uniform mat4 uView;
+uniform mat4 uModel;
 
 void main() {
     fTexCoords = aTexCoords;
     fColor = aColor;
-    gl_Position = uProjection * vec4(aPos, -5, 1);
+    gl_Position = uProjection * uView * uModel * vec4(aPos, -5, 1);
 }
 
     #type fragment

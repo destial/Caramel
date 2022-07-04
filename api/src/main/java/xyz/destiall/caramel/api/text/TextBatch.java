@@ -81,18 +81,19 @@ public final class TextBatch {
         glEnableVertexAttribArray(2);
     }
 
-    public void render(Camera camera) {
+    public void render(Transform transform, Camera camera) {
+        shader.use();
         // Clear the buffer on the GPU, and then upload the CPU contents, and then draw
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, Float.BYTES * VERTEX_SIZE * BATCH_SIZE, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
 
         // Draw the buffer that we just uploaded
-        shader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_BUFFER, font.textureId);
         shader.uploadTexture("uFontTexture", 0);
         shader.uploadMat4f("uProjection", camera.projection);
+        shader.uploadMat4f("uModel", transform.model);
 
         glBindVertexArray(vao);
 
@@ -116,8 +117,10 @@ public final class TextBatch {
         float x1 = x + charInfo.width;
         float y1 = y + charInfo.height;
 
-        float ux0 = charInfo.textureCoordinates[0].x; float uy0 = charInfo.textureCoordinates[0].y;
-        float ux1 = charInfo.textureCoordinates[1].x; float uy1 = charInfo.textureCoordinates[1].y;
+        float ux0 = charInfo.textureCoordinates[0].x;
+        float uy0 = charInfo.textureCoordinates[0].y;
+        float ux1 = charInfo.textureCoordinates[1].x;
+        float uy1 = charInfo.textureCoordinates[1].y;
 
         int index = size * 7;
         vertices[index] = x1;      vertices[index + 1] = y;
@@ -143,9 +146,8 @@ public final class TextBatch {
         return true;
     }
 
-    public void addText(String text, Transform transform) {
-        float x = transform.position.x;
-        float y = transform.position.y;
+    public void addText(String text) {
+        float x = 0;
         for (int i=0; i < text.length(); i++) {
             char c = text.charAt(i);
 
@@ -156,7 +158,7 @@ public final class TextBatch {
             }
 
             float xPos = x;
-            addCharacter(xPos, y, charInfo);
+            addCharacter(xPos, 0, charInfo);
             x += charInfo.width;
         }
     }

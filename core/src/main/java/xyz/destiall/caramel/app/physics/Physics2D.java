@@ -14,7 +14,7 @@ import xyz.destiall.caramel.api.physics.internals.ContactListener;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 
 
-public class Physics2D implements Physics {
+public final class Physics2D implements Physics {
     private final Vec2 gravity = new Vec2(0, -10f);
 
     private World world;

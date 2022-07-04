@@ -59,4 +59,29 @@ public final class DebugImpl extends Debug {
 
         DebugDraw.INSTANCE.addLine(new Vector3f(to.x, from.y, from.z), new Vector3f(from.x, to.y, to.z), color);
     }
+
+    @Override
+    protected void _log(Object log) {
+        log(log);
+    }
+
+    @Override
+    protected void _logError(Object error) {
+        logError(error);
+    }
+
+    @Override
+    protected void _drawLine(Vector3f from, Vector3f offset, Vector3f color) {
+        drawLine(from, offset, color);
+    }
+
+    @Override
+    protected void _drawBox2D(Vector3f center, Vector3f offset, Vector3f color) {
+        drawBox2D(center, offset, color);
+    }
+
+    @Override
+    protected void _drawBox3D(Vector3f center, Vector3f offset, Vector3f color) {
+        drawBox3D(center, offset, color);
+    }
 }

@@ -6,7 +6,7 @@ import org.joml.Vector4f;
 
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
-public class MeshBuilder {
+public final class MeshBuilder {
 
     public static Mesh createCircle(Vector4f color, float radius, int n) {
         Mesh mesh = new Mesh();

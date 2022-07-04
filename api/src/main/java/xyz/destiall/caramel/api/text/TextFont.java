@@ -1,6 +1,8 @@
 package xyz.destiall.caramel.api.text;
 
 import org.lwjgl.BufferUtils;
+import xyz.destiall.caramel.api.render.Text;
+import xyz.destiall.caramel.api.texture.Texture;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -24,6 +26,7 @@ import static org.lwjgl.opengl.GL11C.glTexParameteri;
 
 public final class TextFont {
     private final String filepath;
+    public final Texture texture;
     private int fontSize;
 
     private int width, height, lineHeight;
@@ -35,14 +38,14 @@ public final class TextFont {
         this.filepath = filepath;
         this.fontSize = fontSize;
         this.characterMap = new HashMap<>();
-        generateBitmap();
+        texture = generateTexture();
     }
 
     public CharInfo getCharacter(int codepoint) {
         return characterMap.getOrDefault(codepoint, new CharInfo(0, 0, 0, 0));
     }
 
-    public void generateBitmap() {
+    public Texture generateTexture() {
         Font font = new Font(filepath, Font.PLAIN, fontSize);
 
         // Create fake image to get font information
@@ -91,10 +94,10 @@ public final class TextFont {
         }
         g2d.dispose();
 
-        uploadTexture(img);
+        return uploadTexture(img);
     }
 
-    private void uploadTexture(BufferedImage image) {
+    private Texture uploadTexture(BufferedImage image) {
         // Taken from https://stackoverflow.com/questions/10801016/lwjgl-textures-and-strings
 
         int[] pixels = new int[image.getHeight() * image.getWidth()];
@@ -113,15 +116,6 @@ public final class TextFont {
         }
         buffer.flip();
 
-        textureId = glGenTextures();
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, image.getWidth(), image.getHeight(),
-                0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-        buffer.clear();
+        return new Texture(image.getWidth(), image.getHeight(), buffer);
     }
 }

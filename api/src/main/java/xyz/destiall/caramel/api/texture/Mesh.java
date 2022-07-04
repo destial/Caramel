@@ -35,7 +35,7 @@ import static org.lwjgl.opengl.GL30.glGenBuffers;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
-public class Mesh {
+public final class Mesh {
     private final List<Vertex> vertexArray;
     private final List<Integer> elementArray;
 

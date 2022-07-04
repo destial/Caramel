@@ -5,7 +5,7 @@ import org.joml.Vector4f;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Transform;
 
-public class Sprite {
+public final class Sprite {
     private Vector4f color;
     private String shader;
     private Mesh mesh;

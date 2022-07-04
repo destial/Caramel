@@ -27,13 +27,14 @@ import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 
-public class Texture {
+public final class Texture {
     private transient boolean loaded = false;
     private int width, height;
     private String path;
     private int texId;
+    private transient ByteBuffer buffer;
 
-    private Texture reference;
+    private transient Texture reference;
 
     public Texture(int width, int height) {
         this.width = width;
@@ -45,7 +46,7 @@ public class Texture {
     public Texture(int width, int height, ByteBuffer buffer) {
         this.width = width;
         this.height = height;
-
+        this.buffer = buffer;
     }
 
     public Texture getReference() {
@@ -76,6 +77,26 @@ public class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    }
+
+    public void buildBuffer() {
+        texId = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, texId);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+        if (buffer.get(0) == 3) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, buffer);
+        } else if (buffer.get(0) == 4) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+        } else {
+            Debug.logError("Invalid channels for texture: " + getPath());
+        }
+        loaded = true;
     }
 
     public void buildTexture() {

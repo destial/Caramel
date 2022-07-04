@@ -1,10 +1,8 @@
 package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
-import imgui.ImGuiStyle;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
-import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
@@ -25,7 +23,7 @@ import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class HierarchyPanel extends Panel {
-    private boolean addingComponentsHierarchy;
+    private boolean addingGameObjectHierarchy;
     private boolean editingGameObject;
     private int nodeId;
     private ImVec2 popupMousePos;
@@ -48,13 +46,13 @@ public final class HierarchyPanel extends Panel {
 
         if (ImGui.isWindowHovered()) {
             if (scene.hoveredGameObject == null && !editingGameObject && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
-                addingComponentsHierarchy = !addingComponentsHierarchy;
+                addingGameObjectHierarchy = !addingGameObjectHierarchy;
                 editingGameObject = false;
-                if (addingComponentsHierarchy) {
+                if (addingGameObjectHierarchy) {
                     popupMousePos = new ImVec2(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
                 }
             } else if (ImGui.isMouseClicked(Input.Mouse.LEFT)) {
-                addingComponentsHierarchy = false;
+                addingGameObjectHierarchy = false;
                 editingGameObject = false;
                 if (scene.hoveredGameObject == null) {
                     scene.getSelectedGameObject().clear();
@@ -62,32 +60,38 @@ public final class HierarchyPanel extends Panel {
             }
         }
 
-        if (ImGui.isWindowFocused() && !scene.getSelectedGameObject().isEmpty()) {
-            if (Input.isKeyDown(Input.Key.BACKSPACE) || Input.isKeyDown(Input.Key.DELETE)) {
-                for (GameObject go : scene.getSelectedGameObject()) {
-                    scene.destroy(go);
+        if (ImGui.isWindowFocused()) {
+            if (!scene.getSelectedGameObject().isEmpty()) {
+                if (Input.isKeyDown(Input.Key.BACKSPACE) || Input.isKeyDown(Input.Key.DELETE)) {
+                    for (GameObject go : scene.getSelectedGameObject()) {
+                        scene.destroy(go);
+                    }
+                    scene.getSelectedGameObject().clear();
                 }
-                scene.getSelectedGameObject().clear();
+
+                if (Input.isControlPressedAnd(Input.Key.C) && !scene.getSelectedGameObject().isEmpty()) {
+                    Payload.COPIED.addAll(scene.getSelectedGameObject());
+                }
+
+                if (Input.isControlPressedAnd(Input.Key.V) && Payload.COPIED != null) {
+                    for (GameObject copied : Payload.COPIED) {
+                        GameObject go = copied.clone(false);
+                        scene.addGameObject(go);
+                    }
+                    addingGameObjectHierarchy = false;
+                }
+
+                if (Input.isControlPressedAnd(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
+                    for (GameObject copied : scene.getSelectedGameObject()) {
+                        GameObject go = copied.clone(false);
+                        scene.addGameObject(go);
+                    }
+                    addingGameObjectHierarchy = false;
+                }
             }
 
-            if (Input.isControlPressedAnd(Input.Key.C) && !scene.getSelectedGameObject().isEmpty()) {
-                Payload.COPIED = new HashSet<>(scene.getSelectedGameObject());
-            }
-
-            if (Input.isControlPressedAnd(Input.Key.V) && Payload.COPIED != null) {
-                for (GameObject copied : Payload.COPIED) {
-                    GameObject go = copied.clone(false);
-                    scene.addGameObject(go);
-                }
-                addingComponentsHierarchy = false;
-            }
-
-            if (Input.isControlPressedAnd(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
-                for (GameObject copied : scene.getSelectedGameObject()) {
-                    GameObject go = copied.clone(false);
-                    scene.addGameObject(go);
-                }
-                addingComponentsHierarchy = false;
+            if (Input.isControlPressedAnd(Input.Key.A)) {
+                scene.getSelectedGameObject().addAll(scene.getGameObjects());
             }
         }
 
@@ -103,9 +107,10 @@ public final class HierarchyPanel extends Panel {
                 editingGameObject = false;
             }
             ImGui.end();
-        } else if (addingComponentsHierarchy) {
+        } else if (addingGameObjectHierarchy) {
             ImGui.begin("##addgameobject", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
             ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
+
             if (ImGui.selectable("Add GameObject")) {
                 GameObject go = new GameObjectImpl(scene);
                 Mesh quad = MeshBuilder.createQuad(1);
@@ -115,13 +120,26 @@ public final class HierarchyPanel extends Panel {
                 renderer.setMesh(quad);
                 go.addComponent(renderer);
                 scene.addGameObject(go);
-                addingComponentsHierarchy = false;
-            } else if (ImGui.menuItem("Paste", "CTRL + V", false, Payload.COPIED != null)) {
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.menuItem("Select All", "CTRL + A", false, !scene.getSelectedGameObject().isEmpty())) {
+                scene.getSelectedGameObject().addAll(scene.getGameObjects());
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.menuItem("Copy", "CTRL + C", false, !scene.getSelectedGameObject().isEmpty())) {
+                Payload.COPIED.clear();
+                Payload.COPIED.addAll(scene.getSelectedGameObject());
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.menuItem("Paste", "CTRL + V", false, !Payload.COPIED.isEmpty())) {
                 for (GameObject copied : Payload.COPIED) {
                     GameObject go = copied.clone(false);
                     scene.addGameObject(go);
                 }
-                addingComponentsHierarchy = false;
+                addingGameObjectHierarchy = false;
             }
             ImGui.end();
         }
@@ -161,7 +179,7 @@ public final class HierarchyPanel extends Panel {
         }
 
         if (ImGui.isMouseClicked(Input.Mouse.RIGHT) && ImGui.isItemHovered()) {
-            addingComponentsHierarchy = false;
+            addingGameObjectHierarchy = false;
             editingGameObject = true;
             editingGo = gameObject;
             popupMousePos = new ImVec2(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());

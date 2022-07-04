@@ -4,12 +4,11 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
+import xyz.destiall.caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.api.scripts.ScriptManager;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.events.FileEvent;
-import xyz.destiall.caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.app.scripts.loader.ScriptLoader;
-import xyz.destiall.caramel.app.editor.ui.InspectorPanel;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandler;
 import xyz.destiall.java.events.Listener;
@@ -17,13 +16,7 @@ import xyz.destiall.java.events.Listener;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class EditorScriptManager implements ScriptManager, Listener {
@@ -37,7 +30,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         scriptsRootFolder = new File("assets/scripts/");
         scriptsRootFolder.mkdir();
         compiledScripts = new ConcurrentHashMap<>();
-        awaitingCompilation = new HashSet<>();
+        awaitingCompilation = ConcurrentHashMap.newKeySet();
 
         if (ApplicationImpl.getApp().EDITOR_MODE) {
             watcher = new FileWatcher(scriptsRootFolder);
@@ -86,16 +79,39 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         }
     }
 
+    @Override
     public InternalScript getScript(String name) {
         return compiledScripts.get(name);
     }
 
+    @Override
     public InternalScript reloadScript(File file) {
         if (file.getName().endsWith(".java")) {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             if (compiledScripts.containsKey(scriptName)) return compiledScripts.get(scriptName);
             try {
                 InternalScript compiledScript = loader.compile(file);
+                if (compiledScript.getCompiledClass().isAssignableFrom(Component.class)) {
+                    DebugImpl.logError("Script " + scriptName + " does not inherit Component class!");
+                    return null;
+                }
+                compiledScripts.put(scriptName, compiledScript);
+                Payload.COMPONENTS.add(compiledScript.getCompiledClass());
+                return compiledScript;
+            } catch (Exception e) {
+                DebugImpl.logError(e.getLocalizedMessage());
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public InternalScript reloadScript(File file, String contents) {
+        if (file.getName().endsWith(".java")) {
+            String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
+            if (compiledScripts.containsKey(scriptName)) return compiledScripts.get(scriptName);
+            try {
+                InternalScript compiledScript = loader.compile(file, contents);
                 if (compiledScript.getCompiledClass().isAssignableFrom(Component.class)) {
                     DebugImpl.logError("Script " + scriptName + " does not inherit Component class!");
                     return null;

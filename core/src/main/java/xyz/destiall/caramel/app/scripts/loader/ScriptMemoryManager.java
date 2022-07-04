@@ -20,12 +20,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFileManager> {
 
-    private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new HashMap<>();
+    private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new ConcurrentHashMap<>();
     private final ClassLoader parentClassLoader;
 
     public ScriptMemoryManager(JavaFileManager fileManager, ClassLoader parentClassLoader) {
@@ -43,7 +44,7 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
     }
 
     public ScriptClassLoader getClassLoader(ScriptLoader loader, File file, String fullClassName, String simpleClassName) throws ScriptException, MalformedURLException {
-        Map<String, byte[]> mapNameToBytes = new HashMap<>();
+        Map<String, byte[]> mapNameToBytes = new ConcurrentHashMap<>();
         for (ClassScriptMemoryJavaObject outputMemoryJavaFileObject : memoryClasses()) {
             mapNameToBytes.put(
                     outputMemoryJavaFileObject.getName(),

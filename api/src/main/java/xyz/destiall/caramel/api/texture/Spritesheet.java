@@ -7,7 +7,7 @@ import xyz.destiall.caramel.api.interfaces.Update;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Spritesheet implements Update {
+public final class Spritesheet implements Update {
     private int index = 0;
     private final List<Sprite> sprites;
     private final Texture texture;

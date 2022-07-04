@@ -231,7 +231,6 @@ public final class ImGuiUtils {
         return outString.get();
     }
 
-
     public static String inputText(String label, String text) {
         ImGui.pushID(label);
 
@@ -392,7 +391,9 @@ public final class ImGuiUtils {
                 Mesh mesh = (Mesh) value;
                 ImGui.text("shader: " + mesh.getShader().getPath());
                 if (mesh.getColor() != null) {
-                    ImGuiUtils.colorPicker4("color", mesh.getColor());
+                    if (ImGuiUtils.colorPicker4("color", mesh.getColor())) {
+                        mesh.setColor(mesh.getColor());
+                    }
                 }
                 String string = ImGuiUtils.inputText("texture:", mesh.getTexture() == null ? "" : mesh.getTexture().getPath());
                 ImGui.sameLine();

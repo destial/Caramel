@@ -168,8 +168,8 @@ public final class SceneImpl extends Scene {
 
         for (GameObject selected : selectedGameObject) {
             DebugImpl.drawBox2D(selected.transform.position, selected.transform.scale, new Vector3f(1, 0, 0));
-
         }
+
         DebugDraw.INSTANCE.update();
     }
 
@@ -209,7 +209,6 @@ public final class SceneImpl extends Scene {
         for (Panel panel : panels.values()) {
             panel.__imguiLayer();
         }
-        ImGui.showDemoWindow();
     }
 
     public void setEditorCamera(EditorCamera camera) {
@@ -230,6 +229,8 @@ public final class SceneImpl extends Scene {
         if ((camera = gameObject.getComponentInChildren(Camera.class)) != null) {
             if (camera == gameCamera) gameCamera = null;
         }
+        selectedGameObject.remove(gameObject);
+        selectedPlayingGameObject.remove(gameObject);
         physics.get(physicsMode).removeGameObject(gameObject);
     }
 }

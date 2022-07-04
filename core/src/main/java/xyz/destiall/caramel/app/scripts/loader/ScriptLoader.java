@@ -19,12 +19,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 public final class ScriptLoader {
     private final ScriptManager scriptManager;
-    private final Map<String, Class<?>> classes = new HashMap<>();
-    private final Map<String, ScriptClassLoader> loaders = new LinkedHashMap<>();
+    private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
+    private final Map<String, ScriptClassLoader> loaders = new ConcurrentHashMap<>();
     private final NameStrategy nameStrategy;
     private final ScriptMemoryManager scriptMemoryManager;
     private final JavaCompiler compiler;
@@ -77,10 +78,7 @@ public final class ScriptLoader {
         classes.remove(name);
     }
 
-    public InternalScript compile(File file) throws ScriptException, FileNotFoundException, MalformedURLException {
-        if (!file.exists()) throw new FileNotFoundException();
-        String code = FileIO.readData(file);
-
+    public InternalScript compile(File file, String code) throws ScriptException, MalformedURLException{
         String fullClassName = nameStrategy.getFullName(code);
         String simpleClassName = NameStrategy.extractSimpleName(fullClassName);
         loaders.remove(fullClassName);
@@ -103,5 +101,11 @@ public final class ScriptLoader {
         loaders.put(fullClassName, loader);
         setClass(fullClassName, loader.script.getCompiledClass());
         return loader.script;
+    }
+
+    public InternalScript compile(File file) throws ScriptException, FileNotFoundException, MalformedURLException {
+        if (!file.exists()) throw new FileNotFoundException();
+        String code = FileIO.readData(file);
+        return compile(file, code);
     }
 }

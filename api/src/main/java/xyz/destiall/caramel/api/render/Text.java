@@ -5,17 +5,21 @@ import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.text.TextBatch;
 import xyz.destiall.caramel.api.text.TextFont;
+import xyz.destiall.caramel.api.texture.Mesh;
+import xyz.destiall.caramel.api.texture.MeshBuilder;
 
 public final class Text extends Renderer {
-    private transient final TextBatch batch;
+
+    private transient final Mesh mesh;
     @ShowInEditor
     private String text = "New text";
 
     public Text(GameObject gameObject) {
         super(gameObject);
-        batch = new TextBatch(gameObject.scene);
-        batch.initBatch();
-        batch.font = new TextFont("assets/arial.TTF", 16);
+        mesh = MeshBuilder.createQuad(1);
+        TextFont font = new TextFont("assets/arial.TTF", 16);
+        mesh.setTexture(font.texture);
+        mesh.build();
     }
 
     public void setText(String text) {
@@ -33,7 +37,6 @@ public final class Text extends Renderer {
 
     @Override
     public void render(Camera camera) {
-        batch.addText(text, transform);
-        batch.render(camera);
+        mesh.render(transform, camera);
     }
 }

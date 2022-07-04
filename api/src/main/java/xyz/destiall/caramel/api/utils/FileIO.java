@@ -2,6 +2,7 @@ package xyz.destiall.caramel.api.utils;
 
 import com.google.common.io.Files;
 import xyz.destiall.caramel.api.Application;
+import xyz.destiall.caramel.api.scripts.InternalScript;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
@@ -40,23 +41,24 @@ public final class FileIO {
             "    }\n" +
             "}";
 
-    public static File writeScript(String className) {
+    public static InternalScript writeScript(String className) {
         File scriptFolder = new File("assets/scripts/");
         if (!scriptFolder.exists()) scriptFolder.mkdir();
         String contents = BASE.replace("${name}", className);
         File scriptFile = new File(scriptFolder, className + ".java");
-        if (scriptFile.exists()) return scriptFile;
+        if (scriptFile.exists()) return null;
         try {
             FileWriter write = new FileWriter(scriptFile);
             BufferedWriter buffer = new BufferedWriter(write);
             buffer.write(contents);
+            buffer.flush();
             buffer.close();
 
-            Application.getApp().getScriptManager().reloadScript(scriptFile);
+            return Application.getApp().getScriptManager().reloadScript(scriptFile, contents);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return scriptFile;
+        return null;
     }
 
     public static boolean writeData(File location, String contents) {

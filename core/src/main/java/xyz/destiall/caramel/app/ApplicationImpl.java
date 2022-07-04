@@ -240,6 +240,8 @@ public final class ApplicationImpl extends Application {
         File file = new File(lastScene);
         SceneImpl scene = loadScene(file);
 
+        DebugImpl.log("Opening scene " + scene.name);
+
         running = true;
 
         if (!EDITOR_MODE) {
