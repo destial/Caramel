@@ -17,9 +17,8 @@ import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.texture.MeshBuilder;
 import xyz.destiall.caramel.app.editor.SceneImpl;
 import xyz.destiall.caramel.app.utils.Payload;
-import xyz.destiall.caramel.app.utils.StringWrapperImpl;
+import xyz.destiall.caramel.api.objects.StringWrapperImpl;
 
-import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class HierarchyPanel extends Panel {

@@ -3,12 +3,11 @@ package xyz.destiall.caramel.api.text;
 import org.joml.Vector2f;
 
 public final class CharInfo {
-    public int sourceX;
-    public int sourceY;
-    public int width;
-    public int height;
-
-    public Vector2f[] textureCoordinates = new Vector2f[4];
+    public final Vector2f[] textureCoordinates = new Vector2f[4];
+    public final int sourceX;
+    public final int sourceY;
+    public final int width;
+    public final int height;
 
     public CharInfo(int sourceX, int sourceY, int width, int height) {
         this.sourceX = sourceX;

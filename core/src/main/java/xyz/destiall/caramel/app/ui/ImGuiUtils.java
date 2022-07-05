@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.app.editor.ui;
+package xyz.destiall.caramel.app.ui;
 
 import imgui.ImGui;
 import imgui.flag.ImGuiCol;

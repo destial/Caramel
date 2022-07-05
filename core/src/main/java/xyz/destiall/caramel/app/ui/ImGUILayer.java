@@ -11,10 +11,12 @@ import imgui.callback.ImStrSupplier;
 import imgui.flag.ImGuiBackendFlags;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiConfigFlags;
+import imgui.flag.ImGuiKey;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
+import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.ui.ScenePanel;
@@ -103,6 +105,20 @@ public final class ImGUILayer {
 
         fontConfig.destroy();
 
+        io.setKeyMap(ImGuiKey.Backspace, Input.Key.BACKSPACE);
+        io.setKeyMap(ImGuiKey.Enter, Input.Key.ENTER);
+        io.setKeyMap(ImGuiKey.Delete, Input.Key.DELETE);
+        io.setKeyMap(ImGuiKey.DownArrow, Input.Key.DOWN);
+        io.setKeyMap(ImGuiKey.UpArrow, Input.Key.UP);
+        io.setKeyMap(ImGuiKey.LeftArrow, Input.Key.LEFT);
+        io.setKeyMap(ImGuiKey.RightArrow, Input.Key.RIGHT);
+        io.setKeyMap(ImGuiKey.End, Input.Key.END);
+        io.setKeyMap(ImGuiKey.Insert, Input.Key.INSERT);
+        io.setKeyMap(ImGuiKey.PageDown, Input.Key.PAGE_DOWN);
+        io.setKeyMap(ImGuiKey.PageUp, Input.Key.PAGE_UP);
+        io.setKeyMap(ImGuiKey.Home, Input.Key.HOME);
+        io.setKeyMap(ImGuiKey.Tab, Input.Key.TAB);
+
         glfwSetKeyCallback(glfwWindow, (w, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
                 io.setKeysDown(key, true);
@@ -115,15 +131,11 @@ public final class ImGUILayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            //if (!io.getWantCaptureKeyboard()) {
-                window.getKeyListener().keyCallback(w, key, scancode, action, mods);
-            //}
+            window.getKeyListener().keyCallback(w, key, scancode, action, mods);
         });
 
         glfwSetCharCallback(glfwWindow, (w, c) -> {
-            //if (c != GLFW_KEY_DELETE) {
-                io.addInputCharacter(c);
-            //}
+            io.addInputCharacter(c);
         });
 
         glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {

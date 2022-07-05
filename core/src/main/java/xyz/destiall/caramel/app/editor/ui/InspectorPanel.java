@@ -2,26 +2,19 @@ package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.ImVec2;
-import imgui.extension.imnodes.ImNodes;
 import imgui.extension.texteditor.TextEditor;
 import imgui.extension.texteditor.TextEditorLanguageDefinition;
-import imgui.extension.texteditor.flag.TextEditorPaletteIndex;
-import imgui.extension.texteditor.flag.TextEditorSelectionMode;
-import imgui.flag.ImGuiSelectableFlags;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.interfaces.FunctionButton;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.physics.components.Collider;
-import xyz.destiall.caramel.api.render.SpriteRenderer;
-import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.components.Transform;
@@ -32,19 +25,15 @@ import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
-import xyz.destiall.caramel.app.utils.StringWrapperImpl;
+import xyz.destiall.caramel.api.objects.StringWrapperImpl;
 
-import javax.tools.ToolProvider;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.HashSet;
-import java.util.Set;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_1;
-import static org.lwjgl.glfw.GLFW.GLFW_MOUSE_BUTTON_2;
 
 public final class InspectorPanel extends Panel {
     private static final TextEditor editor = new TextEditor();
@@ -81,7 +70,7 @@ public final class InspectorPanel extends Panel {
             ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
             for (Component component : selected.getComponents()) {
                 if (selectedComponent == component) {
-                    // push style
+                    ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.3f, 0.3f, 0.7f, 1.0f);
                 }
                 if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
                     ImGui.text("id: " + component.id);
@@ -110,7 +99,7 @@ public final class InspectorPanel extends Panel {
                     }
                 }
                 if (selectedComponent == component) {
-                    // pop style
+                    ImGui.popStyleColor();
                 }
                 if (component instanceof Transform) continue;
 

@@ -24,14 +24,17 @@
     <packaging>jar</packaging>
 
     <build>
+        <finalName>api-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
+                    <fork>true</fork>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <buildDirectory>../api-target</buildDirectory>
                 </configuration>
             </plugin>
         </plugins>

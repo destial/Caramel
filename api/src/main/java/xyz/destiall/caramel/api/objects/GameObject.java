@@ -11,6 +11,7 @@ import xyz.destiall.caramel.api.interfaces.Update;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -171,7 +172,7 @@ public abstract class GameObject implements Update, Render {
 
     public Collection<Component> getComponents() {
         List<Component> immutable = new ArrayList<>(components);
-        immutable.sort((a, b) -> b.id - a.id);
+        immutable.sort(Comparator.comparingInt(a -> a.id));
         return immutable;
     }
 

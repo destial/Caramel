@@ -29,17 +29,15 @@ import static org.lwjgl.stb.STBImage.stbi_load;
 
 public final class Texture {
     private transient boolean loaded = false;
+    private transient ByteBuffer buffer;
+    private transient Texture reference;
     private int width, height;
     private String path;
     private int texId;
-    private transient ByteBuffer buffer;
-
-    private transient Texture reference;
 
     public Texture(int width, int height) {
         this.width = width;
         this.height = height;
-
         loaded = true;
     }
 
@@ -92,8 +90,6 @@ public final class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-
-        Debug.logError("Invalid buffer for texture");
 
         loaded = true;
     }

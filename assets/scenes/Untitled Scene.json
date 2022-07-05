@@ -4,121 +4,7 @@
     {
       "components": [
         {
-          "clazz": "scripts.OtherScript",
-          "id": 7,
-          "enabled": true
-        },
-        {
-          "mesh": {
-            "vertexArray": [
-              {
-                "position": {
-                  "x": 0.5,
-                  "y": -0.5,
-                  "z": 0.0
-                },
-                "texCoords": {
-                  "x": 1.0,
-                  "y": 1.0
-                },
-                "color": {
-                  "x": 1.0,
-                  "y": 1.0,
-                  "z": 1.0,
-                  "w": 1.0
-                },
-                "normal": {
-                  "x": 0.0,
-                  "y": 0.0,
-                  "z": 0.0
-                }
-              },
-              {
-                "position": {
-                  "x": -0.5,
-                  "y": 0.5,
-                  "z": 0.0
-                },
-                "texCoords": {
-                  "x": 0.0,
-                  "y": 0.0
-                },
-                "color": {
-                  "x": 1.0,
-                  "y": 1.0,
-                  "z": 1.0,
-                  "w": 1.0
-                },
-                "normal": {
-                  "x": 0.0,
-                  "y": 0.0,
-                  "z": 0.0
-                }
-              },
-              {
-                "position": {
-                  "x": 0.5,
-                  "y": 0.5,
-                  "z": 0.0
-                },
-                "texCoords": {
-                  "x": 1.0,
-                  "y": 0.0
-                },
-                "color": {
-                  "x": 1.0,
-                  "y": 1.0,
-                  "z": 1.0,
-                  "w": 1.0
-                },
-                "normal": {
-                  "x": 0.0,
-                  "y": 0.0,
-                  "z": 0.0
-                }
-              },
-              {
-                "position": {
-                  "x": -0.5,
-                  "y": -0.5,
-                  "z": 0.0
-                },
-                "texCoords": {
-                  "x": 0.0,
-                  "y": 1.0
-                },
-                "color": {
-                  "x": 1.0,
-                  "y": 1.0,
-                  "z": 1.0,
-                  "w": 1.0
-                },
-                "normal": {
-                  "x": 0.0,
-                  "y": 0.0,
-                  "z": 0.0
-                }
-              }
-            ],
-            "elementArray": [
-              2,
-              1,
-              0,
-              0,
-              1,
-              3
-            ],
-            "type": 4,
-            "shader": "color",
-            "color": {
-              "x": 1.0,
-              "y": 1.0,
-              "z": 1.0,
-              "w": 1.0
-            },
-            "dirty": false,
-            "drawArrays": false
-          },
+          "text": "ada",
           "pos": {
             "x": 0.0,
             "y": 0.0,
@@ -131,12 +17,17 @@
             "w": 1.0
           },
           "sca": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": 4.5,
+            "y": 2.4,
             "z": 1.0
           },
-          "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
-          "id": 6,
+          "clazz": "xyz.destiall.caramel.api.render.Text",
+          "id": 8,
+          "enabled": true
+        },
+        {
+          "clazz": "scripts.OtherScript",
+          "id": 7,
           "enabled": true
         },
         {
@@ -163,8 +54,8 @@
             "w": 0.0
           },
           "scale": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": 4.5,
+            "y": 2.4,
             "z": 1.0
           },
           "localScale": {
@@ -230,8 +121,8 @@
           "m21": 0.0,
           "m22": 1.0,
           "m23": 0.0,
-          "m30": 0.38433313,
-          "m31": 0.5665558,
+          "m30": 0.10632838,
+          "m31": 0.83405787,
           "m32": -0.0,
           "m33": 1.0,
           "properties": 18
@@ -261,8 +152,8 @@
       },
       {
         "position": {
-          "x": -0.38433313,
-          "y": -0.5665558,
+          "x": -0.10632838,
+          "y": -0.83405787,
           "z": 0.0
         },
         "localPosition": {

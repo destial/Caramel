@@ -54,14 +54,39 @@ public final class Mesh {
         type = GL_TRIANGLES;
     }
 
+    public void setDrawArrays(boolean drawArrays) {
+        this.drawArrays = drawArrays;
+    }
+
     public Mesh(boolean arrays) {
         this();
         drawArrays = arrays;
     }
 
+    public Mesh resetArrays() {
+        vertexArray.clear();
+        setDirty(true);
+        return this;
+    }
+
+    public Mesh resetIndices() {
+        vertexArray.clear();
+        setDirty(true);
+        return this;
+    }
+
     public Mesh pushVertex(Vertex vertex) {
         vertexArray.add(vertex);
+        setDirty(true);
         return this;
+    }
+
+    public Vertex getVertex(int index) {
+        while (index >= vertexArray.size()) {
+            pushVertex(0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 1f);
+            if (index < vertexArray.size()) break;
+        }
+        return vertexArray.get(index);
     }
 
     public Mesh pushVertex(Vector3f position, Vector4f color, Vector2f texCoords, Vector3f normal) {
@@ -70,6 +95,7 @@ public final class Mesh {
         vertex.color.set(color);
         vertex.texCoords.set(texCoords);
         vertex.normal.set(normal);
+        setDirty(true);
         return pushVertex(vertex);
     }
 
@@ -88,16 +114,19 @@ public final class Mesh {
         vertex.normal.x = floats[9];
         vertex.normal.y = floats[10];
         vertex.normal.z = floats[11];
+        setDirty(true);
         return pushVertex(vertex);
     }
 
     public Mesh pushIndex(int i) {
         elementArray.add(i);
+        setDirty(true);
         return this;
     }
 
     public Mesh pushIndex(int... indexes) {
         for (int i : indexes) elementArray.add(i);
+        setDirty(true);
         return this;
     }
 
@@ -122,6 +151,10 @@ public final class Mesh {
     }
 
     public void build() {
+        build(true);
+    }
+
+    public void build(boolean with_indices) {
         if (shader == null) {
             if (texture != null) {
                 shader = "default";
@@ -138,16 +171,18 @@ public final class Mesh {
         glBindBuffer(GL_ARRAY_BUFFER, vboId);
         glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_DYNAMIC_DRAW);
 
-        IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.size());
-        int[] indices = new int[elementArray.size()];
-        for (int i = 0; i < elementArray.size(); i++) {
-            indices[i] = elementArray.get(i);
-        }
-        elementBuffer.put(indices).flip();
-        int eboId = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
+        if (with_indices) {
+            IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.size());
+            int[] indices = new int[elementArray.size()];
+            for (int i = 0; i < elementArray.size(); i++) {
+                indices[i] = elementArray.get(i);
+            }
+            elementBuffer.put(indices).flip();
+            int eboId = glGenBuffers();
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_DYNAMIC_DRAW);
 
+        }
         int positionSize = 3;
         int colorSize = 4;
         int texSize = 2;
@@ -214,9 +249,9 @@ public final class Mesh {
     public void render(Transform transform, Camera camera) {
         Shader.getShader(shader).use();
         if (texture != null) {
-            Shader.getShader(shader).uploadTexture("texSampler", 0);
             glActiveTexture(GL_TEXTURE0);
             texture.bind();
+            Shader.getShader(shader).uploadTexture("texSampler", 0);
         }
 
         if (dirty) {

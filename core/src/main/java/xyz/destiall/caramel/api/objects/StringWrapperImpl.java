@@ -1,4 +1,4 @@
-package xyz.destiall.caramel.app.utils;
+package xyz.destiall.caramel.api.objects;
 
 import imgui.type.ImString;
 import xyz.destiall.caramel.api.interfaces.StringWrapper;

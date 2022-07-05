@@ -17,5 +17,15 @@ public final class Vertex {
         normal = new Vector3f();
     }
 
+    @Override
+    public String toString() {
+        return "Vertex{" +
+                "position=" + position +
+                ", texCoords=" + texCoords +
+                ", color=" + color +
+                ", normal=" + normal +
+                '}';
+    }
+
     public static final int SIZE = 3 + 2 + 4 + 3;
 }

@@ -24,6 +24,7 @@
     <packaging>jar</packaging>
 
     <build>
+        <finalName>core-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

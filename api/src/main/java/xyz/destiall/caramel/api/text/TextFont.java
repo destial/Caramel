@@ -10,20 +10,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class TextFont {
-    private final String filepath;
-    public final Texture texture;
-    private int fontSize;
-
-    private int width, height, lineHeight;
     private final Map<Integer, CharInfo> characterMap;
+    private final String filepath;
+    private final int fontSize;
 
-    public int textureId;
+    public Texture texture;
 
     public TextFont(String filepath, int fontSize) {
         this.filepath = filepath;
         this.fontSize = fontSize;
         this.characterMap = new HashMap<>();
-        texture = generateTexture();
     }
 
     public CharInfo getCharacter(int codepoint) {
@@ -33,22 +29,19 @@ public final class TextFont {
     public Texture generateTexture() {
         Font font = new Font(filepath, Font.PLAIN, fontSize);
 
-        // Create fake image to get font information
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
         g2d.setFont(font);
         FontMetrics fontMetrics = g2d.getFontMetrics();
 
         int estimatedWidth = (int)Math.sqrt(font.getNumGlyphs()) * font.getSize() + 1;
-        width = 0;
-        height = fontMetrics.getHeight();
-        lineHeight = fontMetrics.getHeight();
+        int width = 0;
+        int height = fontMetrics.getHeight();
         int x = 0;
         int y = (int)(fontMetrics.getHeight() * 1.4f);
 
         for (int i=0; i < font.getNumGlyphs(); i++) {
             if (font.canDisplay(i)) {
-                // Get the sizes for each codepoint glyph, and update the actual image width and height
                 CharInfo charInfo = new CharInfo(x, y, fontMetrics.charWidth(i), fontMetrics.getHeight());
                 characterMap.put(i, charInfo);
                 width = Math.max(x + fontMetrics.charWidth(i), width);
@@ -64,7 +57,6 @@ public final class TextFont {
         height += fontMetrics.getHeight() * 1.4f;
         g2d.dispose();
 
-        // Create the real texture
         img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         g2d = img.createGraphics();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -79,12 +71,11 @@ public final class TextFont {
         }
         g2d.dispose();
 
-        return uploadTexture(img);
+        texture = uploadTexture(img);
+        return texture;
     }
 
     private Texture uploadTexture(BufferedImage image) {
-        // Taken from https://stackoverflow.com/questions/10801016/lwjgl-textures-and-strings
-
         int[] pixels = new int[image.getHeight() * image.getWidth()];
         image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
 

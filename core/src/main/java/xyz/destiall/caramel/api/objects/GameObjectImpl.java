@@ -4,7 +4,6 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.interfaces.Render;
 import xyz.destiall.caramel.api.interfaces.Update;
-import xyz.destiall.caramel.app.utils.StringWrapperImpl;
 
 public final class GameObjectImpl extends GameObject implements Update, Render {
 

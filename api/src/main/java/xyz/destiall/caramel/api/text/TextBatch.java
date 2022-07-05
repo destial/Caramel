@@ -44,7 +44,7 @@ public final class TextBatch {
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_BUFFER, font.textureId);
+        glBindTexture(GL_TEXTURE_BUFFER, font.texture.getTexId());
         shader.uploadTexture("texSampler", 0);
         shader.uploadMat4f("uProjection", camera.getProjection());
         shader.uploadMat4f("uView", camera.getView());
