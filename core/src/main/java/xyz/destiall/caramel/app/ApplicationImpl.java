@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -177,7 +178,7 @@ public final class ApplicationImpl extends Application {
         if (glfwWindow == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
         // Set resize callbacks.
-        // Input callbacks are set in ImGUI
+        // Input callbacks are set in ImGUI.
         glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
@@ -223,20 +224,23 @@ public final class ApplicationImpl extends Application {
         framebuffer = new Framebuffer[2];
         framebuffer[0] = new Framebuffer(this.width, this.height);
         framebuffer[1] = new Framebuffer(this.width, this.height);
-    }
 
-    private void loop() {
         // Load all the scripts
         scriptManager.reloadAll();
 
+        // Load all built-in components
         Reflections reflections = new Reflections("xyz.destiall.caramel.api");
         Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
-        for (Class<? extends Component> c : set) {
+        List<Class<? extends Component>> sorted = new ArrayList<>(set);
+        sorted.sort(Comparator.comparing(Class::getName));
+        for (Class<? extends Component> c : sorted) {
             if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
             if (c == Transform.class) continue;
             Payload.COMPONENTS.add(c);
         }
+    }
 
+    private void loop() {
         Time.timeStarted = System.currentTimeMillis();
         long startTime = Time.timeStarted;
         long endTime;
@@ -400,13 +404,26 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public SceneImpl loadScene(File file) {
-        SceneImpl scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
-        if (!scenes.removeIf(s -> s.name.equals(scene.name))) {
+        SceneImpl scene = scenes.stream().filter(s -> s.getFile().equals(file)).findFirst().orElse(null);
+        if (scene != null) {
+            sceneIndex = scenes.indexOf(scene);
+            return scene;
+        }
+        scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
+
+        SceneImpl finalScene = scene;
+        if (!scenes.removeIf(s -> s.name.equals(finalScene.name))) {
             sceneIndex++;
         }
         scenes.add(scene);
         scene.setFile(file);
         return scene;
+    }
+
+    @Override
+    public SceneImpl loadScene(int index) {
+        sceneIndex = index;
+        return getCurrentScene();
     }
 
     @Override
@@ -419,8 +436,11 @@ public final class ApplicationImpl extends Application {
     public void saveScene(Scene scene, File file) {
         scene.setFile(file);
         String savedScene = serializer.toJson(scene);
-        FileIO.writeData(file, savedScene);
-        DebugImpl.log("Saved scene " + scene.name);
+        if (FileIO.writeData(file, savedScene)) {
+            DebugImpl.log("Saved scene " + scene.name);
+        } else {
+            DebugImpl.log("Unable to save scene " + scene.name);
+        }
     }
 
     @Override

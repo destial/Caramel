@@ -25,6 +25,8 @@ public abstract class Application implements Runnable {
 
     public abstract Scene loadScene(File file);
 
+    public abstract Scene loadScene(int index);
+
     public abstract void saveCurrentScene();
 
     public abstract void saveScene(Scene scene, File file);
