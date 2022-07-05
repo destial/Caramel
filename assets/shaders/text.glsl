@@ -23,11 +23,12 @@ void main() {
 in vec2 fTexCoords;
 in vec3 fColor;
 
-uniform sampler2D uFontTexture;
+uniform sampler2D texSampler;
 
 out vec4 color;
 
 void main() {
-    float c = texture(uFontTexture, fTexCoords).r;
-    color = vec4(1, 1, 1, c) * vec4(fColor, 1);
+    // float c = texture(texSampler, fTexCoords).r;
+    // color = vec4(1, 1, 1, c) * vec4(fColor, 1);
+    color = texture(texSampler, fTexCoords);
 }

@@ -8,5 +8,6 @@ public interface ScriptManager {
     void reloadAll();
     void destroy();
     void loadScripts(File folder);
+    InternalScript getInternalScript(Class<?> clazz);
     InternalScript getScript(String name);
 }

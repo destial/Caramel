@@ -43,14 +43,14 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
         return new ScriptMemoryJavaObject(origin, name, JavaFileObject.Kind.SOURCE, code);
     }
 
-    public ScriptClassLoader getClassLoader(ScriptLoader loader, File file, String fullClassName, String simpleClassName) throws ScriptException, MalformedURLException {
+    public ScriptClassLoader getClassLoader(ScriptLoader loader, File file, String fullClassName, String simpleClassName, ScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
         Map<String, byte[]> mapNameToBytes = new ConcurrentHashMap<>();
         for (ClassScriptMemoryJavaObject outputMemoryJavaFileObject : memoryClasses()) {
             mapNameToBytes.put(
                     outputMemoryJavaFileObject.getName(),
                     outputMemoryJavaFileObject.getBytes());
         }
-        return new ScriptClassLoader(loader, mapNameToBytes, parentClassLoader, file, fullClassName, simpleClassName);
+        return new ScriptClassLoader(loader, mapNameToBytes, parentClassLoader, file, fullClassName, simpleClassName, source);
     }
 
     @Override

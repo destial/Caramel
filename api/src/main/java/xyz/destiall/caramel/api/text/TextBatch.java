@@ -1,37 +1,27 @@
 package xyz.destiall.caramel.api.text;
 
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL15C.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15C.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL31.GL_TEXTURE_BUFFER;
-
-import org.lwjgl.opengl.GL15;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.objects.Scene;
 import xyz.destiall.caramel.api.render.Shader;
 
+import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
+import static org.lwjgl.opengl.GL15.GL_DYNAMIC_DRAW;
+import static org.lwjgl.opengl.GL15.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL15.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL15.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL15.glActiveTexture;
+import static org.lwjgl.opengl.GL15.glBindBuffer;
+import static org.lwjgl.opengl.GL15.glBindTexture;
+import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glDrawElements;
+import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL31.GL_TEXTURE_BUFFER;
+
 public final class TextBatch {
-//    private float[] vertices = {
-//            // x, y,        r, g, b              ux, uy
-//            0.5f, 0.5f,     1.0f, 0.2f, 0.11f,    1.0f, 0.0f,
-//            0.5f, -0.5f,    1.0f, 0.2f, 0.11f,    1.0f, 1.0f,
-//            -0.5f, -0.5f,   1.0f, 0.2f, 0.11f,    0.0f, 1.0f,
-//            -0.5f, 0.5f,    1.0f, 0.2f, 0.11f,    0.0f, 0.0f
-//    };
-
-    private int[] indices = {
-            0, 1, 3,
-            1, 2, 3
-    };
-
     private final Scene scene;
 
-    // 25 quads
     public static int BATCH_SIZE = 100;
     public static int VERTEX_SIZE = 7;
     public float[] vertices = new float[BATCH_SIZE * VERTEX_SIZE];
@@ -44,62 +34,26 @@ public final class TextBatch {
 
     public TextBatch(Scene scene) {
         this.scene = scene;
-    }
-
-    public void generateEbo() {
-        int elementSize = BATCH_SIZE * 3;
-        int[] elementBuffer = new int[elementSize];
-
-        for (int i=0; i < elementSize; i++) {
-            elementBuffer[i] = indices[(i % 6)] + ((i / 6) * 4);
-        }
-
-        int ebo = glGenBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
-    }
-
-    public void initBatch() {
         shader = Shader.getShader("text");
-        vao = glGenVertexArrays();
-        glBindVertexArray(vao);
-
-        vbo = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, Float.BYTES * VERTEX_SIZE * BATCH_SIZE, GL_DYNAMIC_DRAW);
-
-        generateEbo();
-
-        int stride = 7 * Float.BYTES;
-        glVertexAttribPointer(0, 2, GL_FLOAT, false, stride, 0);
-        glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, stride, 2 * Float.BYTES);
-        glEnableVertexAttribArray(1);
-
-        glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, 5 * Float.BYTES);
-        glEnableVertexAttribArray(2);
     }
 
     public void render(Transform transform, Camera camera) {
         shader.use();
-        // Clear the buffer on the GPU, and then upload the CPU contents, and then draw
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, Float.BYTES * VERTEX_SIZE * BATCH_SIZE, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
 
-        // Draw the buffer that we just uploaded
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_BUFFER, font.textureId);
-        shader.uploadTexture("uFontTexture", 0);
-        shader.uploadMat4f("uProjection", camera.projection);
+        shader.uploadTexture("texSampler", 0);
+        shader.uploadMat4f("uProjection", camera.getProjection());
+        shader.uploadMat4f("uView", camera.getView());
         shader.uploadMat4f("uModel", transform.model);
 
         glBindVertexArray(vao);
 
         glDrawElements(GL_TRIANGLES, size * 6, GL_UNSIGNED_INT, 0);
 
-        // Reset batch for use on next draw call
         size = 0;
         shader.detach();
     }

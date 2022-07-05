@@ -96,8 +96,7 @@ public final class ScriptLoader {
             throw new ScriptException(message);
         }
         System.out.println("Loading " + file.getName());
-        ScriptClassLoader loader = scriptMemoryManager.getClassLoader(this, file, fullClassName, simpleClassName);
-        loader.setSource(scriptSource);
+        ScriptClassLoader loader = scriptMemoryManager.getClassLoader(this, file, fullClassName, simpleClassName, scriptSource);
         loaders.put(fullClassName, loader);
         setClass(fullClassName, loader.script.getCompiledClass());
         return loader.script;

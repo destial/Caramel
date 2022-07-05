@@ -4,6 +4,11 @@
     {
       "components": [
         {
+          "clazz": "scripts.OtherScript",
+          "id": 7,
+          "enabled": true
+        },
+        {
           "mesh": {
             "vertexArray": [
               {

@@ -5,6 +5,7 @@ import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.scripts.InternalScript;
+import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.api.scripts.ScriptManager;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.events.FileEvent;
@@ -85,14 +86,19 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     }
 
     @Override
+    public InternalScript getInternalScript(Class<?> clazz) {
+        return compiledScripts.values().stream().filter(c -> c.getCompiledClass().isAssignableFrom(clazz)).findFirst().orElse(null);
+    }
+
+    @Override
     public InternalScript reloadScript(File file) {
         if (file.getName().endsWith(".java")) {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             if (compiledScripts.containsKey(scriptName)) return compiledScripts.get(scriptName);
             try {
                 InternalScript compiledScript = loader.compile(file);
-                if (compiledScript.getCompiledClass().isAssignableFrom(Component.class)) {
-                    DebugImpl.logError("Script " + scriptName + " does not inherit Component class!");
+                if (compiledScript.getCompiledClass().isAssignableFrom(Script.class)) {
+                    DebugImpl.logError("Script " + scriptName + " does not inherit Script class!");
                     return null;
                 }
                 compiledScripts.put(scriptName, compiledScript);

@@ -10,10 +10,16 @@ import java.lang.reflect.InvocationTargetException;
 public final class InternalScript {
     private final String name;
     private final Class<?> compiledClass;
+    private final CharSequence code;
 
-    public InternalScript(String name, Class<?> compiledClass) {
+    public InternalScript(String name, Class<?> compiledClass, CharSequence code) {
         this.name = name;
         this.compiledClass = compiledClass;
+        this.code = code;
+    }
+
+    public CharSequence getCode() {
+        return code;
     }
 
     public String getName() {
