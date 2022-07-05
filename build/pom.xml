@@ -73,7 +73,7 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <outputFile>../dist/Caramel.jar</outputFile>
+                            <outputFile>../output/Caramel.jar</outputFile>
                         </configuration>
                     </execution>
                 </executions>

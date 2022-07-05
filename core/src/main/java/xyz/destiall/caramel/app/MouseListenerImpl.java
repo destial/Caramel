@@ -49,10 +49,10 @@ public final class MouseListenerImpl implements MouseListener {
         }
         ScenePanel panel = ApplicationImpl.getApp().getCurrentScene().getEditorPanel(ScenePanel.class);
         if (panel != null) {
-            if (xPos > panel.getGameWindowPos().x &&
-                    yPos > panel.getGameWindowPos().y &&
-                    xPos < panel.getGameWindowPos().x + panel.getGameWindowSize().x &&
-                    yPos < panel.getGameWindowPos().y + panel.getGameWindowSize().y) {
+            if (xPos > panel.getWindowPos().x &&
+                    yPos > panel.getWindowPos().y &&
+                    xPos < panel.getWindowPos().x + panel.getWindowSize().x &&
+                    yPos < panel.getWindowPos().y + panel.getWindowSize().y) {
             } else {
                 Arrays.fill(mouseButtonPressed, false);
             }
@@ -64,10 +64,10 @@ public final class MouseListenerImpl implements MouseListener {
     public void mouseButtonCallback(long window, int button, int action, int mods) {
         ScenePanel panel = ApplicationImpl.getApp().getCurrentScene().getEditorPanel(ScenePanel.class);
         if (panel != null) {
-            if (xPos > panel.getGameWindowPos().x &&
-                    yPos > panel.getGameWindowPos().y &&
-                    xPos < panel.getGameWindowPos().x + panel.getGameWindowSize().x &&
-                    yPos < panel.getGameWindowPos().y + panel.getGameWindowSize().y) {
+            if (xPos > panel.getWindowPos().x &&
+                    yPos > panel.getWindowPos().y &&
+                    xPos < panel.getWindowPos().x + panel.getWindowSize().x &&
+                    yPos < panel.getWindowPos().y + panel.getWindowSize().y) {
                 if (action == GLFW_PRESS) {
                     mouseButtonPressed[button] = true;
                     if (mouseButtonReleased[button]) {

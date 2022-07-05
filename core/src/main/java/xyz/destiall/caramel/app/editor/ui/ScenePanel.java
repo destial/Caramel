@@ -3,27 +3,26 @@ package xyz.destiall.caramel.app.editor.ui;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
+import imgui.extension.imguizmo.flag.Mode;
 import imgui.extension.imguizmo.flag.Operation;
-import imgui.flag.ImGuiInputTextFlags;
 import imgui.flag.ImGuiWindowFlags;
-import imgui.type.ImBoolean;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.ApplicationImpl;
+import xyz.destiall.caramel.app.editor.EditorCamera;
 import xyz.destiall.caramel.app.editor.SceneImpl;
+
+import java.awt.*;
 
 public final class ScenePanel extends Panel {
     private final ApplicationImpl window;
-    private ImVec2 gameWindowSize;
-    private ImVec2 gameWindowPos;
-    private float previousFps;
+    private ImVec2 windowSize;
+    private ImVec2 windowPos;
     private float previousDt;
     private float leftX, rightX, topY, bottomY;
-    private int gizmoOperation;
-    private ImBoolean showImGuizmoWindow = new ImBoolean(true);
 
     public ScenePanel(SceneImpl scene) {
         super(scene);
@@ -32,38 +31,38 @@ public final class ScenePanel extends Panel {
 
     @Override
     public void __imguiLayer() {
-        ImGui.begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-        if (Time.isSecond) {
-            previousFps = Time.getFPS();
-            previousDt = Time.deltaTime;
-        }
-        ImGui.text("FPS: " + previousFps);
-        ImGui.text("Delta: " + previousDt + "ms");
-
+        ImGui.begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize);
         Panel.setPanelFocused(ScenePanel.class, ImGui.isWindowFocused());
         Panel.setPanelHovered(ScenePanel.class, ImGui.isWindowHovered());
 
-        gameWindowSize = getLargestSizeForViewport();
-        gameWindowPos = getCenteredPositionForViewport(gameWindowSize);
+        if (Time.isSecond) {
+            previousDt = Time.deltaTime;
+        }
+        ImGui.text("Delta: " + previousDt + "ms");
 
-        ImGui.setCursorPos(gameWindowPos.x, gameWindowPos.y);
+        windowSize = getLargestSizeForViewport();
+        windowPos = getCenteredPositionForViewport(windowSize);
 
-        ImVec2 topLeft = new ImVec2();
-        ImGui.getCursorScreenPos(topLeft);
-        topLeft.x -= ImGui.getScrollX();
-        topLeft.y -= ImGui.getScrollY();
+        ImGui.setCursorPos(windowPos.x, windowPos.y);
 
-        leftX = topLeft.x;
-        bottomY = topLeft.y;
-        rightX = topLeft.x + gameWindowSize.x;
-        topY = topLeft.y + gameWindowSize.y;
+        ImVec2 bottomLeft = new ImVec2();
+        ImGui.getCursorScreenPos(bottomLeft);
+        bottomLeft.x -= ImGui.getScrollX();
+        bottomLeft.y -= ImGui.getScrollY();
+
+        leftX = bottomLeft.x;
+        bottomY = bottomLeft.y;
+        rightX = bottomLeft.x + windowSize.x;
+        topY = bottomLeft.y + windowSize.y;
 
         int texId = window.getSceneViewFramebuffer().getTexture().getTexId();
 
-        window.getMouseListener().setGameViewportPos(new Vector2f(topLeft.x, topLeft.y));
-        window.getMouseListener().setGameViewportSize(new Vector2f(gameWindowSize.x, gameWindowPos.y));
+        ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
 
-        ImGui.image(texId, gameWindowSize.x, gameWindowSize.y, 0, 1, 1, 0);
+        window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
+        window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowPos.y));
+
+        ImGui.getForegroundDrawList().addRect(leftX, bottomY, rightX, topY, Color.RED.getRGB());
 
         GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
 
@@ -73,111 +72,77 @@ public final class ScenePanel extends Panel {
             scene.getEditorCamera().transform.position.y = selected.transform.position.y;
         }
 
-        /**
-        if (selected != null && false) {
-            ImGuizmo.beginFrame();
-            ImGuizmo.setOrthographic(false);
+        if (selected != null && !scene.isPlaying()) {
+            ImGuizmo.setEnabled(true);
+            ImGuizmo.setOrthographic(true);
             ImGuizmo.setDrawList();
-            ImGuizmo.setRect(ImGui.getWindowPosX(), ImGui.getWindowPosY(), ImGui.getWindowWidth(), ImGui.getWindowHeight());
+
+            ImGuizmo.setRect(leftX, bottomY, windowSize.x, windowSize.y);
 
             EditorCamera camera = scene.getEditorCamera();
-            Matrix4f cameraProjection = new Matrix4f(camera.projection);
-            Matrix4f cameraView = new Matrix4f(camera.transform.model);
-
+            Matrix4f inverseView = camera.getInverseView();
+            Matrix4f projection = camera.getProjection();
             Matrix4f transform = selected.transform.model;
-            float[] floats = transform.get(new float[16]);
-            ImGuizmo.manipulate(cameraView.get(new float[16]), cameraProjection.get(new float[16]), floats, Operation.TRANSLATE, Mode.LOCAL);
+
+            float[] view = new float[16];
+            inverseView.get(view);
+            float[] proj = new float[16];
+            projection.get(proj);
+            float[] model = new float[16];
+            transform.get(model);
+
+            ImGuizmo.manipulate(view, proj, model, Operation.TRANSLATE, Mode.LOCAL);
+
             if (ImGuizmo.isUsing()) {
-                selected.transform.position.set(Arrays.copyOf(floats, 3));
+                selected.transform.position.set(model[12], model[13], model[14]);
+                selected.transform.scale.set(model[0], model[5], model[10]);
             }
-        }**/
+
+        } else {
+            ImGuizmo.setEnabled(false);
+        }
 
         ImGui.end();
     }
 
+    public boolean isMouseOnScene() {
+        return window.getMouseListener().getX() >= leftX && window.getMouseListener().getX() <= rightX &&
+               window.getMouseListener().getY() >= bottomY && window.getMouseListener().getY() <= topY;
+    }
+
     private ImVec2 getCenteredPositionForViewport(ImVec2 aspectSize) {
-        ImVec2 windowSize = new ImVec2();
-        ImGui.getContentRegionAvail(windowSize);
-        windowSize.x -= ImGui.getScrollX();
-        windowSize.y -= ImGui.getScrollY();
+        ImVec2 windowSize = getWindowAvailSize();
 
         float viewportX = (windowSize.x / 2f) - (aspectSize.x / 2f);
         float viewportY = (windowSize.y / 2f) - (aspectSize.y / 2f);
 
-        return new ImVec2(viewportX, viewportY);
+        return new ImVec2(viewportX + ImGui.getCursorPosX(), viewportY + ImGui.getCursorPosY());
     }
 
-    public boolean isMouseOnScene() {
-        return window.getMouseListener().getX() >= leftX && window.getMouseListener().getX() <= rightX &&
-                window.getMouseListener().getY() >= bottomY && window.getMouseListener().getY() <= topY;
-    }
-
-    private ImVec2 getLargestSizeForViewport() {
+    private ImVec2 getWindowAvailSize() {
         ImVec2 windowSize = new ImVec2();
         ImGui.getContentRegionAvail(windowSize);
         windowSize.x -= ImGui.getScrollX();
         windowSize.y -= ImGui.getScrollY();
+        return windowSize;
+    }
 
+    private ImVec2 getLargestSizeForViewport() {
+        ImVec2 windowSize = getWindowAvailSize();
         float aspectWidth = windowSize.x;
-        float aspectHeight = aspectWidth / (16 / 9f);
+        float aspectHeight = aspectWidth / (16f / 9f);
         if (aspectHeight > windowSize.y) {
             aspectHeight = windowSize.y;
-            aspectWidth = aspectHeight * (16 / 9f);
+            aspectWidth = aspectHeight * (16f / 9f);
         }
         return new ImVec2(aspectWidth, aspectHeight);
     }
 
-    private void editTransform(ImBoolean showImGuizmoWindow) {
-        if (ImGui.isKeyPressed(Input.Key.T)) {
-            gizmoOperation = Operation.TRANSLATE;
-        } else if (ImGui.isKeyPressed(Input.Key.R)) {
-            gizmoOperation = Operation.ROTATE;
-        } else if (ImGui.isKeyPressed(Input.Key.S)) {
-            gizmoOperation = Operation.SCALE;
-        }
-
-        GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
-        if (selected == null) return;
-
-        float[] model = selected.transform.model.get(new float[16]);
-        float[] position = {
-                selected.transform.position.x + selected.transform.localPosition.x,
-                selected.transform.position.y + selected.transform.localPosition.y,
-                selected.transform.position.z + selected.transform.localPosition.z,
-        };
-        Vector3f euler = selected.transform.rotation.getEulerAnglesXYZ(new Vector3f());
-        Vector3f localEuler = selected.transform.localRotation.getEulerAnglesXYZ(new Vector3f());
-        float[] rotation = {
-                euler.x + localEuler.x,
-                euler.y + localEuler.y,
-                euler.z + localEuler.z,
-        };
-        float[] scale = {
-                selected.transform.scale.x * selected.transform.localScale.x,
-                selected.transform.scale.y * selected.transform.localScale.y,
-                selected.transform.scale.z * selected.transform.localScale.z,
-        };
-        if (ImGuizmo.isUsing()) {
-            ImGuizmo.decomposeMatrixToComponents(model, position, rotation, scale);
-        }
-
-        ImGui.inputFloat3("Tr", position, "%.3f", ImGuiInputTextFlags.None);
-        ImGui.inputFloat3("Rt", rotation, "%.3f", ImGuiInputTextFlags.None);
-        ImGui.inputFloat3("Sc", scale, "%.3f", ImGuiInputTextFlags.None);
-
-        if (ImGuizmo.isUsing()) {
-            ImGuizmo.recomposeMatrixFromComponents(model, position, rotation, scale);
-            selected.transform.position.set(position);
-            // selected.transform.rotation.rotation);
-            selected.transform.scale.set(scale);
-        }
+    public ImVec2 getWindowPos() {
+        return windowPos;
     }
 
-    public ImVec2 getGameWindowPos() {
-        return gameWindowPos;
-    }
-
-    public ImVec2 getGameWindowSize() {
-        return gameWindowSize;
+    public ImVec2 getWindowSize() {
+        return windowSize;
     }
 }

@@ -8,6 +8,7 @@ import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
+import imgui.extension.imguizmo.ImGuizmo;
 import imgui.flag.ImGuiBackendFlags;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiConfigFlags;
@@ -234,6 +235,7 @@ public final class ImGUILayer {
 
         glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         ImGui.newFrame();
+        ImGuizmo.beginFrame();
         Panel.reset();
     }
 

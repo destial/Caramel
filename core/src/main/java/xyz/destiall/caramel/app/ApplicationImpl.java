@@ -1,7 +1,10 @@
 package xyz.destiall.caramel.app;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.opengl.GL;
+import org.lwjgl.stb.STBImage;
 import org.reflections.Reflections;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Component;
@@ -22,9 +25,12 @@ import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -41,6 +47,7 @@ import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowSizeCallback;
@@ -61,7 +68,11 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.stb.STBImage.stbi_image_free;
+import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
+import static org.lwjgl.system.MemoryUtil.memAllocInt;
+import static org.lwjgl.system.MemoryUtil.memFree;
 
 public final class ApplicationImpl extends Application {
     public boolean EDITOR_MODE = true;
@@ -155,6 +166,16 @@ public final class ApplicationImpl extends Application {
                 FileIO.saveResource("imgui.ini", "imgui.ini");
             }
 
+            File logo16 = new File("logo_16.png");
+            if (!logo16.exists()) {
+                FileIO.saveResource("logo_16.png", "logo_16.png");
+            }
+
+            File logo32 = new File("logo_32.png");
+            if (!logo32.exists()) {
+                FileIO.saveResource("logo_32.png", "logo_32.png");
+            }
+
             Thread.sleep(1000);
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
@@ -176,6 +197,39 @@ public final class ApplicationImpl extends Application {
         // Create GLFW window
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
         if (glfwWindow == NULL) throw new RuntimeException("Failed to create the GLFW window");
+
+        try {
+            ByteBuffer[] list = new ByteBuffer[2];
+            IntBuffer width16 = BufferUtils.createIntBuffer(1);
+            IntBuffer height16 = BufferUtils.createIntBuffer(1);
+            IntBuffer channels16 = BufferUtils.createIntBuffer(1);
+            list[0] = stbi_load("logo_16.png", width16, height16, channels16, 0);
+
+            IntBuffer width32 = BufferUtils.createIntBuffer(1);
+            IntBuffer height32 = BufferUtils.createIntBuffer(1);
+            IntBuffer channels32 = BufferUtils.createIntBuffer(1);
+            list[1] = stbi_load("logo_32.png", width32, height32, channels32, 0);
+
+            GLFWImage.Buffer icons = GLFWImage.malloc(2);
+            icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
+            icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
+            icons.position(0);
+
+            glfwSetWindowIcon(glfwWindow, icons);
+
+            stbi_image_free(list[0]);
+            stbi_image_free(list[1]);
+
+            memFree(width16);
+            memFree(width32);
+            memFree(height16);
+            memFree(height32);
+            memFree(channels16);
+            memFree(channels32);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // Set resize callbacks.
         // Input callbacks are set in ImGUI.
