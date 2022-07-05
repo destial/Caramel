@@ -8,12 +8,13 @@ import imgui.extension.imguizmo.flag.Operation;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.app.editor.EditorCamera;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.components.EditorCamera;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 
 import java.awt.*;
 
@@ -130,12 +131,16 @@ public final class ScenePanel extends Panel {
     private ImVec2 getLargestSizeForViewport() {
         ImVec2 windowSize = getWindowAvailSize();
         float aspectWidth = windowSize.x;
-        float aspectHeight = aspectWidth / (16f / 9f);
+        float aspectHeight = aspectWidth / getRatio();
         if (aspectHeight > windowSize.y) {
             aspectHeight = windowSize.y;
-            aspectWidth = aspectHeight * (16f / 9f);
+            aspectWidth = aspectHeight * getRatio();
         }
         return new ImVec2(aspectWidth, aspectHeight);
+    }
+
+    private float getRatio() {
+        return Application.getApp().getWidth() / (float) Application.getApp().getHeight();
     }
 
     public ImVec2 getWindowPos() {

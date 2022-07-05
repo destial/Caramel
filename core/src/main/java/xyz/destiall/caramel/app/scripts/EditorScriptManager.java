@@ -8,7 +8,7 @@ import xyz.destiall.caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.api.scripts.ScriptManager;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.app.events.FileEvent;
+import xyz.destiall.caramel.api.events.FileEvent;
 import xyz.destiall.caramel.app.scripts.loader.ScriptLoader;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandler;

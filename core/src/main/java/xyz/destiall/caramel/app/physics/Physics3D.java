@@ -10,7 +10,7 @@ import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.RigidBody3D;
 import xyz.destiall.caramel.api.physics.components.Box3DCollider;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 
 public final class Physics3D implements Physics {
     private final DVector3 gravity = new DVector3(0, -1f, 0);

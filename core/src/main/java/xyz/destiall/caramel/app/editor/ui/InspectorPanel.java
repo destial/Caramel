@@ -24,7 +24,7 @@ import xyz.destiall.caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.api.utils.FileIO;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.caramel.api.objects.StringWrapperImpl;
@@ -87,6 +87,7 @@ public final class InspectorPanel extends Panel {
                         if (method.isAnnotationPresent(FunctionButton.class)) {
                             method.setAccessible(true);
                             ImGuiUtils.imguiLayer(method, component);
+                            ImGui.sameLine();
                         }
                     }
 

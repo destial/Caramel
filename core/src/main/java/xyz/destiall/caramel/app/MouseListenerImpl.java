@@ -4,7 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
 import xyz.destiall.caramel.api.MouseListener;
-import xyz.destiall.caramel.app.editor.EditorCamera;
+import xyz.destiall.caramel.api.components.EditorCamera;
 import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 
 import java.util.Arrays;

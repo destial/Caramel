@@ -3,29 +3,34 @@ package xyz.destiall.caramel.app;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.stb.STBImage;
 import org.reflections.Reflections;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
+import xyz.destiall.caramel.api.audio.AudioListener;
 import xyz.destiall.caramel.api.components.Transform;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.objects.Scene;
 import xyz.destiall.caramel.api.utils.FileIO;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandling;
+import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
 
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -58,6 +63,13 @@ import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwTerminate;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
+import static org.lwjgl.openal.ALC10.ALC_DEFAULT_DEVICE_SPECIFIER;
+import static org.lwjgl.openal.ALC10.alcCloseDevice;
+import static org.lwjgl.openal.ALC10.alcCreateContext;
+import static org.lwjgl.openal.ALC10.alcDestroyContext;
+import static org.lwjgl.openal.ALC10.alcGetString;
+import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
+import static org.lwjgl.openal.ALC10.alcOpenDevice;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
@@ -71,7 +83,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.system.MemoryUtil.memAllocInt;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
 public final class ApplicationImpl extends Application {
@@ -81,7 +92,9 @@ public final class ApplicationImpl extends Application {
     private final MouseListenerImpl mouseListener;
     private final KeyListenerImpl keyListener;
     private final EventHandling eventHandling;
+    private final List<Listener> listeners;
     private final Gson serializer;
+
     private ImGUILayer imGui;
     private Framebuffer[] framebuffer;
     private EditorScriptManager scriptManager;
@@ -92,6 +105,9 @@ public final class ApplicationImpl extends Application {
     private int winPosY;
     private String lastScene;
     private String title;
+
+    private long audioContext;
+    private long audioDevice;
 
     private final List<SceneImpl> scenes;
     private int sceneIndex = -1;
@@ -121,6 +137,8 @@ public final class ApplicationImpl extends Application {
                 .setPrettyPrinting()
                 .setLenient()
                 .create();
+        listeners = new ArrayList<>();
+        listeners.add(new AudioListener());
     }
 
     @Override
@@ -141,7 +159,7 @@ public final class ApplicationImpl extends Application {
                 object.addProperty("height", height = 720);
                 object.addProperty("windowPosX", winPosX = 50);
                 object.addProperty("windowPosY", winPosY = 50);
-                object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.json");
+                object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.caramel");
                 FileIO.writeData(settings, serializer.toJson(object));
 
             } else {
@@ -160,7 +178,9 @@ public final class ApplicationImpl extends Application {
                 new File(assets, "textures" + File.separator).mkdirs();
                 new File(assets, "shaders" + File.separator).mkdirs();
                 new File(assets, "scenes" + File.separator).mkdirs();
+                new File(assets, "sounds" + File.separator).mkdirs();
             }
+
             File imgui = new File("imgui.ini");
             if (!imgui.exists()) {
                 FileIO.saveResource("imgui.ini", "imgui.ini");
@@ -257,8 +277,25 @@ public final class ApplicationImpl extends Application {
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
 
-        // Some stuff with OpenGL
+        // Create audio handler
+        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+        audioDevice = alcOpenDevice(defaultDeviceName);
+
+        int[] attributes = {0};
+        audioContext = alcCreateContext(audioDevice, attributes);
+        alcMakeContextCurrent(audioContext);
+
+        // Create OpenGL capabilities
         GL.createCapabilities();
+
+        // Create OpenAL capabilities
+        ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+
+        if (!alCapabilities.OpenAL10) {
+            Debug.logError("Audio AL10 library not supported!");
+        }
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -267,7 +304,10 @@ public final class ApplicationImpl extends Application {
 
         // Register event listeners
         if (EDITOR_MODE) {
-            eventHandling.registerListener(scriptManager);
+            listeners.add(scriptManager);
+        }
+        for (Listener listener : listeners) {
+            eventHandling.registerListener(listener);
         }
 
         // Create and setup ImGUI
@@ -396,7 +436,9 @@ public final class ApplicationImpl extends Application {
         scriptManager.destroy();
 
         // Unregister any remaining listeners
-        eventHandling.unregisterListener(scriptManager);
+        for (Listener listener : listeners) {
+            eventHandling.unregisterListener(listener);
+        }
 
         // Destroy ImGUI
         imGui.destroyImGui();
@@ -410,6 +452,9 @@ public final class ApplicationImpl extends Application {
         object.addProperty("windowPosY", winPosY);
         object.addProperty("lastScene", getCurrentScene().getFile().getPath());
         FileIO.writeData(settings, serializer.toJson(object));
+
+        alcDestroyContext(audioContext);
+        alcCloseDevice(audioDevice);
 
         // Free GLFW callbacks and destroy the window (if not yet destroyed)
         glfwFreeCallbacks(glfwWindow);

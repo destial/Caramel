@@ -5,7 +5,7 @@
       "components": [
         {
           "position": {
-            "x": -1.9,
+            "x": -0.58164835,
             "y": 0.6,
             "z": 0.0
           },
@@ -167,7 +167,7 @@
             "drawArrays": false
           },
           "pos": {
-            "x": -1.9,
+            "x": -0.58164835,
             "y": 0.6,
             "z": 0.0
           },
@@ -184,6 +184,13 @@
           },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
           "id": 9,
+          "enabled": true
+        },
+        {
+          "path": "assets/sounds/anvil_use.ogg",
+          "loop": false,
+          "clazz": "xyz.destiall.caramel.api.audio.AudioPlayer",
+          "id": 10,
           "enabled": true
         }
       ],

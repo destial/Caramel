@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.api.utils.Pair;
 
 import java.awt.*;

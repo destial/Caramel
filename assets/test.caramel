@@ -5728,7 +5728,7 @@
         "fov": 60.0,
         "near": 0.1,
         "far": 1000.0,
-        "clazz": "xyz.destiall.caramel.app.editor.EditorCamera",
+        "clazz": "xyz.destiall.caramel.api.components.EditorCamera",
         "id": 110,
         "enabled": true
       },

@@ -11,7 +11,7 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.components.RigidBody2D;
 import xyz.destiall.caramel.api.physics.components.Box2DCollider;
 import xyz.destiall.caramel.api.physics.internals.ContactListener;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 
 
 public final class Physics2D implements Physics {

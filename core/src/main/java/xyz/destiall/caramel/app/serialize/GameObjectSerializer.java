@@ -5,7 +5,7 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.render.MeshRenderer;
 import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.app.editor.SceneImpl;
+import xyz.destiall.caramel.api.objects.SceneImpl;
 import xyz.destiall.java.gson.JsonArray;
 import xyz.destiall.java.gson.JsonDeserializationContext;
 import xyz.destiall.java.gson.JsonDeserializer;
