@@ -63,7 +63,7 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class ApplicationImpl extends Application {
-    public final boolean EDITOR_MODE = true;
+    public boolean EDITOR_MODE = true;
     private boolean running = false;
 
     private final MouseListenerImpl mouseListener;
@@ -85,6 +85,12 @@ public final class ApplicationImpl extends Application {
     private int sceneIndex = -1;
 
     public long glfwWindow;
+
+    public static ApplicationImpl getRunnable() {
+        if (inst == null) inst = new ApplicationImpl();
+        ((ApplicationImpl) inst).EDITOR_MODE = false;
+        return (ApplicationImpl) inst;
+    }
 
     public static ApplicationImpl getApp() {
         if (inst == null) inst = new ApplicationImpl();
