@@ -5,23 +5,24 @@ import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
 import imgui.extension.imguizmo.flag.Mode;
 import imgui.extension.imguizmo.flag.Operation;
+import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.api.components.EditorCamera;
+import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.objects.SceneImpl;
+import xyz.destiall.caramel.app.ApplicationImpl;
 
-import java.awt.*;
+import java.util.Arrays;
 
 public final class ScenePanel extends Panel {
     private final ApplicationImpl window;
-    private ImVec2 windowSize;
-    private ImVec2 windowPos;
+    private ImVec2 windowSize = new ImVec2();
+    private ImVec2 windowPos = new ImVec2();
     private float previousDt;
     private float leftX, rightX, topY, bottomY;
 
@@ -32,6 +33,7 @@ public final class ScenePanel extends Panel {
 
     @Override
     public void __imguiLayer() {
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
         ImGui.begin("Scene", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize);
         Panel.setPanelFocused(ScenePanel.class, ImGui.isWindowFocused());
         Panel.setPanelHovered(ScenePanel.class, ImGui.isWindowHovered());
@@ -41,9 +43,13 @@ public final class ScenePanel extends Panel {
         }
         ImGui.text("Delta: " + previousDt + "ms");
 
-        windowSize = getLargestSizeForViewport();
-        windowPos = getCenteredPositionForViewport(windowSize);
+        ImVec2 newWindowSize = getLargestSizeForViewport();
+        if (!newWindowSize.equals(windowSize)) {
+            windowSize = newWindowSize;
+            window.getSceneViewFramebuffer().resize((int) windowSize.x, (int) windowSize.y);
+        }
 
+        windowPos = getCenteredPositionForViewport(windowSize);
         ImGui.setCursorPos(windowPos.x, windowPos.y);
 
         ImVec2 bottomLeft = new ImVec2();
@@ -57,13 +63,10 @@ public final class ScenePanel extends Panel {
         topY = bottomLeft.y + windowSize.y;
 
         int texId = window.getSceneViewFramebuffer().getTexture().getTexId();
-
         ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
 
         window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
         window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowPos.y));
-
-        ImGui.getForegroundDrawList().addRect(leftX, bottomY, rightX, topY, Color.RED.getRGB());
 
         GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
 
@@ -93,10 +96,24 @@ public final class ScenePanel extends Panel {
             transform.get(model);
 
             ImGuizmo.manipulate(view, proj, model, Operation.TRANSLATE, Mode.LOCAL);
-
+            float[] t = new float[3];
+            float[] r = new float[3];
+            float[] s = new float[3];
+            ImGuizmo.decomposeMatrixToComponents(model, t, r, s);
             if (ImGuizmo.isUsing()) {
-                selected.transform.position.set(model[12], model[13], model[14]);
-                selected.transform.scale.set(model[0], model[5], model[10]);
+                boolean nan = false;
+                for (Float f : model) {
+                    if (Float.isNaN(f) || Float.isInfinite(f)) {
+                        nan = true;
+                        System.out.println(Arrays.toString(model));
+                        break;
+                    }
+                }
+                if (!nan) {
+                    selected.transform.position.set(t[0], t[1], t[2]);
+                    selected.transform.rotation.set(r[0], r[1], r[2]);
+                    selected.transform.scale.set(s[0], s[1], s[2]);
+                }
             }
 
         } else {
@@ -104,6 +121,7 @@ public final class ScenePanel extends Panel {
         }
 
         ImGui.end();
+        ImGui.popStyleVar();
     }
 
     public boolean isMouseOnScene() {
@@ -130,13 +148,7 @@ public final class ScenePanel extends Panel {
 
     private ImVec2 getLargestSizeForViewport() {
         ImVec2 windowSize = getWindowAvailSize();
-        float aspectWidth = windowSize.x;
-        float aspectHeight = aspectWidth / getRatio();
-        if (aspectHeight > windowSize.y) {
-            aspectHeight = windowSize.y;
-            aspectWidth = aspectHeight * getRatio();
-        }
-        return new ImVec2(aspectWidth, aspectHeight);
+        return new ImVec2(windowSize.x, windowSize.y);
     }
 
     private float getRatio() {

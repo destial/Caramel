@@ -124,7 +124,7 @@ public final class SceneImpl extends Scene {
                 parent.children.add(child);
                 child.parent = parent.transform;
                 child.scene = parent.scene;
-                child.transform.localPosition.add(child.transform.position.sub(parent.transform.position, new Vector3f()));
+                // child.transform.position.set(parent.transform.position.sub(child.transform.position, new Vector3f()));
             }
 
             if (playing) physics.get(physicsMode).addGameObject(child);
@@ -181,12 +181,15 @@ public final class SceneImpl extends Scene {
             if (ApplicationImpl.getApp().EDITOR_MODE) {
                 GameObject clone = go.clone(true);
                 defaultGameObjects.add(clone);
+
                 if (selectedGameObject.contains(go)) {
                     selectedPlayingGameObject.add(go);
                 }
             }
             physics.get(physicsMode).addGameObject(go);
         }
+
+        selectedGameObject.clear();
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }
 
@@ -194,10 +197,11 @@ public final class SceneImpl extends Scene {
         if (!playing) return;
         playing = false;
         if (ApplicationImpl.getApp().EDITOR_MODE) {
-            gameObjects.clear();
             selectedGameObject.clear();
             selectedGameObject.addAll(selectedPlayingGameObject);
             selectedPlayingGameObject.clear();
+
+            gameObjects.clear();
             gameObjects.addAll(defaultGameObjects);
             defaultGameObjects.clear();
             for (Physics p : physics.values()) {
@@ -219,6 +223,16 @@ public final class SceneImpl extends Scene {
 
     public EditorCamera getEditorCamera() {
         return editorCamera;
+    }
+
+    @Override
+    public int getSceneViewX() {
+        return (int) getEditorPanel(ScenePanel.class).getWindowSize().x;
+    }
+
+    @Override
+    public int getSceneViewY() {
+        return (int) getEditorPanel(ScenePanel.class).getWindowSize().y;
     }
 
     public void destroy(GameObject gameObject) {

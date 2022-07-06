@@ -25,6 +25,7 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
     @Override
     public Component deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         String clazz = jsonElement.getAsJsonObject().get("clazz").getAsString();
+        System.out.println("Deserializing " + clazz);
         Class<? extends Component> c;
         try {
             c = (Class<? extends Component>) Class.forName(clazz);
@@ -65,6 +66,7 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
 
     @Override
     public JsonElement serialize(Component component, Type type, JsonSerializationContext jsonSerializationContext) {
+        System.out.println("Serializing " + component.getClass().getName());
         JsonElement element = defaultGson.toJsonTree(component);
         JsonObject object = element.getAsJsonObject();
         object.addProperty("clazz", component.getClass().getName());

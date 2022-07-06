@@ -10,11 +10,8 @@ import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
 public final class Transform extends Component {
     public final Vector3f position;
-    public final Vector3f localPosition;
-    public final Quaternionf rotation;
-    public final Quaternionf localRotation;
+    public final Vector3f rotation;
     public final Vector3f scale;
-    public final Vector3f localScale;
 
     @HideInEditor public transient final Matrix4f model;
     @HideInEditor public final Vector3f forward;
@@ -23,15 +20,13 @@ public final class Transform extends Component {
     public Transform(GameObject gameObject) {
         super(gameObject);
         gameObject.transform = this;
-        position = new Vector3f();
-        localPosition = new Vector3f(0, 0, 0);
-        rotation = new Quaternionf();
-        localRotation = new Quaternionf(0, 0, 0, 0);
-        scale = new Vector3f(1, 1, 1);
-        localScale = new Vector3f(1, 1, 1);
-        forward = new Vector3f(0, 0, -1);
-        up = new Vector3f(0, 1, 0);
-        model = new Matrix4f().identity();
+        transform = this;
+        position = new Vector3f(0f, 0f, -1f);
+        rotation = new Vector3f(0f, 0f, 0f);
+        scale = new Vector3f(1f, 1f, 1f);
+        forward = new Vector3f(0f, 0f, -1f);
+        up = new Vector3f(0f, 1f, 0f);
+        model = new Matrix4f();
         gameObject.addComponent(this);
     }
 
@@ -47,4 +42,15 @@ public final class Transform extends Component {
     public void start() {}
 
     public void update() {}
+
+    @Override
+    public void lateUpdate() {
+        transform.model
+                .identity()
+                .translate(position)
+                .rotate(rotation.x, 1, 0, 0)
+                .rotate(rotation.y, 0, 1, 0)
+                .rotate(rotation.z, 0, 0, 1)
+                .scale(scale);
+    }
 }

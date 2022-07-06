@@ -29,11 +29,8 @@ public final class GameObjectImpl extends GameObject implements Update, Render {
         }
         clone.name.set(name.get());
         clone.transform.position.set(transform.position);
-        clone.transform.localPosition.set(transform.localPosition);
         clone.transform.rotation.set(transform.rotation);
-        clone.transform.localRotation.set(transform.localRotation);
         clone.transform.scale.set(transform.scale);
-        clone.transform.localScale.set(transform.localScale);
         clone.transform.forward.set(transform.forward);
         clone.transform.enabled = transform.enabled;
         clone.active = active;

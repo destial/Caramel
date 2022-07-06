@@ -70,7 +70,7 @@ public abstract class Scene implements Update, Render {
     }
 
     public Set<GameObject> getSelectedGameObject() {
-        return selectedGameObject;
+        return isPlaying() ? selectedPlayingGameObject : selectedGameObject;
     }
 
     public void setGameCamera(Camera camera) {
@@ -126,4 +126,8 @@ public abstract class Scene implements Update, Render {
     private boolean entityIdExists(List<GameObject> list, int id) {
         return list.stream().anyMatch(g -> g.id == id || g.getMutableComponents().stream().anyMatch(c -> c.id == id) || entityIdExists(g.children, id));
     }
+
+    public abstract int getSceneViewX();
+
+    public abstract int getSceneViewY();
 }

@@ -8,43 +8,35 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
 public class Camera extends Component {
-    public Matrix4f projection, view;
-    public Vector3f target;
+    public transient Matrix4f projection, view;
+    public transient Vector3f target;
 
-    public boolean isEditor = false;
-
+    @HideInEditor public boolean isEditor = false;
     @HideInEditor public Vector3f forward;
     @HideInEditor public Vector3f up;
-    @HideInEditor public float fov = 60f;
-    @HideInEditor public float near = 0.1f;
-    @HideInEditor public float far = 1000f;
+    public transient float near = 0.1f;
+    public transient float far = 1000f;
+    public transient float zoom = 4.5f;
 
     public Camera(GameObject gameObject) {
         super(gameObject);
         projection = new Matrix4f();
         view = new Matrix4f();
+        transform.position.set(transform.position.x, transform.position.y, 1f);
         target = new Vector3f(transform.forward);
         forward = new Vector3f(target.x, 0f, target.z);
         up = new Vector3f(transform.up);
 
         projection.identity();
-        //projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
-        //projection.ortho(-8, 8, -4.5f, 4.5f, near, far, true);
     }
 
     @Override
     public void start() {}
 
-    @Override
-    public void update() {}
-
-    @Override
-    public void editorUpdate() {}
-
     public Matrix4f getProjection() {
         float ratio = Application.getApp().getWidth() / (float) Application.getApp().getHeight();
         projection.identity();
-        projection.ortho(-4.5f * ratio, 4.5f * ratio, -2.5f * ratio, 2.5f * ratio, near, far, true);
+        projection.ortho(-ratio * zoom, ratio * zoom, -zoom * 0.5f, zoom * 0.5f, near, far, true);
         return projection;
     }
 

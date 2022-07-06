@@ -5,33 +5,16 @@
       "components": [
         {
           "position": {
-            "x": -0.58164835,
-            "y": 0.6,
-            "z": 0.0
-          },
-          "localPosition": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0
+            "z": -1.0
           },
           "rotation": {
             "x": 0.0,
             "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "localRotation": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 0.0
+            "z": 0.0
           },
           "scale": {
-            "x": 4.5,
-            "y": 2.4,
-            "z": 1.0
-          },
-          "localScale": {
             "x": 1.0,
             "y": 1.0,
             "z": 1.0
@@ -48,11 +31,6 @@
           },
           "clazz": "xyz.destiall.caramel.api.components.Transform",
           "id": 4,
-          "enabled": true
-        },
-        {
-          "clazz": "scripts.OtherScript",
-          "id": 7,
           "enabled": true
         },
         {
@@ -166,31 +144,8 @@
             "dirty": false,
             "drawArrays": false
           },
-          "pos": {
-            "x": -0.58164835,
-            "y": 0.6,
-            "z": 0.0
-          },
-          "rot": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0,
-            "w": 1.0
-          },
-          "sca": {
-            "x": 4.5,
-            "y": 2.4,
-            "z": 1.0
-          },
           "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
-          "id": 9,
-          "enabled": true
-        },
-        {
-          "path": "assets/sounds/anvil_use.ogg",
-          "loop": false,
-          "clazz": "xyz.destiall.caramel.api.audio.AudioPlayer",
-          "id": 10,
+          "id": 6,
           "enabled": true
         }
       ],
@@ -204,33 +159,16 @@
     "components": [
       {
         "position": {
-          "x": -0.10632838,
-          "y": -0.83405787,
-          "z": 0.0
-        },
-        "localPosition": {
           "x": 0.0,
           "y": 0.0,
-          "z": 0.0
+          "z": 1.0
         },
         "rotation": {
           "x": 0.0,
           "y": 0.0,
-          "z": 0.0,
-          "w": 1.0
-        },
-        "localRotation": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": 0.0,
-          "w": 0.0
+          "z": 0.0
         },
         "scale": {
-          "x": 1.0,
-          "y": 1.0,
-          "z": 1.0
-        },
-        "localScale": {
           "x": 1.0,
           "y": 1.0,
           "z": 1.0
@@ -250,51 +188,6 @@
         "enabled": true
       },
       {
-        "perspective": false,
-        "sensitivity": 0.5,
-        "projection": {
-          "m00": 0.125,
-          "m01": 0.0,
-          "m02": 0.0,
-          "m03": 0.0,
-          "m10": 0.0,
-          "m11": 0.225,
-          "m12": 0.0,
-          "m13": 0.0,
-          "m20": 0.0,
-          "m21": 0.0,
-          "m22": -0.0010000999,
-          "m23": 0.0,
-          "m30": -0.0,
-          "m31": -0.0,
-          "m32": -1.0001E-4,
-          "m33": 1.0,
-          "properties": 2
-        },
-        "view": {
-          "m00": 1.0,
-          "m01": 0.0,
-          "m02": 0.0,
-          "m03": 0.0,
-          "m10": 0.0,
-          "m11": 1.0,
-          "m12": 0.0,
-          "m13": 0.0,
-          "m20": 0.0,
-          "m21": 0.0,
-          "m22": 1.0,
-          "m23": 0.0,
-          "m30": 0.10632838,
-          "m31": 0.83405787,
-          "m32": -0.0,
-          "m33": 1.0,
-          "properties": 18
-        },
-        "target": {
-          "x": 0.0,
-          "y": 0.0,
-          "z": -1.0
-        },
         "isEditor": true,
         "forward": {
           "x": 0.0,
@@ -306,10 +199,7 @@
           "y": 1.0,
           "z": 0.0
         },
-        "fov": 60.0,
-        "near": 0.1,
-        "far": 1000.0,
-        "clazz": "xyz.destiall.caramel.app.editor.EditorCamera",
+        "clazz": "xyz.destiall.caramel.api.components.EditorCamera",
         "id": 3,
         "enabled": true
       }

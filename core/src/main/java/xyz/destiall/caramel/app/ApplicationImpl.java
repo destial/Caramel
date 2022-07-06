@@ -17,6 +17,7 @@ import xyz.destiall.caramel.api.audio.AudioListener;
 import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.debug.DebugImpl;
+import xyz.destiall.caramel.api.events.WindowResizeEvent;
 import xyz.destiall.caramel.api.objects.Scene;
 import xyz.destiall.caramel.api.utils.FileIO;
 import xyz.destiall.caramel.api.objects.SceneImpl;
@@ -25,6 +26,7 @@ import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.Payload;
+import xyz.destiall.java.events.EventHandler;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.gson.Gson;
@@ -85,7 +87,7 @@ import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
 import static org.lwjgl.system.MemoryUtil.memFree;
 
-public final class ApplicationImpl extends Application {
+public final class ApplicationImpl extends Application implements Listener {
     public boolean EDITOR_MODE = true;
     private boolean running = false;
 
@@ -139,6 +141,7 @@ public final class ApplicationImpl extends Application {
                 .create();
         listeners = new ArrayList<>();
         listeners.add(new AudioListener());
+        listeners.add(this);
     }
 
     @Override
@@ -196,8 +199,8 @@ public final class ApplicationImpl extends Application {
                 FileIO.saveResource("logo_32.png", "logo_32.png");
             }
 
-            Thread.sleep(1000);
-        } catch (IOException | InterruptedException e) {
+            // Thread.sleep(1000);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -256,6 +259,7 @@ public final class ApplicationImpl extends Application {
         glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
+            eventHandling.call(new WindowResizeEvent(width, height));
         });
 
         // Set position callbacks.
@@ -572,5 +576,10 @@ public final class ApplicationImpl extends Application {
     @Override
     public EditorScriptManager getScriptManager() {
         return scriptManager;
+    }
+
+    @EventHandler
+    private void onWindowResize(WindowResizeEvent e) {
+        // glViewport(0, 0, e.getWidth(), e.getHeight());
     }
 }

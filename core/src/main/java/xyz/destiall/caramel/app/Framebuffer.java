@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.texture.Texture;
 
+import static org.lwjgl.opengl.GL11C.glViewport;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_ATTACHMENT;
 import static org.lwjgl.opengl.GL30.GL_DEPTH_COMPONENT32;
@@ -13,6 +14,8 @@ import static org.lwjgl.opengl.GL30.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL30.glBindFramebuffer;
 import static org.lwjgl.opengl.GL30.glBindRenderbuffer;
 import static org.lwjgl.opengl.GL30.glCheckFramebufferStatus;
+import static org.lwjgl.opengl.GL30.glDeleteFramebuffers;
+import static org.lwjgl.opengl.GL30.glDeleteRenderbuffers;
 import static org.lwjgl.opengl.GL30.glFramebufferRenderbuffer;
 import static org.lwjgl.opengl.GL30.glFramebufferTexture2D;
 import static org.lwjgl.opengl.GL30.glGenFramebuffers;
@@ -20,9 +23,9 @@ import static org.lwjgl.opengl.GL30.glGenRenderbuffers;
 import static org.lwjgl.opengl.GL30.glRenderbufferStorage;
 
 public final class Framebuffer {
-    private final int fboId;
-    private final int rboId;
-    private final Texture texture;
+    private int fboId;
+    private int rboId;
+    private Texture texture;
     private int width;
     private int height;
 
@@ -30,6 +33,10 @@ public final class Framebuffer {
         this.width = width;
         this.height = height;
 
+        generate();
+    }
+
+    private void generate() {
         fboId = glGenFramebuffers();
         bind();
 
@@ -53,14 +60,16 @@ public final class Framebuffer {
     public void resize(int width, int height) {
         this.width = width;
         this.height = height;
-        texture.resize(width, height);
+
+        glDeleteRenderbuffers(rboId);
+        glDeleteFramebuffers(fboId);
+        texture.invalidate();
+
+        generate();
 
         bind();
-        glBindRenderbuffer(GL_RENDERBUFFER, rboId);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, width, height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
+        glViewport(0, 0, width, height);
         unbind();
-
     }
 
     public void bind() {

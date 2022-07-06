@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.editor.ui;
 
 import imgui.ImGui;
 import imgui.ImVec2;
+import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Time;
@@ -22,6 +23,7 @@ public final class GamePanel extends Panel {
 
     @Override
     public void __imguiLayer() {
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0, 0);
         ImGui.begin("Game", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize);
         Panel.setPanelFocused(GamePanel.class, ImGui.isWindowFocused());
         Panel.setPanelHovered(GamePanel.class, ImGui.isWindowHovered());
@@ -50,6 +52,7 @@ public final class GamePanel extends Panel {
 
         ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
         ImGui.end();
+        ImGui.popStyleVar();
     }
 
     public boolean isMouseOnScene() {

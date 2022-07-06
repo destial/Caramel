@@ -203,18 +203,17 @@ public final class ImGUILayer {
     }
 
     private void setupDockspace() {
-        int windowFlags =
-                ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove |
-                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBringToFrontOnFocus |
-                ImGuiWindowFlags.NoNavFocus;
 
         ImGui.setNextWindowPos(0f, 0f, ImGuiCond.Always);
         ImGui.setNextWindowSize(window.getWidth(), window.getHeight());
         ImGui.pushStyleVar(ImGuiStyleVar.WindowRounding, 0f);
         ImGui.pushStyleVar(ImGuiStyleVar.WindowBorderSize, 0f);
 
-        ImGui.begin("Dockspace", new ImBoolean(true), windowFlags);
+        ImGui.begin("Dockspace", new ImBoolean(true),
+                ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBringToFrontOnFocus |
+                ImGuiWindowFlags.NoNavFocus);
         ImGui.popStyleVar(2);
 
         ImGui.dockSpace(ImGui.getID("Dockspace"));
