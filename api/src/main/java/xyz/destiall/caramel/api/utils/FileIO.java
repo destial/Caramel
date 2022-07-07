@@ -49,12 +49,13 @@ public final class FileIO {
         if (scriptFile.exists()) return null;
         try {
             FileWriter write = new FileWriter(scriptFile);
+            InternalScript internalScript = Application.getApp().getScriptManager().reloadScript(scriptFile, contents);
+
             BufferedWriter buffer = new BufferedWriter(write);
             buffer.write(contents);
             buffer.flush();
             buffer.close();
-
-            return Application.getApp().getScriptManager().reloadScript(scriptFile, contents);
+            return internalScript;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,7 +150,7 @@ public final class FileIO {
         }
     }
 
-    private static void copyDirectory(File source, File destination) throws IOException {
+    public static void copyDirectory(File source, File destination) throws IOException {
         destination.mkdirs();
 
         File[] files = source.listFiles();
@@ -163,7 +164,7 @@ public final class FileIO {
         }
     }
 
-    private static void copyFile(File source, File destination) throws IOException {
+    public static void copyFile(File source, File destination) throws IOException {
         Files.copy(source, destination);
     }
 

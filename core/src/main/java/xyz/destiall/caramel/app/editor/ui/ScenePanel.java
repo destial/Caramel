@@ -17,6 +17,9 @@ import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.api.components.EditorCamera;
 import xyz.destiall.caramel.api.objects.SceneImpl;
+import xyz.destiall.caramel.app.editor.action.AddGameObjects;
+import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
+import xyz.destiall.caramel.app.editor.action.EditTransformComponent;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.utils.Payload;
 
@@ -26,6 +29,8 @@ import java.util.Set;
 public final class ScenePanel extends Panel {
     private final ApplicationImpl window;
     private final ImVec2 startMouseCoords = new ImVec2(0, 0);
+    private int operation = Operation.TRANSLATE;
+    private EditTransformComponent editTransformComponent;
     private boolean dragging = false;
     private ImVec2 windowSize;
     private ImVec2 windowPos;
@@ -67,6 +72,17 @@ public final class ScenePanel extends Panel {
         int texId = window.getSceneViewFramebuffer().getTexture().getTexId();
 
         ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
+        if (ImGui.button("Move")) {
+            operation = Operation.TRANSLATE;
+        }
+        ImGui.sameLine();
+        if (ImGui.button("Scale")) {
+            operation = Operation.SCALE;
+        }
+        ImGui.sameLine();
+        if (ImGui.button("Rotate")) {
+            operation = Operation.ROTATE;
+        }
 
         window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
         window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
@@ -101,10 +117,13 @@ public final class ScenePanel extends Panel {
 
         if (ImGui.isWindowFocused()) {
             if (!scene.getSelectedGameObject().isEmpty()) {
-                if (Input.isKeyDown(Input.Key.BACKSPACE) || Input.isKeyDown(Input.Key.DELETE)) {
+                if (Input.isKeyPressed(Input.Key.BACKSPACE) || Input.isKeyPressed(Input.Key.DELETE)) {
+                    DeleteGameObjects action = new DeleteGameObjects(scene);
                     for (GameObject go : scene.getSelectedGameObject()) {
                         scene.destroy(go);
+                        action.deleted.add(go);
                     }
+                    scene.addUndoAction(action);
                     scene.getSelectedGameObject().clear();
                 }
 
@@ -113,17 +132,23 @@ public final class ScenePanel extends Panel {
                 }
 
                 if (Input.isControlPressedAnd(Input.Key.V) && !Payload.COPIED.isEmpty()) {
+                    AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : Payload.COPIED) {
                         GameObject go = copied.clone(false);
+                        action.added.add(go);
                         scene.addGameObject(go);
                     }
+                    scene.addUndoAction(action);
                 }
 
                 if (Input.isControlPressedAnd(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
+                    AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : scene.getSelectedGameObject()) {
                         GameObject go = copied.clone(false);
                         scene.addGameObject(go);
+                        action.added.add(go);
                     }
+                    scene.addUndoAction(action);
                 }
             }
 
@@ -132,7 +157,7 @@ public final class ScenePanel extends Panel {
             }
         }
 
-        GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
+        GameObject selected = window.getCurrentScene().getSelectedGameObject().size() == 1 ? window.getCurrentScene().getSelectedGameObject().stream().findFirst().get() : null;
 
         if (selected != null && !scene.isPlaying()) {
             ImGuizmo.setEnabled(true);
@@ -153,7 +178,7 @@ public final class ScenePanel extends Panel {
             float[] model = new float[16];
             transform.get(model);
 
-            ImGuizmo.manipulate(view, proj, model, Operation.TRANSLATE, Mode.LOCAL);
+            ImGuizmo.manipulate(view, proj, model, operation, Mode.LOCAL);
 
             if (ImGuizmo.isUsing()) {
                 float[] t = new float[3];
@@ -162,7 +187,16 @@ public final class ScenePanel extends Panel {
                 ImGuizmo.decomposeMatrixToComponents(model, t, r, s);
                 selected.transform.position.set(t[0], t[1], t[2]);
                 selected.transform.scale.set(s[0], s[1], s[2]);
+                if (editTransformComponent == null) {
+                    editTransformComponent = new EditTransformComponent(scene, selected.transform);
+                }
+
                 dragging = false;
+            } else {
+                if (editTransformComponent != null) {
+                    scene.addUndoAction(editTransformComponent);
+                    editTransformComponent = null;
+                }
             }
 
         } else {

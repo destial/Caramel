@@ -132,7 +132,8 @@ public final class ImGUILayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            window.getKeyListener().keyCallback(w, key, scancode, action, mods);
+            if (!io.getWantCaptureKeyboard())
+                window.getKeyListener().keyCallback(w, key, scancode, action, mods);
         });
 
         glfwSetCharCallback(glfwWindow, (w, c) -> {

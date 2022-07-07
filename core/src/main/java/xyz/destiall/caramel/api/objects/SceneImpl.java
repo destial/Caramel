@@ -13,6 +13,7 @@ import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.components.Light;
 import xyz.destiall.caramel.api.objects.Scene;
 import xyz.destiall.caramel.app.ApplicationImpl;
+import xyz.destiall.caramel.app.editor.action.EditorAction;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.editor.ui.GamePanel;
 import xyz.destiall.caramel.app.editor.ui.InspectorPanel;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
@@ -44,6 +46,10 @@ import static org.lwjgl.opengl.GL11.glPolygonMode;
 public final class SceneImpl extends Scene {
     private final Map<Physics.Mode, Physics> physics;
     private final Map<Class<?>, Panel> panels;
+    private final List<EditorAction> actions;
+    private final List<EditorAction> redoActions;
+    private EditorAction lastActionBeforeSaved;
+    private boolean saved = true;
 
     private EditorCamera editorCamera;
     private Physics.Mode physicsMode = Physics.Mode._2D;
@@ -56,6 +62,8 @@ public final class SceneImpl extends Scene {
         defaultGameObjects = new LinkedList<>();
         toAdd = new ArrayList<>();
         panels = new HashMap<>();
+        actions = new ArrayList<>();
+        redoActions = new ArrayList<>();
 
         if (ApplicationImpl.getApp().EDITOR_MODE) {
             panels.put(HierarchyPanel.class, new HierarchyPanel(this));
@@ -91,6 +99,36 @@ public final class SceneImpl extends Scene {
 
         physics.get(physicsMode).update();
         for (GameObject go : gameObjects) go.lateUpdate();
+    }
+
+    public void undoLastAction() {
+        if (actions.size() == 0) return;
+        EditorAction action = actions.get(actions.size() - 1);
+        action.undo();
+        actions.remove(action);
+        redoActions.add(action);
+    }
+
+    public void redoLastAction() {
+        if (redoActions.size() == 0) return;
+        EditorAction action = redoActions.get(redoActions.size() - 1);
+        action.redo();
+        redoActions.remove(action);
+        actions.add(action);
+    }
+
+    public void addUndoAction(EditorAction action) {
+        actions.add(action);
+        redoActions.clear();
+        saved = false;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
+    }
+
+    public boolean isSaved() {
+        return saved;
     }
 
     @Override
@@ -143,6 +181,14 @@ public final class SceneImpl extends Scene {
 
     @Override
     public void editorUpdate() {
+        if (Input.isControlPressedAnd(Input.Key.Z)) {
+            undoLastAction();
+        }
+
+        if (Input.isControlPressedAnd(Input.Key.Y)) {
+            redoLastAction();
+        }
+
         editorCamera.gameObject.update();
         lights = gameObjects.stream()
                 .map(g -> g.getComponentsInChildren(Light.class))

@@ -16,6 +16,8 @@ import xyz.destiall.caramel.api.components.Transform;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.texture.MeshBuilder;
 import xyz.destiall.caramel.api.objects.SceneImpl;
+import xyz.destiall.caramel.app.editor.action.AddGameObjects;
+import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.caramel.api.objects.StringWrapperImpl;
 
@@ -26,6 +28,7 @@ public final class HierarchyPanel extends Panel {
     private boolean editingGameObject;
     private ImVec2 popupMousePos;
     private GameObject editingGo;
+    private GameObject hoveredGameObject;
 
     public HierarchyPanel(SceneImpl scene) {
         super(scene);
@@ -37,13 +40,13 @@ public final class HierarchyPanel extends Panel {
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         AtomicInteger index = new AtomicInteger(0);
-        scene.hoveredGameObject = null;
+        hoveredGameObject = null;
         for (GameObject gameObject : scene.getGameObjects()) {
             if (treeNode(gameObject, index)) ImGui.treePop();
         }
 
         if (ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
-            if (scene.hoveredGameObject == null && !editingGameObject && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
+            if (hoveredGameObject == null && !editingGameObject && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
                 addingGameObjectHierarchy = !addingGameObjectHierarchy;
                 editingGameObject = false;
                 if (addingGameObjectHierarchy) {
@@ -52,19 +55,22 @@ public final class HierarchyPanel extends Panel {
             } else if (ImGui.isMouseClicked(Input.Mouse.LEFT)) {
                 addingGameObjectHierarchy = false;
                 editingGameObject = false;
-                if (scene.hoveredGameObject == null) {
+                if (hoveredGameObject == null) {
                     System.out.println("test");
                     scene.getSelectedGameObject().clear();
                 }
             }
         }
 
-        if (ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
+        if (ImGui.isWindowFocused()) {
             if (!scene.getSelectedGameObject().isEmpty()) {
-                if (Input.isKeyDown(Input.Key.BACKSPACE) || Input.isKeyDown(Input.Key.DELETE)) {
+                if (Input.isKeyPressed(Input.Key.BACKSPACE) || Input.isKeyPressed(Input.Key.DELETE)) {
+                    DeleteGameObjects action = new DeleteGameObjects(scene);
                     for (GameObject go : scene.getSelectedGameObject()) {
                         scene.destroy(go);
+                        action.deleted.add(go);
                     }
+                    scene.addUndoAction(action);
                     scene.getSelectedGameObject().clear();
                 }
 
@@ -73,19 +79,23 @@ public final class HierarchyPanel extends Panel {
                 }
 
                 if (Input.isControlPressedAnd(Input.Key.V) && !Payload.COPIED.isEmpty()) {
+                    AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : Payload.COPIED) {
                         GameObject go = copied.clone(false);
+                        action.added.add(go);
                         scene.addGameObject(go);
                     }
-                    addingGameObjectHierarchy = false;
+                    scene.addUndoAction(action);
                 }
 
                 if (Input.isControlPressedAnd(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
+                    AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : scene.getSelectedGameObject()) {
                         GameObject go = copied.clone(false);
                         scene.addGameObject(go);
+                        action.added.add(go);
                     }
-                    addingGameObjectHierarchy = false;
+                    scene.addUndoAction(action);
                 }
             }
 
@@ -102,7 +112,10 @@ public final class HierarchyPanel extends Panel {
                 Payload.COPIED.add(editingGo);
                 editingGameObject = false;
             } else if (ImGui.selectable("Delete")) {
+                DeleteGameObjects deleteGameObjects = new DeleteGameObjects(scene);
                 scene.destroy(editingGo);
+                deleteGameObjects.deleted.add(editingGo);
+                scene.addUndoAction(deleteGameObjects);
                 editingGameObject = false;
             }
             ImGui.end();
@@ -118,7 +131,10 @@ public final class HierarchyPanel extends Panel {
                 MeshRenderer renderer = new MeshRenderer(go);
                 renderer.setMesh(quad);
                 go.addComponent(renderer);
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
                 scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
                 addingGameObjectHierarchy = false;
             }
 
@@ -134,10 +150,13 @@ public final class HierarchyPanel extends Panel {
             }
 
             if (ImGui.menuItem("Paste", "CTRL + V", false, !Payload.COPIED.isEmpty())) {
+                AddGameObjects action = new AddGameObjects(scene);
                 for (GameObject copied : Payload.COPIED) {
                     GameObject go = copied.clone(false);
+                    action.added.add(go);
                     scene.addGameObject(go);
                 }
+                scene.addUndoAction(action);
                 addingGameObjectHierarchy = false;
             }
             ImGui.end();
@@ -174,7 +193,7 @@ public final class HierarchyPanel extends Panel {
         }
 
         if (ImGui.isItemHovered()) {
-            scene.hoveredGameObject = gameObject;
+            hoveredGameObject = gameObject;
         }
 
         if (ImGui.isMouseClicked(Input.Mouse.RIGHT) && ImGui.isItemHovered()) {

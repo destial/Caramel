@@ -12,6 +12,10 @@ public abstract class Prefab extends GameObject {
         this.file = file;
     }
 
+    /**
+     * Get the file which this {@link Prefab} was loaded from.
+     * @return The origin file.
+     */
     public File getFile() {
         return file;
     }

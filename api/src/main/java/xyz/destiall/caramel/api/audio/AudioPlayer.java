@@ -2,6 +2,7 @@ package xyz.destiall.caramel.api.audio;
 
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.interfaces.FunctionButton;
+import xyz.destiall.caramel.api.interfaces.ShowInEditor;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.sound.Sound;
 import xyz.destiall.caramel.api.sound.SoundSource;
@@ -9,10 +10,10 @@ import xyz.destiall.caramel.api.sound.SoundSource;
 public final class AudioPlayer extends Component {
     private transient SoundSource source;
     private transient Sound sound;
-    public String path = "";
-    public boolean loop;
-    public float volume;
-    public boolean playOnStart;
+    @ShowInEditor public String path = "";
+    @ShowInEditor public boolean loop;
+    @ShowInEditor public float volume;
+    @ShowInEditor public boolean playOnStart;
 
     public AudioPlayer(GameObject gameObject) {
         super(gameObject);

@@ -25,6 +25,8 @@ import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.api.utils.FileIO;
 import xyz.destiall.caramel.api.objects.SceneImpl;
+import xyz.destiall.caramel.app.editor.action.AddComponents;
+import xyz.destiall.caramel.app.editor.action.DeleteComponents;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.caramel.api.objects.StringWrapperImpl;
@@ -46,9 +48,12 @@ public final class InspectorPanel extends Panel {
         lang.setCommentEnd("*/");
         lang.setKeywords(new String[] {"for", "while", "do", "if", "else", "break", "continue", "return", "class", "interface", "extends", "implements", "public", "private", "protected", "final", "import", "package", "new", "this"});
         editor.setLanguageDefinition(lang);
+        editor.setPalette(editor.getDarkPalette());
+        editor.setReadOnly(true);
     }
     private final ImString search = new ImString();
     private final ImString scriptName = new ImString();
+    private InternalScript currentScript;
     private boolean addingComponents;
     private boolean addingScript;
     private Component selectedComponent;
@@ -92,9 +97,14 @@ public final class InspectorPanel extends Panel {
 
                     if (component instanceof Script) {
                         InternalScript s = Application.getApp().getScriptManager().getInternalScript(component.getClass());
-                        if (s != null) {
-                            editor.setText((String) s.getCode());
-                            editor.render((String) s.getCode());
+                        if (s != currentScript) {
+                            currentScript = s;
+                            if (s != null) {
+                                editor.setText((String) currentScript.getCode());
+                            }
+                        }
+                        if (currentScript != null) {
+                            editor.render(editor.getText());
                         }
                     }
                 }
@@ -118,6 +128,9 @@ public final class InspectorPanel extends Panel {
                 ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
                 if (ImGui.selectable("Remove Component")) {
                     selected.removeComponent(selectedComponent.getClass());
+                    DeleteComponents deleteComponents = new DeleteComponents(selected);
+                    deleteComponents.deleted.add(selectedComponent);
+                    scene.addUndoAction(deleteComponents);
                     selectedComponent = null;
                 }
                 ImGui.end();
@@ -180,16 +193,21 @@ public final class InspectorPanel extends Panel {
     private void addComponent(GameObject gameObject, Class<?> componentClass) {
         if (Component.class.isAssignableFrom(componentClass)) {
             try {
+                AddComponents addComponents = new AddComponents(gameObject);
                 if (componentClass.isAssignableFrom(Box2DCollider.class) && !gameObject.hasComponent(RigidBody2D.class)) {
                     RigidBody2D rigidBody = new RigidBody2D(gameObject);
                     gameObject.addComponent(rigidBody);
+                    addComponents.added.add(rigidBody);
                 }
                 if (componentClass.isAssignableFrom(Box3DCollider.class) && !gameObject.hasComponent(RigidBody3D.class)) {
                     RigidBody3D rigidBody = new RigidBody3D(gameObject);
                     gameObject.addComponent(rigidBody);
+                    addComponents.added.add(rigidBody);
                 }
-                Object instance = componentClass.getConstructor(GameObject.class).newInstance(gameObject);
-                gameObject.addComponent((Component) instance);
+                Component instance = (Component) componentClass.getConstructor(GameObject.class).newInstance(gameObject);
+                gameObject.addComponent(instance);
+                addComponents.added.add(instance);
+                scene.addUndoAction(addComponents);
             } catch (Exception e) {
                 e.printStackTrace();
             }

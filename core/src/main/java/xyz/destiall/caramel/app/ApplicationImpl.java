@@ -44,11 +44,11 @@ import java.util.Set;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -151,6 +151,7 @@ public final class ApplicationImpl extends Application {
 
     @SuppressWarnings("all")
     private void loadFiles() {
+        // Load settings and data files
         try {
             File settings = new File("settings.json");
             JsonObject object = new JsonObject();
@@ -217,6 +218,7 @@ public final class ApplicationImpl extends Application {
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
         if (glfwWindow == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
+        // Create window icons
         try {
             ByteBuffer[] list = new ByteBuffer[2];
             IntBuffer width16 = BufferUtils.createIntBuffer(1);
@@ -234,8 +236,10 @@ public final class ApplicationImpl extends Application {
             icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
             icons.position(0);
 
+            // Set window icons
             glfwSetWindowIcon(glfwWindow, icons);
 
+            // Free up buffer space
             stbi_image_free(list[0]);
             stbi_image_free(list[1]);
 
@@ -266,11 +270,6 @@ public final class ApplicationImpl extends Application {
         // Set window position from settings.
         glfwSetWindowPos(glfwWindow, winPosX, winPosY);
 
-        // Set cursor mode
-        //if (!EDITOR_MODE) {
-        //    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        //}
-
         // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
@@ -290,11 +289,11 @@ public final class ApplicationImpl extends Application {
         // Create OpenAL capabilities
         ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
         ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
-
         if (!alCapabilities.OpenAL10) {
             Debug.logError("Audio AL10 library not supported!");
         }
 
+        // Enable blending
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -334,9 +333,9 @@ public final class ApplicationImpl extends Application {
     }
 
     private void loop() {
-        Time.timeStarted = System.currentTimeMillis();
-        long startTime = Time.timeStarted;
-        long endTime;
+        Time.timeStarted = (float) glfwGetTime();
+        float startTime = Time.timeStarted;
+        float endTime;
         float second = 0;
 
         // Create the scene
@@ -358,13 +357,13 @@ public final class ApplicationImpl extends Application {
             if (!EDITOR_MODE && Input.isKeyDown(Input.Key.ESCAPE)) break;
 
             if (Time.isSecond) {
-                glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
+                glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + (getCurrentScene().isSaved() ? "" : "*") + " | FPS: " + (int) (Time.getFPS()));
             }
 
             if (process()) break;
 
-            endTime = System.currentTimeMillis();
-            Time.deltaTime = (endTime - startTime) / 1000f;
+            endTime = (float) glfwGetTime();
+            Time.deltaTime = endTime - startTime;
             Time.deltaTime = Math.max(Time.deltaTime, Time.minDeltaTime);
             startTime = endTime;
 
@@ -429,19 +428,6 @@ public final class ApplicationImpl extends Application {
     }
 
     private void destroy() {
-        // Destroy any remaining objects
-
-        // Destroy and clear up any script class loaders
-        scriptManager.destroy();
-
-        // Unregister any remaining listeners
-        for (Listener listener : listeners) {
-            eventHandling.unregisterListener(listener);
-        }
-
-        // Destroy ImGUI
-        imGui.destroyImGui();
-
         // Save settings
         File settings = new File("settings.json");
         JsonObject object = new JsonObject();
@@ -452,6 +438,18 @@ public final class ApplicationImpl extends Application {
         object.addProperty("lastScene", getCurrentScene().getFile().getPath());
         FileIO.writeData(settings, serializer.toJson(object));
 
+        // Destroy and clean up any remaining objects
+        scriptManager.destroy();
+
+        // Unregister any remaining listeners
+        for (Listener listener : listeners) {
+            eventHandling.unregisterListener(listener);
+        }
+
+        // Destroy ImGUI
+        imGui.destroyImGui();
+
+        // Free ALC context and close device
         alcDestroyContext(audioContext);
         alcCloseDevice(audioDevice);
 
@@ -483,6 +481,7 @@ public final class ApplicationImpl extends Application {
     @Override
     public void setTitle(String title) {
         this.title = title;
+        glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
     }
 
     @Override
@@ -535,6 +534,7 @@ public final class ApplicationImpl extends Application {
         scene.setFile(file);
         String savedScene = serializer.toJson(scene);
         if (FileIO.writeData(file, savedScene)) {
+            ((SceneImpl) scene).setSaved(true);
             DebugImpl.log("Saved scene " + scene.name);
         } else {
             DebugImpl.log("Unable to save scene " + scene.name);

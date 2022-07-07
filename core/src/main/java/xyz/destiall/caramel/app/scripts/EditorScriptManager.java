@@ -3,7 +3,6 @@ package xyz.destiall.caramel.app.scripts;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
 import xyz.destiall.caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.api.scripts.Script;
 import xyz.destiall.caramel.api.scripts.ScriptManager;
@@ -17,7 +16,11 @@ import xyz.destiall.java.events.Listener;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class EditorScriptManager implements ScriptManager, Listener {
@@ -40,6 +43,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         loader = new ScriptLoader(this);
     }
 
+    @Override
     public void reloadAll() {
         if (!scriptsRootFolder.exists()) scriptsRootFolder.mkdir();
         loadScripts(scriptsRootFolder);
@@ -47,10 +51,12 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         if (watcher != null) watcher.watch();
     }
 
+    @Override
     public void destroy() {
         if (watcher != null) watcher.destroy();
     }
 
+    @Override
     public void loadScripts(File folder) {
         compiledScripts.clear();
         File[] files = folder.listFiles();
@@ -118,8 +124,8 @@ public final class EditorScriptManager implements ScriptManager, Listener {
             if (compiledScripts.containsKey(scriptName)) return compiledScripts.get(scriptName);
             try {
                 InternalScript compiledScript = loader.compile(file, contents);
-                if (compiledScript.getCompiledClass().isAssignableFrom(Component.class)) {
-                    DebugImpl.logError("Script " + scriptName + " does not inherit Component class!");
+                if (compiledScript.getCompiledClass().isAssignableFrom(Script.class)) {
+                    DebugImpl.logError("Script " + scriptName + " does not inherit Script class!");
                     return null;
                 }
                 compiledScripts.put(scriptName, compiledScript);
@@ -130,29 +136,6 @@ public final class EditorScriptManager implements ScriptManager, Listener {
             }
         }
         return null;
-    }
-
-    public boolean uploadScript(GameObjectImpl object, String script) {
-        InternalScript scriptComponent = compiledScripts.get(script);
-        if (scriptComponent == null) return false;
-        try {
-            Component component = scriptComponent.getAsComponent(object);
-            return object.addComponent(component);
-        } catch (Exception e) {
-            DebugImpl.logError(e.getLocalizedMessage());
-            e.printStackTrace();
-        }
-        return false;
-    }
-
-    public boolean removeScript(GameObjectImpl object, String script) {
-        InternalScript scriptComponent = compiledScripts.get(script);
-        if (scriptComponent == null) return false;
-        return object.removeComponent(scriptComponent.getCompiledClass());
-    }
-
-    public Collection<String> getScripts() {
-        return compiledScripts.keySet();
     }
 
     @EventHandler

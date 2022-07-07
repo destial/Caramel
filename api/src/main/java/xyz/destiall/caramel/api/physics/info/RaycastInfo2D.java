@@ -7,13 +7,13 @@ import org.joml.Vector2f;
 import xyz.destiall.caramel.api.objects.GameObject;
 
 public final class RaycastInfo2D implements RayCastCallback {
+    private final GameObject requestingObject;
     public Fixture fixture;
     public Vector2f point;
     public Vector2f normal;
     public float fraction;
     public boolean hit;
     public GameObject hitObject;
-    private GameObject requestingObject;
 
     public RaycastInfo2D(GameObject obj) {
         fixture = null;

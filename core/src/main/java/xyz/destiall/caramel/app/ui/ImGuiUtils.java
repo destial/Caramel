@@ -4,6 +4,7 @@ import imgui.ImGui;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImBoolean;
+import imgui.type.ImInt;
 import imgui.type.ImString;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
@@ -13,7 +14,6 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.math.Vector2;
 import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.texture.Mesh;
-import xyz.destiall.caramel.api.physics.RigidBodyType;
 import xyz.destiall.caramel.api.texture.Texture;
 
 import java.lang.reflect.Field;
@@ -354,6 +354,24 @@ public final class ImGuiUtils {
         return imBoolean.get();
     }
 
+    public static int drawListBox(String label, int id, String[] items) {
+        ImGui.pushID(label);
+
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, width);
+        ImGui.text(label);
+        ImGui.nextColumn();
+
+        ImInt imInt = new ImInt(id);
+        if (ImGui.collapsingHeader(items[id])) {
+            ImGui.listBox("##listbox", imInt, items);
+        }
+        ImGui.columns(1);
+        ImGui.popID();
+
+        return imInt.get();
+    }
+
     public static void imguiLayer(Field field, Component component) {
         try {
             Class<?> type = field.getType();
@@ -361,31 +379,31 @@ public final class ImGuiUtils {
             String name = field.getName();
 
             if (type == boolean.class) {
-                field.setBoolean(component, ImGuiUtils.drawCheckBox(name, (boolean) value));
+                field.setBoolean(component, drawCheckBox(name, (boolean) value));
 
             } else if (type == int.class) {
-                field.setInt(component, ImGuiUtils.dragInt(name, (int) value));
+                field.setInt(component, dragInt(name, (int) value));
 
             } else if (type == float.class) {
-                field.setFloat(component, ImGuiUtils.dragFloat(name, (float) value));
+                field.setFloat(component, dragFloat(name, (float) value));
 
             } else if (type == String.class) {
-                field.set(component, ImGuiUtils.inputText(name, (String) value));
+                field.set(component, inputText(name, (String) value));
 
             } else if (type == Vector3f.class) {
-                ImGuiUtils.drawVec3Control(name, (Vector3f) value, 1f);
+                drawVec3Control(name, (Vector3f) value, 1f);
 
             } else if (type == Vector3.class) {
-                ImGuiUtils.drawVec3Control(name, ((Vector3) value).getJoml(), 1f);
+                drawVec3Control(name, ((Vector3) value).getJoml(), 1f);
 
             } else if (type == Vector2f.class) {
-                ImGuiUtils.drawVec2Control(name, (Vector2f) value, 1f);
+                drawVec2Control(name, (Vector2f) value, 1f);
 
             } else if (type == Vector2.class) {
-                ImGuiUtils.drawVec2Control(name, ((Vector2) value).getJoml(), 1f);
+                drawVec2Control(name, ((Vector2) value).getJoml(), 1f);
 
             } else if (type == Quaternionf.class) {
-                ImGuiUtils.drawQuatControl(name, (Quaternionf) value, 0.f);
+                drawQuatControl(name, (Quaternionf) value, 0.f);
 
             } else if (type == Mesh.class) {
                 Mesh mesh = (Mesh) value;
@@ -395,7 +413,7 @@ public final class ImGuiUtils {
                         mesh.setColor(mesh.getColor());
                     }
                 }
-                String string = ImGuiUtils.inputText("texture:", mesh.getTexture() == null ? "" : mesh.getTexture().getPath());
+                String string = inputText("texture:", mesh.getTexture() == null ? "" : mesh.getTexture().getPath());
                 ImGui.sameLine();
                 if (ImGui.button("apply")) {
                     if (mesh.getTexture() == null || !mesh.getTexture().getPath().equalsIgnoreCase(string)) {
@@ -406,12 +424,18 @@ public final class ImGuiUtils {
                         }
                     }
                 }
-            } else if (type == RigidBodyType.class) {
-                for (RigidBodyType bodyType : RigidBodyType.values()) {
-                    if (ImGuiUtils.drawCheckBox(bodyType.name().toLowerCase(), field.get(component) == bodyType)) {
-                        field.set(component, bodyType);
+            } else if (type.isEnum()) {
+                Enum<?>[] values = (Enum<?>[]) type.getMethod("values").invoke(null);
+                String[] items = new String[values.length];
+                int currentItem = 0;
+                for (int i = 0; i < values.length; i++) {
+                    items[i] = values[i].name();
+                    if (field.get(component) == values[i]) {
+                        currentItem = i;
                     }
                 }
+                currentItem = drawListBox(name, currentItem, items);
+                field.set(component, values[currentItem]);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -8,6 +8,9 @@ import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
+/**
+ * This {@link Component} represents the transform matrices of the {@link GameObject}.
+ */
 public final class Transform extends Component {
     public final Vector3f position;
     public final Vector3f localPosition;

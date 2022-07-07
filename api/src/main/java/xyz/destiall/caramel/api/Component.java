@@ -65,6 +65,7 @@ public abstract class Component implements Update {
     public Component clone(GameObject gameObject, boolean copyId) {
         try {
             Component clone = getClass().getDeclaredConstructor(GameObject.class).newInstance(gameObject);
+            gameObject.scene.entityIds.decrementAndGet();
             for (Field field : getClass().getFields()) {
                 try {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
@@ -77,8 +78,9 @@ public abstract class Component implements Update {
                 }
             }
             if (copyId) {
-                gameObject.scene.entityIds.decrementAndGet();
                 clone.id = id;
+            } else {
+                clone.id = gameObject.scene.generateId();
             }
             return clone;
         } catch (Exception e) {
