@@ -41,8 +41,7 @@ public final class RigidBody3D extends RigidBody {
             transform.rotation.set(
                     (float) rawBody.getRotation().get00(),
                     (float) rawBody.getRotation().get01(),
-                    (float) rawBody.getRotation().get02(),
-                    transform.rotation.w
+                    (float) rawBody.getRotation().get02()
             );
         }
     }

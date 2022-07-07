@@ -48,7 +48,6 @@ public final class SceneImpl extends Scene {
     private final Map<Class<?>, Panel> panels;
     private final List<EditorAction> actions;
     private final List<EditorAction> redoActions;
-    private EditorAction lastActionBeforeSaved;
     private boolean saved = true;
 
     private EditorCamera editorCamera;
@@ -162,7 +161,8 @@ public final class SceneImpl extends Scene {
                 parent.children.add(child);
                 child.parent = parent.transform;
                 child.scene = parent.scene;
-                child.transform.localPosition.add(child.transform.position.sub(parent.transform.position, new Vector3f()));
+                child.transform.localPosition.set(parent.transform.position.sub(child.transform.position, new Vector3f()));
+                child.transform.position.set(parent.transform.position);
             }
 
             if (playing) physics.get(physicsMode).addGameObject(child);
@@ -249,6 +249,7 @@ public final class SceneImpl extends Scene {
             for (Physics p : physics.values()) {
                 p.reset();
             }
+            gameCamera = null;
         }
         Application.getApp().getEventHandler().call(new SceneStopEvent(this));
     }

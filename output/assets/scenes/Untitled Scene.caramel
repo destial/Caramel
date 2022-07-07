@@ -1,0 +1,286 @@
+{
+  "name": "Untitled Scene",
+  "gameObjects": [
+    {
+      "components": [
+        {
+          "position": {
+            "x": 0.8710599,
+            "y": -0.5886307,
+            "z": -1.0
+          },
+          "localPosition": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "clazz": "xyz.destiall.caramel.api.components.Transform",
+          "id": 4,
+          "enabled": true
+        },
+        {
+          "mesh": {
+            "vertexArray": [
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "x": 1.0,
+                  "y": 1.0,
+                  "z": 1.0,
+                  "w": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              }
+            ],
+            "elementArray": [
+              2,
+              1,
+              0,
+              0,
+              1,
+              3
+            ],
+            "type": 4,
+            "shader": "color",
+            "color": {
+              "x": 1.0,
+              "y": 1.0,
+              "z": 1.0,
+              "w": 1.0
+            },
+            "dirty": false,
+            "drawArrays": false
+          },
+          "pos": {
+            "x": 0.8710599,
+            "y": -0.5886307,
+            "z": -1.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "sca": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "clazz": "xyz.destiall.caramel.api.render.MeshRenderer",
+          "id": 6,
+          "enabled": true
+        }
+      ],
+      "children": [],
+      "tags": [],
+      "name": "GameObject",
+      "id": 5
+    }
+  ],
+  "editorCamera": {
+    "components": [
+      {
+        "position": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -1.0
+        },
+        "localPosition": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 1.0,
+          "y": 1.0,
+          "z": 1.0
+        },
+        "forward": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -1.0
+        },
+        "up": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "clazz": "xyz.destiall.caramel.api.components.Transform",
+        "id": 1,
+        "enabled": true
+      },
+      {
+        "perspective": false,
+        "sensitivity": 0.5,
+        "projection": {
+          "m00": 0.125,
+          "m01": 0.0,
+          "m02": 0.0,
+          "m03": 0.0,
+          "m10": 0.0,
+          "m11": 0.225,
+          "m12": 0.0,
+          "m13": 0.0,
+          "m20": 0.0,
+          "m21": 0.0,
+          "m22": -0.0010000999,
+          "m23": 0.0,
+          "m30": -0.0,
+          "m31": -0.0,
+          "m32": -1.0001E-4,
+          "m33": 1.0,
+          "properties": 2
+        },
+        "view": {
+          "m00": 1.0,
+          "m01": 0.0,
+          "m02": 0.0,
+          "m03": 0.0,
+          "m10": 0.0,
+          "m11": 1.0,
+          "m12": 0.0,
+          "m13": 0.0,
+          "m20": 0.0,
+          "m21": 0.0,
+          "m22": 1.0,
+          "m23": 0.0,
+          "m30": -0.0,
+          "m31": -0.0,
+          "m32": 1.0,
+          "m33": 1.0,
+          "properties": 18
+        },
+        "target": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -1.0
+        },
+        "isEditor": true,
+        "forward": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": -1.0
+        },
+        "up": {
+          "x": 0.0,
+          "y": 1.0,
+          "z": 0.0
+        },
+        "fov": 60.0,
+        "near": 0.1,
+        "far": 1000.0,
+        "clazz": "xyz.destiall.caramel.api.components.EditorCamera",
+        "id": 3,
+        "enabled": true
+      }
+    ],
+    "children": [],
+    "tags": [],
+    "name": "GameObject",
+    "id": 2
+  },
+  "prefabs": []
+}

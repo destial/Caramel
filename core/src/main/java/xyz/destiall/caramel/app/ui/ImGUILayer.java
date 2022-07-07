@@ -23,7 +23,6 @@ import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
 import xyz.destiall.caramel.api.utils.FileIO;
-import xyz.destiall.caramel.app.utils.FontIcons;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +91,6 @@ public final class ImGUILayer {
 
         final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
         rangesBuilder.addRanges(fontAtlas.getGlyphRangesDefault());
-        rangesBuilder.addRanges(FontIcons._IconRange);
 
         final ImFontConfig fontConfig = new ImFontConfig();
         fontConfig.setMergeMode(true);
