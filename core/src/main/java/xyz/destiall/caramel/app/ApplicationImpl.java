@@ -301,9 +301,7 @@ public final class ApplicationImpl extends Application {
         scriptManager = new EditorScriptManager();
 
         // Register event listeners
-        if (EDITOR_MODE) {
-            listeners.add(scriptManager);
-        }
+        listeners.add(scriptManager);
         for (Listener listener : listeners) {
             eventHandling.registerListener(listener);
         }

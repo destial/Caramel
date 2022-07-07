@@ -22,7 +22,7 @@ public final class FileIO {
     private static final String BASE =
             "package scripts;\n" +
             "\n" +
-            "import xyz.destiall.caramel.api.objects.GameObject;\n" +
+            "import xyz.destiall.caramel.api.objects.*;\n" +
             "import xyz.destiall.caramel.api.scripts.Script;\n" +
             "\n" +
             "public class ${name} extends Script {\n" +
@@ -30,11 +30,13 @@ public final class FileIO {
             "        super(gameObject);\n" +
             "    }\n" +
             "\n" +
+            "    // This method is called on the first frame" +
             "    @Override\n" +
             "    public void start() {\n" +
             "\n" +
             "    }\n" +
             "\n" +
+            "    // This method is called on every frame" +
             "    @Override\n" +
             "    public void update() {\n" +
             "\n" +

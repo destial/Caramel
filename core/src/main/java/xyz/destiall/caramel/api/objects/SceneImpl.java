@@ -5,27 +5,24 @@ import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.components.EditorCamera;
+import xyz.destiall.caramel.api.components.Light;
 import xyz.destiall.caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.api.events.ScenePlayEvent;
 import xyz.destiall.caramel.api.events.SceneStopEvent;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
-import xyz.destiall.caramel.api.components.Light;
-import xyz.destiall.caramel.api.objects.Scene;
+import xyz.destiall.caramel.api.utils.Pair;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.EditorAction;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
-import xyz.destiall.caramel.app.editor.ui.GamePanel;
-import xyz.destiall.caramel.app.editor.ui.InspectorPanel;
-import xyz.destiall.caramel.app.editor.ui.MenuBarPanel;
-import xyz.destiall.caramel.app.editor.ui.ConsolePanel;
-import xyz.destiall.caramel.app.editor.ui.ScenePanel;
-import xyz.destiall.caramel.app.editor.ui.HierarchyPanel;
-import xyz.destiall.caramel.app.editor.ui.Panel;
+import xyz.destiall.caramel.app.editor.panels.ConsolePanel;
+import xyz.destiall.caramel.app.editor.panels.GamePanel;
+import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
+import xyz.destiall.caramel.app.editor.panels.InspectorPanel;
+import xyz.destiall.caramel.app.editor.panels.MenuBarPanel;
+import xyz.destiall.caramel.app.editor.panels.Panel;
+import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.physics.Physics;
 import xyz.destiall.caramel.app.physics.Physics2D;
 import xyz.destiall.caramel.app.physics.Physics3D;
-import xyz.destiall.caramel.api.utils.Pair;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,6 +41,8 @@ import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPolygonMode;
 
 public final class SceneImpl extends Scene {
+    private final Vector3f selectionColor = new Vector3f(1, 0, 0);
+
     private final Map<Physics.Mode, Physics> physics;
     private final Map<Class<?>, Panel> panels;
     private final List<EditorAction> actions;
@@ -213,7 +212,7 @@ public final class SceneImpl extends Scene {
         editorCamera.gameObject.lateUpdate();
 
         for (GameObject selected : selectedGameObject) {
-            DebugImpl.drawBox2D(selected.transform.position, selected.transform.scale, new Vector3f(1, 0, 0));
+            DebugImpl.drawOutline(selected.transform, selectionColor);
         }
 
         DebugDraw.INSTANCE.update();

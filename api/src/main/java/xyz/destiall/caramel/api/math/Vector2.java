@@ -66,6 +66,11 @@ public final class Vector2 {
         return jbox2d;
     }
 
+    public static Vector2 lerp(Vector2 vector, Vector2 target, float dt) {
+        vector.joml.lerp(target.joml, dt);
+        return vector;
+    }
+
     @Override
     public String toString() {
         return joml.toString();

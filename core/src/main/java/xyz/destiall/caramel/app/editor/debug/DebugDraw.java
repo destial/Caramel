@@ -80,7 +80,7 @@ public final class DebugDraw implements Update, Render {
         for (DebugLine line : lines) {
             for (int i = 0; i < 2; i++) {
                 Vector3f pos = i == 0 ? line.from : line.to;
-                vertexArray[index] = pos.x;
+                vertexArray[  index  ] = pos.x;
                 vertexArray[index + 1] = pos.y;
                 vertexArray[index + 2] = pos.z;
 

@@ -1,6 +1,8 @@
 package xyz.destiall.caramel.api.debug;
 
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.components.Transform;
+import xyz.destiall.caramel.api.math.Vector3;
 
 public abstract class Debug {
     protected static Debug inst;
@@ -42,9 +44,25 @@ public abstract class Debug {
         inst._drawBox3D(from, to, color);
     }
 
+    /**
+     * Draw an outline of the {@link Transform} component.
+     */
+    public static void drawOutline(Transform transform, Vector3f color) {
+        inst._drawOutline(transform, color);
+    }
+
+    /**
+     * Draw an outline of the {@link Transform} component.
+     */
+    public static void drawOutline(Transform transform, Vector3f offset, Vector3f color) {
+        inst._drawOutline(transform, offset, color);
+    }
+
     protected abstract void _log(Object log);
     protected abstract void _logError(Object error);
     protected abstract void _drawLine(Vector3f from, Vector3f offset, Vector3f color);
     protected abstract void _drawBox2D(Vector3f center, Vector3f offset, Vector3f color);
     protected abstract void _drawBox3D(Vector3f center, Vector3f offset, Vector3f color);
+    protected abstract void _drawOutline(Transform transform, Vector3f color);
+    protected abstract void _drawOutline(Transform transform, Vector3f offset, Vector3f color);
 }

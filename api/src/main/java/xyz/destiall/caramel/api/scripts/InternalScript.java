@@ -4,26 +4,27 @@ import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.java.reflection.Reflect;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 public final class InternalScript {
-    private final String name;
     private final Class<?> compiledClass;
     private final CharSequence code;
+    private final File file;
 
-    public InternalScript(String name, Class<?> compiledClass, CharSequence code) {
-        this.name = name;
+    public InternalScript(Class<?> compiledClass, File file, CharSequence code) {
         this.compiledClass = compiledClass;
         this.code = code;
+        this.file = file;
+    }
+
+    public File getFile() {
+        return file;
     }
 
     public CharSequence getCode() {
         return code;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public Class<? extends Component> getCompiledClass() {

@@ -8,7 +8,7 @@ public final class FileEvent extends Event {
     private final File file;
     private final Type type;
     public FileEvent(File file, Type type) {
-        super(true);
+        super(false);
         this.file = file;
         this.type = type;
     }

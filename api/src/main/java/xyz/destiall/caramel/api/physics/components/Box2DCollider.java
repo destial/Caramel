@@ -41,6 +41,9 @@ public final class Box2DCollider extends Collider {
         if (collisionRender && camera.isEditor) {
             float x = useScale ? transform.scale.x : halfSize.x;
             float y = useScale ? transform.scale.y : halfSize.y;
+            Vector3f off = new Vector3f(x, y, 1);
+            Debug.drawOutline(transform, off, debugColor);
+            /*
             Debug.drawLine(
                     new Vector3f(offset.x + transform.position.x - x * 0.5f, offset.y + transform.position.y + y * 0.5f, transform.position.z),
                     new Vector3f(offset.x + transform.position.x + x * 0.5f, offset.y + transform.position.y + y * 0.5f, transform.position.z),
@@ -61,6 +64,7 @@ public final class Box2DCollider extends Collider {
                     new Vector3f(offset.x + transform.position.x + x * 0.5f, offset.y + transform.position.y + y * 0.5f, transform.position.z),
                     debugColor
             );
+            */
         }
     }
 }

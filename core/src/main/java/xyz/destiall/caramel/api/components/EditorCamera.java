@@ -5,11 +5,10 @@ import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.app.editor.ui.HierarchyPanel;
-import xyz.destiall.caramel.app.editor.ui.ScenePanel;
-import xyz.destiall.caramel.app.editor.ui.Panel;
+import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
+import xyz.destiall.caramel.app.editor.panels.ScenePanel;
+import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
 public final class EditorCamera extends Camera {

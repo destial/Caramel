@@ -5,6 +5,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.debug.Debug;
+import xyz.destiall.caramel.api.math.Vector3;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
@@ -32,6 +33,15 @@ public final class Transform extends Component {
         up = new Vector3f(0, 1, 0);
         model = new Matrix4f().identity();
         gameObject.addComponent(this);
+    }
+
+    public void setPosition(float x, float y, float z) {
+        Vector3f pos = gameObject.parent != null ? localPosition : position;
+        pos.set(x, y, z);
+        RigidBody rb = getComponent(RigidBody.class);
+        if (rb != null) {
+            rb._setPosition(position.x + localPosition.x, position.y + localPosition.y, position.z + localPosition.z);
+        }
     }
 
     @Override

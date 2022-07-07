@@ -150,46 +150,47 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                     return;
                 }
                 if (script != null && event.getType() == FileEvent.Type.MODIFY) {
-                    System.out.println("Modified file: " + event.getFile().getName());
                     compiledScripts.remove(scriptName);
                     Payload.COMPONENTS.remove(script.getCompiledClass());
-
                     System.gc();
                     try {
                         InternalScript newScript = reloadScript(file);
-
-                        for (GameObject go : ApplicationImpl.getApp().getCurrentScene().getGameObjects()) {
-                            Component instance;
-                            if ((instance = go.getComponent(script.getCompiledClass())) != null) {
-                                Field[] fields = script.getCompiledClass().getFields();
-                                if (go.removeComponent(script.getCompiledClass())) {
-                                    Component component = newScript.getAsComponent(go);
-                                    for (Field field : fields) {
-                                        if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
-                                        Field newField = component.getClass().getField(field.getName());
-                                        if (newField.getType() == field.getType()) {
-                                            newField.setAccessible(true);
-                                            try {
-                                                newField.set(component, field.get(instance));
-                                            } catch (IllegalAccessException e) {
-                                                DebugImpl.logError(e.getMessage());
-                                                e.printStackTrace();
+                        if (newScript != null) {
+                            for (GameObject go : ApplicationImpl.getApp().getCurrentScene().getGameObjects()) {
+                                Component instance;
+                                if ((instance = go.getComponent(script.getCompiledClass())) != null) {
+                                    Field[] fields = script.getCompiledClass().getFields();
+                                    if (go.removeComponent(script.getCompiledClass())) {
+                                        Component component = newScript.getAsComponent(go);
+                                        for (Field field : fields) {
+                                            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
+                                                continue;
+                                            Field newField = component.getClass().getField(field.getName());
+                                            if (newField.getType() == field.getType()) {
+                                                newField.setAccessible(true);
+                                                try {
+                                                    newField.set(component, field.get(instance));
+                                                } catch (IllegalAccessException e) {
+                                                    DebugImpl.logError(e.getMessage());
+                                                    e.printStackTrace();
+                                                }
                                             }
                                         }
+                                        go.addComponent(component);
                                     }
-                                    go.addComponent(component);
                                 }
                             }
                         }
-                        awaitingCompilation.remove(file.getName());
+                        System.gc();
                     } catch (Exception e) {
                         DebugImpl.logError(e.getMessage());
                         e.printStackTrace();
                     }
-                } else {
+                } else if (event.getType() == FileEvent.Type.MODIFY) {
                     reloadScript(file);
                     System.gc();
                 }
+                awaitingCompilation.remove(file.getName());
             } else {
                 if (script != null) {
                     ApplicationImpl.getApp().getCurrentScene().forEachGameObject(go -> go.removeComponent(script.getCompiledClass()));

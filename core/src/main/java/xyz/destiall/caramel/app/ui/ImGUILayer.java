@@ -20,8 +20,8 @@ import imgui.type.ImBoolean;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.app.editor.ui.ScenePanel;
-import xyz.destiall.caramel.app.editor.ui.Panel;
+import xyz.destiall.caramel.app.editor.panels.ScenePanel;
+import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.api.utils.FileIO;
 
 import java.util.HashMap;
