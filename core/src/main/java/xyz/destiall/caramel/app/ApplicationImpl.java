@@ -155,8 +155,8 @@ public final class ApplicationImpl extends Application {
             File settings = new File("settings.json");
             JsonObject object = new JsonObject();
             if (settings.createNewFile()) {
-                object.addProperty("width", width = 1280);
-                object.addProperty("height", height = 720);
+                object.addProperty("width", width = 1920);
+                object.addProperty("height", height = 1080);
                 object.addProperty("windowPosX", winPosX = 50);
                 object.addProperty("windowPosY", winPosY = 50);
                 object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.caramel");
@@ -196,8 +196,7 @@ public final class ApplicationImpl extends Application {
                 FileIO.saveResource("logo_32.png", "logo_32.png");
             }
 
-            Thread.sleep(1000);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -212,7 +211,7 @@ public final class ApplicationImpl extends Application {
         // Set GLFW window hints and setup
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         // Create GLFW window
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);

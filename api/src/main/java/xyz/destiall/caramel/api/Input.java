@@ -15,6 +15,10 @@ public interface Input {
         return Application.getApp().getMouseListener().isButtonPressedThisFrame(mouse);
     }
 
+    static boolean isMouseReleased(int mouse) {
+        return Application.getApp().getMouseListener().isButtonReleasedThisFrame(mouse);
+    }
+
     static boolean isControlPressedAnd(int key) {
         return Input.isKeyDown(Key.CONTROL) && Input.isKeyPressed(key);
     }

@@ -24,7 +24,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class HierarchyPanel extends Panel {
     private boolean addingGameObjectHierarchy;
     private boolean editingGameObject;
-    private int nodeId;
     private ImVec2 popupMousePos;
     private GameObject editingGo;
 
@@ -72,7 +71,7 @@ public final class HierarchyPanel extends Panel {
                     Payload.COPIED.addAll(scene.getSelectedGameObject());
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.V) && Payload.COPIED != null) {
+                if (Input.isControlPressedAnd(Input.Key.V) && !Payload.COPIED.isEmpty()) {
                     for (GameObject copied : Payload.COPIED) {
                         GameObject go = copied.clone(false);
                         scene.addGameObject(go);
@@ -186,7 +185,6 @@ public final class HierarchyPanel extends Panel {
                 scene.getSelectedGameObject().clear();
             }
             scene.getSelectedGameObject().add(gameObject);
-            nodeId = index.get();
         }
 
         if (ImGui.beginDragDropSource()) {

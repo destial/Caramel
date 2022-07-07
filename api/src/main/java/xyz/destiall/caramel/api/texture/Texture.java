@@ -21,6 +21,7 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
@@ -45,6 +46,11 @@ public final class Texture {
         this.width = width;
         this.height = height;
         this.buffer = buffer;
+    }
+
+    public void invalidate() {
+        glDeleteTextures(texId);
+        texId = 0;
     }
 
     public Texture getReference() {
@@ -131,12 +137,6 @@ public final class Texture {
         loaded = true;
 
         stbi_image_free(image);
-    }
-
-    public void resize(int width, int height) {
-        bind();
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-        unbind();
     }
 
     public boolean isLoaded() {

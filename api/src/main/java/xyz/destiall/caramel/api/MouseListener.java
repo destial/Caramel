@@ -34,6 +34,8 @@ public interface MouseListener {
 
     boolean isButtonPressedThisFrame(int button);
 
+    boolean isButtonReleasedThisFrame(int button);
+
     void setGameViewportPos(Vector2f vector2f);
 
     void setGameViewportSize(Vector2f vector2f);

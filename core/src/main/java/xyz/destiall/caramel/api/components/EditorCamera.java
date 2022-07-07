@@ -2,10 +2,12 @@ package xyz.destiall.caramel.api.components;
 
 import imgui.ImGui;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
 import xyz.destiall.caramel.api.components.Camera;
 import xyz.destiall.caramel.api.objects.GameObject;
+import xyz.destiall.caramel.app.editor.ui.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.ui.ScenePanel;
 import xyz.destiall.caramel.app.editor.ui.Panel;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
@@ -59,6 +61,14 @@ public final class EditorCamera extends Camera {
             transform.position.add(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
             Vector3f right = target.cross(up, new Vector3f());
             transform.position.add(right.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseX));
+        }
+
+        GameObject selected = Application.getApp().getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
+
+        if (Input.isKeyPressed(Input.Key.F) && selected != null &&
+                (Panel.isWindowFocused(ScenePanel.class) || Panel.isWindowFocused(HierarchyPanel.class))) {
+            gameObject.scene.getEditorCamera().transform.position.x = selected.transform.position.x;
+            gameObject.scene.getEditorCamera().transform.position.y = selected.transform.position.y;
         }
 
         //if (Input.isKeyPressed(Input.Key.C)) {

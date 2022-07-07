@@ -11,8 +11,7 @@ public class Camera extends Component {
     public Matrix4f projection, view;
     public Vector3f target;
 
-    public boolean isEditor = false;
-
+    @HideInEditor public boolean isEditor = false;
     @HideInEditor public Vector3f forward;
     @HideInEditor public Vector3f up;
     @HideInEditor public float fov = 60f;
@@ -45,13 +44,13 @@ public class Camera extends Component {
         float ratio = Application.getApp().getWidth() / (float) Application.getApp().getHeight();
         projection.identity();
         projection.ortho(-4.5f * ratio, 4.5f * ratio, -2.5f * ratio, 2.5f * ratio, near, far, true);
-        return projection;
+        return new Matrix4f(projection);
     }
 
     public Matrix4f getView() {
         view.identity();
         view.lookAt(transform.position, target.add(transform.position, new Vector3f()), up);
-        return view;
+        return new Matrix4f(view);
     }
 
     public Matrix4f getInverseProjection() {
