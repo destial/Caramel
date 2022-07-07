@@ -42,7 +42,7 @@ public final class HierarchyPanel extends Panel {
             if (treeNode(gameObject, index)) ImGui.treePop();
         }
 
-        if (ImGui.isWindowHovered()) {
+        if (ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
             if (scene.hoveredGameObject == null && !editingGameObject && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
                 addingGameObjectHierarchy = !addingGameObjectHierarchy;
                 editingGameObject = false;
@@ -53,12 +53,13 @@ public final class HierarchyPanel extends Panel {
                 addingGameObjectHierarchy = false;
                 editingGameObject = false;
                 if (scene.hoveredGameObject == null) {
+                    System.out.println("test");
                     scene.getSelectedGameObject().clear();
                 }
             }
         }
 
-        if (ImGui.isWindowFocused()) {
+        if (ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
             if (!scene.getSelectedGameObject().isEmpty()) {
                 if (Input.isKeyDown(Input.Key.BACKSPACE) || Input.isKeyDown(Input.Key.DELETE)) {
                     for (GameObject go : scene.getSelectedGameObject()) {

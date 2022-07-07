@@ -87,7 +87,6 @@ public final class InspectorPanel extends Panel {
                         if (method.isAnnotationPresent(FunctionButton.class)) {
                             method.setAccessible(true);
                             ImGuiUtils.imguiLayer(method, component);
-                            ImGui.sameLine();
                         }
                     }
 

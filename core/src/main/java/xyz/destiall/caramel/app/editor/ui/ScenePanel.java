@@ -20,14 +20,12 @@ import xyz.destiall.caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.utils.Payload;
 
-import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
 public final class ScenePanel extends Panel {
     private final ApplicationImpl window;
     private final ImVec2 startMouseCoords = new ImVec2(0, 0);
-    private final ImVec2 startScreenCoords = new ImVec2(0, 0);
     private boolean dragging = false;
     private ImVec2 windowSize;
     private ImVec2 windowPos;
@@ -73,49 +71,23 @@ public final class ScenePanel extends Panel {
         window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
         window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
 
-        if (Input.isMousePressed(Input.Mouse.LEFT) && Panel.isWindowFocused(ScenePanel.class)) {
+        if (ImGui.isMouseDown(Input.Mouse.LEFT) && ImGui.isWindowHovered() && !dragging) {
+            dragging = true;
+            startMouseCoords.set(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
+        }
+
+        if (Input.isMousePressed(Input.Mouse.LEFT) && ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
             GameObject clicked = getClicked();
             if (clicked != null) {
                 if (!Input.isKeyDown(Input.Key.CONTROL)) {
                     window.getCurrentScene().getSelectedGameObject().clear();
                 }
                 window.getCurrentScene().getSelectedGameObject().add(clicked);
+                dragging = false;
             }
         }
 
-        if (Input.isMouseDown(Input.Mouse.LEFT) && Panel.isWindowFocused(ScenePanel.class) && !dragging) {
-            dragging = true;
-            System.out.println("dragging");
-            startMouseCoords.set(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
-            startScreenCoords.set(window.getMouseListener().getX(), window.getMouseListener().getY());
-        }
-
-        if (dragging) {
-            ImVec2 endMouseCoords = new ImVec2(window.getMouseListener().getX(), window.getMouseListener().getY());
-            // ImGui.getForegroundDrawList().addRect(startScreenCoords.x, startScreenCoords.y, endMouseCoords.x, endMouseCoords.y, Color.BLUE.getRGB());
-            DebugDraw.INSTANCE.addLine(
-                    new Vector3f(startMouseCoords.x, startMouseCoords.y, 1),
-                    new Vector3f(window.getMouseListener().getOrthoX(), startMouseCoords.y, 1),
-                    new Vector3f(1.f, 0.f, 0.f)
-            );
-            DebugDraw.INSTANCE.addLine(
-                    new Vector3f(startMouseCoords.x, startMouseCoords.y, 1),
-                    new Vector3f(startMouseCoords.x, window.getMouseListener().getOrthoY(), 1),
-                    new Vector3f(1.f, 0.f, 0.f)
-            );
-            DebugDraw.INSTANCE.addLine(
-                    new Vector3f(window.getMouseListener().getOrthoX(), startMouseCoords.y, 1),
-                    new Vector3f(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY(), 1),
-                    new Vector3f(1.f, 0.f, 0.f)
-            );
-            DebugDraw.INSTANCE.addLine(
-                    new Vector3f(startMouseCoords.x, window.getMouseListener().getOrthoY(), 1),
-                    new Vector3f(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY(), 1),
-                    new Vector3f(1.f, 0.f, 0.f)
-            );
-        }
-
-        if (Input.isMouseReleased(Input.Mouse.LEFT) && dragging) {
+        if (ImGui.isMouseReleased(Input.Mouse.LEFT) && dragging) {
             ImVec2 endMouseCoords = new ImVec2(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
             Set<GameObject> objects = getSelected(startMouseCoords, endMouseCoords);
             if (objects != null) {
@@ -190,10 +162,34 @@ public final class ScenePanel extends Panel {
                 ImGuizmo.decomposeMatrixToComponents(model, t, r, s);
                 selected.transform.position.set(t[0], t[1], t[2]);
                 selected.transform.scale.set(s[0], s[1], s[2]);
+                dragging = false;
             }
 
         } else {
             ImGuizmo.setEnabled(false);
+        }
+
+        if (dragging) {
+            DebugDraw.INSTANCE.addLine(
+                    new Vector3f(startMouseCoords.x, startMouseCoords.y, 1),
+                    new Vector3f(window.getMouseListener().getOrthoX(), startMouseCoords.y, 1),
+                    new Vector3f(1.f, 0.f, 0.f)
+            );
+            DebugDraw.INSTANCE.addLine(
+                    new Vector3f(startMouseCoords.x, startMouseCoords.y, 1),
+                    new Vector3f(startMouseCoords.x, window.getMouseListener().getOrthoY(), 1),
+                    new Vector3f(1.f, 0.f, 0.f)
+            );
+            DebugDraw.INSTANCE.addLine(
+                    new Vector3f(window.getMouseListener().getOrthoX(), startMouseCoords.y, 1),
+                    new Vector3f(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY(), 1),
+                    new Vector3f(1.f, 0.f, 0.f)
+            );
+            DebugDraw.INSTANCE.addLine(
+                    new Vector3f(startMouseCoords.x, window.getMouseListener().getOrthoY(), 1),
+                    new Vector3f(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY(), 1),
+                    new Vector3f(1.f, 0.f, 0.f)
+            );
         }
 
         ImGui.end();
