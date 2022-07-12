@@ -4,6 +4,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Component;
+import xyz.destiall.caramel.api.debug.Debug;
 import xyz.destiall.caramel.api.objects.GameObject;
 import xyz.destiall.caramel.api.interfaces.HideInEditor;
 
@@ -35,7 +36,12 @@ public class Camera extends Component {
     public void start() {}
 
     @Override
-    public void update() {}
+    public void update() {
+        double y = transform.rotation.z / Math.PI;
+        Debug.log(y);
+        up.set(0, y, 0);
+        up.normalize();
+    }
 
     @Override
     public void editorUpdate() {}

@@ -16,15 +16,19 @@ public final class DeleteGameObjects extends EditorAction {
 
     @Override
     public void undo() {
+        if (action == PreviousAction.UNDO) return;
         for (GameObject d : deleted) {
             scene.addGameObject(d);
         }
+        action = PreviousAction.UNDO;
     }
 
     @Override
     public void redo() {
+        if (action == PreviousAction.REDO) return;
         for (GameObject d : deleted) {
             scene.destroy(d);
         }
+        action = PreviousAction.REDO;
     }
 }

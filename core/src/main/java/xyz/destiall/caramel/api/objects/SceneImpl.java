@@ -227,11 +227,12 @@ public final class SceneImpl extends Scene {
                 GameObject clone = go.clone(true);
                 defaultGameObjects.add(clone);
                 if (selectedGameObject.contains(go)) {
-                    selectedPlayingGameObject.add(go);
+                    selectedPlayingGameObject.add(clone);
                 }
             }
             physics.get(physicsMode).addGameObject(go);
         }
+        selectedGameObject.clear();
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }
 

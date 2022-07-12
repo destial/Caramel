@@ -30,13 +30,13 @@ public final class FileIO {
             "        super(gameObject);\n" +
             "    }\n" +
             "\n" +
-            "    // This method is called on the first frame" +
+            "    // This method is called on the first frame\n" +
             "    @Override\n" +
             "    public void start() {\n" +
             "\n" +
             "    }\n" +
             "\n" +
-            "    // This method is called on every frame" +
+            "    // This method is called on every frame\n" +
             "    @Override\n" +
             "    public void update() {\n" +
             "\n" +

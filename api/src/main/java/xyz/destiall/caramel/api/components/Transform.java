@@ -25,6 +25,7 @@ public final class Transform extends Component {
     public Transform(GameObject gameObject) {
         super(gameObject);
         gameObject.transform = this;
+        transform = this;
         position = new Vector3f(0f, 0f, -1f);
         localPosition = new Vector3f(0f, 0f, 0f);
         rotation = new Vector3f(0f, 0f, 0f);
@@ -48,4 +49,5 @@ public final class Transform extends Component {
     public void start() {}
 
     public void update() {}
+
 }
