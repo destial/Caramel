@@ -243,12 +243,12 @@ public final class ApplicationImpl extends Application {
             stbi_image_free(list[0]);
             stbi_image_free(list[1]);
 
-            memFree(width16);
-            memFree(width32);
-            memFree(height16);
-            memFree(height32);
-            memFree(channels16);
-            memFree(channels32);
+            //memFree(width16);
+            //memFree(width32);
+            //memFree(height16);
+            //memFree(height32);
+            //memFree(channels16);
+            //memFree(channels32);
 
         } catch (Exception e) {
             e.printStackTrace();

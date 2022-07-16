@@ -7,6 +7,7 @@ import imgui.extension.imguizmo.flag.Mode;
 import imgui.extension.imguizmo.flag.Operation;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
+import org.joml.Matrix3d;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -87,8 +88,11 @@ public final class ScenePanel extends Panel {
         window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
 
         if (ImGui.isMouseDown(Input.Mouse.LEFT) && ImGui.isWindowHovered() && !dragging) {
-            dragging = true;
-            startMouseCoords.set(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
+            GameObject clicked = getClicked();
+            if (clicked == null) {
+                dragging = true;
+                startMouseCoords.set(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
+            }
         }
 
         if (Input.isMousePressed(Input.Mouse.LEFT) && ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
@@ -238,12 +242,17 @@ public final class ScenePanel extends Panel {
         float y = window.getMouseListener().getOrthoY();
 
         for (GameObject gameObject : scene.getGameObjects()) {
-            float minX = gameObject.transform.position.x - gameObject.transform.scale.x * 0.5f;
-            float maxX = gameObject.transform.position.x + gameObject.transform.scale.x * 0.5f;
-            float minY = gameObject.transform.position.y - gameObject.transform.scale.y * 0.5f;
-            float maxY = gameObject.transform.position.y + gameObject.transform.scale.y * 0.5f;
+            Vector3f max = new Vector3f(0.5f, 0.5f, 1f);
+            Vector3f min = new Vector3f(-0.5f, -0.5f, 1f);
 
-            if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+            float tx = gameObject.transform.position.x + gameObject.transform.localPosition.x;
+            float ty = gameObject.transform.position.y + gameObject.transform.localPosition.y;
+            float tz = gameObject.transform.position.z + gameObject.transform.localPosition.z;
+
+            Vector3f mX = max.mul(gameObject.transform.model.get3x3(new Matrix3d())).add(tx, ty, tz);
+            Vector3f mN = min.mul(gameObject.transform.model.get3x3(new Matrix3d())).add(tx, ty, tz);
+
+            if (x >= mN.x && x <= mX.x && y >= mN.y && y <= mX.y) {
                 return gameObject;
             }
         }
