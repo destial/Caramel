@@ -144,6 +144,14 @@ public final class SceneImpl extends Scene {
         }
     }
 
+    public boolean canUndo() {
+        return !actions.isEmpty();
+    }
+
+    public boolean canRedo() {
+        return !redoActions.isEmpty();
+    }
+
     public void endFrame() {
         for (Pair<GameObject, GameObject> entry : toAdd) {
             GameObject parent = entry.getKey();

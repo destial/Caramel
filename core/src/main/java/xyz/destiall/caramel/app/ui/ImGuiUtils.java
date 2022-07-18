@@ -417,7 +417,8 @@ public final class ImGuiUtils {
                 ImGui.sameLine();
                 if (ImGui.button("apply")) {
                     if (mesh.getTexture() == null || !mesh.getTexture().getPath().equalsIgnoreCase(string)) {
-                        Texture texture = new Texture(string);
+                        new Texture(string);
+                        Texture texture = Texture.getTexture(string);
                         texture.buildTexture();
                         if (texture.isLoaded()) {
                             mesh.setTexture(texture);

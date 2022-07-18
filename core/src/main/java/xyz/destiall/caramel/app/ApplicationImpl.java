@@ -83,7 +83,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.system.MemoryUtil.memFree;
 
 public final class ApplicationImpl extends Application {
     public boolean EDITOR_MODE = true;
@@ -196,7 +195,6 @@ public final class ApplicationImpl extends Application {
             if (!logo32.exists()) {
                 FileIO.saveResource("logo_32.png", "logo_32.png");
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

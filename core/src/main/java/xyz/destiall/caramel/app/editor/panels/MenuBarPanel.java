@@ -27,7 +27,7 @@ public final class MenuBarPanel extends Panel {
                     public void paneFun(String filter, long userDatas, boolean canContinue) {}
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
             }
-            if (ImGui.menuItem("Save", "Ctrl + S")) {
+            if (ImGui.menuItem("Save", "Ctrl + S", false, !scene.isSaved())) {
                 if (scene.isPlaying()) scene.stop();
                 ApplicationImpl.getApp().saveCurrentScene();
             }
@@ -37,6 +37,17 @@ public final class MenuBarPanel extends Panel {
                     @Override
                     public void paneFun(String filter, long userDatas, boolean canContinue) {}
                 }, 250, 1, 42, ImGuiFileDialogFlags.None);
+            }
+
+            ImGui.endMenu();
+        }
+
+        if (ImGui.beginMenu("Edit")) {
+            if (ImGui.menuItem("Undo", "Ctrl + Z", false, !scene.isPlaying() && scene.canUndo())) {
+                scene.undoLastAction();
+            }
+            if (ImGui.menuItem("Redo", "Ctrl + Y", false, !scene.isPlaying() && scene.canRedo())) {
+                scene.redoLastAction();
             }
 
             ImGui.endMenu();

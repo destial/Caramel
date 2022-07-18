@@ -38,9 +38,6 @@ public class Camera extends Component {
     @Override
     public void update() {
         double y = transform.rotation.z / Math.PI;
-        Debug.log(y);
-        up.set(0, y, 0);
-        up.normalize();
     }
 
     @Override

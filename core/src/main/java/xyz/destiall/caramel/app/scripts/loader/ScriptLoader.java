@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
 import xyz.destiall.caramel.api.scripts.InternalScript;
-import xyz.destiall.caramel.api.scripts.ScriptManager;
 import xyz.destiall.caramel.api.utils.FileIO;
 
 import javax.script.ScriptException;
@@ -21,24 +20,21 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class ScriptLoader {
-    private final ScriptManager scriptManager;
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
     private final Map<String, ScriptClassLoader> loaders = new ConcurrentHashMap<>();
-    private final ScriptMemoryManager scriptMemoryManager;
     private final JavaCompiler compiler;
-    private final DiagnosticCollector<JavaFileObject> diagnostics;
 
-    public ScriptLoader(ScriptManager scriptManager) {
-        this.scriptManager = scriptManager;
+    private ScriptMemoryManager scriptMemoryManager;
+    private DiagnosticCollector<JavaFileObject> diagnostics;
 
+    public ScriptLoader() {
         compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            return;
+        }
         diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
         scriptMemoryManager = new ScriptMemoryManager(standardFileManager, getClass().getClassLoader());
-    }
-
-    public ScriptManager getScriptManager() {
-        return scriptManager;
     }
 
     Class<?> getClassByName(final String name) {
@@ -74,7 +70,11 @@ public final class ScriptLoader {
         classes.remove(name);
     }
 
-    public InternalScript compile(File file, String code) throws ScriptException, MalformedURLException{
+    public InternalScript compile(File file, String code) throws ScriptException, MalformedURLException {
+        if (compiler == null) {
+            throw new ScriptException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+        }
+
         String fullClassName = getFullName(file, code);
         String simpleClassName = extractSimpleName(fullClassName);
         loaders.remove(fullClassName);
