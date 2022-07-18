@@ -26,12 +26,13 @@ public final class Transform extends Component {
         super(gameObject);
         gameObject.transform = this;
         transform = this;
-        position = new Vector3f(0f, 0f, -1f);
+        position = new Vector3f(1f, 1f, -1f);
         localPosition = new Vector3f(0f, 0f, 0f);
         rotation = new Vector3f(0f, 0f, 0f);
-        scale = new Vector3f(1, 1, 1);
-        forward = new Vector3f(0, 0, -1);
-        up = new Vector3f(0, 1, 0);
+        scale = new Vector3f(1f, 1f, 1f);
+
+        forward = new Vector3f(0f, 0f, -1f);
+        up = new Vector3f(0f, 1f, 0f);
         model = new Matrix4f().identity();
         gameObject.addComponent(this);
     }

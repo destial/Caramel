@@ -7,10 +7,14 @@ import imgui.extension.imguizmo.flag.Mode;
 import imgui.extension.imguizmo.flag.Operation;
 import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
+import org.jbox2d.common.MathUtils;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.common.Vec3;
 import org.joml.Matrix3d;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.lwjgl.system.MathUtil;
 import xyz.destiall.caramel.api.Application;
 import xyz.destiall.caramel.api.Input;
 import xyz.destiall.caramel.api.Time;
@@ -181,13 +185,29 @@ public final class ScenePanel extends Panel {
             float[] model = new float[16];
             transform.get(model);
 
+            float[] t = new float[3];
+            float[] r = new float[3];
+            float[] s = new float[3];
+
             ImGuizmo.manipulate(view, proj, model, operation, Mode.LOCAL);
 
             if (ImGuizmo.isUsing()) {
-                float[] t = new float[3];
-                float[] r = new float[3];
-                float[] s = new float[3];
                 ImGuizmo.decomposeMatrixToComponents(model, t, r, s);
+                for (int i = 0; i < 3; i++) {
+                    if (Float.isNaN(t[i])) {
+                        t[i] = (i == 2 ? -1f : 0f) + 0.0000001f;
+                    }
+                }
+                for (int i = 0; i < 3; i++) {
+                    if (Float.isNaN(r[i])) {
+                        r[i] = 0f + 0.0000001f;
+                    }
+                }
+                for (int i = 0; i < 3; i++) {
+                    if (Float.isNaN(s[i])) {
+                        s[i] = 1f + 0.0000001f;
+                    }
+                }
                 selected.transform.position.set(t[0], t[1], t[2]);
                 selected.transform.scale.set(s[0], s[1], s[2]);
                 selected.transform.rotation.set(Math.toRadians(r[0]), Math.toRadians(r[1]), Math.toRadians(r[2]));

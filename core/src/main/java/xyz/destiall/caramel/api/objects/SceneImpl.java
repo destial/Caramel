@@ -235,7 +235,7 @@ public final class SceneImpl extends Scene {
                 GameObject clone = go.clone(true);
                 defaultGameObjects.add(clone);
                 if (selectedGameObject.contains(go)) {
-                    selectedPlayingGameObject.add(clone);
+                    selectedDefaultGameObject.add(clone);
                 }
             }
             physics.get(physicsMode).addGameObject(go);
@@ -249,11 +249,14 @@ public final class SceneImpl extends Scene {
         playing = false;
         if (ApplicationImpl.getApp().EDITOR_MODE) {
             gameObjects.clear();
-            selectedGameObject.clear();
-            selectedGameObject.addAll(selectedPlayingGameObject);
-            selectedPlayingGameObject.clear();
             gameObjects.addAll(defaultGameObjects);
+
+            selectedGameObject.clear();
+            selectedGameObject.addAll(selectedDefaultGameObject);
+
             defaultGameObjects.clear();
+            selectedDefaultGameObject.clear();
+
             for (Physics p : physics.values()) {
                 p.reset();
             }
@@ -284,10 +287,17 @@ public final class SceneImpl extends Scene {
         }
         Camera camera;
         if ((camera = gameObject.getComponentInChildren(Camera.class)) != null) {
-            if (camera == gameCamera) gameCamera = null;
+            if (camera == gameCamera) {
+                gameCamera = null;
+            }
+        }
+        if ((camera = gameObject.getComponent(Camera.class)) != null) {
+            if (camera == gameCamera) {
+                gameCamera = null;
+            }
         }
         selectedGameObject.remove(gameObject);
-        selectedPlayingGameObject.remove(gameObject);
+        selectedDefaultGameObject.remove(gameObject);
         physics.get(physicsMode).removeGameObject(gameObject);
     }
 }

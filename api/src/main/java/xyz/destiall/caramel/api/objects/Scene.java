@@ -27,12 +27,12 @@ public abstract class Scene implements Update, Render {
     protected boolean saved = true;
 
     protected final Set<GameObject> selectedGameObject;
-    protected final Set<GameObject> selectedPlayingGameObject;
+    protected final Set<GameObject> selectedDefaultGameObject;
     public String name;
 
     public Scene() {
         selectedGameObject = ConcurrentHashMap.newKeySet();
-        selectedPlayingGameObject = ConcurrentHashMap.newKeySet();
+        selectedDefaultGameObject = ConcurrentHashMap.newKeySet();
     }
 
     /**

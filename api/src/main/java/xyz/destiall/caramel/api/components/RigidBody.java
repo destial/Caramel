@@ -7,7 +7,7 @@ import xyz.destiall.caramel.api.physics.RigidBodyType;
 public abstract class RigidBody extends Component {
     public float angularDamping = 0.8f;
     public float linearDamping = 0.9f;
-    public float mass = 0f;
+    public float mass = 1f;
     public boolean fixedRotation = false;
     public boolean continuousCollision = true;
     public boolean isTrigger = false;

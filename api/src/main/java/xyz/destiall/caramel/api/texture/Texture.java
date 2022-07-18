@@ -32,9 +32,9 @@ public final class Texture {
     private transient boolean loaded = false;
     private transient ByteBuffer buffer;
     private transient Texture reference;
-    private int width, height;
+    private transient int width, height;
+    private transient int texId;
     private String path;
-    private int texId;
 
     public Texture(int width, int height) {
         this.width = width;

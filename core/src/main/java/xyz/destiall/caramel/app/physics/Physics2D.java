@@ -32,7 +32,7 @@ public final class Physics2D implements Physics {
 
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(gameObject.transform.position.x, gameObject.transform.position.y);
-        bodyDef.angle = 0f;
+        bodyDef.angle = gameObject.transform.rotation.z;
         bodyDef.angularDamping = rigidBody.angularDamping;
         bodyDef.linearDamping = rigidBody.linearDamping;
         bodyDef.fixedRotation = rigidBody.fixedRotation;

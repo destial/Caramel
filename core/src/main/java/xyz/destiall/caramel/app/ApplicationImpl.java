@@ -399,13 +399,16 @@ public final class ApplicationImpl extends Application {
             getSceneViewFramebuffer().unbind();
         }
 
-        if (scene.getGameCamera() != null && scene.getGameCamera().gameObject.active) {
-            if (EDITOR_MODE) getGameViewFramebuffer().bind();
+        if (EDITOR_MODE) getGameViewFramebuffer().bind();
+        if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        } else {
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getGameCamera());
-            if (EDITOR_MODE) getGameViewFramebuffer().unbind();
         }
+        if (EDITOR_MODE) getGameViewFramebuffer().unbind();
 
         if (EDITOR_MODE) imGui.update();
 

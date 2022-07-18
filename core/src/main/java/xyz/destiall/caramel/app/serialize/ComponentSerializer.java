@@ -14,6 +14,7 @@ import xyz.destiall.java.gson.JsonSerializationContext;
 import xyz.destiall.java.gson.JsonSerializer;
 import xyz.destiall.java.reflection.Reflect;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -21,7 +22,9 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 
 public final class ComponentSerializer implements JsonSerializer<Component>, JsonDeserializer<Component> {
-    private final Gson defaultGson = new GsonBuilder().setPrettyPrinting().create();
+    private final Gson defaultGson = new GsonBuilder()
+            .registerTypeAdapter(File.class, new FileSerializer())
+            .setPrettyPrinting().create();
     @Override
     public Component deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         String clazz = jsonElement.getAsJsonObject().get("clazz").getAsString();

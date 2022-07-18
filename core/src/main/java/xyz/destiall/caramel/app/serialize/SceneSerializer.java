@@ -25,13 +25,14 @@ import java.lang.reflect.Type;
 
 public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDeserializer<SceneImpl> {
     static final GameObjectSerializer GAME_OBJECT_SERIALIZER = new GameObjectSerializer();
-    private static final PrefabSerializer PREFAB_SERIALIZER = new PrefabSerializer();
+    static final PrefabSerializer PREFAB_SERIALIZER = new PrefabSerializer();
     static final ComponentSerializer COMPONENT_SERIALIZER = new ComponentSerializer();
 
     static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(GameObject.class, GAME_OBJECT_SERIALIZER)
             .registerTypeAdapter(Prefab.class, PREFAB_SERIALIZER)
             .registerTypeAdapter(Component.class, COMPONENT_SERIALIZER)
+            .registerTypeAdapter(File.class, new FileSerializer())
             .setPrettyPrinting()
             .serializeSpecialFloatingPointValues()
             .enableComplexMapKeySerialization()

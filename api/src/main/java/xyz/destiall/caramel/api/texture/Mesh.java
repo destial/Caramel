@@ -202,6 +202,10 @@ public final class Mesh {
         glEnableVertexAttribArray(3);
 
         glBindVertexArray(0);
+
+        if (!texture.isLoaded()) {
+            texture.buildTexture();
+        }
     }
 
     public FloatBuffer getVertexBuffer() {

@@ -87,6 +87,7 @@ public final class RigidBody2D extends RigidBody {
         if (rawBody == null) return;
         transform.position.x = rawBody.getTransform().p.x;
         transform.position.y = rawBody.getTransform().p.y;
+        transform.rotation.z = rawBody.getTransform().q.getAngle();
         velocity.set(rawBody.m_linearVelocity.x, rawBody.m_linearVelocity.y);
     }
 }
