@@ -13,9 +13,11 @@ import org.joml.Vector4f;
 import xyz.destiall.caramel.api.Component;
 import xyz.destiall.caramel.api.math.Vector2;
 import xyz.destiall.caramel.api.math.Vector3;
+import xyz.destiall.caramel.api.objects.StringWrapperImpl;
 import xyz.destiall.caramel.api.texture.Mesh;
 import xyz.destiall.caramel.api.texture.Texture;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -371,6 +373,7 @@ public final class ImGuiUtils {
 
         return imInt.get();
     }
+
 
     public static void imguiLayer(Field field, Component component) {
         try {

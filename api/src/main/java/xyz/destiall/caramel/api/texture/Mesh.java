@@ -203,7 +203,7 @@ public final class Mesh {
 
         glBindVertexArray(0);
 
-        if (!texture.isLoaded()) {
+        if (texture != null && !texture.isLoaded()) {
             texture.buildTexture();
         }
     }
