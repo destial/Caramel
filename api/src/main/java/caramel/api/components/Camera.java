@@ -8,7 +8,7 @@ import org.joml.Vector3f;
 import caramel.api.objects.GameObject;
 
 public class Camera extends Component {
-    public Matrix4f projection, view;
+    public transient Matrix4f projection, view;
     public Vector3f target;
 
     @HideInEditor
