@@ -1,5 +1,7 @@
 package xyz.destiall.caramel.app;
 
+import caramel.api.sound.SoundSource;
+import caramel.api.texture.Texture;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
@@ -421,6 +423,9 @@ public final class ApplicationImpl extends Application {
     }
 
     private void destroy() {
+        Texture.invalidateAll();
+        SoundSource.destroyAll();
+
         // Save settings
         File settings = new File("settings.json");
         JsonObject object = new JsonObject();

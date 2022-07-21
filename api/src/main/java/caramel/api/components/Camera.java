@@ -10,9 +10,9 @@ import caramel.api.objects.GameObject;
 public class Camera extends Component {
     public transient Matrix4f projection, view;
     public Vector3f target;
+    public boolean rotate = false;
 
-    @HideInEditor
-    public boolean isEditor = false;
+    @HideInEditor public boolean isEditor = false;
     @HideInEditor public Vector3f forward;
     @HideInEditor public Vector3f up;
     @HideInEditor public float fov = 60f;
@@ -28,17 +28,13 @@ public class Camera extends Component {
         up = new Vector3f(transform.up);
 
         projection.identity();
-        //projection.perspective((float) Math.toRadians(fov), Application.getApp().getWidth() / (float) Application.getApp().getHeight(), near, far, new Matrix4f());
-        //projection.ortho(-8, 8, -4.5f, 4.5f, near, far, true);
     }
 
     @Override
     public void start() {}
 
     @Override
-    public void update() {
-        double y = transform.rotation.z / Math.PI;
-    }
+    public void update() {}
 
     @Override
     public void editorUpdate() {}
@@ -52,6 +48,13 @@ public class Camera extends Component {
 
     public Matrix4f getView() {
         view.identity();
+        if (rotate) {
+            double x = -Math.sin(transform.rotation.z);
+            double y = Math.cos(transform.rotation.z);
+            up.set(x, y, 0);
+        } else {
+            up.set(0, 1, 0);
+        }
         view.lookAt(transform.position, target.add(transform.position, new Vector3f()), up);
         return new Matrix4f(view);
     }

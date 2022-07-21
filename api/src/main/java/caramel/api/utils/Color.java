@@ -1,21 +1,15 @@
 package caramel.api.utils;
 
-import org.joml.Vector4f;
-
 public final class Color {
-    private final Vector4f vector;
     public float r = 1f, g = 1f, b = 1f, a = 1f;
 
-    public Color() {
-        vector = new Vector4f(r, g, b, a);
-    }
+    public Color() {}
 
     public Color(float r, float g, float b, float a) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
-        vector = new Vector4f(r, g, b, a);
     }
 
     public void set(float r, float g, float b, float a) {
@@ -23,10 +17,22 @@ public final class Color {
         this.g = g;
         this.b = b;
         this.a = a;
-        vector.set(r, g, b, a);
     }
 
-    public Vector4f asVector() {
-        return vector.set(r, g, b, a);
+    public void set(Color color) {
+        this.r = color.r;
+        this.g = color.g;
+        this.b = color.b;
+        this.a = color.a;
+    }
+
+    @Override
+    public String toString() {
+        return "Color{" +
+                "r=" + r +
+                ", g=" + g +
+                ", b=" + b +
+                ", a=" + a +
+                '}';
     }
 }

@@ -10,7 +10,7 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public final class Circle2DCollider extends Collider {
-    public float radius = 1f;
+    public float radius = 0.5f;
     private transient final Vector3f debugColor = new Vector3f(0, 255, 0);
 
     public transient RigidBody2D rigidBody;

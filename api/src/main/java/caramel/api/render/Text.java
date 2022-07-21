@@ -10,12 +10,17 @@ import caramel.api.text.TextMesh;
 import caramel.api.texture.Mesh;
 import caramel.api.text.CharInfo;
 import caramel.api.text.TextFont;
+import caramel.api.utils.Color;
 
 public final class Text extends Renderer {
 
     @HideInEditor private transient TextMesh mesh;
     @HideInEditor private transient TextFont font;
     @ShowInEditor public String text = "New Text";
+
+    @ShowInEditor
+    @InvokeOnEdit("setColor")
+    public Color color = new Color(1f, 1f, 1f, 1f);
 
     @InvokeOnEdit("updateFontSize")
     public int fontSize = 24;
@@ -24,14 +29,16 @@ public final class Text extends Renderer {
         super(gameObject);
     }
 
+    private void setColor() {
+        mesh.setColor(color);
+    }
+
     public String getText() {
         return text;
     }
 
     @Override
-    public void start() {
-
-    }
+    public void start() {}
 
     private void updateFontSize() {
         if (font != null) {
@@ -46,8 +53,10 @@ public final class Text extends Renderer {
     public void render(Camera camera) {
         if (mesh == null) {
             mesh = new TextMesh();
+            setColor();
             updateFontSize();
         }
+
         mesh.addText(text);
         mesh.render(transform, camera);
     }

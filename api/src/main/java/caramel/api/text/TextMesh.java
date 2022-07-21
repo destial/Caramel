@@ -3,6 +3,7 @@ package caramel.api.text;
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
 import caramel.api.render.Shader;
+import caramel.api.utils.Color;
 import org.lwjgl.opengl.GL15;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -25,16 +26,12 @@ import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL31.GL_TEXTURE_BUFFER;
 
 public final class TextMesh {
     private static final int BATCH_SIZE = 1000;
     private static final int VERTEX_SIZE = 7;
     private final float[] vertices = new float[BATCH_SIZE * VERTEX_SIZE];
-    private final int[] indices = {
-            0, 1, 3,
-            1, 2, 3
-    };
+    private Color color;
     private final int vao;
     private final int vbo;
     private final Shader shader;
@@ -57,6 +54,10 @@ public final class TextMesh {
 
         int elementSize = BATCH_SIZE * 3;
         int[] elementBuffer = new int[elementSize];
+        int[] indices = {
+                0, 1, 3,
+                1, 2, 3
+        };
 
         for (int i=0; i < elementSize; i++) {
             elementBuffer[i] = indices[(i % 6)] + ((i / 6) * 4);
@@ -103,6 +104,10 @@ public final class TextMesh {
         shader.detach();
     }
 
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
     public boolean addCharacter(float x, float y, CharInfo charInfo) {
         // If we have no more room in the current batch, flush it and start with a fresh batch
         if (size >= BATCH_SIZE - 4) {
@@ -112,6 +117,12 @@ public final class TextMesh {
         float r = 1f;
         float g = 1f;
         float b = 1f;
+
+        if (color != null) {
+            r = color.r;
+            g = color.g;
+            b = color.b;
+        }
 
         float x1 = x + charInfo.width;
         float y1 = y + charInfo.height;

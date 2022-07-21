@@ -11,9 +11,9 @@ public final class AudioPlayer extends Component {
     private transient SoundSource source;
     private transient Sound sound;
     @ShowInEditor public String path = "";
-    @ShowInEditor public boolean loop;
-    @ShowInEditor public float volume;
-    @ShowInEditor public boolean playOnStart;
+    @ShowInEditor public boolean loop = false;
+    @ShowInEditor public float volume = 0.1f;
+    @ShowInEditor public boolean playOnStart = true;
 
     public AudioPlayer(GameObject gameObject) {
         super(gameObject);
@@ -58,7 +58,7 @@ public final class AudioPlayer extends Component {
         if (source != null) {
             source.destroy();
         }
-        source = new SoundSource(path);
+        source = SoundSource.getSource(path);
         if (source.build()) {
             sound = source.createSound(loop);
             if (sound != null) {

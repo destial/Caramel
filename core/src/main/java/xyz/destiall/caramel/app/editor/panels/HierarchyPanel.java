@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.editor.panels;
 
 import caramel.api.components.RigidBody2D;
 import caramel.api.physics.components.Box2DCollider;
+import caramel.api.physics.components.Circle2DCollider;
 import caramel.api.render.Text;
 import imgui.ImGui;
 import imgui.ImVec2;
@@ -181,15 +182,15 @@ public final class HierarchyPanel extends Panel {
             if (ImGui.selectable("New 2D Circle")) {
                 GameObject go = new GameObjectImpl(scene);
                 MeshRenderer renderer = new MeshRenderer(go);
-                Mesh mesh = MeshBuilder.createCircle(new Vector4f(1f, 1f, 1f, 1f), 1, 36);
-                mesh.build();
+                Mesh mesh = MeshBuilder.createCircle(0.5f, 36);
                 renderer.setMesh(mesh);
+                mesh.build();
                 RigidBody2D rigidBody = new RigidBody2D(go);
-                Box2DCollider boxCollider = new Box2DCollider(go);
+                Circle2DCollider CircleCollider = new Circle2DCollider(go);
 
                 go.addComponent(renderer);
                 go.addComponent(rigidBody);
-                go.addComponent(boxCollider);
+                go.addComponent(CircleCollider);
 
                 AddGameObjects addGameObjects = new AddGameObjects(scene);
                 scene.addGameObject(go);

@@ -6,6 +6,7 @@ import caramel.api.objects.GameObjectImpl;
 import caramel.api.render.MeshRenderer;
 import caramel.api.components.Transform;
 import caramel.api.objects.SceneImpl;
+import caramel.api.render.SpriteRenderer;
 import xyz.destiall.java.gson.JsonArray;
 import xyz.destiall.java.gson.JsonDeserializationContext;
 import xyz.destiall.java.gson.JsonDeserializer;
@@ -61,6 +62,10 @@ public final class GameObjectSerializer implements JsonSerializer<GameObject>, J
             if (component instanceof MeshRenderer) {
                 MeshRenderer renderer = (MeshRenderer) component;
                 if (renderer.mesh != null) renderer.mesh.build();
+            }
+            if (component instanceof SpriteRenderer) {
+                SpriteRenderer renderer = (SpriteRenderer) component;
+                if (renderer.spritesheet != null) renderer.spritesheet.build();
             }
             gameObject.addComponent(component);
             if (maxId < component.id) {

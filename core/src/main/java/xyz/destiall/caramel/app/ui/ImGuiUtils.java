@@ -1,6 +1,11 @@
 package xyz.destiall.caramel.app.ui;
 
+import caramel.api.Component;
 import caramel.api.interfaces.InvokeOnEdit;
+import caramel.api.math.Vector2;
+import caramel.api.math.Vector3;
+import caramel.api.texture.Mesh;
+import caramel.api.texture.Texture;
 import caramel.api.utils.Color;
 import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
@@ -14,17 +19,10 @@ import imgui.type.ImString;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
-import caramel.api.Component;
-import caramel.api.math.Vector2;
-import caramel.api.math.Vector3;
-import caramel.api.texture.Mesh;
-import caramel.api.texture.Texture;
-import xyz.destiall.caramel.app.ApplicationImpl;
 
-import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
 public final class ImGuiUtils {
     private static final float width = 110f;
@@ -515,12 +513,16 @@ public final class ImGuiUtils {
             } else if (type == Mesh.class) {
                 Mesh mesh = (Mesh) value;
                 ImGui.text("shader: " + mesh.getShader().getPath());
-                String path = findFile("texture", ".png,.jpeg,.jpg");
+                String path = findFile("texture", "Load Texture", ".png,.jpeg,.jpg");
+
+                if (mesh.getTexture() != null) {
+                    ImGui.sameLine();
+                    ImGui.text(mesh.getTexturePath());
+                }
+
                 if (path != null) {
-                    Texture texture = Texture.getTexture(path);
-                    if (texture == null) {
-                        new Texture(path).buildTexture();
-                    }
+                    System.out.println(path);
+                    Texture.getTexture(path).buildTexture();
                     mesh.setTexture(path);
                 }
 
@@ -548,29 +550,32 @@ public final class ImGuiUtils {
     }
 
     public static String findFile(String label, String button, String filter) {
+        ImGui.pushID(label);
         ImGui.columns(2);
         ImGui.setColumnWidth(0, width);
         ImGui.text(label);
         ImGui.nextColumn();
 
         if (ImGui.button(button)) {
-            ImGuiFileDialog.openModal("load-file", button, filter, ".", new ImGuiFileDialogPaneFun() {
+            ImGuiFileDialog.openModal(label, button, filter, ".", new ImGuiFileDialogPaneFun() {
                 @Override
                 public void paneFun(String filter, long userDatas, boolean canContinue) {}
             }, 250, 1, 42, ImGuiFileDialogFlags.None);
         }
 
         ImGui.columns(1);
+        ImGui.popID();
 
-        String path = null;
-        if (ImGuiFileDialog.display("load-file", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
+        if (ImGuiFileDialog.display(label, ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
             if (ImGuiFileDialog.isOk()) {
-                path = ImGuiFileDialog.getFilePathName();
+                String path = ImGuiFileDialog.getFilePathName();
+                ImGuiFileDialog.close();
+                return path;
             }
             ImGuiFileDialog.close();
         }
 
-        return path;
+        return null;
     }
 
     public static String findFile(String label, String filter) {
@@ -580,6 +585,7 @@ public final class ImGuiUtils {
     public static void imguiLayer(Method method, Component component) {
         try {
             String name = method.getName();
+            Parameter[] params = method.getParameters();
             if (ImGui.button(name)) {
                 method.invoke(component);
             }

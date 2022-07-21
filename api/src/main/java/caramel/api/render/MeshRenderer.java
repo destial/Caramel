@@ -25,17 +25,20 @@ public final class MeshRenderer extends Renderer {
 
     public void setMesh(Mesh mesh) {
         this.mesh = mesh;
+        setColor();
     }
 
     @Override
     public void render(Camera camera) {
         if (mesh == null) {
             mesh = MeshBuilder.createQuad(1);
-            mesh.setColor(color);
+            setColor();
             mesh.build();
         }
 
-        if (mesh != null) mesh.render(transform, camera);
+        if (mesh != null) {
+            mesh.render(transform, camera);
+        }
     }
 
     @Override

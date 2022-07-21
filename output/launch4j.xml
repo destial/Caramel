@@ -62,4 +62,18 @@
     <jdkPreference>jdkOnly</jdkPreference>
     <runtimeBits>64/32</runtimeBits>
   </jre>
+  <versionInfo>
+    <fileVersion>1.0.0.0</fileVersion>
+    <txtFileVersion>1.0.R-1</txtFileVersion>
+    <fileDescription>A Java-based Game Engine</fileDescription>
+    <copyright>destiall</copyright>
+    <productVersion>1.0.0.0</productVersion>
+    <txtProductVersion>1.0.R-1</txtProductVersion>
+    <productName>Caramel</productName>
+    <companyName>destiall</companyName>
+    <internalName>Caramel-Engine</internalName>
+    <originalFilename>Caramel.exe</originalFilename>
+    <trademarks></trademarks>
+    <language>ENGLISH_US</language>
+  </versionInfo>
 </launch4jConfig>

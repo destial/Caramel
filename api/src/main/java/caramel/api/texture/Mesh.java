@@ -7,7 +7,6 @@ import caramel.api.render.Shader;
 import caramel.api.utils.Color;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import java.nio.FloatBuffer;
@@ -42,7 +41,7 @@ public final class Mesh {
     public int type;
 
     private String shader;
-    private String texture = "";
+    private String texture;
     private Color color;
     private transient int vaoId, vboId;
     private boolean dirty = false;
@@ -89,7 +88,7 @@ public final class Mesh {
         return vertexArray.get(index);
     }
 
-    public Mesh pushVertex(Vector3f position, Vector4f color, Vector2f texCoords, Vector3f normal) {
+    public Mesh pushVertex(Vector3f position, Color color, Vector2f texCoords, Vector3f normal) {
         Vertex vertex = new Vertex();
         vertex.position.set(position);
         vertex.color.set(color);
@@ -105,12 +104,15 @@ public final class Mesh {
         vertex.position.x = floats[0];
         vertex.position.y = floats[1];
         vertex.position.z = floats[2];
-        vertex.color.x = floats[3];
-        vertex.color.y = floats[4];
-        vertex.color.z = floats[5];
-        vertex.color.w = floats[6];
+
+        vertex.color.r = floats[3];
+        vertex.color.g = floats[4];
+        vertex.color.b = floats[5];
+        vertex.color.a = floats[6];
+
         vertex.texCoords.x = floats[7];
         vertex.texCoords.y = floats[8];
+
         vertex.normal.x = floats[9];
         vertex.normal.y = floats[10];
         vertex.normal.z = floats[11];
@@ -142,10 +144,13 @@ public final class Mesh {
         this.color = color;
         if (color != null) {
             for (Vertex vertex : vertexArray) {
-                vertex.color.set(color.asVector());
+                vertex.color.set(color);
             }
-            if (shader != null) Shader.getShader(shader).detach();
-            shader = "color";
+            if (texture != null) {
+                shader = "default";
+            } else {
+                shader = "color";
+            }
         }
         dirty = true;
     }
@@ -181,14 +186,15 @@ public final class Mesh {
             int eboId = glGenBuffers();
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
             glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_DYNAMIC_DRAW);
-
         }
+
         int positionSize = 3;
         int colorSize = 4;
         int texSize = 2;
         int normalSize = 3;
         int floatSizeBytes = 4;
         int vertexSizeBytes = (positionSize + colorSize + texSize + normalSize) * floatSizeBytes;
+
         glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
         glEnableVertexAttribArray(0);
 
@@ -203,13 +209,8 @@ public final class Mesh {
 
         glBindVertexArray(0);
 
-        if (texture != null && !texture.isEmpty()) {
-            Texture tex = Texture.getTexture(texture);
-            if (tex == null) {
-                new Texture(texture).buildTexture();
-            } else if (!tex.isLoaded()) {
-                tex.buildTexture();
-            }
+        if (texture != null) {
+            Texture.getTexture(texture).buildTexture();
         }
     }
 
@@ -218,15 +219,18 @@ public final class Mesh {
         float[] vertex = new float[vertexArray.size() * Vertex.SIZE];
         int index = 0;
         for (Vertex v : vertexArray) {
-            vertex[index] = v.position.x;
+            vertex[  index  ] = v.position.x;
             vertex[index + 1] = v.position.y;
             vertex[index + 2] = v.position.z;
-            vertex[index + 3] = v.color.x;
-            vertex[index + 4] = v.color.y;
-            vertex[index + 5] = v.color.z;
-            vertex[index + 6] = v.color.w;
+
+            vertex[index + 3] = v.color.r;
+            vertex[index + 4] = v.color.g;
+            vertex[index + 5] = v.color.b;
+            vertex[index + 6] = v.color.a;
+
             vertex[index + 7] = v.texCoords.x;
             vertex[index + 8] = v.texCoords.y;
+
             vertex[index + 9] = v.normal.x;
             vertex[index + 10] = v.normal.y;
             vertex[index + 11] = v.normal.z;
@@ -250,7 +254,11 @@ public final class Mesh {
             Texture tex = Texture.getTexture(path);
             if (tex != null) {
                 shader = "default";
+            } else {
+                shader = "color";
             }
+        } else {
+            shader = "color";
         }
         this.dirty = true;
     }
@@ -268,11 +276,9 @@ public final class Mesh {
         s.use();
         if (texture != null) {
             Texture tex = Texture.getTexture(texture);
-            if (tex != null) {
-                glActiveTexture(GL_TEXTURE0);
-                tex.bind();
-                s.uploadTexture("texSampler", 0);
-            }
+            glActiveTexture(GL_TEXTURE0);
+            tex.bind();
+            s.uploadTexture("texSampler", 0);
         }
 
         if (dirty) {
@@ -303,10 +309,8 @@ public final class Mesh {
 
         if (texture != null) {
             Texture tex = Texture.getTexture(texture);
-            if (tex != null) {
-                tex.unbind();
-                glActiveTexture(0);
-            }
+            tex.unbind();
+            glActiveTexture(0);
         }
 
         s.detach();

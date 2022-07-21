@@ -49,32 +49,26 @@ public final class Texture {
     }
 
     public void invalidate() {
-        glDeleteTextures(texId);
-        texId = 0;
-        TEXTURES.remove(path);
-    }
-
-    public Texture getReference() {
-        return reference;
-    }
-
-    public Texture(String path) {
-        this.path = path;
-        if (TEXTURES.containsKey(path)) {
-            Texture existing = getTexture(path);
-            reference = existing;
-            if (existing.isLoaded()) {
-                texId = existing.texId;
-                height = existing.height;
-                width = existing.width;
-                loaded = existing.loaded;
-            }
-            return;
+        glDeleteTextures(getTexId());
+        if (reference != null) {
+            reference.texId = 0;
+            texId = 0;
         }
-        TEXTURES.put(path, this);
+
+        if (path != null) {
+            TEXTURES.remove(path);
+        }
+    }
+
+    private Texture(String path) {
+        this.path = path;
     }
 
     public void buildEmpty() {
+        if (reference != null) {
+            reference.buildEmpty();
+            return;
+        }
         texId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texId);
 
@@ -87,6 +81,10 @@ public final class Texture {
     }
 
     public void buildBuffer() {
+        if (reference != null) {
+            reference.buildBuffer();
+            return;
+        }
         texId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texId);
 
@@ -101,12 +99,16 @@ public final class Texture {
         loaded = true;
     }
 
-    public void buildTexture() {
-        if (texId != 0 && !loaded) return;
+    public boolean buildTexture() {
+        if (texId != 0 && !loaded) return false;
+        if (reference != null) {
+            return reference.buildTexture();
+        }
+
         File file = new File(path);
         if (!file.exists()) {
             Debug.logError("Texture file does not exist: " + file.getPath());
-            return;
+            return false;
         }
 
         IntBuffer width = BufferUtils.createIntBuffer(1);
@@ -116,7 +118,7 @@ public final class Texture {
 
         if (image == null) {
             Debug.logError("Unable to load texture: " + getPath());
-            return;
+            return false;
         }
 
         texId = glGenTextures();
@@ -129,35 +131,40 @@ public final class Texture {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         if (channels.get(0) == 3) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0), 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+            this.width = width.get(0);
+            this.height = height.get(0);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, this.width, this.height, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
         } else if (channels.get(0) == 4) {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+            this.width = width.get(0);
+            this.height = height.get(0);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this.width, this.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
         } else {
             Debug.logError("Invalid channels for texture: " + getPath());
         }
         loaded = true;
 
         stbi_image_free(image);
+        return true;
     }
 
     public boolean isLoaded() {
-        return loaded;
+        return reference != null ? reference.loaded : loaded;
     }
 
     public int getWidth() {
-        return width;
+        return reference != null ? reference.width : width;
     }
 
     public int getHeight() {
-        return height;
+        return reference != null ? reference.height : height;
     }
 
     public int getTexId() {
-        return texId;
+        return reference != null ? reference.texId : texId;
     }
 
     public void bind() {
-        glBindTexture(GL_TEXTURE_2D, texId);
+        glBindTexture(GL_TEXTURE_2D, getTexId());
     }
 
     public void unbind() {
@@ -170,6 +177,26 @@ public final class Texture {
 
     private static final Map<String, Texture> TEXTURES = new HashMap<>();
     public static Texture getTexture(String path) {
-        return TEXTURES.get(path);
+        Texture texture = TEXTURES.get(path);
+        if (texture == null) {
+            texture = new Texture(path);
+            if (texture.buildTexture()) {
+                TEXTURES.put(path, texture);
+            } else {
+                texture = null;
+                TEXTURES.put(path, null);
+            }
+        }
+        return texture;
+    }
+
+    public static void invalidateAll() {
+        for (Texture t : TEXTURES.values()) {
+            if (t.isLoaded()) {
+                glDeleteTextures(t.texId);
+                t.texId = 0;
+            }
+        }
+        TEXTURES.clear();
     }
 }

@@ -4,6 +4,7 @@ import caramel.api.debug.Debug;
 
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,7 +24,7 @@ public final class SoundSource {
     private final Set<Sound> sounds;
     int bufferId = -1;
 
-    public SoundSource(String path) {
+    private SoundSource(String path) {
         this.path = path;
         sounds = ConcurrentHashMap.newKeySet();
     }
@@ -85,5 +86,32 @@ public final class SoundSource {
         }
         sounds.clear();
         alDeleteBuffers(bufferId);
+        bufferId = 0;
+
+        SOURCES.remove(path);
+    }
+
+    private final static Map<String, SoundSource> SOURCES = new ConcurrentHashMap<>();
+
+    public static void destroyAll() {
+        for (SoundSource source : SOURCES.values()) {
+            for (Sound sound : source.sounds) {
+                sound.destroy();
+            }
+            source.sounds.clear();
+            alDeleteBuffers(source.bufferId);
+            source.bufferId = 0;
+        }
+        SOURCES.clear();
+    }
+
+    public static SoundSource getSource(String path) {
+        SoundSource source = SOURCES.get(path);
+        if (source == null) {
+            source = new SoundSource(path);
+            source.build();
+            SOURCES.put(path, source);
+        }
+        return source;
     }
 }
