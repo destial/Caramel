@@ -17,12 +17,12 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
-import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.Time;
+import caramel.api.Input;
+import caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
-import xyz.destiall.caramel.api.utils.FileIO;
+import caramel.api.utils.FileIO;
 
 import java.util.HashMap;
 import java.util.Map;

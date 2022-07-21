@@ -1,12 +1,12 @@
 package xyz.destiall.caramel.app.serialize;
 
-import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.Prefab;
-import xyz.destiall.caramel.api.render.MeshRenderer;
-import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
-import xyz.destiall.caramel.api.objects.PrefabImpl;
+import caramel.api.Component;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.Prefab;
+import caramel.api.render.MeshRenderer;
+import caramel.api.components.Transform;
+import caramel.api.objects.GameObjectImpl;
+import caramel.api.objects.PrefabImpl;
 import xyz.destiall.java.gson.JsonArray;
 import xyz.destiall.java.gson.JsonDeserializationContext;
 import xyz.destiall.java.gson.JsonDeserializer;

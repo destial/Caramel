@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.utils;
 
-import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.objects.GameObject;
+import caramel.api.Component;
+import caramel.api.objects.GameObject;
 
 import java.util.HashSet;
 import java.util.Set;

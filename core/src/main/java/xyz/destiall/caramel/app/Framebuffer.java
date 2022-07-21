@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app;
 
-import xyz.destiall.caramel.api.debug.DebugImpl;
-import xyz.destiall.caramel.api.texture.Texture;
+import caramel.api.debug.DebugImpl;
+import caramel.api.texture.Texture;
 
 import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.opengl.GL30.GL_COLOR_ATTACHMENT0;

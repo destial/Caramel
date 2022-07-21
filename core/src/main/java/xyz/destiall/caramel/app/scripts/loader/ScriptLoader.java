@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
-import xyz.destiall.caramel.api.scripts.InternalScript;
-import xyz.destiall.caramel.api.utils.FileIO;
+import caramel.api.scripts.InternalScript;
+import caramel.api.utils.FileIO;
 
 import javax.script.ScriptException;
 import javax.tools.DiagnosticCollector;

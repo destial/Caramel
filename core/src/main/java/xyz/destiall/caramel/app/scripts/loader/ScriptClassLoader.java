@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
-import xyz.destiall.caramel.api.scripts.InternalScript;
+import caramel.api.scripts.InternalScript;
 
 import javax.script.ScriptException;
 import java.io.File;

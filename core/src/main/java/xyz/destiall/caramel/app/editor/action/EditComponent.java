@@ -1,11 +1,7 @@
 package xyz.destiall.caramel.app.editor.action;
 
-import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.Scene;
-
-import java.util.ArrayList;
-import java.util.List;
+import caramel.api.Component;
+import caramel.api.objects.Scene;
 
 public abstract class EditComponent<C extends Component> extends EditorAction {
     public C component;

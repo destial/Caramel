@@ -1,5 +1,8 @@
 package xyz.destiall.caramel.app.editor.panels;
 
+import caramel.api.components.RigidBody2D;
+import caramel.api.physics.components.Box2DCollider;
+import caramel.api.render.Text;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -7,19 +10,19 @@ import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import org.joml.Vector4f;
-import xyz.destiall.caramel.api.Application;
-import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.GameObjectImpl;
-import xyz.destiall.caramel.api.render.MeshRenderer;
-import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.texture.Mesh;
-import xyz.destiall.caramel.api.texture.MeshBuilder;
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.Application;
+import caramel.api.Input;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.GameObjectImpl;
+import caramel.api.render.MeshRenderer;
+import caramel.api.components.Transform;
+import caramel.api.texture.Mesh;
+import caramel.api.texture.MeshBuilder;
+import caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.utils.Payload;
-import xyz.destiall.caramel.api.objects.StringWrapperImpl;
+import caramel.api.objects.StringWrapperImpl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -110,32 +113,20 @@ public final class HierarchyPanel extends Panel {
                 Payload.COPIED_GAMEOBJECTS.clear();
                 Payload.COPIED_GAMEOBJECTS.add(editingGo);
                 editingGameObject = false;
+
             } else if (ImGui.selectable("Delete")) {
                 DeleteGameObjects deleteGameObjects = new DeleteGameObjects(scene);
                 scene.destroy(editingGo);
                 deleteGameObjects.deleted.add(editingGo);
                 scene.addUndoAction(deleteGameObjects);
                 editingGameObject = false;
+
             }
+
             ImGui.end();
         } else if (addingGameObjectHierarchy) {
             ImGui.begin("##addgameobject", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
             ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
-
-            if (ImGui.selectable("Add GameObject")) {
-                GameObject go = new GameObjectImpl(scene);
-                Mesh quad = MeshBuilder.createQuad(1);
-                quad.setColor(new Vector4f(1f, 1f, 1f, 1f));
-                quad.build();
-                MeshRenderer renderer = new MeshRenderer(go);
-                renderer.setMesh(quad);
-                go.addComponent(renderer);
-                AddGameObjects addGameObjects = new AddGameObjects(scene);
-                scene.addGameObject(go);
-                addGameObjects.added.add(go);
-                scene.addUndoAction(addGameObjects);
-                addingGameObjectHierarchy = false;
-            }
 
             if (ImGui.menuItem("Select All", "CTRL + A", false, !scene.getSelectedGameObject().isEmpty())) {
                 scene.getSelectedGameObject().addAll(scene.getGameObjects());
@@ -156,6 +147,67 @@ public final class HierarchyPanel extends Panel {
                     scene.addGameObject(go);
                 }
                 scene.addUndoAction(action);
+                addingGameObjectHierarchy = false;
+            }
+
+            ImGui.separator();
+
+            if (ImGui.selectable("New Empty GameObject")) {
+                GameObject go = new GameObjectImpl(scene);
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.selectable("New 2D Cube")) {
+                GameObject go = new GameObjectImpl(scene);
+                MeshRenderer renderer = new MeshRenderer(go);
+                RigidBody2D rigidBody = new RigidBody2D(go);
+                Box2DCollider boxCollider = new Box2DCollider(go);
+
+                go.addComponent(renderer);
+                go.addComponent(rigidBody);
+                go.addComponent(boxCollider);
+
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.selectable("New 2D Circle")) {
+                GameObject go = new GameObjectImpl(scene);
+                MeshRenderer renderer = new MeshRenderer(go);
+                Mesh mesh = MeshBuilder.createCircle(new Vector4f(1f, 1f, 1f, 1f), 1, 36);
+                mesh.build();
+                renderer.setMesh(mesh);
+                RigidBody2D rigidBody = new RigidBody2D(go);
+                Box2DCollider boxCollider = new Box2DCollider(go);
+
+                go.addComponent(renderer);
+                go.addComponent(rigidBody);
+                go.addComponent(boxCollider);
+
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.selectable("New UI Text")) {
+                GameObject go = new GameObjectImpl(scene);
+                Text renderer = new Text(go);
+                go.transform.scale.x = 0.025f;
+                go.transform.scale.y = 0.025f;
+                go.addComponent(renderer);
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
                 addingGameObjectHierarchy = false;
             }
             ImGui.end();

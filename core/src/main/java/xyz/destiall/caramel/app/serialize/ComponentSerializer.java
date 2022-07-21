@@ -1,7 +1,10 @@
 package xyz.destiall.caramel.app.serialize;
 
-import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.objects.GameObject;
+import caramel.api.Component;
+import caramel.api.debug.Debug;
+import caramel.api.debug.DebugImpl;
+import caramel.api.objects.GameObject;
+import caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
@@ -32,10 +35,26 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
         try {
             c = (Class<? extends Component>) Class.forName(clazz);
         } catch (ClassNotFoundException e) {
-            String[] split = clazz.split("\\.");
-            String scriptName = split[split.length - 1];
-            c = ApplicationImpl.getApp().getScriptManager().getScript(scriptName).getCompiledClass();
-            if (c == null) return null;
+            clazz = clazz.replace("xyz.destiall.", "");
+            try {
+                c = (Class<? extends Component>) Class.forName(clazz);
+            } catch (ClassNotFoundException ee) {
+                String[] split = clazz.split("\\.");
+                String scriptName = split[split.length - 1];
+                InternalScript script = ApplicationImpl.getApp().getScriptManager().getScript(scriptName);
+                if (script == null) {
+                    DebugImpl.logError("Unable to load class: " + clazz);
+                    e.printStackTrace();
+                    return null;
+                }
+
+                c = script.getCompiledClass();
+                if (c == null) {
+                    DebugImpl.logError("Unable to load class: " + clazz);
+                    e.printStackTrace();
+                    return null;
+                }
+            }
         }
         return defaultGson.fromJson(jsonElement, c);
     }
@@ -49,6 +68,7 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
             component = constructor.newInstance(gameObject);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
+            DebugImpl.logError(e.getLocalizedMessage());
             return gsonComponent;
         }
         for (Field field : gsonComponent.getClass().getFields()) {
@@ -59,6 +79,7 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
                 field.set(component, field.get(gsonComponent));
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
+                Debug.logError(e.getLocalizedMessage());
             }
             if (!accessible) field.setAccessible(false);
         }

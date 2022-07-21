@@ -9,17 +9,17 @@ import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
 import org.reflections.Reflections;
-import xyz.destiall.caramel.api.Application;
-import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.audio.AudioListener;
-import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.debug.Debug;
-import xyz.destiall.caramel.api.debug.DebugImpl;
-import xyz.destiall.caramel.api.objects.Scene;
-import xyz.destiall.caramel.api.utils.FileIO;
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.Application;
+import caramel.api.Component;
+import caramel.api.Input;
+import caramel.api.Time;
+import caramel.api.audio.AudioListener;
+import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
+import caramel.api.debug.DebugImpl;
+import caramel.api.objects.Scene;
+import caramel.api.utils.FileIO;
+import caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
@@ -30,6 +30,7 @@ import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
+import xyz.destiall.java.timer.Scheduler;
 
 import java.io.File;
 import java.io.IOException;
@@ -90,7 +91,8 @@ public final class ApplicationImpl extends Application {
 
     private final MouseListenerImpl mouseListener;
     private final KeyListenerImpl keyListener;
-    private final EventHandling eventHandling;
+    private final EventHandling eventHandler;
+    private final Scheduler scheduler;
     private final List<Listener> listeners;
     private final Gson serializer;
 
@@ -113,12 +115,6 @@ public final class ApplicationImpl extends Application {
 
     public long glfwWindow;
 
-    public static ApplicationImpl getRunnable() {
-        if (inst == null) inst = new ApplicationImpl();
-        ((ApplicationImpl) inst).EDITOR_MODE = false;
-        return (ApplicationImpl) inst;
-    }
-
     public static ApplicationImpl getApp() {
         if (inst == null) inst = new ApplicationImpl();
         return (ApplicationImpl) inst;
@@ -128,7 +124,8 @@ public final class ApplicationImpl extends Application {
         title = "Caramel";
         mouseListener = new MouseListenerImpl();
         keyListener = new KeyListenerImpl();
-        eventHandling = new EventHandling();
+        eventHandler = new EventHandling();
+        scheduler = new Scheduler();
         scenes = new ArrayList<>();
         serializer = new GsonBuilder()
                 .registerTypeAdapter(SceneImpl.class, new SceneSerializer())
@@ -142,14 +139,14 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public void run() {
-        loadFiles();
+        setup();
         init();
         loop();
         destroy();
     }
 
     @SuppressWarnings("all")
-    private void loadFiles() {
+    private void setup() {
         // Load settings and data files
         try {
             File settings = new File("settings.json");
@@ -179,6 +176,8 @@ public final class ApplicationImpl extends Application {
                 new File(assets, "shaders" + File.separator).mkdirs();
                 new File(assets, "scenes" + File.separator).mkdirs();
                 new File(assets, "sounds" + File.separator).mkdirs();
+                new File(assets, "fonts" + File.separator).mkdirs();
+                FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
             }
 
             File imgui = new File("imgui.ini");
@@ -230,23 +229,18 @@ public final class ApplicationImpl extends Application {
             list[1] = stbi_load("logo_32.png", width32, height32, channels32, 0);
 
             GLFWImage.Buffer icons = GLFWImage.malloc(2);
-            icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
-            icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
-            icons.position(0);
+            if (list[0] != null && list[1] != null) {
+                icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
+                icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
+                icons.position(0);
 
-            // Set window icons
-            glfwSetWindowIcon(glfwWindow, icons);
+                // Set window icons
+                glfwSetWindowIcon(glfwWindow, icons);
 
-            // Free up buffer space
-            stbi_image_free(list[0]);
-            stbi_image_free(list[1]);
-
-            //memFree(width16);
-            //memFree(width32);
-            //memFree(height16);
-            //memFree(height32);
-            //memFree(channels16);
-            //memFree(channels32);
+                // Free up buffer space
+                stbi_image_free(list[0]);
+                stbi_image_free(list[1]);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -301,7 +295,7 @@ public final class ApplicationImpl extends Application {
         // Register event listeners
         listeners.add(scriptManager);
         for (Listener listener : listeners) {
-            eventHandling.registerListener(listener);
+            eventHandler.registerListener(listener);
         }
 
         // Create and setup ImGUI
@@ -317,7 +311,7 @@ public final class ApplicationImpl extends Application {
         scriptManager.reloadAll();
 
         // Load all built-in components
-        Reflections reflections = new Reflections("xyz.destiall.caramel.api");
+        Reflections reflections = new Reflections("caramel.api");
         Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
         List<Class<? extends Component>> sorted = new ArrayList<>(set);
         sorted.sort(Comparator.comparing(Class::getName));
@@ -442,7 +436,7 @@ public final class ApplicationImpl extends Application {
 
         // Unregister any remaining listeners
         for (Listener listener : listeners) {
-            eventHandling.unregisterListener(listener);
+            eventHandler.unregisterListener(listener);
         }
 
         // Destroy ImGUI
@@ -474,7 +468,7 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public EventHandling getEventHandler() {
-        return eventHandling;
+        return eventHandler;
     }
 
     @Override
@@ -570,5 +564,10 @@ public final class ApplicationImpl extends Application {
     @Override
     public EditorScriptManager getScriptManager() {
         return scriptManager;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 }

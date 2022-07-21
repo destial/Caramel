@@ -4,9 +4,9 @@ import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
-import xyz.destiall.caramel.api.debug.DebugImpl;
+import caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.objects.SceneImpl;
 
 import java.io.File;
 

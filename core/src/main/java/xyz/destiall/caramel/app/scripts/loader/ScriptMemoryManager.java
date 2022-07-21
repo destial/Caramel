@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
-import xyz.destiall.caramel.api.utils.CompositeIterator;
+import caramel.api.utils.CompositeIterator;
 
 import javax.script.ScriptException;
 import javax.tools.FileObject;

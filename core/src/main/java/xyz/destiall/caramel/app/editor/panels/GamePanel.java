@@ -3,10 +3,10 @@ package xyz.destiall.caramel.app.editor.panels;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiWindowFlags;
-import xyz.destiall.caramel.api.Application;
-import xyz.destiall.caramel.api.Time;
+import caramel.api.Application;
+import caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.objects.SceneImpl;
 
 public final class GamePanel extends Panel {
     private final ApplicationImpl window;

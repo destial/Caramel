@@ -1,17 +1,20 @@
 package xyz.destiall.caramel.app.physics;
 
+import caramel.api.physics.components.Circle2DCollider;
+import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
+import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
-import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.components.RigidBody2D;
-import xyz.destiall.caramel.api.physics.components.Box2DCollider;
-import xyz.destiall.caramel.api.physics.internals.ContactListener;
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.Time;
+import caramel.api.objects.GameObject;
+import caramel.api.components.RigidBody2D;
+import caramel.api.physics.components.Box2DCollider;
+import caramel.api.physics.internals.ContactListener;
+import caramel.api.objects.SceneImpl;
 
 
 public final class Physics2D implements Physics {
@@ -50,11 +53,21 @@ public final class Physics2D implements Physics {
                 break;
         }
 
-        PolygonShape shape = new PolygonShape();
+        Shape shape = null;
 
         if (gameObject.hasComponent(Box2DCollider.class)) {
+            shape = new PolygonShape();
             Box2DCollider collider = gameObject.getComponent(Box2DCollider.class);
-            shape.setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.halfSize.x * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.halfSize.y * 0.5f);
+            ((PolygonShape) shape).setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.bounds.x * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.bounds.y * 0.5f);
+            Vec2 pos = bodyDef.position;
+            float x = pos.x + collider.offset.x;
+            float y = pos.y + collider.offset.y;
+            bodyDef.position.set(x, y);
+
+        } else if (gameObject.hasComponent(Circle2DCollider.class)) {
+            shape = new CircleShape();
+            Circle2DCollider collider = gameObject.getComponent(Circle2DCollider.class);
+            shape.setRadius(collider.radius);
             Vec2 pos = bodyDef.position;
             float x = pos.x + collider.offset.x;
             float y = pos.y + collider.offset.y;

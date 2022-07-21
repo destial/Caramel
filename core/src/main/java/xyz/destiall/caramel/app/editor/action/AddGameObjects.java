@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.editor.action;
 
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.objects.Scene;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.Scene;
 
 import java.util.ArrayList;
 import java.util.List;

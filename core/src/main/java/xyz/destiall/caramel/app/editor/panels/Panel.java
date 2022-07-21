@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.editor.panels;
 
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.objects.SceneImpl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

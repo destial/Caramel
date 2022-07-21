@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.editor.action;
 
-import xyz.destiall.caramel.api.objects.Scene;
+import caramel.api.objects.Scene;
 
 public abstract class EditorAction {
     protected final Scene scene;
