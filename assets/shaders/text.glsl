@@ -14,7 +14,7 @@ uniform mat4 uModel;
 void main() {
     fTexCoords = aTexCoords;
     fColor = aColor;
-    gl_Position = uProjection * uView * uModel * vec4(aPos, -5, 1);
+    gl_Position = uProjection * uView * uModel * vec4(aPos, 5, 1);
 }
 
 #type fragment
@@ -28,5 +28,9 @@ uniform sampler2D texSampler;
 out vec4 color;
 
 void main() {
-    color = texture(texSampler, fTexCoords) * vec4(fColor, 1);
+    vec4 tex = texture(texSampler, fTexCoords);
+    if (tex.a < 0.05) {
+        discard;
+    }
+    color = tex * vec4(fColor, 1);
 }

@@ -26,6 +26,9 @@ public final class Text extends Renderer {
         super(gameObject);
     }
 
+    @Override
+    public void build() {}
+
     private void setColor() {
         mesh.setColor(color);
     }

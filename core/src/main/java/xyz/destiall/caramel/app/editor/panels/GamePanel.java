@@ -1,19 +1,17 @@
 package xyz.destiall.caramel.app.editor.panels;
 
-import caramel.api.Application;
 import caramel.api.Time;
 import caramel.api.objects.SceneImpl;
 import imgui.ImGui;
 import imgui.ImVec2;
+import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
+import org.joml.Vector2f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 
 public final class GamePanel extends Panel {
     private final ApplicationImpl window;
-    private ImVec2 windowSize;
-    private ImVec2 windowPos;
     private float previousFps;
-    private float leftX, rightX, topY, bottomY;
 
     public GamePanel(SceneImpl scene) {
         super(scene);
@@ -22,6 +20,7 @@ public final class GamePanel extends Panel {
 
     @Override
     public void __imguiLayer() {
+        ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0f, 0f);
         ImGui.begin("Game", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize);
         Panel.setPanelFocused(GamePanel.class, ImGui.isWindowFocused());
         Panel.setPanelHovered(GamePanel.class, ImGui.isWindowHovered());
@@ -31,8 +30,8 @@ public final class GamePanel extends Panel {
         }
         ImGui.text("FPS: " + previousFps);
 
-        windowSize = getLargestSizeForViewport();
-        windowPos = getCenteredPositionForViewport(windowSize);
+        ImVec2 windowSize = getLargestAspectRatioViewport();
+        ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
 
         ImGui.setCursorPos(windowPos.x, windowPos.y);
 
@@ -41,20 +40,18 @@ public final class GamePanel extends Panel {
         bottomLeft.x -= ImGui.getScrollX();
         bottomLeft.y -= ImGui.getScrollY();
 
-        leftX = bottomLeft.x;
-        bottomY = bottomLeft.y;
-        rightX = bottomLeft.x + windowSize.x;
-        topY = bottomLeft.y + windowSize.y;
+        float leftX = bottomLeft.x;
+        float bottomY = bottomLeft.y;
 
         int texId = window.getGameViewFramebuffer().getTexture().getTexId();
 
         ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
-        ImGui.end();
-    }
 
-    public boolean isMouseOnScene() {
-        return window.getMouseListener().getX() >= leftX && window.getMouseListener().getX() <= rightX &&
-                window.getMouseListener().getY() >= bottomY && window.getMouseListener().getY() <= topY;
+        window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
+        window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
+
+        ImGui.end();
+        ImGui.popStyleVar();
     }
 
     private ImVec2 getCenteredPositionForViewport(ImVec2 aspectSize) {
@@ -74,7 +71,7 @@ public final class GamePanel extends Panel {
         return windowSize;
     }
 
-    private ImVec2 getLargestSizeForViewport() {
+    private ImVec2 getLargestAspectRatioViewport() {
         ImVec2 windowSize = getWindowAvailSize();
         float aspectWidth = windowSize.x;
         float aspectHeight = aspectWidth / getRatio();
@@ -86,14 +83,6 @@ public final class GamePanel extends Panel {
     }
 
     private float getRatio() {
-        return Application.getApp().getWidth() / (float) Application.getApp().getHeight();
-    }
-
-    public ImVec2 getWindowPos() {
-        return windowPos;
-    }
-
-    public ImVec2 getWindowSize() {
-        return windowSize;
+        return 16 / 9f;
     }
 }

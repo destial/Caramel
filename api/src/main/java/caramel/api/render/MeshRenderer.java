@@ -19,6 +19,11 @@ public final class MeshRenderer extends Renderer {
         super(gameObject);
     }
 
+    @Override
+    public void build() {
+        if (mesh != null) mesh.build();
+    }
+
     public void setColor() {
         mesh.setColor(color);
     }

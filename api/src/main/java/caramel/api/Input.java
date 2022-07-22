@@ -63,11 +63,11 @@ public interface Input {
         return Application.getApp().getMouseListener().getDeltaX();
     }
 
-    static float getMousePositionX() {
+    static float getMouseScreenX() {
         return Application.getApp().getMouseListener().getX();
     }
 
-    static float getMousePositionY() {
+    static float getMouseScreenY() {
         return Application.getApp().getMouseListener().getY();
     }
 
@@ -77,6 +77,14 @@ public interface Input {
 
     static float getMouseScroll() {
         return Application.getApp().getMouseListener().getScrollY();
+    }
+
+    static float getMouseWorldX() {
+        return Application.getApp().getMouseListener().getScreenX();
+    }
+
+    static float getMouseWorldY() {
+        return Application.getApp().getMouseListener().getScreenY();
     }
 
     interface Mouse {

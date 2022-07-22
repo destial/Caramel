@@ -10,6 +10,7 @@ import caramel.api.objects.SceneImpl;
 import caramel.api.objects.StringWrapperImpl;
 import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
+import caramel.api.render.Button;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Text;
 import caramel.api.texture.Mesh;
@@ -210,6 +211,32 @@ public final class HierarchyPanel extends Panel {
                 AddGameObjects addGameObjects = new AddGameObjects(scene);
                 scene.addGameObject(go);
                 addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.selectable("New UI Button")) {
+                GameObject button = new GameObjectImpl(scene);
+                button.name.set("Button");
+                Button b = new Button(button);
+                button.addComponent(b);
+                button.transform.scale.x = 2.7f;
+
+                GameObject text = new GameObjectImpl(scene);
+                text.name.set("Text");
+                Text renderer = new Text(text);
+                text.transform.scale.x = 0.025f;
+                text.transform.scale.y = 0.025f;
+                text.transform.localPosition.x = -1.25f;
+                text.transform.localPosition.y = -0.2f;
+                text.addComponent(renderer);
+
+                button.children.add(text);
+
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(button);
+                addGameObjects.added.add(button);
+                addGameObjects.added.add(text);
                 scene.addUndoAction(addGameObjects);
                 addingGameObjectHierarchy = false;
             }

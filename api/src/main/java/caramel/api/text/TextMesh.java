@@ -67,7 +67,7 @@ public final class TextMesh {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
 
-        int stride = 7 * Float.BYTES;
+        int stride = VERTEX_SIZE * Float.BYTES;
         glVertexAttribPointer(0, 2, GL_FLOAT, false, stride, 0);
         glEnableVertexAttribArray(0);
 
@@ -95,7 +95,7 @@ public final class TextMesh {
 
         glDrawElements(GL_TRIANGLES, size * 6, GL_UNSIGNED_INT, 0);
 
-        for (int i = 0; i < size * 4 * 7; i++) {
+        for (int i = 0; i < size * 4 * VERTEX_SIZE; i++) {
             vertices[i] = 0;
         }
         size = 0;
@@ -132,22 +132,22 @@ public final class TextMesh {
         float ux1 = charInfo.textureCoordinates[1].x;
         float uy1 = charInfo.textureCoordinates[1].y;
 
-        int index = size * 7;
+        int index = size * VERTEX_SIZE;
         vertices[index] = x1;      vertices[index + 1] = y;
         vertices[index + 2] = r;   vertices[index + 3] = g;  vertices[index + 4] = b;
         vertices[index + 5] = ux1; vertices[index + 6] = uy0;
 
-        index += 7;
+        index += VERTEX_SIZE;
         vertices[index] = x1;      vertices[index + 1] = y1;
         vertices[index + 2] = r;   vertices[index + 3] = g;  vertices[index + 4] = b;
         vertices[index + 5] = ux1; vertices[index + 6] = uy1;
 
-        index += 7;
+        index += VERTEX_SIZE;
         vertices[index] = x;      vertices[index + 1] = y1;
         vertices[index + 2] = r;   vertices[index + 3] = g;  vertices[index + 4] = b;
         vertices[index + 5] = ux0; vertices[index + 6] = uy1;
 
-        index += 7;
+        index += VERTEX_SIZE;
         vertices[index] = x;      vertices[index + 1] = y;
         vertices[index + 2] = r;   vertices[index + 3] = g;  vertices[index + 4] = b;
         vertices[index + 5] = ux0; vertices[index + 6] = uy0;

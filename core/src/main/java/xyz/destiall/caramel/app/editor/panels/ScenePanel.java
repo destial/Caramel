@@ -1,6 +1,5 @@
 package xyz.destiall.caramel.app.editor.panels;
 
-import caramel.api.Application;
 import caramel.api.Input;
 import caramel.api.Time;
 import caramel.api.components.EditorCamera;
@@ -84,8 +83,8 @@ public final class ScenePanel extends Panel {
             operation = Operation.ROTATE;
         }
 
-        window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
-        window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
+        window.getMouseListener().setSceneViewport(new Vector2f(leftX, bottomY));
+        window.getMouseListener().setSceneViewportSize(new Vector2f(windowSize.x, windowSize.y));
 
         if (ImGui.isMouseDown(Input.Mouse.LEFT) && ImGui.isWindowHovered() && !dragging) {
             GameObject clicked = getClicked();
@@ -331,6 +330,6 @@ public final class ScenePanel extends Panel {
     }
 
     private float getRatio() {
-        return Application.getApp().getWidth() / (float) Application.getApp().getHeight();
+        return 16 / 9f;
     }
 }

@@ -14,6 +14,7 @@ import caramel.api.render.Shader;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
 import caramel.api.utils.FileIO;
+import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
@@ -35,6 +36,7 @@ import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
 import xyz.destiall.java.timer.Scheduler;
 
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -47,7 +49,6 @@ import java.util.Set;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
-import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
@@ -77,13 +78,12 @@ import static org.lwjgl.openal.ALC10.alcOpenDevice;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_ONE;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -107,6 +107,7 @@ public final class ApplicationImpl extends Application {
     private int height;
     private int winPosX;
     private int winPosY;
+    private boolean fullscreen;
     private String lastScene;
     private String title;
 
@@ -157,8 +158,9 @@ public final class ApplicationImpl extends Application {
             if (settings.createNewFile()) {
                 object.addProperty("width", width = 1920);
                 object.addProperty("height", height = 1080);
-                object.addProperty("windowPosX", winPosX = 50);
-                object.addProperty("windowPosY", winPosY = 50);
+                object.addProperty("windowPosX", winPosX = 25);
+                object.addProperty("windowPosY", winPosY = 25);
+                object.addProperty("fullscreen", fullscreen = false);
                 object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.caramel");
                 FileIO.writeData(settings, serializer.toJson(object));
 
@@ -169,6 +171,7 @@ public final class ApplicationImpl extends Application {
                 winPosX = object.get("windowPosX").getAsInt();
                 winPosY = object.get("windowPosY").getAsInt();
                 lastScene = object.get("lastScene").getAsString();
+                fullscreen = object.has("fullscreen") ? object.get("fullscreen").getAsBoolean() : false;
             }
 
             File assets = new File("assets" + File.separator);
@@ -212,11 +215,10 @@ public final class ApplicationImpl extends Application {
         // Set GLFW window hints and setup
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         // Create GLFW window
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
-        if (glfwWindow == NULL) throw new RuntimeException("Failed to create the GLFW window");
+        if (glfwWindow == NULL) throw new RuntimeException("Failed to create the window");
 
         // Create window icons
         try {
@@ -249,6 +251,17 @@ public final class ApplicationImpl extends Application {
             e.printStackTrace();
         }
 
+        // Set window position from settings.
+        if (!fullscreen) {
+            glfwSetWindowPos(glfwWindow, winPosX, winPosY);
+        } else {
+
+        }
+        // Make context and enable VSync
+        glfwMakeContextCurrent(glfwWindow);
+        glfwSwapInterval(1);
+        glfwShowWindow(glfwWindow);
+
         // Set resize callbacks.
         // Input callbacks are set in ImGUI.
         glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
@@ -262,18 +275,9 @@ public final class ApplicationImpl extends Application {
             this.winPosY = y;
         });
 
-        // Set window position from settings.
-        glfwSetWindowPos(glfwWindow, winPosX, winPosY);
-
-        // Make context and enable VSync
-        glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(1);
-        glfwShowWindow(glfwWindow);
-
         // Create audio handler
         String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
         audioDevice = alcOpenDevice(defaultDeviceName);
-
         int[] attributes = {0};
         audioContext = alcCreateContext(audioDevice, attributes);
         alcMakeContextCurrent(audioContext);
@@ -290,7 +294,7 @@ public final class ApplicationImpl extends Application {
 
         // Enable blending
         glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Setup script manager
         scriptManager = new EditorScriptManager();
@@ -367,10 +371,10 @@ public final class ApplicationImpl extends Application {
             }
         }
 
-        if (getCurrentScene().isPlaying()) getCurrentScene().stop();
-
-        if (EDITOR_MODE) {
-            saveAllScenes();
+        for (SceneImpl s : scenes) {
+            if (s.isPlaying()) {
+                s.stop();
+            }
         }
 
         running = false;
@@ -386,8 +390,6 @@ public final class ApplicationImpl extends Application {
 
         if (EDITOR_MODE) scene.editorUpdate();
         else scene.update();
-
-        glViewport(0, 0, width, height);
 
         if (EDITOR_MODE) {
             getSceneViewFramebuffer().bind();
@@ -410,6 +412,10 @@ public final class ApplicationImpl extends Application {
         if (EDITOR_MODE) getGameViewFramebuffer().unbind();
 
         if (EDITOR_MODE) imGui.update();
+        else {
+            mouseListener.setGameViewportPos(new Vector2f(0, 0));
+            mouseListener.setGameViewportSize(new Vector2f(width, height));
+        }
 
         scene.endFrame();
 
@@ -433,6 +439,7 @@ public final class ApplicationImpl extends Application {
         object.addProperty("height", height);
         object.addProperty("windowPosX", winPosX);
         object.addProperty("windowPosY", winPosY);
+        object.addProperty("fullscreen", fullscreen);
         object.addProperty("lastScene", new File("").toURI().relativize(getCurrentScene().getFile().toURI()).getPath());
         FileIO.writeData(settings, serializer.toJson(object));
 
@@ -521,6 +528,9 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public SceneImpl loadScene(int index) {
+        if (index < 0 || index >= scenes.size()) {
+            return getCurrentScene();
+        }
         sceneIndex = index;
         return getCurrentScene();
     }

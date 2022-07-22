@@ -16,8 +16,14 @@ import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import xyz.destiall.caramel.app.ApplicationImpl;
+import xyz.destiall.caramel.app.editor.debug.DebugLine;
+import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
+
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
@@ -51,6 +57,9 @@ public final class ImGUILayer {
     private final ApplicationImpl window;
     private final long glfwWindow;
     private ScenePanel scenePanel;
+    private GamePanel gamePanel;
+
+    public final List<DebugLine> lines = new ArrayList<>();
 
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
@@ -131,6 +140,7 @@ public final class ImGUILayer {
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
 
             if (scenePanel == null) scenePanel = window.getCurrentScene().getEditorPanel(ScenePanel.class);
+            if (gamePanel == null) gamePanel = window.getCurrentScene().getEditorPanel(GamePanel.class);
 
             if (!io.getWantCaptureMouse() || (scenePanel != null && scenePanel.isMouseOnScene()))
                 window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
@@ -206,6 +216,17 @@ public final class ImGUILayer {
     }
 
     private void endFrame() {
+        for (int i = 0; i < lines.size(); i++) {
+            DebugLine l = lines.get(i);
+            if (l.beginFrame() < 0) {
+                lines.remove(i);
+                i--;
+                continue;
+            }
+
+            ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
+        }
+
         ImGui.end();
         ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());

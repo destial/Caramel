@@ -5,8 +5,8 @@
       "components": [
         {
           "position": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": -0.9617168,
+            "y": 0.7867894,
             "z": -1.0
           },
           "localPosition": {
@@ -16,7 +16,7 @@
           },
           "rotation": {
             "x": 0.0,
-            "y": 0.0,
+            "y": -0.0,
             "z": 0.0
           },
           "scale": {
@@ -72,16 +72,16 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.0,
-              "y": 0.0
+              "x": 0.73197895,
+              "y": 3.7252903E-9
             },
             "jbox2d": {
-              "x": 0.0,
-              "y": 0.0
+              "x": 0.73197895,
+              "y": 3.7252903E-9
             },
             "imgui": {
-              "x": 0.0,
-              "y": 0.0
+              "x": 0.73197895,
+              "y": 3.7252903E-9
             }
           },
           "angularDamping": 0.8,
@@ -147,25 +147,25 @@
             "path": "assets/textures/player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 2,
+            "currentIndex": 0,
             "currentAnimation": "anim0"
           },
           "texture": {
             "path": "assets/textures/player.png"
           },
-          "index": 2,
+          "index": 0,
           "animation": "",
           "columns": 3,
           "rows": 6,
           "timePerAnimation": 0.1,
           "pos": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": -0.9617168,
+            "y": 0.7867894,
             "z": -1.0
           },
           "rot": {
             "x": 0.0,
-            "y": 0.0,
+            "y": -0.0,
             "z": 0.0
           },
           "sca": {
@@ -187,8 +187,8 @@
       "components": [
         {
           "position": {
-            "x": 1.5344015,
-            "y": -0.7396841,
+            "x": -1.1549281,
+            "y": -0.76952827,
             "z": -1.8
           },
           "localPosition": {
@@ -202,8 +202,8 @@
             "z": 0.0
           },
           "scale": {
-            "x": 6.595161,
-            "y": 1.5752553,
+            "x": 301.1594,
+            "y": 0.95622665,
             "z": 1.0
           },
           "forward": {
@@ -339,8 +339,8 @@
             "a": 1.0
           },
           "pos": {
-            "x": 1.5344015,
-            "y": -0.7396841,
+            "x": -1.1549281,
+            "y": -0.76952827,
             "z": -1.8
           },
           "rot": {
@@ -349,8 +349,8 @@
             "z": 0.0
           },
           "sca": {
-            "x": 6.595161,
-            "y": 1.5752553,
+            "x": 301.1594,
+            "y": 0.95622665,
             "z": 1.0
           },
           "clazz": "caramel.api.render.MeshRenderer",
@@ -404,14 +404,296 @@
       "tags": [],
       "name": "GameObject",
       "id": 12
+    },
+    {
+      "components": [
+        {
+          "position": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": -1.0
+          },
+          "localPosition": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 2.7,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "clazz": "caramel.api.components.Transform",
+          "id": 27,
+          "enabled": true
+        },
+        {
+          "currentColor": {
+            "r": 0.029411793,
+            "g": 0.0,
+            "b": 1.0,
+            "a": 1.0
+          },
+          "targetColor": {
+            "r": 0.029411793,
+            "g": 0.0,
+            "b": 1.0,
+            "a": 1.0
+          },
+          "mesh": {
+            "vertexArray": [
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "r": 0.029411793,
+                  "g": 0.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "r": 0.029411793,
+                  "g": 0.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "r": 0.029411793,
+                  "g": 0.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "r": 0.029411793,
+                  "g": 0.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                }
+              }
+            ],
+            "elementArray": [
+              2,
+              1,
+              0,
+              0,
+              1,
+              3
+            ],
+            "type": 4,
+            "shader": "color",
+            "color": {
+              "r": 0.029411793,
+              "g": 0.0,
+              "b": 1.0,
+              "a": 1.0
+            },
+            "dirty": false,
+            "drawArrays": false
+          },
+          "hoverColor": {
+            "r": 1.0,
+            "g": 0.0,
+            "b": 0.0,
+            "a": 1.0
+          },
+          "clickColor": {
+            "r": 0.0,
+            "g": 1.0,
+            "b": 0.0,
+            "a": 1.0
+          },
+          "normalColor": {
+            "r": 0.029411793,
+            "g": 0.0,
+            "b": 1.0,
+            "a": 1.0
+          },
+          "colorChangeTime": 0.0,
+          "pos": {
+            "x": 1.0,
+            "y": 1.0,
+            "z": -1.0
+          },
+          "rot": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "sca": {
+            "x": 2.7,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "clazz": "caramel.api.render.Button",
+          "id": 29,
+          "enabled": true
+        },
+        {
+          "score": 0,
+          "clazz": "scripts.ButtonScript",
+          "id": 39,
+          "enabled": true
+        }
+      ],
+      "children": [
+        {
+          "components": [
+            {
+              "position": {
+                "x": 1.0,
+                "y": 1.0,
+                "z": -1.0
+              },
+              "localPosition": {
+                "x": -1.25,
+                "y": -0.2,
+                "z": 0.0
+              },
+              "rotation": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "scale": {
+                "x": 0.025,
+                "y": 0.025,
+                "z": 1.0
+              },
+              "forward": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": -1.0
+              },
+              "up": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 0.0
+              },
+              "clazz": "caramel.api.components.Transform",
+              "id": 30,
+              "enabled": true
+            },
+            {
+              "text": "New Text",
+              "color": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+              },
+              "fontSize": 24,
+              "pos": {
+                "x": -0.25,
+                "y": 0.8,
+                "z": -1.0
+              },
+              "rot": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0
+              },
+              "sca": {
+                "x": 0.025,
+                "y": 0.025,
+                "z": 1.0
+              },
+              "clazz": "caramel.api.render.Text",
+              "id": 32,
+              "enabled": true
+            }
+          ],
+          "children": [],
+          "tags": [],
+          "name": "Text",
+          "id": 31
+        }
+      ],
+      "tags": [],
+      "name": "Button",
+      "id": 28
     }
   ],
   "editorCamera": {
     "components": [
       {
         "position": {
-          "x": -1.0382924,
-          "y": 1.0344664,
+          "x": -1.338784,
+          "y": 1.3415276,
           "z": -1.0
         },
         "localPosition": {

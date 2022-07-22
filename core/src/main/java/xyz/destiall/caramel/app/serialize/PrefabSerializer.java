@@ -7,6 +7,7 @@ import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Prefab;
 import caramel.api.objects.PrefabImpl;
 import caramel.api.render.MeshRenderer;
+import caramel.api.render.Renderer;
 import caramel.api.render.SpriteRenderer;
 import xyz.destiall.java.gson.JsonArray;
 import xyz.destiall.java.gson.JsonDeserializationContext;
@@ -42,13 +43,9 @@ public final class PrefabSerializer implements JsonSerializer<Prefab>, JsonDeser
         for (JsonElement c : components) {
             if (c.getAsJsonObject().get("clazz").getAsString().equals(Transform.class.getName())) continue;
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, prefab);
-            if (component instanceof MeshRenderer) {
-                MeshRenderer renderer = (MeshRenderer) component;
-                if (renderer.mesh != null) renderer.mesh.build();
-            }
-            if (component instanceof SpriteRenderer) {
-                SpriteRenderer renderer = (SpriteRenderer) component;
-                if (renderer.spritesheet != null) renderer.spritesheet.build();
+            if (component instanceof Renderer) {
+                Renderer renderer = (Renderer) component;
+                renderer.build();
             }
             prefab.addComponent(component);
         }

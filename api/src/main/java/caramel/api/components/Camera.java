@@ -1,6 +1,5 @@
 package caramel.api.components;
 
-import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.objects.GameObject;
@@ -40,7 +39,7 @@ public class Camera extends Component {
     public void editorUpdate() {}
 
     public Matrix4f getProjection() {
-        float ratio = Application.getApp().getWidth() / (float) Application.getApp().getHeight();
+        float ratio = 16 / 9f;
         projection.identity();
         projection.ortho(-4.5f * ratio, 4.5f * ratio, -2.5f * ratio, 2.5f * ratio, near, far, true);
         return new Matrix4f(projection);

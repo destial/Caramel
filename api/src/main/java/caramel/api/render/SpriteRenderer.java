@@ -22,6 +22,11 @@ public final class SpriteRenderer extends Renderer {
         super(gameObject);
     }
 
+    @Override
+    public void build() {
+        if (spritesheet != null) spritesheet.build();
+    }
+
     @FunctionButton
     public void stepAnimation() {
         if (spritesheet == null) return;

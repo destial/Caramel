@@ -27,4 +27,6 @@ public abstract class Renderer extends Component implements Render {
                 .rotate(rot.z, 0, 0, 1)
                 .scale(sca.set(transform.scale));
     }
+
+    public abstract void build();
 }

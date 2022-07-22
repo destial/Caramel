@@ -1,11 +1,16 @@
 package caramel.api.debug;
 
+import caramel.api.Application;
 import caramel.api.components.Transform;
 import org.joml.Matrix3d;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
+import xyz.destiall.caramel.app.editor.debug.DebugLine;
 import xyz.destiall.caramel.app.editor.panels.ConsolePanel;
+import xyz.destiall.caramel.app.ui.ImGUILayer;
 
 public final class DebugImpl extends Debug {
     static {
@@ -188,6 +193,11 @@ public final class DebugImpl extends Debug {
         drawLine(new Vector3f(to.x, from.y, from.z), new Vector3f(from.x, to.y, to.z), color);
     }
 
+    public static void drawDotScreen(float x, float y, Vector3f color) {
+        DebugLine line = new DebugLine(new Vector2f(x, y), new Vector2f(x, y), color, 1);
+        ApplicationImpl.getApp().getImGui().lines.add(line);
+    }
+
     @Override
     protected void _log(Object log) {
         log(log);
@@ -231,5 +241,10 @@ public final class DebugImpl extends Debug {
     @Override
     protected void _drawOutline(Transform transform, Vector3f scale, Vector3f offset, Vector3f color) {
         drawOutline(transform, scale, offset, color);
+    }
+
+    @Override
+    protected void _drawDotScreen(float x, float y, Vector3f color) {
+        drawDotScreen(x, y, color);
     }
 }

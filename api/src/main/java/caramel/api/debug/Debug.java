@@ -71,6 +71,10 @@ public abstract class Debug {
         inst._drawOutline(transform, scale, offset, color);
     }
 
+    public static void drawDotScreen(float x, float y, Vector3f color) {
+        inst._drawDotScreen(x, y, color);
+    }
+
     protected abstract void _log(Object log);
     protected abstract void _logError(Object error);
     protected abstract void _drawLine(Vector3f from, Vector3f offset, Vector3f color);
@@ -80,4 +84,5 @@ public abstract class Debug {
     protected abstract void _drawOutline(Transform transform, float radius, Vector3f color);
     protected abstract void _drawOutline(Transform transform, Vector3f scale, Vector3f color);
     protected abstract void _drawOutline(Transform transform, Vector3f scale, Vector3f offset, Vector3f color);
+    protected abstract void _drawDotScreen(float x, float y, Vector3f color);
 }

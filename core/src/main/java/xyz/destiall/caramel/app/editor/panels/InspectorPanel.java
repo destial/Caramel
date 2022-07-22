@@ -204,7 +204,6 @@ public final class InspectorPanel extends Panel {
         ImGui.end();
     }
 
-
     private void addComponent(GameObject gameObject, Class<?> componentClass) {
         if (Component.class.isAssignableFrom(componentClass)) {
             try {

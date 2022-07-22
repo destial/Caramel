@@ -57,7 +57,6 @@ public abstract class GameObject implements Update, Render {
         for (GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
-            child.transform.scale.set(transform.scale);
             child.update();
         }
 
@@ -90,7 +89,6 @@ public abstract class GameObject implements Update, Render {
         for (GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
-            child.transform.scale.set(transform.scale);
             child.editorUpdate();
         }
 
