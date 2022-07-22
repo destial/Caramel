@@ -42,7 +42,7 @@ public final class Vector2 {
     }
 
     public float x() {
-        return joml.y();
+        return joml.x();
     }
 
     public float distanceSquared(Vector2 other) {

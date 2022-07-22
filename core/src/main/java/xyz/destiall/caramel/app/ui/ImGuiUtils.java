@@ -4,7 +4,9 @@ import caramel.api.Component;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.math.Vector2;
 import caramel.api.math.Vector3;
+import caramel.api.render.Animation;
 import caramel.api.texture.Mesh;
+import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
 import caramel.api.utils.Color;
 import imgui.ImGui;
@@ -20,9 +22,13 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public final class ImGuiUtils {
     private static final float width = 110f;
@@ -399,7 +405,7 @@ public final class ImGuiUtils {
         return imBoolean.get();
     }
 
-    public static int drawListBox(String label, int id, String[] items) {
+    public static int drawListSelectableBox(String label, int id, String[] items) {
         ImGui.pushID(label);
 
         ImGui.columns(2);
@@ -409,7 +415,7 @@ public final class ImGuiUtils {
 
         ImInt imInt = new ImInt(id);
         if (ImGui.collapsingHeader(items[id])) {
-            ImGui.listBox("##listbox", imInt, items);
+            ImGui.listBox("##listselectablebox", imInt, items);
         }
         ImGui.columns(1);
         ImGui.popID();
@@ -417,6 +423,29 @@ public final class ImGuiUtils {
         return imInt.get();
     }
 
+    public static void drawList(String label, List<String> items) {
+        ImGui.pushID(label);
+
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, width);
+        ImGui.text(label);
+        ImGui.nextColumn();
+
+        if (ImGui.treeNodeEx(label)) {
+            if (ImGui.beginListBox("##list")) {
+                for (String item : items) {
+                    ImGui.text(item);
+                }
+
+                ImGui.endListBox();
+            }
+            ImGui.treePop();
+        }
+
+
+        ImGui.columns(1);
+        ImGui.popID();
+    }
 
     public static void imguiLayer(Field field, Component component) {
         try {
@@ -521,9 +550,56 @@ public final class ImGuiUtils {
                 }
 
                 if (path != null) {
-                    System.out.println(path);
                     Texture.getTexture(path).buildTexture();
                     mesh.setTexture(path);
+                }
+
+            } else if (type == Spritesheet.class) {
+                Spritesheet sheet = (Spritesheet) value;
+                if (sheet != null) {
+                    Map<String, Animation> map = sheet.getAnimations();
+                    if (map != null) {
+                        List<String> animation = map.values().stream().map(Animation::toString).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+                        drawList(name, animation);
+                    }
+                }
+
+            } else if (type == Texture.class) {
+                Texture texture = (Texture) value;
+                String path = findFile(name, "Load Texture", ".png,.jpeg,.jpg");
+
+                if (texture != null) {
+                    ImGui.sameLine();
+                    ImGui.text(texture.getPath());
+                }
+
+                if (path != null) {
+                    texture = Texture.getTexture(path);
+                    texture.buildTexture();
+                    field.set(component, texture);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
+                    }
+                }
+
+            } else if (type == File.class) {
+                File file = (File) value;
+                String path = findFile(name, ".");
+
+                if (file != null) {
+                    ImGui.sameLine();
+                    ImGui.text(file.getPath());
+                }
+
+                if (path != null) {
+                    field.set(component, new File(path));
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
+                    }
                 }
 
             } else if (type.isEnum()) {
@@ -536,7 +612,7 @@ public final class ImGuiUtils {
                         previousItem = i;
                     }
                 }
-                int currentItem = drawListBox(name, previousItem, items);
+                int currentItem = drawListSelectableBox(name, previousItem, items);
                 if (invokeMethods != null && currentItem != previousItem) {
                     for (String method : invokeMethods) {
                         component.sendMessage(method);
@@ -585,7 +661,6 @@ public final class ImGuiUtils {
     public static void imguiLayer(Method method, Component component) {
         try {
             String name = method.getName();
-            Parameter[] params = method.getParameters();
             if (ImGui.button(name)) {
                 method.invoke(component);
             }

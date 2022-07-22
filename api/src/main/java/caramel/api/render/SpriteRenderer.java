@@ -6,11 +6,17 @@ import caramel.api.debug.Debug;
 import caramel.api.interfaces.FunctionButton;
 import caramel.api.objects.GameObject;
 import caramel.api.texture.Spritesheet;
+import caramel.api.texture.Texture;
+
+import java.io.File;
 
 public final class SpriteRenderer extends Renderer {
     public Spritesheet spritesheet;
+    public Texture texture;
     public int index = 0;
     public String animation = "";
+    public int columns = 1;
+    public int rows = 1;
     public float timePerAnimation = 1f;
 
     private transient float timeElapsed = 0;
@@ -21,11 +27,28 @@ public final class SpriteRenderer extends Renderer {
 
     @FunctionButton
     public void stepAnimation() {
+        if (spritesheet == null) return;
         spritesheet.step();
     }
 
+    @FunctionButton
+    public void setAnimation() {
+        if (spritesheet == null) return;
+        spritesheet.setCurrentAnimation(animation);
+    }
+
+    public void setAnimation(String animation) {
+        this.animation = animation;
+        if (spritesheet == null) return;
+        spritesheet.setCurrentAnimation(animation);
+    }
+
     public void buildAnimation() {
-        spritesheet = new Spritesheet("assets/textures/player.png", 3, 6);
+        if (texture == null) return;
+        if (spritesheet != null) {
+            spritesheet.invalidate();
+        }
+        spritesheet = new Spritesheet(texture.getPath(), columns, rows);
         spritesheet.build();
     }
 
@@ -34,13 +57,10 @@ public final class SpriteRenderer extends Renderer {
         if (spritesheet == null) {
             buildAnimation();
         }
-
-        spritesheet.render(transform, camera);
-    }
-
-    @FunctionButton
-    public void setAnimation() {
-        spritesheet.setCurrentAnimation(animation);
+        if (spritesheet != null) {
+            index = spritesheet.currentIndex;
+            spritesheet.render(transform, camera);
+        }
     }
 
     @Override
@@ -48,12 +68,11 @@ public final class SpriteRenderer extends Renderer {
         if (spritesheet == null) {
             buildAnimation();
         }
-
-        spritesheet.addAnimation("look left", 0, 2);
     }
 
     @Override
     public void update() {
+        if (spritesheet == null) return;
         timeElapsed += Time.deltaTime;
         if (timeElapsed > timePerAnimation) {
             timeElapsed = 0;

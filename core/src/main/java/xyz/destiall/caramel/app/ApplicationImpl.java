@@ -346,8 +346,6 @@ public final class ApplicationImpl extends Application {
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
-            if (!EDITOR_MODE && Input.isKeyDown(Input.Key.ESCAPE)) break;
-
             if (Time.isSecond) {
                 glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + (getCurrentScene().isSaved() ? "" : "*") + " | FPS: " + (int) (Time.getFPS()));
             }
@@ -380,6 +378,10 @@ public final class ApplicationImpl extends Application {
     private boolean process() {
         SceneImpl scene = getCurrentScene();
         glfwPollEvents();
+
+        if (scene.isPlaying() && Input.isKeyPressed(Input.Key.F11)) {
+            EDITOR_MODE = !EDITOR_MODE;
+        }
 
         if (EDITOR_MODE) scene.editorUpdate();
         else scene.update();

@@ -2,6 +2,8 @@ package caramel.api.texture;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
+import caramel.api.render.Animation;
 import caramel.api.utils.Pair;
 import org.joml.Vector2f;
 
@@ -12,7 +14,7 @@ import java.util.Map;
 
 public final class Spritesheet {
     private transient List<Sprite> sprites;
-    private transient Map<String, Sprite[]> animations;
+    private transient Map<String, Animation> animations;
     private transient Mesh mesh;
     private transient boolean loaded = false;
 
@@ -39,6 +41,7 @@ public final class Spritesheet {
         mesh.build();
         mesh.setTexture(path);
         Texture texture = mesh.getTexture();
+        if (texture == null) return;
 
         int spriteHeight = texture.getHeight() / rows;
         int spriteWidth = texture.getWidth() / columns;
@@ -78,28 +81,46 @@ public final class Spritesheet {
                 addAnimation(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
             }
         }
+        autoDetect();
         step();
         loaded = true;
     }
 
-    public void addAnimation(String name, int indexStart, int indexEnd) {
+    public void autoDetect() {
+        if (sprites.isEmpty() || !animations.isEmpty()) return;
+
+        for (int i = 0; i < rows; i++) {
+            int start = i * columns;
+            int end = start + columns - 1;
+            Animation anim = addAnimation("anim" + i, start, end);
+            Debug.log("Auto detected animation " + anim);
+        }
+    }
+
+    public Animation addAnimation(String name, int indexStart, int indexEnd) {
         int total = indexEnd - indexStart;
-        Sprite[] animation = new Sprite[total];
+        Sprite[] animation = new Sprite[total + 1];
         int j = 0;
-        for (int i = indexStart; i < indexEnd; i++) {
+        for (int i = indexStart; i <= indexEnd; i++) {
             animation[j++] = sprites.get(i);
         }
-        animations.put(name, animation);
+        Animation anim = new Animation(animation);
+        anim.name = name;
+        anim.start = indexStart;
+        anim.end = indexEnd;
+        animations.put(name, anim);
         if (serializedAnimation == null) {
             serializedAnimation = new HashMap<>();
         }
         serializedAnimation.put(name, new Pair<>(indexStart, indexEnd));
         currentAnimation = name;
+        return anim;
     }
 
     public void setCurrentAnimation(String animation) {
         this.currentAnimation = animation;
-        this.currentIndex = 0;
+        this.currentIndex = -1;
+        step();
     }
 
     public void render(Transform transform, Camera camera) {
@@ -109,13 +130,15 @@ public final class Spritesheet {
 
     public void step() {
         if (currentAnimation == null) return;
-        Sprite[] animation = animations.get(currentAnimation);
+        Animation animation = animations.get(currentAnimation);
+        if (animation == null) return;
+        Sprite[] sprites = animation.getSprites();
         currentIndex++;
-        if (currentIndex >= animation.length) {
+        if (currentIndex >= sprites.length) {
             currentIndex = 0;
         }
 
-        Vector2f[] coords = animation[currentIndex].getTexCoords();
+        Vector2f[] coords = sprites[currentIndex].getTexCoords();
 
         for (int i = 0; i < 4; i++) {
             mesh.getVertex(i).texCoords.x = coords[i].x;
@@ -123,5 +146,19 @@ public final class Spritesheet {
         }
 
         mesh.setDirty(true);
+    }
+
+    public Map<String, Animation> getAnimations() {
+        return animations;
+    }
+
+    public void invalidate() {
+        animations.clear();
+        sprites.clear();
+        if (mesh.getTexture() != null) {
+            mesh.getTexture().invalidate();
+        }
+        mesh.resetArrays();
+        mesh.resetIndices();
     }
 }
