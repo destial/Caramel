@@ -1,10 +1,10 @@
 package xyz.destiall.caramel.app.editor.debug;
 
 import org.joml.Vector3f;
-import xyz.destiall.caramel.api.components.Camera;
-import xyz.destiall.caramel.api.render.Shader;
-import xyz.destiall.caramel.api.interfaces.Render;
-import xyz.destiall.caramel.api.interfaces.Update;
+import caramel.api.components.Camera;
+import caramel.api.render.Shader;
+import caramel.api.interfaces.Render;
+import caramel.api.interfaces.Update;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,7 +80,7 @@ public final class DebugDraw implements Update, Render {
         for (DebugLine line : lines) {
             for (int i = 0; i < 2; i++) {
                 Vector3f pos = i == 0 ? line.from : line.to;
-                vertexArray[index] = pos.x;
+                vertexArray[  index  ] = pos.x;
                 vertexArray[index + 1] = pos.y;
                 vertexArray[index + 2] = pos.z;
 

@@ -36,5 +36,5 @@ in vec3 fNormal;
 out vec4 color;
 
 void main() {
-    color = texture(texSampler, fTexCoords);
+    color = texture(texSampler, fTexCoords) * fColor;
 }

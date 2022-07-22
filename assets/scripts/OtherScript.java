@@ -1,8 +1,8 @@
 package scripts;
 
-import xyz.destiall.caramel.api.debug.Debug;
-import xyz.destiall.caramel.api.scripts.Script;
-import xyz.destiall.caramel.api.objects.GameObject;
+import caramel.api.debug.Debug;
+import caramel.api.scripts.Script;
+import caramel.api.objects.GameObject;
 
 import java.util.List;
 

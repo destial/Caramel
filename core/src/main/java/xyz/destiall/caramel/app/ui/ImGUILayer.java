@@ -17,13 +17,12 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
-import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.Time;
+import caramel.api.Input;
+import caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.app.editor.ui.ScenePanel;
-import xyz.destiall.caramel.app.editor.ui.Panel;
-import xyz.destiall.caramel.api.utils.FileIO;
-import xyz.destiall.caramel.app.utils.FontIcons;
+import xyz.destiall.caramel.app.editor.panels.ScenePanel;
+import xyz.destiall.caramel.app.editor.panels.Panel;
+import caramel.api.utils.FileIO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -92,7 +91,6 @@ public final class ImGUILayer {
 
         final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
         rangesBuilder.addRanges(fontAtlas.getGlyphRangesDefault());
-        rangesBuilder.addRanges(FontIcons._IconRange);
 
         final ImFontConfig fontConfig = new ImFontConfig();
         fontConfig.setMergeMode(true);
@@ -132,7 +130,8 @@ public final class ImGUILayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            window.getKeyListener().keyCallback(w, key, scancode, action, mods);
+            if (!io.getWantCaptureKeyboard())
+                window.getKeyListener().keyCallback(w, key, scancode, action, mods);
         });
 
         glfwSetCharCallback(glfwWindow, (w, c) -> {

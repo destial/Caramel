@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
-import xyz.destiall.caramel.api.scripts.InternalScript;
+import caramel.api.scripts.InternalScript;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -21,9 +21,9 @@ public final class ScriptClassLoader extends URLClassLoader {
     private final Map<String, byte[]> mapClassBytes;
     private final File file;
     public final InternalScript script;
-    private final ScriptMemoryManager.ScriptMemoryJavaObject source;
+    private final FileScriptMemoryJavaObject source;
 
-    ScriptClassLoader(ScriptLoader loader, Map<String, byte[]> mapNameToBytes, ClassLoader parent, File file, String fullClassName, String simpleClassName, ScriptMemoryManager.ScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
+    ScriptClassLoader(ScriptLoader loader, Map<String, byte[]> mapNameToBytes, ClassLoader parent, File file, String fullClassName, FileScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
         this.mapClassBytes = mapNameToBytes;
         try {
@@ -38,13 +38,13 @@ public final class ScriptClassLoader extends URLClassLoader {
         this.source = source;
         try {
             Class<?> clazz = loadClass(fullClassName);
-            this.script = new InternalScript(simpleClassName, clazz, this.source.getCharContent(false));
+            this.script = new InternalScript(clazz, file, this.source.getCharContent(false));
         } catch (ClassNotFoundException e) {
             throw new ScriptException(e);
         }
     }
 
-    public ScriptMemoryManager.ScriptMemoryJavaObject getSource() {
+    public FileScriptMemoryJavaObject getSource() {
         return source;
     }
 

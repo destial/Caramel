@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.physics;
 
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.interfaces.Update;
+import caramel.api.objects.GameObject;
+import caramel.api.interfaces.Update;
 
 public interface Physics extends Update {
     void addGameObject(GameObject gameObject);

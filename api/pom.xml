@@ -11,6 +11,7 @@
         <lwjgl.version>3.2.3</lwjgl.version>
         <lwjgl.natives>natives-windows</lwjgl.natives>
         <imgui.version>1.86.4</imgui.version>
+        <nexus.url>https://repo.destial.xyz/repository</nexus.url>
     </properties>
 
     <parent>
@@ -56,6 +57,21 @@
             </plugin>
         </plugins>
     </build>
+
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>nexus</id>
+            <name>Releases</name>
+            <url>${nexus.url}/maven-releases</url>
+        </repository>
+        <snapshotRepository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>nexus</id>
+            <name>Snapshots</name>
+            <url>${nexus.url}/maven-snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>

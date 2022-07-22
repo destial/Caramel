@@ -3,9 +3,8 @@ package xyz.destiall.caramel.app;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import xyz.destiall.caramel.api.MouseListener;
-import xyz.destiall.caramel.api.components.EditorCamera;
-import xyz.destiall.caramel.app.editor.ui.ScenePanel;
+import caramel.api.MouseListener;
+import caramel.api.components.EditorCamera;
 
 import java.util.Arrays;
 
@@ -47,41 +46,24 @@ public final class MouseListenerImpl implements MouseListener {
             lastY = yPos;
             return;
         }
-        ScenePanel panel = ApplicationImpl.getApp().getCurrentScene().getEditorPanel(ScenePanel.class);
-        if (panel != null) {
-            if (xPos > panel.getWindowPos().x &&
-                    yPos > panel.getWindowPos().y &&
-                    xPos < panel.getWindowPos().x + panel.getWindowSize().x &&
-                    yPos < panel.getWindowPos().y + panel.getWindowSize().y) {
-            } else {
-                Arrays.fill(mouseButtonPressed, false);
-            }
-        }
 
         isDragging = mouseButtonPressed[GLFW_MOUSE_BUTTON_1];
     }
 
     public void mouseButtonCallback(long window, int button, int action, int mods) {
-        ScenePanel panel = ApplicationImpl.getApp().getCurrentScene().getEditorPanel(ScenePanel.class);
-        if (panel != null) {
-            if (xPos > panel.getWindowPos().x &&
-                    yPos > panel.getWindowPos().y &&
-                    xPos < panel.getWindowPos().x + panel.getWindowSize().x &&
-                    yPos < panel.getWindowPos().y + panel.getWindowSize().y) {
-                if (action == GLFW_PRESS) {
-                    mouseButtonPressed[button] = true;
-                    if (mouseButtonReleased[button]) {
-                        mouseButtonPressedThisFrame[button] = true;
-                        mouseButtonReleased[button] = false;
-                    }
-                } else if (action == GLFW_RELEASE) {
-                    mouseButtonPressed[button] = false;
-                    mouseButtonReleased[button] = true;
-                    isDragging = false;
-                }
+        if (action == GLFW_PRESS) {
+            mouseButtonPressed[button] = true;
+            if (mouseButtonReleased[button]) {
+                mouseButtonPressedThisFrame[button] = true;
+                mouseButtonReleased[button] = false;
             }
+        } else if (action == GLFW_RELEASE) {
+            mouseButtonPressed[button] = false;
+            mouseButtonReleased[button] = true;
+            isDragging = false;
         }
     }
+
 
     public void mouseScrollCallback(long window, double xOffset, double yOffset) {
         scrollX = xOffset;
@@ -163,6 +145,11 @@ public final class MouseListenerImpl implements MouseListener {
 
     public boolean isButtonPressedThisFrame(int button) {
         return mouseButtonPressedThisFrame[button];
+    }
+
+    @Override
+    public boolean isButtonReleasedThisFrame(int button) {
+        return mouseButtonReleased[button];
     }
 
     public void setGameViewportPos(Vector2f vector2f) {

@@ -1,15 +1,15 @@
 package scripts;
 
-import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.scripts.Script;
-import xyz.destiall.caramel.api.math.Vector3;
-import xyz.destiall.caramel.api.objects.GameObject;
-import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.components.Camera;
-import xyz.destiall.caramel.api.components.RigidBody2D;
-import xyz.destiall.caramel.api.physics.components.Collider;
-import xyz.destiall.caramel.api.physics.components.Contactable2D;
-import xyz.destiall.caramel.api.interfaces.ShowInEditor;
+import caramel.api.Time;
+import caramel.api.scripts.Script;
+import caramel.api.math.Vector3;
+import caramel.api.objects.GameObject;
+import caramel.api.Input;
+import caramel.api.components.Camera;
+import caramel.api.components.RigidBody2D;
+import caramel.api.physics.components.Collider;
+import caramel.api.physics.components.Contactable2D;
+import caramel.api.interfaces.ShowInEditor;
 
 public class NewScript extends Script implements Contactable2D {
     public NewScript(GameObject gameObject) {

@@ -1,5 +1,7 @@
 package xyz.destiall.caramel.app;
 
+import caramel.api.sound.SoundSource;
+import caramel.api.texture.Texture;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWImage;
@@ -9,17 +11,17 @@ import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
 import org.reflections.Reflections;
-import xyz.destiall.caramel.api.Application;
-import xyz.destiall.caramel.api.Component;
-import xyz.destiall.caramel.api.Input;
-import xyz.destiall.caramel.api.Time;
-import xyz.destiall.caramel.api.audio.AudioListener;
-import xyz.destiall.caramel.api.components.Transform;
-import xyz.destiall.caramel.api.debug.Debug;
-import xyz.destiall.caramel.api.debug.DebugImpl;
-import xyz.destiall.caramel.api.objects.Scene;
-import xyz.destiall.caramel.api.utils.FileIO;
-import xyz.destiall.caramel.api.objects.SceneImpl;
+import caramel.api.Application;
+import caramel.api.Component;
+import caramel.api.Input;
+import caramel.api.Time;
+import caramel.api.audio.AudioListener;
+import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
+import caramel.api.debug.DebugImpl;
+import caramel.api.objects.Scene;
+import caramel.api.utils.FileIO;
+import caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
@@ -30,6 +32,7 @@ import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
+import xyz.destiall.java.timer.Scheduler;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,11 +47,11 @@ import java.util.Set;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
-import static org.lwjgl.glfw.GLFW.GLFW_TRUE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
 import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
+import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -83,7 +86,6 @@ import static org.lwjgl.opengl.GL11.glViewport;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
-import static org.lwjgl.system.MemoryUtil.memFree;
 
 public final class ApplicationImpl extends Application {
     public boolean EDITOR_MODE = true;
@@ -91,7 +93,8 @@ public final class ApplicationImpl extends Application {
 
     private final MouseListenerImpl mouseListener;
     private final KeyListenerImpl keyListener;
-    private final EventHandling eventHandling;
+    private final EventHandling eventHandler;
+    private final Scheduler scheduler;
     private final List<Listener> listeners;
     private final Gson serializer;
 
@@ -114,12 +117,6 @@ public final class ApplicationImpl extends Application {
 
     public long glfwWindow;
 
-    public static ApplicationImpl getRunnable() {
-        if (inst == null) inst = new ApplicationImpl();
-        ((ApplicationImpl) inst).EDITOR_MODE = false;
-        return (ApplicationImpl) inst;
-    }
-
     public static ApplicationImpl getApp() {
         if (inst == null) inst = new ApplicationImpl();
         return (ApplicationImpl) inst;
@@ -129,7 +126,8 @@ public final class ApplicationImpl extends Application {
         title = "Caramel";
         mouseListener = new MouseListenerImpl();
         keyListener = new KeyListenerImpl();
-        eventHandling = new EventHandling();
+        eventHandler = new EventHandling();
+        scheduler = new Scheduler();
         scenes = new ArrayList<>();
         serializer = new GsonBuilder()
                 .registerTypeAdapter(SceneImpl.class, new SceneSerializer())
@@ -143,20 +141,21 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public void run() {
-        loadFiles();
+        setup();
         init();
         loop();
         destroy();
     }
 
     @SuppressWarnings("all")
-    private void loadFiles() {
+    private void setup() {
+        // Load settings and data files
         try {
             File settings = new File("settings.json");
             JsonObject object = new JsonObject();
             if (settings.createNewFile()) {
-                object.addProperty("width", width = 1280);
-                object.addProperty("height", height = 720);
+                object.addProperty("width", width = 1920);
+                object.addProperty("height", height = 1080);
                 object.addProperty("windowPosX", winPosX = 50);
                 object.addProperty("windowPosY", winPosY = 50);
                 object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.caramel");
@@ -179,6 +178,8 @@ public final class ApplicationImpl extends Application {
                 new File(assets, "shaders" + File.separator).mkdirs();
                 new File(assets, "scenes" + File.separator).mkdirs();
                 new File(assets, "sounds" + File.separator).mkdirs();
+                new File(assets, "fonts" + File.separator).mkdirs();
+                FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
             }
 
             File imgui = new File("imgui.ini");
@@ -195,9 +196,7 @@ public final class ApplicationImpl extends Application {
             if (!logo32.exists()) {
                 FileIO.saveResource("logo_32.png", "logo_32.png");
             }
-
-            Thread.sleep(1000);
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -212,12 +211,13 @@ public final class ApplicationImpl extends Application {
         // Set GLFW window hints and setup
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         // Create GLFW window
         glfwWindow = glfwCreateWindow(width, height, title, NULL, NULL);
         if (glfwWindow == NULL) throw new RuntimeException("Failed to create the GLFW window");
 
+        // Create window icons
         try {
             ByteBuffer[] list = new ByteBuffer[2];
             IntBuffer width16 = BufferUtils.createIntBuffer(1);
@@ -231,21 +231,18 @@ public final class ApplicationImpl extends Application {
             list[1] = stbi_load("logo_32.png", width32, height32, channels32, 0);
 
             GLFWImage.Buffer icons = GLFWImage.malloc(2);
-            icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
-            icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
-            icons.position(0);
+            if (list[0] != null && list[1] != null) {
+                icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
+                icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
+                icons.position(0);
 
-            glfwSetWindowIcon(glfwWindow, icons);
+                // Set window icons
+                glfwSetWindowIcon(glfwWindow, icons);
 
-            stbi_image_free(list[0]);
-            stbi_image_free(list[1]);
-
-            memFree(width16);
-            memFree(width32);
-            memFree(height16);
-            memFree(height32);
-            memFree(channels16);
-            memFree(channels32);
+                // Free up buffer space
+                stbi_image_free(list[0]);
+                stbi_image_free(list[1]);
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -267,11 +264,6 @@ public final class ApplicationImpl extends Application {
         // Set window position from settings.
         glfwSetWindowPos(glfwWindow, winPosX, winPosY);
 
-        // Set cursor mode
-        //if (!EDITOR_MODE) {
-        //    glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        //}
-
         // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
@@ -291,11 +283,11 @@ public final class ApplicationImpl extends Application {
         // Create OpenAL capabilities
         ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
         ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
-
         if (!alCapabilities.OpenAL10) {
             Debug.logError("Audio AL10 library not supported!");
         }
 
+        // Enable blending
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -303,11 +295,9 @@ public final class ApplicationImpl extends Application {
         scriptManager = new EditorScriptManager();
 
         // Register event listeners
-        if (EDITOR_MODE) {
-            listeners.add(scriptManager);
-        }
+        listeners.add(scriptManager);
         for (Listener listener : listeners) {
-            eventHandling.registerListener(listener);
+            eventHandler.registerListener(listener);
         }
 
         // Create and setup ImGUI
@@ -323,7 +313,7 @@ public final class ApplicationImpl extends Application {
         scriptManager.reloadAll();
 
         // Load all built-in components
-        Reflections reflections = new Reflections("xyz.destiall.caramel.api");
+        Reflections reflections = new Reflections("caramel.api");
         Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
         List<Class<? extends Component>> sorted = new ArrayList<>(set);
         sorted.sort(Comparator.comparing(Class::getName));
@@ -335,9 +325,9 @@ public final class ApplicationImpl extends Application {
     }
 
     private void loop() {
-        Time.timeStarted = System.currentTimeMillis();
-        long startTime = Time.timeStarted;
-        long endTime;
+        Time.timeStarted = (float) glfwGetTime();
+        float startTime = Time.timeStarted;
+        float endTime;
         float second = 0;
 
         // Create the scene
@@ -356,16 +346,14 @@ public final class ApplicationImpl extends Application {
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
-            if (!EDITOR_MODE && Input.isKeyDown(Input.Key.ESCAPE)) break;
-
             if (Time.isSecond) {
-                glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
+                glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + (getCurrentScene().isSaved() ? "" : "*") + " | FPS: " + (int) (Time.getFPS()));
             }
 
             if (process()) break;
 
-            endTime = System.currentTimeMillis();
-            Time.deltaTime = (endTime - startTime) / 1000f;
+            endTime = (float) glfwGetTime();
+            Time.deltaTime = endTime - startTime;
             Time.deltaTime = Math.max(Time.deltaTime, Time.minDeltaTime);
             startTime = endTime;
 
@@ -391,6 +379,10 @@ public final class ApplicationImpl extends Application {
         SceneImpl scene = getCurrentScene();
         glfwPollEvents();
 
+        if (scene.isPlaying() && Input.isKeyPressed(Input.Key.F11)) {
+            EDITOR_MODE = !EDITOR_MODE;
+        }
+
         if (EDITOR_MODE) scene.editorUpdate();
         else scene.update();
 
@@ -405,13 +397,16 @@ public final class ApplicationImpl extends Application {
             getSceneViewFramebuffer().unbind();
         }
 
-        if (scene.getGameCamera() != null && scene.getGameCamera().gameObject.active) {
-            if (EDITOR_MODE) getGameViewFramebuffer().bind();
+        if (EDITOR_MODE) getGameViewFramebuffer().bind();
+        if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
+            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        } else {
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getGameCamera());
-            if (EDITOR_MODE) getGameViewFramebuffer().unbind();
         }
+        if (EDITOR_MODE) getGameViewFramebuffer().unbind();
 
         if (EDITOR_MODE) imGui.update();
 
@@ -430,18 +425,8 @@ public final class ApplicationImpl extends Application {
     }
 
     private void destroy() {
-        // Destroy any remaining objects
-
-        // Destroy and clear up any script class loaders
-        scriptManager.destroy();
-
-        // Unregister any remaining listeners
-        for (Listener listener : listeners) {
-            eventHandling.unregisterListener(listener);
-        }
-
-        // Destroy ImGUI
-        imGui.destroyImGui();
+        Texture.invalidateAll();
+        SoundSource.destroyAll();
 
         // Save settings
         File settings = new File("settings.json");
@@ -453,6 +438,18 @@ public final class ApplicationImpl extends Application {
         object.addProperty("lastScene", getCurrentScene().getFile().getPath());
         FileIO.writeData(settings, serializer.toJson(object));
 
+        // Destroy and clean up any remaining objects
+        scriptManager.destroy();
+
+        // Unregister any remaining listeners
+        for (Listener listener : listeners) {
+            eventHandler.unregisterListener(listener);
+        }
+
+        // Destroy ImGUI
+        imGui.destroyImGui();
+
+        // Free ALC context and close device
         alcDestroyContext(audioContext);
         alcCloseDevice(audioDevice);
 
@@ -478,12 +475,13 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public EventHandling getEventHandler() {
-        return eventHandling;
+        return eventHandler;
     }
 
     @Override
     public void setTitle(String title) {
         this.title = title;
+        glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
     }
 
     @Override
@@ -536,6 +534,7 @@ public final class ApplicationImpl extends Application {
         scene.setFile(file);
         String savedScene = serializer.toJson(scene);
         if (FileIO.writeData(file, savedScene)) {
+            ((SceneImpl) scene).setSaved(true);
             DebugImpl.log("Saved scene " + scene.name);
         } else {
             DebugImpl.log("Unable to save scene " + scene.name);
@@ -572,5 +571,10 @@ public final class ApplicationImpl extends Application {
     @Override
     public EditorScriptManager getScriptManager() {
         return scriptManager;
+    }
+
+    @Override
+    public Scheduler getScheduler() {
+        return scheduler;
     }
 }
