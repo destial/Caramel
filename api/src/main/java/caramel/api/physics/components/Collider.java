@@ -7,7 +7,7 @@ import org.joml.Vector3f;
 
 public abstract class Collider extends Component implements Render {
     public Vector3f offset = new Vector3f(0);
-    public boolean collisionRender = true;
+    public boolean collisionRender = false;
 
     public Collider(GameObject gameObject) {
         super(gameObject);

@@ -36,7 +36,6 @@ import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
 import xyz.destiall.java.timer.Scheduler;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;

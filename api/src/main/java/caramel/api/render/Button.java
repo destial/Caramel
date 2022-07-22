@@ -3,7 +3,6 @@ package caramel.api.render;
 import caramel.api.Input;
 import caramel.api.Time;
 import caramel.api.components.Camera;
-import caramel.api.debug.Debug;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.objects.GameObject;

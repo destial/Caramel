@@ -39,7 +39,6 @@ import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
 import static org.lwjgl.opengl.GL11.GL_LINE;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glPolygonMode;
-import static org.lwjgl.opengl.GL11.glViewport;
 
 public final class SceneImpl extends Scene {
     private final Vector3f selectionColor = new Vector3f(1, 0, 0);

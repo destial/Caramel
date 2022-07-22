@@ -1,6 +1,5 @@
 package caramel.api.debug;
 
-import caramel.api.Application;
 import caramel.api.components.Transform;
 import org.joml.Matrix3d;
 import org.joml.Matrix4f;
@@ -10,7 +9,6 @@ import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.editor.debug.DebugLine;
 import xyz.destiall.caramel.app.editor.panels.ConsolePanel;
-import xyz.destiall.caramel.app.ui.ImGUILayer;
 
 public final class DebugImpl extends Debug {
     static {

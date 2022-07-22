@@ -1,7 +1,6 @@
 package caramel.api.utils;
 
 import org.joml.Math;
-import org.joml.Vector4f;
 
 public final class Color {
     public float r = 1f, g = 1f, b = 1f, a = 1f;
