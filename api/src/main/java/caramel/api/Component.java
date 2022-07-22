@@ -1,11 +1,11 @@
 package caramel.api;
 
-import caramel.api.components.Transform;
 import caramel.api.components.RigidBody2D;
-import caramel.api.objects.GameObject;
-import caramel.api.physics.info.ContactPoint2D;
+import caramel.api.components.Transform;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.Update;
+import caramel.api.objects.GameObject;
+import caramel.api.physics.info.ContactPoint2D;
 import xyz.destiall.java.reflection.Reflect;
 
 import java.lang.reflect.Field;

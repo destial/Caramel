@@ -2,10 +2,10 @@ package caramel.api.audio;
 
 import caramel.api.Component;
 import caramel.api.interfaces.FunctionButton;
-import caramel.api.sound.SoundSource;
 import caramel.api.interfaces.ShowInEditor;
 import caramel.api.objects.GameObject;
 import caramel.api.sound.Sound;
+import caramel.api.sound.SoundSource;
 
 public final class AudioPlayer extends Component {
     private transient SoundSource source;

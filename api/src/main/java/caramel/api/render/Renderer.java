@@ -1,9 +1,9 @@
 package caramel.api.render;
 
-import org.joml.Vector3f;
 import caramel.api.Component;
 import caramel.api.interfaces.Render;
 import caramel.api.objects.GameObject;
+import org.joml.Vector3f;
 
 public abstract class Renderer extends Component implements Render {
     protected final Vector3f pos;

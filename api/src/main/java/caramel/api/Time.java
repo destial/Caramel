@@ -1,6 +1,6 @@
 package caramel.api;
 
-import java.awt.GraphicsEnvironment;
+import java.awt.*;
 
 public abstract class Time {
     public static float timeStarted;

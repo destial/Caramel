@@ -1,10 +1,10 @@
 package caramel.api.physics.info;
 
+import caramel.api.objects.GameObject;
 import org.jbox2d.callbacks.RayCastCallback;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Fixture;
 import org.joml.Vector2f;
-import caramel.api.objects.GameObject;
 
 public final class RaycastInfo2D implements RayCastCallback {
     private final GameObject requestingObject;

@@ -2,11 +2,11 @@ package xyz.destiall.caramel.app.serialize;
 
 import caramel.api.Component;
 import caramel.api.components.Camera;
+import caramel.api.components.EditorCamera;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Prefab;
 import caramel.api.objects.PrefabImpl;
-import caramel.api.components.EditorCamera;
 import caramel.api.objects.SceneImpl;
 import caramel.api.utils.FileIO;
 import xyz.destiall.java.gson.Gson;

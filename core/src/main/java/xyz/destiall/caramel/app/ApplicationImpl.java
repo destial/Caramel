@@ -1,17 +1,5 @@
 package xyz.destiall.caramel.app;
 
-import caramel.api.render.Shader;
-import caramel.api.sound.SoundSource;
-import caramel.api.texture.Texture;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWImage;
-import org.lwjgl.openal.AL;
-import org.lwjgl.openal.ALC;
-import org.lwjgl.openal.ALCCapabilities;
-import org.lwjgl.openal.ALCapabilities;
-import org.lwjgl.opengl.GL;
-import org.reflections.Reflections;
 import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.Input;
@@ -21,8 +9,20 @@ import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.objects.Scene;
-import caramel.api.utils.FileIO;
 import caramel.api.objects.SceneImpl;
+import caramel.api.render.Shader;
+import caramel.api.sound.SoundSource;
+import caramel.api.texture.Texture;
+import caramel.api.utils.FileIO;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.glfw.GLFWErrorCallback;
+import org.lwjgl.glfw.GLFWImage;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
+import org.lwjgl.opengl.GL;
+import org.reflections.Reflections;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
@@ -433,7 +433,7 @@ public final class ApplicationImpl extends Application {
         object.addProperty("height", height);
         object.addProperty("windowPosX", winPosX);
         object.addProperty("windowPosY", winPosY);
-        object.addProperty("lastScene", getCurrentScene().getFile().getPath());
+        object.addProperty("lastScene", new File("").toURI().relativize(getCurrentScene().getFile().toURI()).getPath());
         FileIO.writeData(settings, serializer.toJson(object));
 
         // Destroy and clean up any remaining objects

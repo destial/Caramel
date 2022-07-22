@@ -1,9 +1,9 @@
 package caramel.api.utils;
 
 import caramel.api.Application;
-import com.google.common.io.Files;
 import caramel.api.debug.Debug;
 import caramel.api.scripts.InternalScript;
+import com.google.common.io.Files;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;

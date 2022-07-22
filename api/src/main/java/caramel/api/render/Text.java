@@ -1,15 +1,12 @@
 package caramel.api.render;
 
 import caramel.api.components.Camera;
-import caramel.api.interfaces.FunctionButton;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.interfaces.ShowInEditor;
 import caramel.api.objects.GameObject;
-import caramel.api.text.TextMesh;
-import caramel.api.texture.Mesh;
-import caramel.api.text.CharInfo;
 import caramel.api.text.TextFont;
+import caramel.api.text.TextMesh;
 import caramel.api.utils.Color;
 
 public final class Text extends Renderer {

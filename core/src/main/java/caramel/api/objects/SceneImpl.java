@@ -1,6 +1,5 @@
 package caramel.api.objects;
 
-import org.joml.Vector3f;
 import caramel.api.Application;
 import caramel.api.Input;
 import caramel.api.components.Camera;
@@ -10,6 +9,7 @@ import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.utils.Pair;
+import org.joml.Vector3f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.EditorAction;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;

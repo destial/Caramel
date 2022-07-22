@@ -1,10 +1,10 @@
 package xyz.destiall.caramel.app;
 
+import caramel.api.MouseListener;
+import caramel.api.components.EditorCamera;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
-import caramel.api.MouseListener;
-import caramel.api.components.EditorCamera;
 
 import java.util.Arrays;
 

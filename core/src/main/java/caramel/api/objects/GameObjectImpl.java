@@ -1,7 +1,7 @@
 package caramel.api.objects;
 
-import caramel.api.components.Transform;
 import caramel.api.Component;
+import caramel.api.components.Transform;
 import caramel.api.interfaces.Render;
 import caramel.api.interfaces.Update;
 

@@ -2,11 +2,11 @@ package caramel.api.physics.components;
 
 import caramel.api.components.Camera;
 import caramel.api.components.RigidBody2D;
+import caramel.api.debug.Debug;
 import caramel.api.objects.GameObject;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import caramel.api.debug.Debug;
 
 public final class Box2DCollider extends Collider {
     public Vector2f bounds = new Vector2f(1f);

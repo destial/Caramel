@@ -3,9 +3,9 @@ package caramel.api.components;
 import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.interfaces.HideInEditor;
+import caramel.api.objects.GameObject;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import caramel.api.objects.GameObject;
 
 public class Camera extends Component {
     public transient Matrix4f projection, view;

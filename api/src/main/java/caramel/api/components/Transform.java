@@ -1,10 +1,10 @@
 package caramel.api.components;
 
+import caramel.api.Component;
+import caramel.api.interfaces.HideInEditor;
+import caramel.api.objects.GameObject;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import caramel.api.Component;
-import caramel.api.objects.GameObject;
-import caramel.api.interfaces.HideInEditor;
 
 /**
  * This {@link Component} represents the transform matrices of the {@link GameObject}.

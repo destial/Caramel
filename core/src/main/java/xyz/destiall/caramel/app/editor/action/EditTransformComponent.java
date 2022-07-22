@@ -1,8 +1,8 @@
 package xyz.destiall.caramel.app.editor.action;
 
-import org.joml.Vector3f;
 import caramel.api.components.Transform;
 import caramel.api.objects.Scene;
+import org.joml.Vector3f;
 
 public final class EditTransformComponent extends EditComponent<Transform> {
     public Vector3f pos1;

@@ -1,6 +1,12 @@
 package xyz.destiall.caramel.app.serialize;
 
-import xyz.destiall.java.gson.*;
+import xyz.destiall.java.gson.JsonDeserializationContext;
+import xyz.destiall.java.gson.JsonDeserializer;
+import xyz.destiall.java.gson.JsonElement;
+import xyz.destiall.java.gson.JsonObject;
+import xyz.destiall.java.gson.JsonParseException;
+import xyz.destiall.java.gson.JsonSerializationContext;
+import xyz.destiall.java.gson.JsonSerializer;
 
 import java.io.File;
 import java.lang.reflect.Type;
@@ -16,7 +22,7 @@ public final class FileSerializer implements JsonSerializer<File>, JsonDeseriali
     @Override
     public JsonElement serialize(File file, Type type, JsonSerializationContext jsonSerializationContext) {
         JsonObject object = new JsonObject();
-        object.addProperty("path", file.getPath());
+        object.addProperty("path", new File("").toURI().relativize(file.toURI()).getPath());
         return object;
     }
 }

@@ -1,16 +1,16 @@
 package xyz.destiall.caramel.app.physics;
 
+import caramel.api.Time;
+import caramel.api.components.RigidBody3D;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.SceneImpl;
+import caramel.api.physics.components.Box3DCollider;
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DBody;
 import org.ode4j.ode.DBox;
 import org.ode4j.ode.DMass;
 import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
-import caramel.api.Time;
-import caramel.api.objects.GameObject;
-import caramel.api.components.RigidBody3D;
-import caramel.api.physics.components.Box3DCollider;
-import caramel.api.objects.SceneImpl;
 
 public final class Physics3D implements Physics {
     private final DVector3 gravity = new DVector3(0, -1f, 0);

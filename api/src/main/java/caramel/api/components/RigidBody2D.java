@@ -1,12 +1,12 @@
 package caramel.api.components;
 
-import caramel.api.physics.components.Circle2DCollider;
-import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import caramel.api.math.Vector2;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.components.Box2DCollider;
+import caramel.api.physics.components.Circle2DCollider;
 import caramel.api.physics.info.RaycastInfo2D;
+import org.jbox2d.common.Vec2;
+import org.jbox2d.dynamics.Body;
 
 public final class RigidBody2D extends RigidBody {
     public final Vector2 velocity = new Vector2();

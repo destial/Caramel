@@ -2,13 +2,13 @@ package xyz.destiall.caramel.app.scripts;
 
 import caramel.api.Component;
 import caramel.api.debug.DebugImpl;
+import caramel.api.events.FileEvent;
 import caramel.api.objects.GameObject;
 import caramel.api.scripts.InternalScript;
 import caramel.api.scripts.Script;
 import caramel.api.scripts.ScriptManager;
 import caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import caramel.api.events.FileEvent;
 import xyz.destiall.caramel.app.scripts.loader.ScriptLoader;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandler;

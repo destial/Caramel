@@ -210,7 +210,7 @@ public final class Mesh {
         glBindVertexArray(0);
 
         if (texture != null) {
-            Texture.getTexture(texture).buildTexture();
+            Texture.getTexture(texture);
         }
     }
 

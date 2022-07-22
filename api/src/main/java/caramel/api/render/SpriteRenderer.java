@@ -2,13 +2,10 @@ package caramel.api.render;
 
 import caramel.api.Time;
 import caramel.api.components.Camera;
-import caramel.api.debug.Debug;
 import caramel.api.interfaces.FunctionButton;
 import caramel.api.objects.GameObject;
 import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
-
-import java.io.File;
 
 public final class SpriteRenderer extends Renderer {
     public Spritesheet spritesheet;

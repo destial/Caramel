@@ -1,12 +1,12 @@
 package caramel.api.render;
 
+import caramel.api.components.Camera;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.interfaces.ShowInEditor;
-import caramel.api.utils.Color;
-import caramel.api.components.Camera;
 import caramel.api.objects.GameObject;
 import caramel.api.texture.Mesh;
 import caramel.api.texture.MeshBuilder;
+import caramel.api.utils.Color;
 
 public final class MeshRenderer extends Renderer {
     public Mesh mesh;

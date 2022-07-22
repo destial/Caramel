@@ -1,5 +1,11 @@
 package xyz.destiall.caramel.app.editor.panels;
 
+import caramel.api.Application;
+import caramel.api.Input;
+import caramel.api.Time;
+import caramel.api.components.EditorCamera;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.SceneImpl;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
@@ -11,13 +17,7 @@ import org.joml.Matrix3d;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import caramel.api.Application;
-import caramel.api.Input;
-import caramel.api.Time;
-import caramel.api.objects.GameObject;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import caramel.api.components.EditorCamera;
-import caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.editor.action.EditTransformComponent;

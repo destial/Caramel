@@ -72,16 +72,16 @@
         {
           "velocity": {
             "joml": {
-              "x": -2.5763853,
-              "y": 9.313226E-9
+              "x": 0.0,
+              "y": 0.0
             },
             "jbox2d": {
-              "x": -2.5763853,
-              "y": 9.313226E-9
+              "x": 0.0,
+              "y": 0.0
             },
             "imgui": {
-              "x": -2.5763853,
-              "y": 9.313226E-9
+              "x": 0.0,
+              "y": 0.0
             }
           },
           "angularDamping": 0.8,
@@ -112,6 +112,11 @@
           "enabled": true
         },
         {
+          "clazz": "scripts.AnimationUpdate",
+          "id": 24,
+          "enabled": true
+        },
+        {
           "spritesheet": {
             "serializedAnimation": {
               "anim0": {
@@ -139,17 +144,17 @@
                 "value": 17
               }
             },
-            "path": "D:\\Github\\Caramel\\assets\\textures\\player.png",
+            "path": "assets/textures/player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 0,
-            "currentAnimation": "anim5"
+            "currentIndex": 2,
+            "currentAnimation": "anim0"
           },
           "texture": {
-            "path": "D:\\Github\\Caramel\\assets\\textures\\player.png"
+            "path": "assets/textures/player.png"
           },
-          "index": 0,
-          "animation": "anim0",
+          "index": 2,
+          "animation": "",
           "columns": 3,
           "rows": 6,
           "timePerAnimation": 0.1,
@@ -169,12 +174,7 @@
             "z": 1.0
           },
           "clazz": "caramel.api.render.SpriteRenderer",
-          "id": 21,
-          "enabled": true
-        },
-        {
-          "clazz": "scripts.AnimationUpdate",
-          "id": 24,
+          "id": 26,
           "enabled": true
         }
       ],
@@ -187,8 +187,8 @@
       "components": [
         {
           "position": {
-            "x": 0.84731376,
-            "y": -0.53501546,
+            "x": 1.5344015,
+            "y": -0.7396841,
             "z": -1.8
           },
           "localPosition": {
@@ -202,8 +202,8 @@
             "z": 0.0
           },
           "scale": {
-            "x": 46.776703,
-            "y": 0.6303475,
+            "x": 6.595161,
+            "y": 1.5752553,
             "z": 1.0
           },
           "forward": {
@@ -321,7 +321,8 @@
               3
             ],
             "type": 4,
-            "shader": "color",
+            "shader": "default",
+            "texture": "assets/textures/rock.png",
             "color": {
               "r": 1.0,
               "g": 1.0,
@@ -338,8 +339,8 @@
             "a": 1.0
           },
           "pos": {
-            "x": 0.84731376,
-            "y": -0.53501546,
+            "x": 1.5344015,
+            "y": -0.7396841,
             "z": -1.8
           },
           "rot": {
@@ -348,8 +349,8 @@
             "z": 0.0
           },
           "sca": {
-            "x": 46.776703,
-            "y": 0.6303475,
+            "x": 6.595161,
+            "y": 1.5752553,
             "z": 1.0
           },
           "clazz": "caramel.api.render.MeshRenderer",

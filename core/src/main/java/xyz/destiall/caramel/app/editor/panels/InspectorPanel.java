@@ -1,5 +1,23 @@
 package xyz.destiall.caramel.app.editor.panels;
 
+import caramel.api.Application;
+import caramel.api.Component;
+import caramel.api.Input;
+import caramel.api.components.RigidBody2D;
+import caramel.api.components.RigidBody3D;
+import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
+import caramel.api.interfaces.FunctionButton;
+import caramel.api.interfaces.HideInEditor;
+import caramel.api.interfaces.ShowInEditor;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.SceneImpl;
+import caramel.api.objects.StringWrapperImpl;
+import caramel.api.physics.components.Box2DCollider;
+import caramel.api.physics.components.Box3DCollider;
+import caramel.api.scripts.InternalScript;
+import caramel.api.scripts.Script;
+import caramel.api.utils.FileIO;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.texteditor.TextEditor;
@@ -7,29 +25,11 @@ import imgui.extension.texteditor.TextEditorLanguageDefinition;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
-import caramel.api.Application;
-import caramel.api.Component;
-import caramel.api.Input;
-import caramel.api.debug.Debug;
-import caramel.api.interfaces.FunctionButton;
-import caramel.api.interfaces.HideInEditor;
-import caramel.api.interfaces.ShowInEditor;
-import caramel.api.objects.GameObject;
-import caramel.api.components.RigidBody2D;
-import caramel.api.components.RigidBody3D;
-import caramel.api.components.Transform;
-import caramel.api.physics.components.Box2DCollider;
-import caramel.api.physics.components.Box3DCollider;
-import caramel.api.scripts.InternalScript;
-import caramel.api.scripts.Script;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import caramel.api.utils.FileIO;
-import caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.action.AddComponents;
 import xyz.destiall.caramel.app.editor.action.DeleteComponents;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
-import caramel.api.objects.StringWrapperImpl;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -74,10 +74,10 @@ public final class InspectorPanel extends Panel {
         if (selected != null) {
             selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
             ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
-            String path = ImGuiUtils.findFile("prefab", "Create", ".caramelprefab");
-            if (path != null) {
-                // TODO: Create prefab from gameobject
-            }
+            // String path = ImGuiUtils.findFile("prefab", "Create", ".caramelprefab");
+            //if (path != null) {
+            //    // TODO: Create prefab from gameobject
+            //}
             for (Component component : selected.getComponents()) {
                 if (selectedComponent == component) {
                     ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.3f, 0.3f, 0.7f, 1.0f);

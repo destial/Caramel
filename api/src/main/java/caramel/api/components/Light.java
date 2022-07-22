@@ -1,8 +1,8 @@
 package caramel.api.components;
 
 import caramel.api.Component;
-import org.joml.Vector3f;
 import caramel.api.objects.GameObject;
+import org.joml.Vector3f;
 
 public final class Light extends Component {
     private Vector3f color;

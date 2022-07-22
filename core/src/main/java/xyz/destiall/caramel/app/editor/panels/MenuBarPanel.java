@@ -1,12 +1,13 @@
 package xyz.destiall.caramel.app.editor.panels;
 
+import caramel.api.debug.DebugImpl;
+import caramel.api.objects.SceneImpl;
 import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
-import caramel.api.debug.DebugImpl;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import caramel.api.objects.SceneImpl;
+import xyz.destiall.caramel.app.ui.ImGuiUtils;
 
 import java.io.File;
 
@@ -22,21 +23,55 @@ public final class MenuBarPanel extends Panel {
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         if (ImGui.beginMenu("File")) {
             if (ImGui.menuItem("Open Scene")) {
-                ImGuiFileDialog.openModal("open-scene", "Open Scene", ".caramel", ".", new ImGuiFileDialogPaneFun() {
-                    @Override
-                    public void paneFun(String filter, long userDatas, boolean canContinue) {}
-                }, 250, 1, 42, ImGuiFileDialogFlags.None);
+                if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
+                    ImGuiFileDialog.openModal("open-scene", "Open Scene", ".caramel", ".", new ImGuiFileDialogPaneFun() {
+                        @Override
+                        public void paneFun(String filter, long userDatas, boolean canContinue) {
+                        }
+                    }, 250, 1, 42, ImGuiFileDialogFlags.None);
+                } else {
+                    String path = ImGuiUtils.openFileJava("Open Scene", ".caramel");
+                    if (path != null) {
+                        File file = new File(path);
+                        if (!file.exists()) {
+                            DebugImpl.logError(file.getPath() + " does not exist!");
+                        } else {
+                            if (path.endsWith(".caramel")) {
+                                if (scene.isPlaying()) scene.stop();
+                                SceneImpl s = ApplicationImpl.getApp().loadScene(file);
+                                ApplicationImpl.getApp().setTitle(s.name);
+                            }
+                        }
+                    }
+                }
+
             }
+
             if (ImGui.menuItem("Save", "Ctrl + S", false, !scene.isSaved())) {
                 if (scene.isPlaying()) scene.stop();
                 ApplicationImpl.getApp().saveCurrentScene();
             }
 
             if (ImGui.menuItem("Save As", "Ctrl + Shift + S")) {
-                ImGuiFileDialog.openModal("save-scene", "Save Scene As", ".caramel", ".", new ImGuiFileDialogPaneFun() {
-                    @Override
-                    public void paneFun(String filter, long userDatas, boolean canContinue) {}
-                }, 250, 1, 42, ImGuiFileDialogFlags.None);
+                if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
+                    ImGuiFileDialog.openModal("save-scene", "Save Scene As", ".caramel", ".", new ImGuiFileDialogPaneFun() {
+                        @Override
+                        public void paneFun(String filter, long userDatas, boolean canContinue) {}
+                    }, 250, 1, 42, ImGuiFileDialogFlags.None);
+
+                } else {
+                    String path = ImGuiUtils.saveFileJava("Save Scene", ".caramel");
+                    if (path != null) {
+                        if (!path.toLowerCase().endsWith(".caramel")) {
+                            path += ".caramel";
+                        }
+                        File file = new File(path);
+                        String fileName = file.getName();
+                        scene.name = fileName.substring(0, file.getName().length() - ".caramel".length());
+                        ApplicationImpl.getApp().saveScene(scene, file);
+                        ApplicationImpl.getApp().setTitle(scene.name);
+                    }
+                }
             }
 
             ImGui.endMenu();
@@ -53,26 +88,29 @@ public final class MenuBarPanel extends Panel {
             ImGui.endMenu();
         }
 
-        if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
-            if (ImGuiFileDialog.isOk()) {
-                File file = new File(ImGuiFileDialog.getFilePathName());
+        if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
+            if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
+                if (ImGuiFileDialog.isOk()) {
+                    File file = new File(ImGuiFileDialog.getFilePathName());
 
-                String fileName = ImGuiFileDialog.getCurrentFileName();
-                scene.name = fileName.substring(0, file.getName().length() - ImGuiFileDialog.getCurrentFilter().length());
-                ApplicationImpl.getApp().saveScene(scene, file);
-                ApplicationImpl.getApp().setTitle(scene.name);
+                    String fileName = ImGuiFileDialog.getCurrentFileName();
+                    scene.name = fileName.substring(0, file.getName().length() - ImGuiFileDialog.getCurrentFilter().length());
+                    ApplicationImpl.getApp().saveScene(scene, file);
+                    ApplicationImpl.getApp().setTitle(scene.name);
+                }
+                ImGuiFileDialog.close();
+
+            } else if (ImGuiFileDialog.display("open-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
+                File file = new File(ImGuiFileDialog.getFilePathName());
+                if (!file.exists()) {
+                    DebugImpl.logError(file.getPath() + " does not exist!");
+                } else {
+                    if (scene.isPlaying()) scene.stop();
+                    SceneImpl s = ApplicationImpl.getApp().loadScene(file);
+                    ApplicationImpl.getApp().setTitle(s.name);
+                }
+                ImGuiFileDialog.close();
             }
-            ImGuiFileDialog.close();
-        } else if (ImGuiFileDialog.display("open-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
-            File file = new File(ImGuiFileDialog.getFilePathName());
-            if (!file.exists()) {
-                DebugImpl.logError(file.getPath() + " does not exist!");
-            } else {
-                if (scene.isPlaying()) scene.stop();
-                SceneImpl s = ApplicationImpl.getApp().loadScene(file);
-                ApplicationImpl.getApp().setTitle(s.name);
-            }
-            ImGuiFileDialog.close();
         }
 
         if (!scene.isPlaying() && ImGui.button("Play")) {

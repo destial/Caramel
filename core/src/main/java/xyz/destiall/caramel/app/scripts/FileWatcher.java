@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app.scripts;
 
-import xyz.destiall.caramel.app.ApplicationImpl;
 import caramel.api.events.FileEvent;
+import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.java.timer.Scheduler;
 import xyz.destiall.java.timer.Task;
 

@@ -8,8 +8,8 @@ import caramel.api.objects.GameObject;
 import imgui.ImGui;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
-import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
+import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 
 public final class EditorCamera extends Camera {
     @HideInEditor

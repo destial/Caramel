@@ -1,12 +1,12 @@
 package scripts;
 
+import caramel.api.Input;
 import caramel.api.Time;
+import caramel.api.components.RigidBody2D;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.ShowInEditor;
-import caramel.api.scripts.Script;
 import caramel.api.objects.GameObject;
-import caramel.api.Input;
-import caramel.api.components.RigidBody2D;
+import caramel.api.scripts.Script;
 
 public class CharacterController2D extends Script {
     @HideInEditor private transient RigidBody2D rb;

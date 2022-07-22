@@ -1,8 +1,8 @@
 package caramel.api.components;
 
 import caramel.api.Component;
-import caramel.api.physics.RigidBodyType;
 import caramel.api.objects.GameObject;
+import caramel.api.physics.RigidBodyType;
 
 public abstract class RigidBody extends Component {
     public float angularDamping = 0.8f;

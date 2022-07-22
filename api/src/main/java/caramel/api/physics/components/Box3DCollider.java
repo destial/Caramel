@@ -2,10 +2,10 @@ package caramel.api.physics.components;
 
 import caramel.api.components.Camera;
 import caramel.api.components.RigidBody3D;
-import org.joml.Vector3f;
-import org.ode4j.ode.DMass;
 import caramel.api.debug.Debug;
 import caramel.api.objects.GameObject;
+import org.joml.Vector3f;
+import org.ode4j.ode.DMass;
 
 public final class Box3DCollider extends Collider {
     public Vector3f halfSize = new Vector3f(0.5f);

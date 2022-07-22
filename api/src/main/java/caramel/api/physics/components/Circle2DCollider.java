@@ -5,8 +5,6 @@ import caramel.api.components.RigidBody2D;
 import caramel.api.debug.Debug;
 import caramel.api.objects.GameObject;
 import org.jbox2d.collision.shapes.CircleShape;
-import org.jbox2d.collision.shapes.PolygonShape;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public final class Circle2DCollider extends Collider {

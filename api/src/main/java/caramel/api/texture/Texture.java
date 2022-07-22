@@ -1,7 +1,7 @@
 package caramel.api.texture;
 
-import org.lwjgl.BufferUtils;
 import caramel.api.debug.Debug;
+import org.lwjgl.BufferUtils;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -31,7 +31,6 @@ import static org.lwjgl.stb.STBImage.stbi_load;
 public final class Texture {
     private transient boolean loaded = false;
     private transient ByteBuffer buffer;
-    private transient Texture reference;
     private transient int width, height;
     private transient int texId;
     private String path;
@@ -50,10 +49,6 @@ public final class Texture {
 
     public void invalidate() {
         glDeleteTextures(getTexId());
-        if (reference != null) {
-            reference.texId = 0;
-            texId = 0;
-        }
 
         if (path != null) {
             TEXTURES.remove(path);
@@ -65,10 +60,6 @@ public final class Texture {
     }
 
     public void buildEmpty() {
-        if (reference != null) {
-            reference.buildEmpty();
-            return;
-        }
         texId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texId);
 
@@ -81,10 +72,6 @@ public final class Texture {
     }
 
     public void buildBuffer() {
-        if (reference != null) {
-            reference.buildBuffer();
-            return;
-        }
         texId = glGenTextures();
         glBindTexture(GL_TEXTURE_2D, texId);
 
@@ -101,9 +88,6 @@ public final class Texture {
 
     public boolean buildTexture() {
         if (texId != 0 && !loaded) return false;
-        if (reference != null) {
-            return reference.buildTexture();
-        }
 
         File file = new File(path);
         if (!file.exists()) {
@@ -148,19 +132,19 @@ public final class Texture {
     }
 
     public boolean isLoaded() {
-        return reference != null ? reference.loaded : loaded;
+        return loaded;
     }
 
     public int getWidth() {
-        return reference != null ? reference.width : width;
+        return width;
     }
 
     public int getHeight() {
-        return reference != null ? reference.height : height;
+        return height;
     }
 
     public int getTexId() {
-        return reference != null ? reference.texId : texId;
+        return texId;
     }
 
     public void bind() {

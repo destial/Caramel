@@ -1,5 +1,7 @@
 package xyz.destiall.caramel.app.ui;
 
+import caramel.api.Input;
+import caramel.api.Time;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -13,11 +15,9 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
-import caramel.api.Input;
-import caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
-import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
+import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;

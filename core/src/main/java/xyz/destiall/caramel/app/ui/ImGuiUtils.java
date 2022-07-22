@@ -22,6 +22,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 
 public final class ImGuiUtils {
     private static final float width = 110f;
+    public static final boolean USE_IMGUI_FILE_CHOOSER = false;
 
     public static boolean drawVec2Control(String label, Vector2f values) {
         return drawVec2Control(label, values, 0.0f, width);
@@ -550,8 +552,11 @@ public final class ImGuiUtils {
                 }
 
                 if (path != null) {
-                    Texture.getTexture(path).buildTexture();
-                    mesh.setTexture(path);
+                    File absolute = new File(path);
+                    String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
+                    if (Texture.getTexture(relative) != null) {
+                        mesh.setTexture(path);
+                    }
                 }
 
             } else if (type == Spritesheet.class) {
@@ -575,11 +580,12 @@ public final class ImGuiUtils {
 
                 if (path != null) {
                     texture = Texture.getTexture(path);
-                    texture.buildTexture();
-                    field.set(component, texture);
-                    if (invokeMethods != null) {
-                        for (String method : invokeMethods) {
-                            component.sendMessage(method);
+                    if (texture.buildTexture()) {
+                        field.set(component, texture);
+                        if (invokeMethods != null) {
+                            for (String method : invokeMethods) {
+                                component.sendMessage(method);
+                            }
                         }
                     }
                 }
@@ -633,24 +639,61 @@ public final class ImGuiUtils {
         ImGui.nextColumn();
 
         if (ImGui.button(button)) {
-            ImGuiFileDialog.openModal(label, button, filter, ".", new ImGuiFileDialogPaneFun() {
-                @Override
-                public void paneFun(String filter, long userDatas, boolean canContinue) {}
-            }, 250, 1, 42, ImGuiFileDialogFlags.None);
-        }
+            if (USE_IMGUI_FILE_CHOOSER) {
+                ImGuiFileDialog.openModal(label, button, filter, ".", new ImGuiFileDialogPaneFun() {
+                    @Override
+                    public void paneFun(String filter, long userDatas, boolean canContinue) {}
+                }, 250, 1, 42, ImGuiFileDialogFlags.None);
 
+            } else {
+                ImGui.columns(1);
+                ImGui.popID();
+
+                return openFileJava(button, filter);
+            }
+        }
         ImGui.columns(1);
         ImGui.popID();
 
-        if (ImGuiFileDialog.display(label, ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
-            if (ImGuiFileDialog.isOk()) {
-                String path = ImGuiFileDialog.getFilePathName();
+        if (USE_IMGUI_FILE_CHOOSER) {
+            if (ImGuiFileDialog.display(label, ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
+                if (ImGuiFileDialog.isOk()) {
+                    String path = ImGuiFileDialog.getFilePathName();
+                    File absolute = new File(path);
+                    String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
+                    ImGuiFileDialog.close();
+                    return relative;
+                }
                 ImGuiFileDialog.close();
-                return path;
             }
-            ImGuiFileDialog.close();
         }
 
+        return null;
+    }
+
+    public static String openFileJava(String title, String filter) {
+        String[] extensions = filter.split(",");
+        JFileChooser chooser = new FileChooser(title, extensions);
+
+        chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        int result = chooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            return new File("").toURI().relativize(file.toURI()).getPath();
+        }
+        return null;
+    }
+
+    public static String saveFileJava(String title, String filter) {
+        String[] extensions = filter.split(",");
+        JFileChooser chooser = new FileChooser(title, extensions);
+
+        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
+        int result = chooser.showSaveDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = chooser.getSelectedFile();
+            return new File("").toURI().relativize(file.toURI()).getPath();
+        }
         return null;
     }
 

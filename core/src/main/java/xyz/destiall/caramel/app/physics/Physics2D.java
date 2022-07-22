@@ -1,6 +1,12 @@
 package xyz.destiall.caramel.app.physics;
 
+import caramel.api.Time;
+import caramel.api.components.RigidBody2D;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.SceneImpl;
+import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
+import caramel.api.physics.internals.ContactListener;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
@@ -9,12 +15,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
-import caramel.api.Time;
-import caramel.api.objects.GameObject;
-import caramel.api.components.RigidBody2D;
-import caramel.api.physics.components.Box2DCollider;
-import caramel.api.physics.internals.ContactListener;
-import caramel.api.objects.SceneImpl;
 
 
 public final class Physics2D implements Physics {

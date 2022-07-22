@@ -1,29 +1,28 @@
 package xyz.destiall.caramel.app.editor.panels;
 
+import caramel.api.Application;
+import caramel.api.Input;
 import caramel.api.components.RigidBody2D;
+import caramel.api.components.Transform;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.GameObjectImpl;
+import caramel.api.objects.SceneImpl;
+import caramel.api.objects.StringWrapperImpl;
 import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
+import caramel.api.render.MeshRenderer;
 import caramel.api.render.Text;
+import caramel.api.texture.Mesh;
+import caramel.api.texture.MeshBuilder;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiTreeNodeFlags;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
-import org.joml.Vector4f;
-import caramel.api.Application;
-import caramel.api.Input;
-import caramel.api.objects.GameObject;
-import caramel.api.objects.GameObjectImpl;
-import caramel.api.render.MeshRenderer;
-import caramel.api.components.Transform;
-import caramel.api.texture.Mesh;
-import caramel.api.texture.MeshBuilder;
-import caramel.api.objects.SceneImpl;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.utils.Payload;
-import caramel.api.objects.StringWrapperImpl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
