@@ -56,7 +56,7 @@ public final class AudioPlayer extends Component {
     @FunctionButton
     public void rebuild() {
         if (source != null) {
-            source.destroy();
+            source.invalidate();
         }
         source = SoundSource.getSource(path);
         if (source.build()) {

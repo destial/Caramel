@@ -22,6 +22,8 @@ import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glCompileShader;
 import static org.lwjgl.opengl.GL20.glCreateProgram;
 import static org.lwjgl.opengl.GL20.glCreateShader;
+import static org.lwjgl.opengl.GL20.glDeleteProgram;
+import static org.lwjgl.opengl.GL20.glDeleteShader;
 import static org.lwjgl.opengl.GL20.glGetProgramInfoLog;
 import static org.lwjgl.opengl.GL20.glGetProgrami;
 import static org.lwjgl.opengl.GL20.glGetShaderInfoLog;
@@ -36,11 +38,13 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public final class Shader {
-    private final String path;
-    private String vertexShaderSrc = "";
-    private String fragmentShaderSrc = "";
-
-    private int shaderProgram;
+    private transient final String path;
+    private transient String vertexShaderSrc = "";
+    private transient String fragmentShaderSrc = "";
+    private transient boolean compiled = false;
+    private transient int shaderProgram;
+    private transient int vertexShader;
+    private transient int fragmentShader;
 
     private Shader(String filePath) {
         this.path = filePath;
@@ -81,36 +85,37 @@ public final class Shader {
         }
     }
 
-    public void compile() {
-        int vertexId = glCreateShader(GL_VERTEX_SHADER);
+    public boolean compile() {
+        if (compiled) return false;
+        vertexShader = glCreateShader(GL_VERTEX_SHADER);
 
-        glShaderSource(vertexId, vertexShaderSrc);
-        glCompileShader(vertexId);
+        glShaderSource(vertexShader, vertexShaderSrc);
+        glCompileShader(vertexShader);
 
-        int success = glGetShaderi(vertexId, GL_COMPILE_STATUS);
+        int success = glGetShaderi(vertexShader, GL_COMPILE_STATUS);
         if (success == GL_FALSE) {
-            int len = glGetShaderi(vertexId, GL_INFO_LOG_LENGTH);
+            int len = glGetShaderi(vertexShader, GL_INFO_LOG_LENGTH);
             Debug.logError("Vertex compilation failed. Shader path: " + path);
-            System.err.println(glGetShaderInfoLog(vertexId, len));
-            return;
+            System.err.println(glGetShaderInfoLog(vertexShader, len));
+            return false;
         }
 
-        int fragmentId = glCreateShader(GL_FRAGMENT_SHADER);
+        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-        glShaderSource(fragmentId, fragmentShaderSrc);
-        glCompileShader(fragmentId);
+        glShaderSource(fragmentShader, fragmentShaderSrc);
+        glCompileShader(fragmentShader);
 
-        success = glGetShaderi(fragmentId, GL_COMPILE_STATUS);
+        success = glGetShaderi(fragmentShader, GL_COMPILE_STATUS);
         if (success == GL_FALSE) {
-            int len = glGetShaderi(fragmentId, GL_INFO_LOG_LENGTH);
+            int len = glGetShaderi(fragmentShader, GL_INFO_LOG_LENGTH);
             Debug.logError("Fragment compilation failed. Shader path: " + path);
-            System.err.println(glGetShaderInfoLog(fragmentId, len));
-            return;
+            System.err.println(glGetShaderInfoLog(fragmentShader, len));
+            return false;
         }
 
         shaderProgram = glCreateProgram();
-        glAttachShader(shaderProgram, vertexId);
-        glAttachShader(shaderProgram, fragmentId);
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
         glLinkProgram(shaderProgram);
 
         success = glGetProgrami(shaderProgram, GL_LINK_STATUS);
@@ -118,7 +123,11 @@ public final class Shader {
             int len = glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);
             Debug.logError("Shader linking failed. Shader path: " + path);
             System.err.println(glGetProgramInfoLog(shaderProgram, len));
+            return false;
         }
+
+        compiled = true;
+        return true;
     }
 
     public void use() {
@@ -127,6 +136,16 @@ public final class Shader {
 
     public void detach() {
         glUseProgram(0);
+    }
+
+    public void invalidate() {
+        glDeleteProgram(shaderProgram);
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
+        shaderProgram = 0;
+        vertexShader = 0;
+        fragmentShader = 0;
+        SHADERS.remove(path.substring(0, path.length() - ".glsl".length()));
     }
 
     public void uploadMat4f(String name, Matrix4f matrix) {
@@ -155,20 +174,35 @@ public final class Shader {
         return path;
     }
 
-    private static final HashMap<String, Shader> shaders = new HashMap<>();
+    private static final HashMap<String, Shader> SHADERS = new HashMap<>();
 
-    public static Shader getShader(String name) {
-        return shaders.get(name);
+    public static void invalidateAll() {
+        for (Shader shader : SHADERS.values()) {
+            glDeleteShader(shader.shaderProgram);
+            glDeleteShader(shader.vertexShader);
+            glDeleteShader(shader.fragmentShader);
+            shader.shaderProgram = 0;
+            shader.vertexShader = 0;
+            shader.fragmentShader = 0;
+        }
+        SHADERS.clear();
     }
 
-    static {
-        shaders.put("default", new Shader("default.glsl"));
-        shaders.put("color", new Shader("color.glsl"));
-        shaders.put("light", new Shader("light.glsl"));
-        shaders.put("line", new Shader("line.glsl"));
-        shaders.put("text", new Shader("text.glsl"));
-        for (Shader shader : shaders.values()) {
-            shader.compile();
+    public static Shader getShader(String name) {
+        Shader shader = SHADERS.get(name);
+        if (shader == null) {
+            shader = new Shader(name + ".glsl");
+            if (shader.compile()) {
+                SHADERS.put(name, shader);
+            }
         }
+        return shader;
+    }
+    static {
+        getShader("default");
+        getShader("color");
+        getShader("light");
+        getShader("line");
+        getShader("text");
     }
 }

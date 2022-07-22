@@ -72,16 +72,16 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.0,
-              "y": 0.0
+              "x": -2.5763853,
+              "y": 9.313226E-9
             },
             "jbox2d": {
-              "x": 0.0,
-              "y": 0.0
+              "x": -2.5763853,
+              "y": 9.313226E-9
             },
             "imgui": {
-              "x": 0.0,
-              "y": 0.0
+              "x": -2.5763853,
+              "y": 9.313226E-9
             }
           },
           "angularDamping": 0.8,
@@ -142,13 +142,13 @@
             "path": "D:\\Github\\Caramel\\assets\\textures\\player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 2,
-            "currentAnimation": "anim0"
+            "currentIndex": 0,
+            "currentAnimation": "anim5"
           },
           "texture": {
             "path": "D:\\Github\\Caramel\\assets\\textures\\player.png"
           },
-          "index": 2,
+          "index": 0,
           "animation": "anim0",
           "columns": 3,
           "rows": 6,

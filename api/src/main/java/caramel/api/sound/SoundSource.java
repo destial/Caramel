@@ -80,9 +80,9 @@ public final class SoundSource {
         return sound;
     }
 
-    public void destroy() {
+    public void invalidate() {
         for (Sound sound : sounds) {
-            sound.destroy();
+            sound.invalidate();
         }
         sounds.clear();
         alDeleteBuffers(bufferId);
@@ -93,10 +93,10 @@ public final class SoundSource {
 
     private final static Map<String, SoundSource> SOURCES = new ConcurrentHashMap<>();
 
-    public static void destroyAll() {
+    public static void invalidateAll() {
         for (SoundSource source : SOURCES.values()) {
             for (Sound sound : source.sounds) {
-                sound.destroy();
+                sound.invalidate();
             }
             source.sounds.clear();
             alDeleteBuffers(source.bufferId);

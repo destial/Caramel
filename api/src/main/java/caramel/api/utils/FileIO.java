@@ -26,6 +26,9 @@ public final class FileIO {
             "\n" +
             "import caramel.api.objects.*;\n" +
             "import caramel.api.components.*;\n" +
+            "import caramel.api.physics.components.*;\n" +
+            "import caramel.api.interfaces.*;\n" +
+            "import caramel.api.render.*;\n" +
             "import caramel.api.debug.*;\n" +
             "import caramel.api.audio.*;\n" +
             "import caramel.api.math.*;\n" +

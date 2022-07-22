@@ -73,10 +73,12 @@ public final class SpriteRenderer extends Renderer {
     @Override
     public void update() {
         if (spritesheet == null) return;
-        timeElapsed += Time.deltaTime;
-        if (timeElapsed > timePerAnimation) {
-            timeElapsed = 0;
-            spritesheet.step();
+        if (timePerAnimation > 0) {
+            timeElapsed += Time.deltaTime;
+            if (timeElapsed > timePerAnimation) {
+                timeElapsed = 0;
+                spritesheet.step();
+            }
         }
     }
 }

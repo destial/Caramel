@@ -1,9 +1,5 @@
 package xyz.destiall.caramel.app.ui;
 
-import imgui.ImFont;
-import imgui.ImFontAtlas;
-import imgui.ImFontConfig;
-import imgui.ImFontGlyphRangesBuilder;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -22,10 +18,6 @@ import caramel.api.Time;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
-import caramel.api.utils.FileIO;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
@@ -58,20 +50,13 @@ import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 public final class ImGUILayer {
     private final ApplicationImpl window;
     private final long glfwWindow;
-    private final Map<Font, ImFont> fonts;
     private ScenePanel scenePanel;
 
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
 
-    public enum Font {
-        DEFAULT,
-        ARIAL,
-    }
-
     public ImGUILayer(ApplicationImpl window) {
         this.window = window;
         this.glfwWindow = window.glfwWindow;
-        fonts = new HashMap<>();
     }
 
     // Initialize Dear ImGui.
@@ -85,24 +70,6 @@ public final class ImGUILayer {
         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
         io.addBackendFlags(ImGuiBackendFlags.HasMouseCursors);
         io.setBackendPlatformName("imgui_java_impl_glfw");
-
-        final ImFontAtlas fontAtlas = io.getFonts();
-        fonts.put(Font.DEFAULT, fontAtlas.addFontDefault());
-
-        final ImFontGlyphRangesBuilder rangesBuilder = new ImFontGlyphRangesBuilder(); // Glyphs ranges provide
-        rangesBuilder.addRanges(fontAtlas.getGlyphRangesDefault());
-
-        final ImFontConfig fontConfig = new ImFontConfig();
-        fontConfig.setMergeMode(true);
-
-        final short[] glyphRanges = rangesBuilder.buildRanges();
-        fonts.put(Font.ARIAL, fontAtlas.addFontFromMemoryTTF(FileIO.loadResource("arial.TTF"), 26, fontConfig, glyphRanges));
-        fontAtlas.build();
-
-        fontConfig.setName(Font.ARIAL.name());
-        io.setFontDefault(fonts.get(Font.ARIAL));
-
-        fontConfig.destroy();
 
         io.setKeyMap(ImGuiKey.Backspace, Input.Key.BACKSPACE);
         io.setKeyMap(ImGuiKey.Enter, Input.Key.ENTER);
@@ -243,7 +210,6 @@ public final class ImGUILayer {
         ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());
 
-
         ImGui.updatePlatformWindows();
         ImGui.renderPlatformWindowsDefault();
         glfwMakeContextCurrent(window.glfwWindow);
@@ -253,9 +219,5 @@ public final class ImGUILayer {
         imGuiGl3.dispose();
         ImGui.getIO().getFonts().destroy();
         ImGui.destroyContext();
-    }
-
-    public Map<Font, ImFont> getFonts() {
-        return fonts;
     }
 }

@@ -1,5 +1,6 @@
 package xyz.destiall.caramel.app;
 
+import caramel.api.render.Shader;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
 import org.lwjgl.BufferUtils;
@@ -425,9 +426,6 @@ public final class ApplicationImpl extends Application {
     }
 
     private void destroy() {
-        Texture.invalidateAll();
-        SoundSource.destroyAll();
-
         // Save settings
         File settings = new File("settings.json");
         JsonObject object = new JsonObject();
@@ -439,6 +437,10 @@ public final class ApplicationImpl extends Application {
         FileIO.writeData(settings, serializer.toJson(object));
 
         // Destroy and clean up any remaining objects
+        Texture.invalidateAll();
+        Shader.invalidateAll();
+        SoundSource.invalidateAll();
+
         scriptManager.destroy();
 
         // Unregister any remaining listeners

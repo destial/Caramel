@@ -92,7 +92,7 @@ public final class Sound {
         }
     }
 
-    void destroy() {
+    void invalidate() {
         alDeleteSources(sourceId);
     }
 }

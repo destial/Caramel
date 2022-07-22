@@ -22,7 +22,7 @@ public final class ConsolePanel extends Panel {
             if (LOGS.size() > 0) {
                 Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
                 if (previous != null && previous.getKey().equals(s) && previous.getValue() == Level.INFO) {
-                    LOGS.remove(previous);
+                    LOGS.remove(LOGS.size() - 1);
                 }
             }
             LOGS.add(new Pair<>(s, Level.INFO));

@@ -162,8 +162,9 @@ public final class HierarchyPanel extends Panel {
                 addingGameObjectHierarchy = false;
             }
 
-            if (ImGui.selectable("New 2D Cube")) {
+            if (ImGui.selectable("New 2D Quad")) {
                 GameObject go = new GameObjectImpl(scene);
+                go.name.set("Quad");
                 MeshRenderer renderer = new MeshRenderer(go);
                 RigidBody2D rigidBody = new RigidBody2D(go);
                 Box2DCollider boxCollider = new Box2DCollider(go);
@@ -181,6 +182,7 @@ public final class HierarchyPanel extends Panel {
 
             if (ImGui.selectable("New 2D Circle")) {
                 GameObject go = new GameObjectImpl(scene);
+                go.name.set("Circle");
                 MeshRenderer renderer = new MeshRenderer(go);
                 Mesh mesh = MeshBuilder.createCircle(0.5f, 36);
                 renderer.setMesh(mesh);
@@ -201,6 +203,7 @@ public final class HierarchyPanel extends Panel {
 
             if (ImGui.selectable("New UI Text")) {
                 GameObject go = new GameObjectImpl(scene);
+                go.name.set("Text");
                 Text renderer = new Text(go);
                 go.transform.scale.x = 0.025f;
                 go.transform.scale.y = 0.025f;
