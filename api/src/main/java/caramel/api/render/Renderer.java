@@ -19,13 +19,6 @@ public abstract class Renderer extends Component implements Render {
     @Override
     public void lateUpdate() {
         rot.set(transform.rotation);
-        transform.model
-                .identity()
-                .translate(pos.set(transform.position).add(transform.localPosition))
-                .rotate(rot.x, 1, 0, 0)
-                .rotate(rot.y, 0, 1, 0)
-                .rotate(rot.z, 0, 0, 1)
-                .scale(sca.set(transform.scale));
     }
 
     public abstract void build();

@@ -99,6 +99,9 @@ public final class TextFont {
         }
         buffer.flip();
 
-        return new Texture(image.getWidth(), image.getHeight(), buffer);
+        Texture texture = new Texture(image.getWidth(), image.getHeight(), buffer);
+        texture.setPath(filepath);
+        Texture.getTextures().add(texture);
+        return texture;
     }
 }

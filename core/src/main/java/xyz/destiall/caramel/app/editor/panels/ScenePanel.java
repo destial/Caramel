@@ -5,6 +5,7 @@ import caramel.api.Time;
 import caramel.api.components.EditorCamera;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
+import caramel.api.render.BatchRenderer;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.extension.imguizmo.ImGuizmo;
@@ -21,6 +22,7 @@ import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.editor.action.EditTransformComponent;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
+import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import java.util.HashSet;
@@ -52,6 +54,7 @@ public final class ScenePanel extends Panel {
             previousDt = Time.deltaTime;
         }
         ImGui.text("Delta: " + previousDt + "ms");
+        ImGui.text("Draw Calls: " + BatchRenderer.DRAW_CALLS);
 
         ImVec2 windowSize = getLargestAspectRatioViewport();
         ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
@@ -82,6 +85,7 @@ public final class ScenePanel extends Panel {
         if (ImGui.button("R")) {
             operation = Operation.ROTATE;
         }
+        BatchRenderer.USE_BATCH = ImGuiUtils.drawCheckBox("batch render", BatchRenderer.USE_BATCH);
 
         window.getMouseListener().setSceneViewport(new Vector2f(leftX, bottomY));
         window.getMouseListener().setSceneViewportSize(new Vector2f(windowSize.x, windowSize.y));
@@ -171,7 +175,7 @@ public final class ScenePanel extends Panel {
             EditorCamera camera = scene.getEditorCamera();
             Matrix4f inverseView = camera.getView();
             Matrix4f projection = camera.getProjection();
-            Matrix4f transform = selected.transform.model;
+            Matrix4f transform = selected.transform.getModel();
 
             float[] view = new float[16];
             inverseView.get(view);
@@ -263,9 +267,10 @@ public final class ScenePanel extends Panel {
             float tx = gameObject.transform.position.x + gameObject.transform.localPosition.x;
             float ty = gameObject.transform.position.y + gameObject.transform.localPosition.y;
             float tz = gameObject.transform.position.z + gameObject.transform.localPosition.z;
+            Matrix4f model = gameObject.transform.getModel();
 
-            Vector3f mX = max.mul(gameObject.transform.model.get3x3(new Matrix3d())).add(tx, ty, tz);
-            Vector3f mN = min.mul(gameObject.transform.model.get3x3(new Matrix3d())).add(tx, ty, tz);
+            Vector3f mX = max.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
+            Vector3f mN = min.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
 
             if (x >= mN.x && x <= mX.x && y >= mN.y && y <= mX.y) {
                 return gameObject;

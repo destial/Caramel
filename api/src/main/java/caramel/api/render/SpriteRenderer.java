@@ -83,4 +83,11 @@ public final class SpriteRenderer extends Renderer {
             }
         }
     }
+
+    @Override
+    public SpriteRenderer clone(GameObject gameObject, boolean copyId) {
+        SpriteRenderer clone = (SpriteRenderer) super.clone(gameObject, copyId);
+        clone.spritesheet = spritesheet.copy();
+        return clone;
+    }
 }

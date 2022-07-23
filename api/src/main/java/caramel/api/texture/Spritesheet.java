@@ -161,4 +161,12 @@ public final class Spritesheet {
         mesh.resetArrays();
         mesh.resetIndices();
     }
+
+    public Spritesheet copy() {
+        Spritesheet spritesheet = new Spritesheet(path, columns, rows);
+        spritesheet.build();
+        spritesheet.currentAnimation = currentAnimation;
+        spritesheet.currentIndex = currentIndex;
+        return spritesheet;
+    }
 }

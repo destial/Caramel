@@ -9,7 +9,20 @@ import caramel.api.text.TextFont;
 import caramel.api.text.TextMesh;
 import caramel.api.utils.Color;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class Text extends Renderer {
+    private static final Set<TextMesh> meshes = new HashSet<>();
+    public static void addMesh(TextMesh mesh) {
+        meshes.add(mesh);
+    }
+    public static void invalidateAll() {
+        for (TextMesh mesh : meshes) {
+            mesh.invalidate();
+        }
+        meshes.clear();
+    }
 
     @HideInEditor private transient TextMesh mesh;
     @HideInEditor private transient TextFont font;

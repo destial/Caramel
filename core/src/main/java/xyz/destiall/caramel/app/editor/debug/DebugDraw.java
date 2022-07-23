@@ -3,7 +3,9 @@ package xyz.destiall.caramel.app.editor.debug;
 import caramel.api.components.Camera;
 import caramel.api.interfaces.Render;
 import caramel.api.interfaces.Update;
+import caramel.api.render.BatchRenderer;
 import caramel.api.render.Shader;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -30,7 +32,7 @@ public final class DebugDraw implements Update, Render {
     public static DebugDraw INSTANCE = new DebugDraw();
 
     private final List<DebugLine> lines = new ArrayList<>();
-    private final float[] vertexArray = new float[500 * 6 * 2];
+    private float[] vertexArray = new float[500 * 6 * 2];
 
     private int vaoID;
     private int vboID;
@@ -74,7 +76,8 @@ public final class DebugDraw implements Update, Render {
             }
         }
 
-        if (lines.size() <= 0) return;
+        if (lines.isEmpty()) return;
+        vertexArray = new float[lines.size() * 2 * 6];
 
         int index = 0;
         for (DebugLine line : lines) {
@@ -94,18 +97,21 @@ public final class DebugDraw implements Update, Render {
 
     @Override
     public void render(Camera camera) {
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, Arrays.copyOfRange(vertexArray, 0, lines.size() * 6 * 2));
+        if (lines.isEmpty()) return;
 
-        shader.use();
-        shader.uploadMat4f("uProjection", camera.getProjection());
-        shader.uploadMat4f("uView", camera.getView());
+        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
+
+        shader.attach();
+        Matrix4f vp = camera.getProjection().mul(camera.getView());
+        shader.uploadMat4f("uVP", vp);
 
         glBindVertexArray(vaoID);
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
 
         glDrawArrays(GL_LINES, 0, lines.size() * 2);
+        BatchRenderer.DRAW_CALLS++;
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);

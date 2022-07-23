@@ -7,14 +7,12 @@ layout(location=2) in vec2 aTexCoords;
 out vec2 fTexCoords;
 out vec3 fColor;
 
-uniform mat4 uProjection;
-uniform mat4 uView;
-uniform mat4 uModel;
+uniform mat4 uMVP;
 
 void main() {
     fTexCoords = aTexCoords;
     fColor = aColor;
-    gl_Position = uProjection * uView * uModel * vec4(aPos, 5, 1);
+    gl_Position = uMVP * vec4(aPos, 5, 1);
 }
 
 #type fragment

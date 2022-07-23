@@ -6,7 +6,9 @@ import org.lwjgl.BufferUtils;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.lwjgl.opengl.GL11.GL_LINEAR;
@@ -159,23 +161,30 @@ public final class Texture {
         return path;
     }
 
-    private static final Map<String, Texture> TEXTURES = new HashMap<>();
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    private static final List<Texture> TEXTURES = new ArrayList<>();
     public static Texture getTexture(String path) {
-        Texture texture = TEXTURES.get(path);
+        Texture texture = TEXTURES.stream().filter(t -> t.getPath().equals(path)).findFirst().orElse(null);
         if (texture == null) {
             texture = new Texture(path);
             if (texture.buildTexture()) {
-                TEXTURES.put(path, texture);
+                TEXTURES.add(texture);
             } else {
                 texture = null;
-                TEXTURES.put(path, null);
             }
         }
         return texture;
     }
 
+    public static List<Texture> getTextures() {
+        return TEXTURES;
+    }
+
     public static void invalidateAll() {
-        for (Texture t : TEXTURES.values()) {
+        for (Texture t : TEXTURES) {
             if (t.isLoaded()) {
                 glDeleteTextures(t.texId);
                 t.texId = 0;

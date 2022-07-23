@@ -9,12 +9,14 @@ public final class Vertex {
     public Vector2f texCoords;
     public Color color;
     public Vector3f normal;
+    public float texSlot;
 
     public Vertex() {
         position = new Vector3f();
         texCoords = new Vector2f();
         color = new Color();
         normal = new Vector3f();
+        texSlot = -1;
     }
 
     @Override
@@ -24,8 +26,9 @@ public final class Vertex {
                 ", texCoords=" + texCoords +
                 ", color=" + color +
                 ", normal=" + normal +
+                ", texSlot=" + texSlot +
                 '}';
     }
 
-    public static final int SIZE = 3 + 2 + 4 + 3;
+    public static final int SIZE = 3 + 2 + 4 + 3 + 1;
 }
