@@ -8,20 +8,16 @@ layout (location=3) in vec3 aNormal;
 
 const int MAX_LIGHTS = 8;
 
-uniform mat4 uProjection;
-uniform mat4 uView;
-uniform mat4 uModel;
+uniform mat4 uMVP;
 
 out vec4 fColor;
 out vec2 fTexCoords;
-out vec3 fPos;
 out vec3 fNormal;
 
 void main() {
     fColor = aColor;
     fTexCoords = aTexCoords;
-    fPos = vec3(uModel * vec4(aPos, 1.0));
-    gl_Position = uProjection * uView * uModel * vec4(aPos, 1.0);
+    gl_Position = uMVP * vec4(aPos, 1.0);
 }
 
 #type fragment
@@ -32,7 +28,6 @@ uniform sampler2D texSampler;
 in int MAX_LIGHTS;
 in vec4 fColor;
 in vec2 fTexCoords;
-in vec3 fPos;
 in vec3 fNormal;
 
 out vec4 FragColor;

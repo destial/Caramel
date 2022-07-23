@@ -33,6 +33,7 @@ import static org.lwjgl.opengl.GL20.glLinkProgram;
 import static org.lwjgl.opengl.GL20.glShaderSource;
 import static org.lwjgl.opengl.GL20.glUniform1f;
 import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniform1iv;
 import static org.lwjgl.opengl.GL20.glUniform3f;
 import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
@@ -130,7 +131,7 @@ public final class Shader {
         return true;
     }
 
-    public void use() {
+    public void attach() {
         glUseProgram(shaderProgram);
     }
 
@@ -149,25 +150,30 @@ public final class Shader {
     }
 
     public void uploadMat4f(String name, Matrix4f matrix) {
-        int var = glGetUniformLocation(shaderProgram, name);
+        int loc = glGetUniformLocation(shaderProgram, name);
         FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
         matrix.get(matBuffer);
-        glUniformMatrix4fv(var, false, matBuffer);
+        glUniformMatrix4fv(loc, false, matBuffer);
     }
 
     public void uploadVec3f(String name, Vector3f vector) {
-        int var = glGetUniformLocation(shaderProgram, name);
-        glUniform3f(var, vector.x, vector.y, vector.z);
+        int loc = glGetUniformLocation(shaderProgram, name);
+        glUniform3f(loc, vector.x, vector.y, vector.z);
     }
 
     public void uploadFloat(String name, float f) {
-        int var = glGetUniformLocation(shaderProgram, name);
-        glUniform1f(var, f);
+        int loc = glGetUniformLocation(shaderProgram, name);
+        glUniform1f(loc, f);
     }
 
     public void uploadTexture(String name, int id) {
-        int var = glGetUniformLocation(shaderProgram, name);
-        glUniform1i(var, id);
+        int loc = glGetUniformLocation(shaderProgram, name);
+        glUniform1i(loc, id);
+    }
+
+    public void uploadIntArray(String name, int[] array) {
+        int loc = glGetUniformLocation(shaderProgram, name);
+        glUniform1iv(loc, array);
     }
 
     public String getPath() {

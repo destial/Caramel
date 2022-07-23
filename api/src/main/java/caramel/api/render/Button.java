@@ -11,6 +11,7 @@ import caramel.api.texture.MeshBuilder;
 import caramel.api.utils.Color;
 import imgui.ImGui;
 import org.joml.Matrix3d;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -122,8 +123,10 @@ public final class Button extends Renderer {
         float ty = transform.position.y + transform.localPosition.y;
         float tz = transform.position.z + transform.localPosition.z;
 
-        Vector3f mX = max.mul(transform.model.get3x3(new Matrix3d())).add(tx, ty, tz);
-        Vector3f mN = min.mul(transform.model.get3x3(new Matrix3d())).add(tx, ty, tz);
+        Matrix4f model = transform.getModel();
+
+        Vector3f mX = max.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
+        Vector3f mN = min.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
 
         return x >= mN.x && x <= mX.x && y >= mN.y && y <= mX.y;
     }

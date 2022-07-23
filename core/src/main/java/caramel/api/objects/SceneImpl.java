@@ -8,6 +8,7 @@ import caramel.api.components.Light;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
+import caramel.api.render.BatchRenderer;
 import caramel.api.utils.Pair;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.app.ApplicationImpl;
@@ -134,14 +135,19 @@ public final class SceneImpl extends Scene {
         glEnable(GL_DEPTH_TEST);
         if (playing) {
             for (GameObject go : gameObjects) go.render(camera);
+
+            if (BatchRenderer.USE_BATCH) BatchRenderer.render();
         } else {
             if (Input.isKeyDown(GLFW_KEY_G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             for (GameObject go : gameObjects) go.render(camera);
 
+            if (BatchRenderer.USE_BATCH) BatchRenderer.render();
+
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
+
     }
 
     public boolean canUndo() {

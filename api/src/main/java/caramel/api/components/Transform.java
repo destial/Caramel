@@ -15,7 +15,7 @@ public final class Transform extends Component {
     public final Vector3f rotation;
     public final Vector3f scale;
 
-    @HideInEditor public transient final Matrix4f model;
+    @HideInEditor private transient final Matrix4f model;
     @HideInEditor public final Vector3f forward;
     @HideInEditor public final Vector3f up;
 
@@ -41,6 +41,19 @@ public final class Transform extends Component {
         if (rb != null) {
             rb._setPosition(position.x + localPosition.x, position.y + localPosition.y, position.z + localPosition.z);
         }
+    }
+
+    public Matrix4f getModel() {
+        Vector3f pos = new Vector3f(position).add(localPosition);
+        model
+            .identity()
+            .translate(pos)
+            .rotate(rotation.x, 1, 0, 0)
+            .rotate(rotation.y, 0, 1, 0)
+            .rotate(rotation.z, 0, 0, 1)
+            .scale(scale);
+
+        return model;
     }
 
     @Override

@@ -4,6 +4,7 @@ import caramel.api.components.Camera;
 import caramel.api.components.Transform;
 import caramel.api.render.Shader;
 import caramel.api.utils.Color;
+import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL15;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -79,17 +80,16 @@ public final class TextMesh {
     }
 
     public void render(Transform transform, Camera camera) {
-        shader.use();
+        shader.attach();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, Float.BYTES * VERTEX_SIZE * BATCH_SIZE, GL_DYNAMIC_DRAW);
         glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, font.texture.getTexId());
         shader.uploadTexture("texSampler", 0);
-        shader.uploadMat4f("uProjection", camera.getProjection());
-        shader.uploadMat4f("uView", camera.getView());
-        shader.uploadMat4f("uModel", transform.model);
+
+        Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
+        shader.uploadMat4f("uMVP", mvp);
 
         glBindVertexArray(vao);
 
@@ -101,6 +101,7 @@ public final class TextMesh {
         size = 0;
 
         glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(0);
         shader.detach();
     }
 
@@ -157,19 +158,32 @@ public final class TextMesh {
     }
 
     public void addText(String text) {
-        float x = 0;
+        float length = 0;
+        float height = 0;
         for (int i=0; i < text.length(); i++) {
             char c = text.charAt(i);
-
             CharInfo charInfo = font.getCharacter(c);
             if (charInfo.width == 0) {
                 System.out.println("Unknown character " + c);
                 continue;
             }
+            height = Math.max(height, charInfo.height);
+            length += charInfo.width;
+        }
 
+        float x = -length / 2;
+        float y = -height / 4;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            CharInfo charInfo = font.getCharacter(c);
+            if (charInfo.width == 0) {
+                System.out.println("Unknown character " + c);
+                continue;
+            }
             float xPos = x;
-            addCharacter(xPos, 0, charInfo);
+            addCharacter(xPos, y, charInfo);
             x += charInfo.width;
+
         }
     }
 }

@@ -97,7 +97,7 @@ public final class DebugDraw implements Update, Render {
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
         glBufferSubData(GL_ARRAY_BUFFER, 0, Arrays.copyOfRange(vertexArray, 0, lines.size() * 6 * 2));
 
-        shader.use();
+        shader.attach();
         shader.uploadMat4f("uProjection", camera.getProjection());
         shader.uploadMat4f("uView", camera.getView());
 

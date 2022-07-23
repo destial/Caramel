@@ -42,7 +42,11 @@ public final class MeshRenderer extends Renderer {
         }
 
         if (mesh != null) {
-            mesh.render(transform, camera);
+            if (BatchRenderer.USE_BATCH) {
+                mesh.renderBatch(transform, camera);
+            } else {
+                mesh.render(transform, camera);
+            }
         }
     }
 
