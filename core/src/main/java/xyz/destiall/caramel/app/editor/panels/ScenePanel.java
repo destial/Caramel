@@ -54,6 +54,7 @@ public final class ScenePanel extends Panel {
             previousDt = Time.deltaTime;
         }
         ImGui.text("Delta: " + previousDt + "ms");
+        ImGui.text("Draw Calls: " + BatchRenderer.DRAW_CALLS);
 
         ImVec2 windowSize = getLargestAspectRatioViewport();
         ImVec2 windowPos = getCenteredPositionForViewport(windowSize);

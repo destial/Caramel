@@ -8,12 +8,27 @@ import caramel.api.texture.Mesh;
 import caramel.api.texture.MeshBuilder;
 import caramel.api.utils.Color;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class MeshRenderer extends Renderer {
+    private static final Set<Mesh> meshes = new HashSet<>();
+
+    public static void invalidateAll() {
+        for (Mesh mesh : meshes) {
+            mesh.invalidate();
+        }
+        meshes.clear();
+    }
+
+    public static void addMesh(Mesh mesh) {
+        meshes.add(mesh);
+    }
+
     public Mesh mesh;
 
-    @ShowInEditor
     @InvokeOnEdit("setColor")
-    public Color color = new Color(1f, 1f, 1f, 1f);
+    @ShowInEditor public final Color color = new Color(1f, 1f, 1f, 1f);
 
     public MeshRenderer(GameObject gameObject) {
         super(gameObject);
@@ -21,7 +36,9 @@ public final class MeshRenderer extends Renderer {
 
     @Override
     public void build() {
-        if (mesh != null) mesh.build();
+        if (mesh != null) {
+            mesh.build();
+        }
     }
 
     public void setColor() {
@@ -52,4 +69,11 @@ public final class MeshRenderer extends Renderer {
 
     @Override
     public void start() {}
+
+    @Override
+    public MeshRenderer clone(GameObject gameObject, boolean copyId) {
+        MeshRenderer clone = (MeshRenderer) super.clone(gameObject, copyId);
+        clone.mesh = mesh.copy();
+        return clone;
+    }
 }

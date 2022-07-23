@@ -85,9 +85,10 @@ public final class InspectorPanel extends Panel {
                 if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
                     ImGui.text("id: " + component.id);
                     for (Field field : component.getClass().getFields()) {
-                        if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers()))
+                        if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) {
                             continue;
-                        if (Modifier.isPublic(field.getModifiers()) || field.isAnnotationPresent(ShowInEditor.class)) {
+                        }
+                        if (field.isAnnotationPresent(ShowInEditor.class) || Modifier.isPublic(field.getModifiers())) {
                             field.setAccessible(true);
                             ImGuiUtils.imguiLayer(field, component);
                         }

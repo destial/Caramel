@@ -99,7 +99,7 @@ public final class Physics2D implements Physics {
     @Override
     public void update() {
         if (Time.deltaTime >= 0.f) {
-            world.step(Time.deltaTime, 8, 3);
+            world.step(Time.deltaTime, 6, 3);
         }
     }
 }

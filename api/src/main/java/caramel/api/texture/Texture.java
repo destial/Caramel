@@ -161,6 +161,10 @@ public final class Texture {
         return path;
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     private static final List<Texture> TEXTURES = new ArrayList<>();
     public static Texture getTexture(String path) {
         Texture texture = TEXTURES.stream().filter(t -> t.getPath().equals(path)).findFirst().orElse(null);

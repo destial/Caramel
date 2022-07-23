@@ -16,7 +16,7 @@ public final class Vertex {
         texCoords = new Vector2f();
         color = new Color();
         normal = new Vector3f();
-        texSlot = 0;
+        texSlot = -1;
     }
 
     @Override

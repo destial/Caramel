@@ -2,7 +2,9 @@ package caramel.api.text;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.render.BatchRenderer;
 import caramel.api.render.Shader;
+import caramel.api.render.Text;
 import caramel.api.utils.Color;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL15;
@@ -19,23 +21,27 @@ import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBindTexture;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glBufferSubData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glDrawElements;
 import static org.lwjgl.opengl.GL15C.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15C.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15C.glGenBuffers;
+import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 public final class TextMesh {
     private static final int BATCH_SIZE = 1000;
     private static final int VERTEX_SIZE = 7;
     private final float[] vertices = new float[BATCH_SIZE * VERTEX_SIZE];
-    private Color color;
-    private final int vao;
-    private final int vbo;
-    private final Shader shader;
+    private transient Color color;
+    private transient final int vao;
+    private transient final int vbo;
+    private transient final int ebo;
+    private transient final Shader shader;
 
     private int size = 0;
     private TextFont font;
@@ -64,7 +70,7 @@ public final class TextMesh {
             elementBuffer[i] = indices[(i % 6)] + ((i / 6) * 4);
         }
 
-        int ebo = glGenBuffers();
+        ebo = glGenBuffers();
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
 
@@ -77,6 +83,16 @@ public final class TextMesh {
 
         glVertexAttribPointer(2, 2, GL_FLOAT, false, stride, 5 * Float.BYTES);
         glEnableVertexAttribArray(2);
+
+        Text.addMesh(this);
+    }
+
+    public void invalidate() {
+        glDeleteVertexArrays(vao);
+        glDeleteBuffers(vbo);
+        if (ebo != 0) {
+            glDeleteBuffers(ebo);
+        }
     }
 
     public void render(Transform transform, Camera camera) {
@@ -92,8 +108,17 @@ public final class TextMesh {
         shader.uploadMat4f("uMVP", mvp);
 
         glBindVertexArray(vao);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(1);
+        glEnableVertexAttribArray(2);
 
         glDrawElements(GL_TRIANGLES, size * 6, GL_UNSIGNED_INT, 0);
+        BatchRenderer.DRAW_CALLS++;
+
+        glDisableVertexAttribArray(0);
+        glDisableVertexAttribArray(1);
+        glDisableVertexAttribArray(2);
+        glBindVertexArray(0);
 
         for (int i = 0; i < size * 4 * VERTEX_SIZE; i++) {
             vertices[i] = 0;
@@ -101,7 +126,6 @@ public final class TextMesh {
         size = 0;
 
         glBindTexture(GL_TEXTURE_2D, 0);
-        glActiveTexture(0);
         shader.detach();
     }
 

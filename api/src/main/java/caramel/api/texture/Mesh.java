@@ -5,6 +5,7 @@ import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
 import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
+import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
 import caramel.api.utils.Color;
 import org.joml.Matrix4f;
@@ -12,12 +13,14 @@ import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
+import org.ode4j.ode.internal.Matrix;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL30.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL30.GL_DYNAMIC_DRAW;
 import static org.lwjgl.opengl.GL30.GL_ELEMENT_ARRAY_BUFFER;
@@ -30,6 +33,7 @@ import static org.lwjgl.opengl.GL30.glBindBuffer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glBufferData;
 import static org.lwjgl.opengl.GL30.glBufferSubData;
+import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
 import static org.lwjgl.opengl.GL30.glDisableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.glDrawArrays;
 import static org.lwjgl.opengl.GL30.glDrawElements;
@@ -40,16 +44,14 @@ import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
 public class Mesh {
 
+    protected transient final List<Vertex> dirtyVertexArray;
+    protected transient int vaoId, vboId, eboId;
     protected final List<Vertex> vertexArray;
-    protected final List<Vertex> dirtyVertexArray;
     protected final List<Integer> elementArray;
-
     public int type;
-
     protected String shader;
     protected String texture;
-    protected Color color;
-    protected transient int vaoId, vboId, eboId;
+    protected Color color = new Color();
     protected boolean dirty = false;
     protected boolean drawArrays = false;
     protected boolean withIndices = false;
@@ -82,14 +84,40 @@ public class Mesh {
         drawArrays = arrays;
     }
 
+    public Mesh copy() {
+        Mesh mesh = new Mesh(drawArrays);
+        for (Vertex vertex : vertexArray) {
+            Vertex copy = new Vertex();
+            copy.position.set(vertex.position);
+            copy.normal.set(vertex.normal);
+            copy.color.set(vertex.color);
+            copy.texCoords.set(vertex.texCoords);
+            copy.texSlot = vertex.texSlot;
+            mesh.vertexArray.add(copy);
+        }
+        mesh.type = type;
+        mesh.texture = texture;
+        mesh.shader = shader;
+        mesh.dirty = dirty;
+        mesh.elementArray.addAll(elementArray);
+        mesh.build(withIndices);
+        return mesh;
+    }
+
     public Mesh resetArrays() {
         vertexArray.clear();
         setDirty(true);
         return this;
     }
 
+    public Mesh resetDirtyArrays() {
+        dirtyVertexArray.clear();
+        setDirty(true);
+        return this;
+    }
+
     public Mesh resetIndices() {
-        vertexArray.clear();
+        elementArray.clear();
         setDirty(true);
         return this;
     }
@@ -164,16 +192,14 @@ public class Mesh {
     }
 
     public void setColor(Color color) {
-        this.color = color;
-        if (color != null) {
-            for (Vertex vertex : vertexArray) {
-                vertex.color.set(color);
-            }
-            if (texture != null) {
-                shader = "default";
-            } else {
-                shader = "color";
-            }
+        this.color.set(color);
+        for (Vertex vertex : vertexArray) {
+            vertex.color.set(color);
+        }
+        if (texture != null) {
+            shader = "default";
+        } else {
+            shader = "color";
         }
         dirty = true;
     }
@@ -233,44 +259,55 @@ public class Mesh {
         if (texture != null) {
             Texture.getTexture(texture);
         }
+
+        MeshRenderer.addMesh(this);
     }
 
-    public FloatBuffer getVertexBuffer() {
-        FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertexArray.size() * Vertex.SIZE);
-        float[] vertex = new float[vertexArray.size() * Vertex.SIZE];
+    public void invalidate() {
+        glDeleteVertexArrays(vaoId);
+        glDeleteBuffers(vboId);
+
+        vaoId = 0;
+        vboId = 0;
+        if (eboId != 0) {
+            glDeleteBuffers(eboId);
+            eboId = 0;
+        }
+    }
+
+    public float[] getVertexBuffer() {
+        float[] vertices = new float[vertexArray.size() * Vertex.SIZE];
         int index = 0;
         for (Vertex v : vertexArray) {
-            vertex[  index  ] = v.position.x;
-            vertex[index + 1] = v.position.y;
-            vertex[index + 2] = v.position.z;
+            vertices[  index  ] = v.position.x;
+            vertices[index + 1] = v.position.y;
+            vertices[index + 2] = v.position.z;
 
-            vertex[index + 3] = v.color.r;
-            vertex[index + 4] = v.color.g;
-            vertex[index + 5] = v.color.b;
-            vertex[index + 6] = v.color.a;
+            vertices[index + 3] = v.color.r;
+            vertices[index + 4] = v.color.g;
+            vertices[index + 5] = v.color.b;
+            vertices[index + 6] = v.color.a;
 
-            vertex[index + 7] = v.texCoords.x;
-            vertex[index + 8] = v.texCoords.y;
+            vertices[index + 7] = v.texCoords.x;
+            vertices[index + 8] = v.texCoords.y;
 
-            vertex[index + 9] = v.normal.x;
-            vertex[index + 10] = v.normal.y;
-            vertex[index + 11] = v.normal.z;
+            vertices[index + 9] = v.normal.x;
+            vertices[index + 10] = v.normal.y;
+            vertices[index + 11] = v.normal.z;
 
-            vertex[index + 12] = v.texSlot;
+            vertices[index + 12] = v.texSlot;
             index += Vertex.SIZE;
         }
-        vertexBuffer.put(vertex).flip();
-        return vertexBuffer;
+
+        return vertices;
     }
 
-    public IntBuffer getIndexBuffer() {
-        IntBuffer elementBuffer = BufferUtils.createIntBuffer(elementArray.size());
+    public int[] getIndexBuffer() {
         int[] indices = new int[elementArray.size()];
         for (int i = 0; i < elementArray.size(); i++) {
             indices[i] = elementArray.get(i);
         }
-        elementBuffer.put(indices).flip();
-        return elementBuffer;
+        return indices;
     }
 
     public void setShader(String shader) {
@@ -308,8 +345,8 @@ public class Mesh {
         shader = "defaultBatch";
         Shader s = Shader.getShader(shader);
         Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
-
         dirtyVertexArray.clear();
+
         Texture t = texture != null ? Texture.getTexture(texture) : null;
         int texId = -1;
         if (t != null) {
@@ -322,9 +359,10 @@ public class Mesh {
             }
         }
 
+        Vector4f aPos = new Vector4f();
         for (Vertex vertex : vertexArray) {
             Vertex v = new Vertex();
-            Vector4f aPos = new Vector4f(vertex.position, 1f);
+            aPos.set(vertex.position, 1f);
             aPos.mul(mvp);
             v.position.x = aPos.x;
             v.position.y = aPos.y;
@@ -386,7 +424,7 @@ public class Mesh {
         if (drawArrays) glDrawArrays(type, 0, vertexArray.size());
         else glDrawElements(type, elementArray.size(), GL_UNSIGNED_INT, 0);
 
-        Debug.log(toString());
+        BatchRenderer.DRAW_CALLS++;
 
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);

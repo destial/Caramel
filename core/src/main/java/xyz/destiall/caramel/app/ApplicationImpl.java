@@ -5,12 +5,16 @@ import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.Time;
 import caramel.api.audio.AudioListener;
+import caramel.api.components.EditorCamera;
 import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
+import caramel.api.render.BatchRenderer;
+import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
+import caramel.api.render.Text;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
 import caramel.api.utils.FileIO;
@@ -35,6 +39,7 @@ import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonObject;
 import xyz.destiall.java.timer.Scheduler;
+import xyz.destiall.java.timer.Task;
 
 import java.io.File;
 import java.io.IOException;
@@ -323,7 +328,7 @@ public final class ApplicationImpl extends Application {
         sorted.sort(Comparator.comparing(Class::getName));
         for (Class<? extends Component> c : sorted) {
             if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
-            if (c == Transform.class) continue;
+            if (c == Transform.class || c == EditorCamera.class) continue;
             Payload.COMPONENTS.add(c);
         }
     }
@@ -347,6 +352,8 @@ public final class ApplicationImpl extends Application {
         }
 
         setTitle(scene.name);
+
+        Task task = scheduler.runTaskInterval(System::gc, 10000, 10000);
 
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
@@ -375,6 +382,8 @@ public final class ApplicationImpl extends Application {
                 s.stop();
             }
         }
+
+        task.runThenCancel();
 
         running = false;
     }
@@ -417,6 +426,7 @@ public final class ApplicationImpl extends Application {
         }
 
         scene.endFrame();
+        BatchRenderer.DRAW_CALLS = 0;
 
         if (EDITOR_MODE && Input.isControlPressedAnd(Input.Key.S)) {
             if (scene.isPlaying()) scene.stop();
@@ -444,6 +454,8 @@ public final class ApplicationImpl extends Application {
 
         // Destroy and clean up any remaining objects
         Texture.invalidateAll();
+        Text.invalidateAll();
+        MeshRenderer.invalidateAll();
         Shader.invalidateAll();
         SoundSource.invalidateAll();
 
