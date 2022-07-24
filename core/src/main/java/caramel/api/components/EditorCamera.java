@@ -36,24 +36,24 @@ public final class EditorCamera extends Camera {
             float mouseY = Input.getMouseDeltaY() * sensitivity;
 
             if (perspective) {
-                if (Input.isKeyDown(Input.Key.W)) {
-                    transform.position.add(target.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
-                } else if (Input.isKeyDown(Input.Key.S)) {
-                    transform.position.sub(target.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
+                if (ImGui.isKeyDown(Input.Key.W)) {
+                    transform.position.add(target.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
+                } else if (ImGui.isKeyDown(Input.Key.S)) {
+                    transform.position.sub(target.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
                 }
 
-                if (Input.isKeyDown(Input.Key.A)) {
+                if (ImGui.isKeyDown(Input.Key.A)) {
                     Vector3f left = up.cross(target, new Vector3f());
-                    transform.position.add(left.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
-                } else if (Input.isKeyDown(Input.Key.D)) {
+                    transform.position.add(left.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
+                } else if (ImGui.isKeyDown(Input.Key.D)) {
                     Vector3f right = target.cross(up, new Vector3f());
-                    transform.position.add(right.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
+                    transform.position.add(right.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
                 }
 
-                if (Input.isKeyDown(Input.Key.SPACE)) {
-                    transform.position.add(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
-                } else if (Input.isKeyDown(Input.Key.L_SHIFT)) {
-                    transform.position.sub(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
+                if (ImGui.isKeyDown(Input.Key.SPACE)) {
+                    transform.position.add(up.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
+                } else if (ImGui.isKeyDown(Input.Key.L_SHIFT)) {
+                    transform.position.sub(up.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1), new Vector3f()));
                 }
 
                 target.rotateY(mouseX * Time.deltaTime);
@@ -68,21 +68,20 @@ public final class EditorCamera extends Camera {
 
             } else {
 
-                transform.position.add(up.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
+                transform.position.add(up.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
                 Vector3f right = target.cross(up, new Vector3f());
-                transform.position.add(right.mul(Time.deltaTime * (Input.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseX));
+                transform.position.add(right.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseX));
             }
         }
 
         GameObject selected = Application.getApp().getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
 
-        if (Input.isKeyPressed(Input.Key.F) && selected != null &&
-                (Panel.isWindowFocused(ScenePanel.class) || Panel.isWindowFocused(HierarchyPanel.class))) {
+        if (ImGui.isKeyPressed(Input.Key.F) && selected != null && (Panel.isWindowFocused(ScenePanel.class) || Panel.isWindowFocused(HierarchyPanel.class))) {
             gameObject.scene.getEditorCamera().transform.position.x = selected.transform.position.x;
             gameObject.scene.getEditorCamera().transform.position.y = selected.transform.position.y;
         }
 
-        if (Input.isKeyPressed(Input.Key.C)) {
+        if (ImGui.isKeyPressed(Input.Key.C)) {
             toggleCameraView();
         }
     }

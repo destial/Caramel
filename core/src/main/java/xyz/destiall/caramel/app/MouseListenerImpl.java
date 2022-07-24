@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app;
 import caramel.api.MouseListener;
 import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
+import imgui.ImGui;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector4f;
@@ -117,7 +118,7 @@ public final class MouseListenerImpl implements MouseListener {
     }
 
     public float getOrthoX() {
-        float currentX = getX() - sceneViewportPos.x;
+        float currentX = ImGui.getMousePosX() - sceneViewportPos.x;
         currentX = (currentX / sceneViewportSize.x) * 2.0f - 1.0f;
         Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
 
@@ -132,7 +133,7 @@ public final class MouseListenerImpl implements MouseListener {
 
     @Override
     public float getOrthoY() {
-        float currentY = getY() - sceneViewportPos.y;
+        float currentY = ImGui.getMousePosY() - sceneViewportPos.y;
         currentY = -((currentY / sceneViewportSize.y) * 2.0f - 1.0f);
         Vector4f tmp = new Vector4f(0, currentY, 0, 1);
 
@@ -147,7 +148,7 @@ public final class MouseListenerImpl implements MouseListener {
 
     @Override
     public float getScreenX() {
-        float currentX = getX() - gameViewportPos.x;
+        float currentX = ImGui.getMousePosX() - gameViewportPos.x;
         currentX = (currentX / gameViewportSize.x) * 2.0f - 1.0f;
         Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
 
@@ -162,7 +163,7 @@ public final class MouseListenerImpl implements MouseListener {
 
     @Override
     public float getScreenY() {
-        float currentY = getY() - gameViewportPos.y;
+        float currentY = ImGui.getMousePosY() - gameViewportPos.y;
         currentY = -((currentY / gameViewportSize.y) * 2.0f - 1.0f);
         Vector4f tmp = new Vector4f(0, currentY, 0, 1);
 

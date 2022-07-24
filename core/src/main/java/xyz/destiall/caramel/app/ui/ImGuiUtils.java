@@ -592,7 +592,7 @@ public final class ImGuiUtils {
 
             } else if (type == File.class) {
                 File file = (File) value;
-                String path = findFile(name, ".");
+                String path = findFile(name, ".*");
 
                 if (file != null) {
                     ImGui.sameLine();

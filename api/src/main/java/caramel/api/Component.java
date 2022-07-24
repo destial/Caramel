@@ -9,6 +9,7 @@ import caramel.api.physics.info.ContactPoint2D;
 import xyz.destiall.java.reflection.Reflect;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.TimeUnit;
 
@@ -113,6 +114,8 @@ public abstract class Component implements Update {
      * @param methodName The method to invoke.
      */
     public void sendMessage(String methodName) {
+        Method m = Reflect.getDeclaredMethod(this.getClass(), methodName);
+        m.setAccessible(true);
         Reflect.invokeMethod(this, methodName);
     }
 

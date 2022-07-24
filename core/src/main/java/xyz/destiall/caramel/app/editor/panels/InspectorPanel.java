@@ -74,10 +74,6 @@ public final class InspectorPanel extends Panel {
         if (selected != null) {
             selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
             ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
-            // String path = ImGuiUtils.findFile("prefab", "Create", ".caramelprefab");
-            //if (path != null) {
-            //    // TODO: Create prefab from gameobject
-            //}
             for (Component component : selected.getComponents()) {
                 if (selectedComponent == component) {
                     ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.3f, 0.3f, 0.7f, 1.0f);
@@ -103,6 +99,14 @@ public final class InspectorPanel extends Panel {
 
                     if (component instanceof Script) {
                         InternalScript s = Application.getApp().getScriptManager().getInternalScript(component.getClass());
+                        if (s != null && ImGui.button("Open Script")) {
+                            try {
+                                Desktop.getDesktop().open(s.getFile());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
                         if (s != currentScript) {
                             currentScript = s;
                             if (s != null) {
@@ -113,14 +117,6 @@ public final class InspectorPanel extends Panel {
                         if (currentScript != null) {
                             editor.render(editor.getText());
                         }
-
-                        if (s != null && ImGui.button("Open Script")) {
-                            try {
-                                Desktop.getDesktop().open(s.getFile());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
                     }
                 }
                 if (selectedComponent == component) {
@@ -130,10 +126,8 @@ public final class InspectorPanel extends Panel {
 
                 if (ImGui.isItemHovered() && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
                     selectedComponent = component;
-                    popupMousePos = new ImVec2(ApplicationImpl.getApp().getMouseListener().getX(), ApplicationImpl.getApp().getMouseListener().getY());
-                }
-
-                if (ImGui.isWindowHovered() && ImGui.isMouseClicked(Input.Mouse.LEFT)) {
+                    popupMousePos = new ImVec2(ImGui.getMousePosX(), ImGui.getMousePosY());
+                } else if (ImGui.isWindowHovered() && ImGui.isMouseClicked(Input.Mouse.LEFT)) {
                     selectedComponent = null;
                 }
             }

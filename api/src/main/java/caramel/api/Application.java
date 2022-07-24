@@ -45,4 +45,6 @@ public abstract class Application implements Runnable {
     public abstract MouseListener getMouseListener();
 
     public abstract KeyListener getKeyListener();
+
+    public abstract JoystickListener getJoystickListener();
 }

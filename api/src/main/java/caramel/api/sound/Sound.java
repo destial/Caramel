@@ -18,10 +18,11 @@ import static org.lwjgl.openal.AL10.alSourcei;
 
 public final class Sound {
     private final SoundSource source;
-    private final int sourceId;
+    private int sourceId;
     private boolean loop = false;
+    private float volume = 0f;
 
-    public Sound(SoundSource source) {
+    protected Sound(SoundSource source) {
         this.source = source;
 
         sourceId = alGenSources();
@@ -32,6 +33,7 @@ public final class Sound {
     }
 
     public void setVolume(float volume) {
+        this.volume = volume;
         alSourcef(sourceId, AL_GAIN, volume);
     }
 
@@ -70,10 +72,9 @@ public final class Sound {
     }
 
     public void play(boolean cont) {
-        if (!isPlaying()) {
-            if (!cont) setPosition(0);
-            alSourcePlay(sourceId);
-        }
+        if (!cont) setPosition(0);
+        alSourcef(sourceId, AL_GAIN, volume);
+        alSourcePlay(sourceId);
     }
 
     public void resume() {
@@ -81,18 +82,26 @@ public final class Sound {
     }
 
     public void pause() {
-        if (isPlaying()) {
-            alSourcePause(sourceId);
-        }
+        alSourcef(sourceId, AL_GAIN, 0);
+        alSourcePause(sourceId);
     }
 
     public void stop() {
-        if (isPlaying()) {
-            alSourceStop(sourceId);
-        }
+        System.out.println("stopping " + this);
+        alSourcef(sourceId, AL_GAIN, 0);
+        alSourcei(sourceId, AL_LOOPING, 0);
+        alSourceStop(sourceId);
+        alDeleteSources(sourceId);
+
+        sourceId = alGenSources();
+        alSourcei(sourceId, AL_BUFFER, source.bufferId);
+        setPosition(0);
+        setLoop(loop);
+        setVolume(volume);
     }
 
-    void invalidate() {
+    public void invalidate() {
+        stop();
         alDeleteSources(sourceId);
     }
 }

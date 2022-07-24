@@ -5,6 +5,8 @@ import caramel.api.components.RigidBody3D;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
 import caramel.api.physics.components.Box3DCollider;
+import org.joml.Quaternionf;
+import org.ode4j.math.DQuaternion;
 import org.ode4j.math.DVector3;
 import org.ode4j.ode.DBody;
 import org.ode4j.ode.DBox;
@@ -14,7 +16,7 @@ import org.ode4j.ode.OdeHelper;
 
 public final class Physics3D implements Physics {
     private final DVector3 gravity = new DVector3(0, -1f, 0);
-    private final float physicsTimeStep = 1.f / 60.f;
+    private final float physicsTimeStep = Time.deltaTime;
 
     private DWorld world;
     private final SceneImpl scene;
@@ -25,6 +27,7 @@ public final class Physics3D implements Physics {
         world.setGravity(gravity);
     }
 
+    // @SuppressWarnings("all")
     @Override
     public void addGameObject(GameObject gameObject) {
         RigidBody3D rigidBody = gameObject.getComponent(RigidBody3D.class);
@@ -35,6 +38,10 @@ public final class Physics3D implements Physics {
         bodyDef.setMass(mass);
         mass.setMass(rigidBody.mass);
         bodyDef.setPosition(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
+        Quaternionf rot = gameObject.transform.rotation.rotationTo(gameObject.transform.rotation, new Quaternionf());
+        DQuaternion quat = new DQuaternion();
+        quat.set(rot.x, rot.y, rot.z, rot.w);
+        bodyDef.setQuaternion(quat);
         bodyDef.setAngularDamping(rigidBody.angularDamping);
         bodyDef.setLinearDamping(rigidBody.linearDamping);
         bodyDef.setFiniteRotationMode(rigidBody.fixedRotation);
@@ -44,7 +51,8 @@ public final class Physics3D implements Physics {
                 bodyDef.setKinematic();
                 break;
             case STATIC:
-                mass.setMass(10000000000d);
+                bodyDef.setGravityMode(false);
+                mass.setMass(1000000d);
                 break;
             case DYNAMIC:
                 bodyDef.setDynamic();
@@ -53,9 +61,9 @@ public final class Physics3D implements Physics {
 
         if (gameObject.hasComponent(Box3DCollider.class)) {
             Box3DCollider collider = gameObject.getComponent(Box3DCollider.class);
-            DBox box = OdeHelper.createBox(collider.halfSize.x * 0.5f, collider.halfSize.y * 0.5f, collider.halfSize.z * 0.5f);
+            DBox box = OdeHelper.createBox(collider.bounds.x * 0.5f, collider.bounds.y * 0.5f, collider.bounds.z * 0.5f);
             box.setBody(bodyDef);
-            mass.setBox(rigidBody.mass / (collider.halfSize.x * collider.halfSize.y * collider.halfSize.z), collider.halfSize.x * 0.5f, collider.halfSize.y * 0.5f, collider.halfSize.z * 0.5f);
+            mass.setBox(rigidBody.mass / (collider.bounds.x * collider.bounds.y * collider.bounds.z), collider.bounds.x * 0.5f, collider.bounds.y * 0.5f, collider.bounds.z * 0.5f);
         }
 
         rigidBody.rawBody = bodyDef;
@@ -77,8 +85,15 @@ public final class Physics3D implements Physics {
     }
 
     @Override
+    public void invalidate() {
+        if (world == null) return;
+        world.destroy();
+        world = null;
+    }
+
+    @Override
     public void update() {
-        if (Time.deltaTime >= 0.f) {
+        if (world != null && Time.deltaTime >= 0.f) {
             world.step(physicsTimeStep);
         }
     }

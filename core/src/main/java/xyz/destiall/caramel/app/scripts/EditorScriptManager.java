@@ -3,6 +3,8 @@ package xyz.destiall.caramel.app.scripts;
 import caramel.api.Component;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FileEvent;
+import caramel.api.events.ScenePlayEvent;
+import caramel.api.events.SceneStopEvent;
 import caramel.api.objects.GameObject;
 import caramel.api.scripts.InternalScript;
 import caramel.api.scripts.Script;
@@ -19,6 +21,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +39,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         if (scriptsRootFolder.mkdir()) {
             FileIO.saveResource("CharacterController2D.java", "assets/scripts/CharacterController2D.java");
         }
+
         compiledScripts = new ConcurrentHashMap<>();
         awaitingCompilation = ConcurrentHashMap.newKeySet();
 
@@ -65,7 +69,6 @@ public final class EditorScriptManager implements ScriptManager, Listener {
 
     @Override
     public void loadScripts(File folder) {
-        compiledScripts.clear();
         File[] files = folder.listFiles();
         if (files == null || files.length == 0) return;
         List<File> sort = Arrays.asList(files);
@@ -191,14 +194,35 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         }
     }
 
+    private final Map<String, FileEvent> awaitingEvents = new HashMap<>();
+    private boolean isPlaying = false;
+
+    @EventHandler
+    private void onScenePlay(ScenePlayEvent e) {
+        isPlaying = true;
+    }
+
+    @EventHandler
+    private void onSceneStop(SceneStopEvent e) {
+        isPlaying = false;
+        for (FileEvent event : awaitingEvents.values()) {
+            onFileModify(event);
+        }
+        awaitingEvents.clear();
+    }
+
     @EventHandler
     private void onFileModify(FileEvent event) {
         if (event.getFile().getName().endsWith(".java")) {
             File file = new File(scriptsRootFolder, event.getFile().getName());
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
             InternalScript script = compiledScripts.get(scriptName);
-
+            if (isPlaying) {
+                awaitingEvents.put(file.getPath(), event);
+                return;
+            }
             if (event.getType() == FileEvent.Type.MODIFY || event.getType() == FileEvent.Type.CREATE) {
+
                 if (!awaitingCompilation.add(file.getName())) {
                     return;
                 }

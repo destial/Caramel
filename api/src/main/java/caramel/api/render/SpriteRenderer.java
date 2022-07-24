@@ -3,6 +3,7 @@ package caramel.api.render;
 import caramel.api.Time;
 import caramel.api.components.Camera;
 import caramel.api.interfaces.FunctionButton;
+import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.objects.GameObject;
 import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
@@ -10,11 +11,13 @@ import caramel.api.texture.Texture;
 public final class SpriteRenderer extends Renderer {
     public Spritesheet spritesheet;
     public Texture texture;
-    public int index = 0;
-    public String animation = "";
+
+    @InvokeOnEdit("setIndex") public int index = 0;
+    @InvokeOnEdit("setAnim") public String animation = "";
     public int columns = 1;
     public int rows = 1;
     public float timePerAnimation = 1f;
+
 
     private transient float timeElapsed = 0;
 
@@ -27,14 +30,11 @@ public final class SpriteRenderer extends Renderer {
         if (spritesheet != null) spritesheet.build();
     }
 
-    @FunctionButton
-    public void stepAnimation() {
-        if (spritesheet == null) return;
-        spritesheet.step();
+    public void setIndex() {
+        spritesheet.setCurrentIndex(index);
     }
 
-    @FunctionButton
-    public void setAnimation() {
+    public void setAnim() {
         if (spritesheet == null) return;
         spritesheet.setCurrentAnimation(animation);
     }
@@ -54,13 +54,19 @@ public final class SpriteRenderer extends Renderer {
         spritesheet.build();
     }
 
+    @FunctionButton
+    public void step() {
+        if (spritesheet == null) return;
+        spritesheet.step();
+    }
+
     @Override
     public void render(Camera camera) {
         if (spritesheet == null) {
             buildAnimation();
         }
         if (spritesheet != null) {
-            index = spritesheet.currentIndex;
+            index = spritesheet.getCurrentIndex();
             spritesheet.render(transform, camera);
         }
     }

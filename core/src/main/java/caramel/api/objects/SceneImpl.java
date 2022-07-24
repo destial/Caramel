@@ -10,6 +10,7 @@ import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.render.BatchRenderer;
 import caramel.api.utils.Pair;
+import imgui.ImGui;
 import org.joml.Vector3f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.EditorAction;
@@ -138,7 +139,7 @@ public final class SceneImpl extends Scene {
 
             if (BatchRenderer.USE_BATCH) BatchRenderer.render();
         } else {
-            if (Input.isKeyDown(GLFW_KEY_G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            if (ImGui.isKeyDown(Input.Key.G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             for (GameObject go : gameObjects) go.render(camera);
@@ -194,11 +195,11 @@ public final class SceneImpl extends Scene {
 
     @Override
     public void editorUpdate() {
-        if (Input.isControlPressedAnd(Input.Key.Z)) {
+        if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Z)) {
             undoLastAction();
         }
 
-        if (Input.isControlPressedAnd(Input.Key.Y)) {
+        if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Y)) {
             redoLastAction();
         }
 
@@ -305,5 +306,22 @@ public final class SceneImpl extends Scene {
         selectedGameObject.remove(gameObject);
         selectedDefaultGameObject.remove(gameObject);
         physics.get(physicsMode).removeGameObject(gameObject);
+    }
+
+    public void invalidate() {
+        for (Physics physics : physics.values()) {
+            physics.invalidate();
+        }
+        physics.clear();
+        gameObjects.clear();
+        defaultGameObjects.clear();
+        selectedDefaultGameObject.clear();
+        selectedGameObject.clear();
+        actions.clear();
+        redoActions.clear();
+        panels.clear();
+        toAdd.clear();
+        prefabs.clear();
+        editorCamera = null;
     }
 }

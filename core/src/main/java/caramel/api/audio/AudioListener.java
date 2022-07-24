@@ -12,7 +12,7 @@ public final class AudioListener implements Listener {
     @EventHandler
     private void onStopScene(SceneStopEvent e) {
         for (GameObject gameObject : e.getScene().getGameObjects()) {
-            Set<AudioPlayer> audioPlayers = gameObject.getComponentsInChildren(AudioPlayer.class);
+            Set<AudioPlayer> audioPlayers = gameObject.getComponents(AudioPlayer.class);
             for (AudioPlayer a : audioPlayers) {
                 a.stop();
             }

@@ -7,6 +7,7 @@ public interface Physics extends Update {
     void addGameObject(GameObject gameObject);
     void removeGameObject(GameObject gameObject);
     void reset();
+    void invalidate();
 
     enum Mode {
         _3D,

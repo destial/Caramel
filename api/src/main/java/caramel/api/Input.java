@@ -87,6 +87,26 @@ public interface Input {
         return Application.getApp().getMouseListener().getScreenY();
     }
 
+    static float getJoystickAxis(int code) {
+        return Application.getApp().getJoystickListener().getAxis(Joystick.PAD1, code);
+    }
+
+    static boolean isJoystickDown(int code) {
+        return Application.getApp().getJoystickListener().isButtonDown(Joystick.PAD1, code);
+    }
+
+    static boolean isJoystickReleased(int code) {
+        return Application.getApp().getJoystickListener().isButtonReleased(Joystick.PAD1, code);
+    }
+
+    static boolean isJoystickPressed(int code) {
+        return Application.getApp().getJoystickListener().isButtonPressed(Joystick.PAD1, code);
+    }
+
+    static List<Integer> getConnectedJoysticks() {
+        return Application.getApp().getJoystickListener().getConnectedJoysticks();
+    }
+
     interface Mouse {
         int LEFT = GLFW_MOUSE_BUTTON_LEFT;
         int RIGHT = GLFW_MOUSE_BUTTON_RIGHT;
@@ -103,6 +123,77 @@ public interface Input {
 
         static String getButtonName(int code) {
             for (Field field : Mouse.class.getFields()) {
+                try {
+                    if ((int) field.get(null) == code) {
+                        return field.getName();
+                    }
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+            return "UNKNOWN";
+        }
+    }
+
+    interface Joystick {
+        int PAD1 = GLFW_JOYSTICK_1;
+        int PAD2 = GLFW_JOYSTICK_2;
+        int PAD3 = GLFW_JOYSTICK_3;
+        int PAD4 = GLFW_JOYSTICK_4;
+        int PAD5 = GLFW_JOYSTICK_5;
+        int PAD6 = GLFW_JOYSTICK_6;
+        int PAD7 = GLFW_JOYSTICK_7;
+        int PAD8 = GLFW_JOYSTICK_8;
+        int PAD9 = GLFW_JOYSTICK_9;
+        int PAD10 = GLFW_JOYSTICK_10;
+        int PAD11 = GLFW_JOYSTICK_11;
+        int PAD12 = GLFW_JOYSTICK_12;
+        int PAD13 = GLFW_JOYSTICK_13;
+        int PAD14 = GLFW_JOYSTICK_14;
+        int PAD15 = GLFW_JOYSTICK_15;
+        int PAD16 = GLFW_JOYSTICK_16;
+
+        interface Axis {
+            int LEFT_X = GLFW_GAMEPAD_AXIS_LEFT_X;
+            int RIGHT_X = GLFW_GAMEPAD_AXIS_RIGHT_X;
+
+            int LEFT_Y = GLFW_GAMEPAD_AXIS_LEFT_Y;
+            int RIGHT_Y = GLFW_GAMEPAD_AXIS_RIGHT_Y;
+
+            int RIGHT_TRIGGER = GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER;
+            int LEFT_TRIGGER = GLFW_GAMEPAD_AXIS_LEFT_TRIGGER;
+        }
+
+        interface Button {
+            int A = GLFW_GAMEPAD_BUTTON_A;
+            int B = GLFW_GAMEPAD_BUTTON_B;
+            int X = GLFW_GAMEPAD_BUTTON_X;
+            int Y = GLFW_GAMEPAD_BUTTON_Y;
+
+            int CIRCLE = GLFW_GAMEPAD_BUTTON_CIRCLE;
+            int CROSS = GLFW_GAMEPAD_BUTTON_CROSS;
+            int SQUARE = GLFW_GAMEPAD_BUTTON_SQUARE;
+            int TRIANGLE = GLFW_GAMEPAD_BUTTON_TRIANGLE;
+
+            int LEFT_PAD = GLFW_GAMEPAD_BUTTON_DPAD_LEFT;
+            int RIGHT = GLFW_GAMEPAD_BUTTON_DPAD_RIGHT;
+            int UP_PAD = GLFW_GAMEPAD_BUTTON_DPAD_UP;
+            int DOWN_PAD = GLFW_GAMEPAD_BUTTON_DPAD_DOWN;
+
+            int RIGHT_BUMPER = GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER;
+            int LEFT_BUMPER = GLFW_GAMEPAD_BUTTON_LEFT_BUMPER;
+
+            int RIGHT_THUMB = GLFW_GAMEPAD_BUTTON_RIGHT_THUMB;
+            int LEFT_THUMB = GLFW_GAMEPAD_BUTTON_LEFT_THUMB;
+
+            int START = GLFW_GAMEPAD_BUTTON_START;
+            int BACK = GLFW_GAMEPAD_BUTTON_BACK;
+            int GUIDE = GLFW_GAMEPAD_BUTTON_GUIDE;
+            int LAST = GLFW_GAMEPAD_BUTTON_LAST;
+        }
+
+        static String getPadName(int code) {
+            for (Field field : Joystick.class.getFields()) {
                 try {
                     if ((int) field.get(null) == code) {
                         return field.getName();

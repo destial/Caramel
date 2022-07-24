@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Input;
 import caramel.api.Time;
+import caramel.api.objects.SceneImpl;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -49,6 +50,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetCharCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetClipboardString;
 import static org.lwjgl.glfw.GLFW.glfwSetCursorPosCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
+import static org.lwjgl.glfw.GLFW.glfwSetJoystickCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
@@ -93,6 +95,14 @@ public final class ImGUILayer {
         io.setKeyMap(ImGuiKey.PageUp, Input.Key.PAGE_UP);
         io.setKeyMap(ImGuiKey.Home, Input.Key.HOME);
         io.setKeyMap(ImGuiKey.Tab, Input.Key.TAB);
+        io.setKeyMap(ImGuiKey.Escape, Input.Key.ESCAPE);
+        io.setKeyMap(ImGuiKey.A, Input.Key.A);
+        io.setKeyMap(ImGuiKey.C, Input.Key.C);
+        io.setKeyMap(ImGuiKey.V, Input.Key.V);
+        io.setKeyMap(ImGuiKey.Y, Input.Key.Y);
+        io.setKeyMap(ImGuiKey.X, Input.Key.X);
+        io.setKeyMap(ImGuiKey.Z, Input.Key.Z);
+        io.setKeyMap(ImGuiKey.KeyPadEnter, Input.Key.ENTER);
 
         glfwSetKeyCallback(glfwWindow, (w, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
@@ -106,13 +116,14 @@ public final class ImGUILayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            if (!io.getWantCaptureKeyboard())
+            if (window.getCurrentScene().isPlaying() && window.isFocused()) {
                 window.getKeyListener().keyCallback(w, key, scancode, action, mods);
+            }
         });
 
-        glfwSetCharCallback(glfwWindow, (w, c) -> {
-            io.addInputCharacter(c);
-        });
+        glfwSetJoystickCallback(window.getJoystickListener()::joystickCallback);
+
+        glfwSetCharCallback(glfwWindow, (w, c) -> io.addInputCharacter(c));
 
         glfwSetMouseButtonCallback(glfwWindow, (w, button, action, mods) -> {
             final boolean[] mouseDown = new boolean[5];
@@ -129,9 +140,7 @@ public final class ImGUILayer {
                 ImGui.setWindowFocus(null);
             }
 
-            if (scenePanel == null) scenePanel = window.getCurrentScene().getEditorPanel(ScenePanel.class);
-
-            if (!io.getWantCaptureMouse() || (scenePanel != null && scenePanel.isMouseOnScene()))
+            if (window.getCurrentScene().isPlaying() && window.isFocused())
                 window.getMouseListener().mouseButtonCallback(w, button, action, mods);
         });
 
@@ -139,16 +148,15 @@ public final class ImGUILayer {
             io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
 
-            if (scenePanel == null) scenePanel = window.getCurrentScene().getEditorPanel(ScenePanel.class);
-            if (gamePanel == null) gamePanel = window.getCurrentScene().getEditorPanel(GamePanel.class);
-
-            if (!io.getWantCaptureMouse() || (scenePanel != null && scenePanel.isMouseOnScene()))
+            if (window.getCurrentScene().isPlaying() && window.isFocused())
                 window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
         });
 
         glfwSetCursorPosCallback(glfwWindow, (w, x, y) -> {
             io.setMousePos((float) x, (float) y);
-            window.getMouseListener().mousePosCallback(w, x, y);
+
+            if (window.getCurrentScene().isPlaying() && window.isFocused())
+                window.getMouseListener().mousePosCallback(w, x, y);
         });
 
         io.setSetClipboardTextFn(new ImStrConsumer() {
@@ -172,8 +180,10 @@ public final class ImGUILayer {
     public void update() {
         startFrame(Time.deltaTime);
 
-        setupDockspace();
-        window.getCurrentScene().__imguiLayer();
+        if (!window.isFullscreen()) {
+            setupDockspace();
+            window.getCurrentScene().__imguiLayer();
+        }
 
         endFrame();
     }
@@ -227,7 +237,9 @@ public final class ImGUILayer {
             ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
         }
 
-        ImGui.end();
+        if (!window.isFullscreen()) {
+            ImGui.end();
+        }
         ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());
 

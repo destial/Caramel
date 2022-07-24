@@ -25,10 +25,9 @@ public final class MeshRenderer extends Renderer {
         meshes.add(mesh);
     }
 
-    public Mesh mesh;
-
     @InvokeOnEdit("setColor")
     @ShowInEditor public final Color color = new Color(1f, 1f, 1f, 1f);
+    public Mesh mesh;
 
     public MeshRenderer(GameObject gameObject) {
         super(gameObject);
@@ -42,6 +41,7 @@ public final class MeshRenderer extends Renderer {
     }
 
     public void setColor() {
+        if (mesh == null) return;
         mesh.setColor(color);
     }
 

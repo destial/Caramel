@@ -2,17 +2,20 @@ package caramel.api.audio;
 
 import caramel.api.Component;
 import caramel.api.interfaces.FunctionButton;
+import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.interfaces.ShowInEditor;
 import caramel.api.objects.GameObject;
 import caramel.api.sound.Sound;
 import caramel.api.sound.SoundSource;
 
+import java.io.File;
+
 public final class AudioPlayer extends Component {
     private transient SoundSource source;
     private transient Sound sound;
-    @ShowInEditor public String path = "";
-    @ShowInEditor public boolean loop = false;
-    @ShowInEditor public float volume = 0.1f;
+    @ShowInEditor @InvokeOnEdit("rebuild") public File file;
+    @ShowInEditor @InvokeOnEdit("rebuild") public boolean loop = false;
+    @ShowInEditor @InvokeOnEdit("setVolume") public float volume = 0.1f;
     @ShowInEditor public boolean playOnStart = true;
 
     public AudioPlayer(GameObject gameObject) {
@@ -53,17 +56,28 @@ public final class AudioPlayer extends Component {
         return source;
     }
 
-    @FunctionButton
+    public void setVolume() {
+        if (sound != null) {
+            sound.setVolume(volume);
+        }
+    }
+
     public void rebuild() {
+        stop();
         if (source != null) {
             source.invalidate();
         }
-        source = SoundSource.getSource(path);
+        if (file == null) return;
+        source = SoundSource.getSource(file.getPath());
         if (source.build()) {
             sound = source.createSound(loop);
-            if (sound != null) {
-                sound.setVolume(volume);
-            }
+            setVolume();
         }
+    }
+
+    @Override
+    public AudioPlayer clone(GameObject gameObject, boolean copyId) {
+        stop();
+        return (AudioPlayer) super.clone(gameObject, copyId);
     }
 }

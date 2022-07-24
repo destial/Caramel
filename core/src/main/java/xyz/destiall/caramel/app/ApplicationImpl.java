@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app;
 import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.Input;
+import caramel.api.JoystickListener;
 import caramel.api.Time;
 import caramel.api.audio.AudioListener;
 import caramel.api.components.EditorCamera;
@@ -18,6 +19,7 @@ import caramel.api.render.Text;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
 import caramel.api.utils.FileIO;
+import imgui.ImGui;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
@@ -61,6 +63,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPosCallback;
@@ -98,6 +101,7 @@ public final class ApplicationImpl extends Application {
 
     private final MouseListenerImpl mouseListener;
     private final KeyListenerImpl keyListener;
+    private final JoystickListenerImpl joystickListener;
     private final EventHandling eventHandler;
     private final Scheduler scheduler;
     private final List<Listener> listeners;
@@ -114,6 +118,8 @@ public final class ApplicationImpl extends Application {
     private boolean fullscreen;
     private String lastScene;
     private String title;
+
+    private boolean focused;
 
     private long audioContext;
     private long audioDevice;
@@ -132,6 +138,7 @@ public final class ApplicationImpl extends Application {
         title = "Caramel";
         mouseListener = new MouseListenerImpl();
         keyListener = new KeyListenerImpl();
+        joystickListener = new JoystickListenerImpl();
         eventHandler = new EventHandling();
         scheduler = new Scheduler();
         scenes = new ArrayList<>();
@@ -143,6 +150,7 @@ public final class ApplicationImpl extends Application {
                 .create();
         listeners = new ArrayList<>();
         listeners.add(new AudioListener());
+        focused = true;
     }
 
     @Override
@@ -256,11 +264,8 @@ public final class ApplicationImpl extends Application {
         }
 
         // Set window position from settings.
-        if (!fullscreen) {
-            glfwSetWindowPos(glfwWindow, winPosX, winPosY);
-        } else {
+        glfwSetWindowPos(glfwWindow, winPosX, winPosY);
 
-        }
         // Make context and enable VSync
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
@@ -277,6 +282,10 @@ public final class ApplicationImpl extends Application {
         glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
             this.winPosX = x;
             this.winPosY = y;
+        });
+
+        glfwSetWindowFocusCallback(glfwWindow, (window, focused) -> {
+            this.focused = focused;
         });
 
         // Create audio handler
@@ -389,17 +398,23 @@ public final class ApplicationImpl extends Application {
     }
 
     private boolean process() {
-        SceneImpl scene = getCurrentScene();
         glfwPollEvents();
+        SceneImpl scene = getCurrentScene();
+        joystickListener.startFrame();
 
-        if (scene.isPlaying() && Input.isKeyPressed(Input.Key.F11)) {
-            EDITOR_MODE = !EDITOR_MODE;
+        if (EDITOR_MODE && ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.P)) {
+            if (scene.isPlaying()) scene.stop();
+            else scene.play();
         }
 
         if (EDITOR_MODE) scene.editorUpdate();
         else scene.update();
 
-        if (EDITOR_MODE) {
+        if (EDITOR_MODE && ImGui.isKeyPressed(Input.Key.F11)) {
+            fullscreen = !fullscreen;
+        }
+
+        if (EDITOR_MODE && !fullscreen) {
             getSceneViewFramebuffer().bind();
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -408,7 +423,8 @@ public final class ApplicationImpl extends Application {
             getSceneViewFramebuffer().unbind();
         }
 
-        if (EDITOR_MODE) getGameViewFramebuffer().bind();
+        if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().bind();
+
         if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -417,9 +433,11 @@ public final class ApplicationImpl extends Application {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getGameCamera());
         }
-        if (EDITOR_MODE) getGameViewFramebuffer().unbind();
+
+        if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().unbind();
 
         if (EDITOR_MODE) imGui.update();
+
         else {
             mouseListener.setGameViewportPos(new Vector2f(0, 0));
             mouseListener.setGameViewportSize(new Vector2f(width, height));
@@ -428,13 +446,14 @@ public final class ApplicationImpl extends Application {
         scene.endFrame();
         BatchRenderer.DRAW_CALLS = 0;
 
-        if (EDITOR_MODE && Input.isControlPressedAnd(Input.Key.S)) {
+        if (EDITOR_MODE && ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.S)) {
             if (scene.isPlaying()) scene.stop();
             saveCurrentScene();
         }
 
         mouseListener.endFrame();
         keyListener.endFrame();
+        joystickListener.endFrame();
 
         glfwSwapBuffers(glfwWindow);
         return false;
@@ -456,8 +475,13 @@ public final class ApplicationImpl extends Application {
         Texture.invalidateAll();
         Text.invalidateAll();
         MeshRenderer.invalidateAll();
+        BatchRenderer.invalidateAll();
         Shader.invalidateAll();
         SoundSource.invalidateAll();
+        for (SceneImpl scene : scenes) {
+            scene.invalidate();
+        }
+        scenes.clear();
 
         scriptManager.destroy();
 
@@ -479,6 +503,8 @@ public final class ApplicationImpl extends Application {
 
         // Terminate the window
         glfwTerminate();
+
+        System.exit(1);
     }
 
     public ImGUILayer getImGui() {
@@ -587,6 +613,11 @@ public final class ApplicationImpl extends Application {
     }
 
     @Override
+    public JoystickListener getJoystickListener() {
+        return joystickListener;
+    }
+
+    @Override
     public MouseListenerImpl getMouseListener() {
         return mouseListener;
     }
@@ -599,5 +630,13 @@ public final class ApplicationImpl extends Application {
     @Override
     public Scheduler getScheduler() {
         return scheduler;
+    }
+
+    public boolean isFocused() {
+        return focused;
+    }
+
+    public boolean isFullscreen() {
+        return fullscreen;
     }
 }

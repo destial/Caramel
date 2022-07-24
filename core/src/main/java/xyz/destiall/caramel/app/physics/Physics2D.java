@@ -97,9 +97,16 @@ public final class Physics2D implements Physics {
     }
 
     @Override
+    public void invalidate() {
+        if (world == null) return;
+        world.clearForces();
+        world = null;
+    }
+
+    @Override
     public void update() {
-        if (Time.deltaTime >= 0.f) {
-            world.step(Time.deltaTime, 6, 3);
+        if (world != null && Time.deltaTime >= 0.f) {
+            world.step(Time.deltaTime, 3, 3);
         }
     }
 }

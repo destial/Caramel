@@ -97,6 +97,14 @@ public final class Spritesheet {
         }
     }
 
+    public int getCurrentIndex() {
+        return currentIndex;
+    }
+
+    public void setCurrentIndex(int currentIndex) {
+        this.currentIndex = currentIndex;
+    }
+
     public Animation addAnimation(String name, int indexStart, int indexEnd) {
         int total = indexEnd - indexStart;
         Sprite[] animation = new Sprite[total + 1];
@@ -134,7 +142,7 @@ public final class Spritesheet {
         if (animation == null) return;
         Sprite[] sprites = animation.getSprites();
         currentIndex++;
-        if (currentIndex >= sprites.length) {
+        if (currentIndex < 0 || currentIndex >= sprites.length) {
             currentIndex = 0;
         }
 

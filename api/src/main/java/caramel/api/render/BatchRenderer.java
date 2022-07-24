@@ -44,7 +44,7 @@ public final class BatchRenderer extends Mesh {
 
     @Override
     public void build() {
-        for (int i = 0; i < MAX_BATCH_SIZE * 3; i++) {
+        for (int i = 0; i < MAX_BATCH_SIZE * 4; i++) {
             vertexArray.add(new Vertex());
         }
         for (int i = 0; i < MAX_BATCH_SIZE * 6; i++) {
@@ -106,6 +106,17 @@ public final class BatchRenderer extends Mesh {
         }
 
         renderer.setDirty(true);
+    }
+
+    public static void invalidateAll() {
+        if (shaderMapping == null) return;
+        for (Map.Entry<Shader, List<BatchRenderer>> entry : shaderMapping.entrySet()) {
+            for (BatchRenderer renderer : entry.getValue()) {
+                renderer.invalidate();
+            }
+            entry.getValue().clear();
+        }
+        shaderMapping.clear();
     }
 
     public static void render() {

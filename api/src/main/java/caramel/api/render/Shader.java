@@ -39,13 +39,14 @@ import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
 import static org.lwjgl.opengl.GL20.glUseProgram;
 
 public final class Shader {
-    private transient final String path;
     private transient String vertexShaderSrc = "";
     private transient String fragmentShaderSrc = "";
     private transient boolean compiled = false;
     private transient int shaderProgram;
     private transient int vertexShader;
     private transient int fragmentShader;
+
+    private final String path;
 
     private Shader(String filePath) {
         this.path = filePath;

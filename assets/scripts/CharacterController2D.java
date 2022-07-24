@@ -3,6 +3,7 @@ package scripts;
 import caramel.api.Time;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.ShowInEditor;
+import caramel.api.debug.Debug;
 import caramel.api.scripts.Script;
 import caramel.api.objects.GameObject;
 import caramel.api.Input;
@@ -24,14 +25,29 @@ public class CharacterController2D extends Script {
     @Override
     public void update() {
         if (rb == null || rb.rawBody == null) return;
+        float x = Input.getJoystickAxis(Input.Joystick.Axis.LEFT_X);
+        float y = rb.getVelocity().y();
+        if (Math.abs(x) > 0.1f) {
+            x *= 5f;
+        } else {
+            x = rb.getVelocity().x();
+        }
+
         if (Input.isKeyDown(Input.Key.D)) {
-            rb.setVelocity(5f, rb.getVelocity().y());
+            x = 5f;
         } else if (Input.isKeyDown(Input.Key.A)) {
-            rb.setVelocity(-5f, rb.getVelocity().y());
+            x = -5f;
         }
-        
-        if (rb.isOnGround() && Input.isKeyDown(Input.Key.SPACE)) {
-            rb.addVelocity(0, jumpForce * Time.deltaTime);
+
+        if (rb.isOnGround() && (Input.isJoystickPressed(Input.Joystick.Button.CIRCLE) || Input.isKeyDown(Input.Key.SPACE))) {
+            y = jumpForce * Time.deltaTime;
         }
+
+        rb.setVelocity(x, y);
+    }
+
+    @Override
+    public void onCollisionEnter(RigidBody2D other) {
+
     }
 }

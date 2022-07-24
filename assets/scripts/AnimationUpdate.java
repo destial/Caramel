@@ -25,16 +25,19 @@ public class AnimationUpdate extends Script {
     // This method is called on every frame
     @Override
     public void update() {
+        int i = 0;
         if (rb == null || sp == null) return;
         Vector2 vel = rb.getVelocity();
+        float frameTime = 0.3f / Math.abs(vel.x());
+        sp.timePerAnimation = frameTime;
         if (vel.x() < 0 && !sp.animation.equals("anim3")) {
+
             sp.setAnimation("anim3");
         } else if (vel.x() > 0 && !sp.animation.equals("anim2")) {
             sp.setAnimation("anim2");
         }
-
         float x = Math.abs(vel.x());
-        if (x >= 0 && x <= 1f && !sp.animation.equals("anim0")) {
+        if (x >= 0 && x <= 0.5f && !sp.animation.equals("anim0")) {
             sp.setAnimation("anim0");
         }
         

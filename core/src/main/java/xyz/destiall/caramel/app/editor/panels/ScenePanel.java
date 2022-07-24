@@ -98,10 +98,10 @@ public final class ScenePanel extends Panel {
             }
         }
 
-        if (Input.isMousePressed(Input.Mouse.LEFT) && ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
+        if (ImGui.isMouseClicked(Input.Mouse.LEFT) && ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
             GameObject clicked = getClicked();
             if (clicked != null) {
-                if (!Input.isKeyDown(Input.Key.CONTROL)) {
+                if (!ImGui.getIO().getKeyCtrl()) {
                     window.getCurrentScene().getSelectedGameObject().clear();
                 }
                 window.getCurrentScene().getSelectedGameObject().add(clicked);
@@ -113,7 +113,7 @@ public final class ScenePanel extends Panel {
             ImVec2 endMouseCoords = new ImVec2(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
             Set<GameObject> objects = getSelected(startMouseCoords, endMouseCoords);
             if (objects != null) {
-                if (!Input.isKeyDown(Input.Key.CONTROL)) {
+                if (!ImGui.getIO().getKeyCtrl()) {
                     window.getCurrentScene().getSelectedGameObject().clear();
                 }
                 window.getCurrentScene().getSelectedGameObject().addAll(objects);
@@ -123,7 +123,7 @@ public final class ScenePanel extends Panel {
 
         if (ImGui.isWindowFocused()) {
             if (!scene.getSelectedGameObject().isEmpty()) {
-                if (Input.isKeyPressed(Input.Key.BACKSPACE) || Input.isKeyPressed(Input.Key.DELETE)) {
+                if (ImGui.isKeyPressed(Input.Key.BACKSPACE) || ImGui.isKeyPressed(Input.Key.DELETE)) {
                     DeleteGameObjects action = new DeleteGameObjects(scene);
                     for (GameObject go : scene.getSelectedGameObject()) {
                         scene.destroy(go);
@@ -133,11 +133,11 @@ public final class ScenePanel extends Panel {
                     scene.getSelectedGameObject().clear();
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.C) && !scene.getSelectedGameObject().isEmpty()) {
+                if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.C) && !scene.getSelectedGameObject().isEmpty()) {
                     Payload.COPIED_GAMEOBJECTS.addAll(scene.getSelectedGameObject());
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.V) && !Payload.COPIED_GAMEOBJECTS.isEmpty()) {
+                if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.V) && !Payload.COPIED_GAMEOBJECTS.isEmpty()) {
                     AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : Payload.COPIED_GAMEOBJECTS) {
                         GameObject go = copied.clone(false);
@@ -147,7 +147,7 @@ public final class ScenePanel extends Panel {
                     scene.addUndoAction(action);
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
+                if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
                     AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : scene.getSelectedGameObject()) {
                         GameObject go = copied.clone(false);
@@ -158,7 +158,7 @@ public final class ScenePanel extends Panel {
                 }
             }
 
-            if (Input.isControlPressedAnd(Input.Key.A)) {
+            if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.A)) {
                 scene.getSelectedGameObject().addAll(scene.getGameObjects());
             }
         }

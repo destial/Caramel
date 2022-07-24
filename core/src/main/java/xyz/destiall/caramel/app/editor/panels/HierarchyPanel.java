@@ -54,7 +54,7 @@ public final class HierarchyPanel extends Panel {
                 addingGameObjectHierarchy = !addingGameObjectHierarchy;
                 editingGameObject = false;
                 if (addingGameObjectHierarchy) {
-                    popupMousePos = new ImVec2(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
+                    popupMousePos = new ImVec2(ImGui.getMousePosX(), ImGui.getMousePosY());
                 }
             } else if (ImGui.isMouseClicked(Input.Mouse.LEFT)) {
                 addingGameObjectHierarchy = false;
@@ -67,7 +67,7 @@ public final class HierarchyPanel extends Panel {
 
         if (ImGui.isWindowFocused()) {
             if (!scene.getSelectedGameObject().isEmpty()) {
-                if (Input.isKeyPressed(Input.Key.BACKSPACE) || Input.isKeyPressed(Input.Key.DELETE)) {
+                if (ImGui.isKeyPressed(Input.Key.BACKSPACE) || ImGui.isKeyPressed(Input.Key.DELETE)) {
                     DeleteGameObjects action = new DeleteGameObjects(scene);
                     for (GameObject go : scene.getSelectedGameObject()) {
                         scene.destroy(go);
@@ -77,11 +77,11 @@ public final class HierarchyPanel extends Panel {
                     scene.getSelectedGameObject().clear();
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.C) && !scene.getSelectedGameObject().isEmpty()) {
+                if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.C) && !scene.getSelectedGameObject().isEmpty()) {
                     Payload.COPIED_GAMEOBJECTS.addAll(scene.getSelectedGameObject());
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.V) && !Payload.COPIED_GAMEOBJECTS.isEmpty()) {
+                if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.V) && !Payload.COPIED_GAMEOBJECTS.isEmpty()) {
                     AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : Payload.COPIED_GAMEOBJECTS) {
                         GameObject go = copied.clone(false);
@@ -91,7 +91,7 @@ public final class HierarchyPanel extends Panel {
                     scene.addUndoAction(action);
                 }
 
-                if (Input.isControlPressedAnd(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
+                if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
                     AddGameObjects action = new AddGameObjects(scene);
                     for (GameObject copied : scene.getSelectedGameObject()) {
                         GameObject go = copied.clone(false);
@@ -102,7 +102,7 @@ public final class HierarchyPanel extends Panel {
                 }
             }
 
-            if (Input.isControlPressedAnd(Input.Key.A)) {
+            if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.A)) {
                 scene.getSelectedGameObject().addAll(scene.getGameObjects());
             }
         }

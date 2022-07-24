@@ -66,6 +66,9 @@ public final class RigidBody2D extends RigidBody {
     }
 
     public Vector2 getVelocity() {
+        if (rawBody != null) {
+            velocity.set(rawBody.m_linearVelocity.x, rawBody.m_linearVelocity.y);
+        }
         return velocity;
     }
 
