@@ -75,8 +75,9 @@ public final class Physics2D implements Physics {
         }
 
         rigidBody.rawBody = world.createBody(bodyDef);
-        Fixture fixture = rigidBody.rawBody.createFixture(shape, rigidBody.mass);
-        fixture.setSensor(rigidBody.isTrigger);
+        rigidBody.fixture = rigidBody.rawBody.createFixture(shape, rigidBody.mass);
+        rigidBody.fixture.setSensor(rigidBody.isTrigger);
+        rigidBody.fixture.setFriction(rigidBody.friction);
     }
 
     @Override

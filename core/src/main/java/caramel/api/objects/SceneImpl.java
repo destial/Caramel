@@ -20,6 +20,7 @@ import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.panels.InspectorPanel;
 import xyz.destiall.caramel.app.editor.panels.MenuBarPanel;
+import xyz.destiall.caramel.app.editor.panels.NodePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.physics.Physics;
@@ -72,6 +73,7 @@ public final class SceneImpl extends Scene {
             panels.put(ConsolePanel.class, new ConsolePanel(this));
             panels.put(ScenePanel.class, new ScenePanel(this));
             panels.put(GamePanel.class, new GamePanel(this));
+            // panels.put(NodePanel.class, new NodePanel(this));
         }
 
         GameObjectImpl go = new GameObjectImpl(this);
@@ -96,7 +98,6 @@ public final class SceneImpl extends Scene {
                 });
 
         for (GameObject go : gameObjects) go.update();
-
         physics.get(physicsMode).update();
         for (GameObject go : gameObjects) go.lateUpdate();
     }
@@ -237,38 +238,39 @@ public final class SceneImpl extends Scene {
         if (playing) return;
         playing = true;
         ConsolePanel.LOGS.clear();
-        for (GameObject go : gameObjects) {
-            if (ApplicationImpl.getApp().EDITOR_MODE) {
-                GameObject clone = go.clone(true);
-                defaultGameObjects.add(clone);
-                if (selectedGameObject.contains(go)) {
-                    selectedDefaultGameObject.add(clone);
-                }
-            }
-            physics.get(physicsMode).addGameObject(go);
-        }
+        defaultGameObjects.addAll(gameObjects);
+        selectedDefaultGameObject.addAll(selectedGameObject);
+
+        gameObjects.clear();
         selectedGameObject.clear();
+        for (GameObject go : defaultGameObjects) {
+            GameObject clone = go.clone(true);
+            gameObjects.add(clone);
+            if (selectedDefaultGameObject.contains(go)) {
+                selectedGameObject.add(clone);
+            }
+            physics.get(physicsMode).addGameObject(clone);
+        }
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }
 
     public void stop() {
         if (!playing) return;
         playing = false;
-        if (ApplicationImpl.getApp().EDITOR_MODE) {
-            gameObjects.clear();
-            gameObjects.addAll(defaultGameObjects);
+        gameObjects.clear();
+        gameObjects.addAll(defaultGameObjects);
 
-            selectedGameObject.clear();
-            selectedGameObject.addAll(selectedDefaultGameObject);
+        selectedGameObject.clear();
+        selectedGameObject.addAll(selectedDefaultGameObject);
 
-            defaultGameObjects.clear();
-            selectedDefaultGameObject.clear();
+        defaultGameObjects.clear();
+        selectedDefaultGameObject.clear();
 
-            for (Physics p : physics.values()) {
-                p.reset();
-            }
-            gameCamera = null;
+        for (Physics p : physics.values()) {
+            p.reset();
         }
+        gameCamera = null;
+
         Application.getApp().getEventHandler().call(new SceneStopEvent(this));
     }
 

@@ -9,8 +9,8 @@ import caramel.api.render.*;
 import caramel.api.scripts.Script;
 
 public class AnimationUpdate extends Script {
-    private transient SpriteRenderer sp;
-    private transient RigidBody2D rb;
+    public transient SpriteRenderer sp;
+    public RigidBody2D rb;
     public AnimationUpdate(GameObject gameObject) {
         super(gameObject);
     }
@@ -19,7 +19,7 @@ public class AnimationUpdate extends Script {
     @Override
     public void start() {
         sp = getComponent(SpriteRenderer.class);
-        rb = getComponent(RigidBody2D.class);
+        // rb = getComponent(RigidBody2D.class);
     }
 
     // This method is called on every frame
@@ -37,8 +37,9 @@ public class AnimationUpdate extends Script {
             sp.setAnimation("anim2");
         }
         float x = Math.abs(vel.x());
-        if (x >= 0 && x <= 0.5f && !sp.animation.equals("anim0")) {
-            sp.setAnimation("anim0");
+        if (x >= 0 && x <= 0.5f && (!sp.animation.equals("anim0") || !sp.animation.equals("anim1"))) {
+            if (vel.x() < 0) sp.setAnimation("anim1");
+            else sp.setAnimation("anim0");
         }
         
     }

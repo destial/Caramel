@@ -4,6 +4,8 @@ import caramel.api.Component;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.math.Vector2;
 import caramel.api.math.Vector3;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.Scene;
 import caramel.api.render.Animation;
 import caramel.api.texture.Mesh;
 import caramel.api.texture.Spritesheet;
@@ -18,17 +20,21 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImBoolean;
 import imgui.type.ImInt;
 import imgui.type.ImString;
+import org.checkerframework.checker.units.qual.C;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import xyz.destiall.caramel.app.utils.Payload;
 
 import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class ImGuiUtils {
@@ -251,7 +257,62 @@ public final class ImGuiUtils {
         return res;
     }
 
-    public static String inputText(String label, ImString outString) {
+    public static Component findComponent(String label, GameObject parent, Component previous, Class<? extends Component> clazz) {
+        ImGui.pushID(label);
+
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, width);
+        ImGui.text(label);
+        ImGui.nextColumn();
+        String id = clazz.getSimpleName() + "-" + parent.id;
+
+        if (ImGui.button("find")) {
+            ImGui.openPopup(id);
+        }
+
+        Component find = null;
+        if (ImGui.isPopupOpen(id)) {
+            if (ImGui.beginPopup(id)) {
+                if (ImGui.beginListBox("##List Component")) {
+                    Set<Component> objects = new HashSet<>();
+                    for (GameObject root : parent.scene.getGameObjects()) {
+                        Set<? extends Component> components = root.getComponents(clazz);
+                        Set<? extends Component> children = root.getComponentsInChildren(clazz);
+                        objects.addAll(components);
+                        objects.addAll(children);
+                    }
+
+                    for (Component component : objects) {
+                        String name = component.getClass().getSimpleName() + " (" + component.gameObject.name + ")";
+                        if (ImGui.selectable(name)) {
+                            find = component;
+                            ImGui.closeCurrentPopup();
+                            System.out.println(name);
+                            break;
+                        }
+                    }
+                }
+                if (ImGui.button("Close")) {
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.endListBox();
+            }
+            ImGui.endPopup();
+        }
+
+        if (previous != null) {
+            ImGui.sameLine();
+            String name = previous.getClass().getSimpleName() + " (" + previous.gameObject.name + ")";
+            ImGui.text(name);
+        }
+
+        ImGui.columns(1);
+        ImGui.popID();
+
+        return find;
+    }
+
+    public static String inputText(String label, ImString outString, float width) {
         ImGui.pushID(label);
 
         ImGui.columns(2);
@@ -267,7 +328,11 @@ public final class ImGuiUtils {
         return outString.get();
     }
 
-    public static String inputText(String label, String text) {
+    public static String inputText(String label, ImString outString) {
+        return inputText(label, outString, width);
+    }
+
+    public static String inputText(String label, String text, float width) {
         ImGui.pushID(label);
 
         ImGui.columns(2);
@@ -287,6 +352,10 @@ public final class ImGuiUtils {
         ImGui.popID();
 
         return text;
+    }
+
+    public static String inputText(String label, String text) {
+        return inputText(label, text, width);
     }
 
     public static boolean drawQuatControl(String label, Quaternionf values, float resetValue) {
@@ -454,6 +523,7 @@ public final class ImGuiUtils {
             Class<?> type = field.getType();
             Object value = field.get(component);
             String name = field.getName();
+
             String[] invokeMethods = null;
             if (field.isAnnotationPresent(InvokeOnEdit.class)) {
                 invokeMethods = field.getAnnotation(InvokeOnEdit.class).value();
@@ -601,6 +671,19 @@ public final class ImGuiUtils {
 
                 if (path != null) {
                     field.set(component, new File(path));
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
+                    }
+                }
+
+            } else if (Component.class.isAssignableFrom(type)) {
+                Component previous = (Component) value;
+                Component find = findComponent(name, component.gameObject, previous, (Class<? extends Component>) type);
+                if (find != null && find != previous) {
+                    System.out.println("setting");
+                    field.set(component, find);
                     if (invokeMethods != null) {
                         for (String method : invokeMethods) {
                             component.sendMessage(method);

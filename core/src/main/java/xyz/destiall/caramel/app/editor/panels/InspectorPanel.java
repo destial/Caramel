@@ -152,11 +152,6 @@ public final class InspectorPanel extends Panel {
             if (addingComponents) {
                 ImGui.beginListBox("##List Component");
                 ImGui.inputText("Search", search);
-                if (ImGui.isKeyPressed(GLFW_KEY_BACKSPACE)) {
-                    String newInput = search.getLength() > 0 ? search.get().substring(0, search.getLength() - 1) : "";
-                    search.clear();
-                    search.set(newInput);
-                }
                 for (Class<?> c : Payload.COMPONENTS) {
                     if (selected.hasComponent((Class<? extends Component>) c)) continue;
                     if (search.isEmpty() || c.getSimpleName().toLowerCase().contains(search.get().toLowerCase())) {

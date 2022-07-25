@@ -137,6 +137,7 @@ public abstract class Component implements Update {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
                     boolean prev = field.isAccessible();
                     field.setAccessible(true);
+
                     field.set(clone, field.get(this));
                     field.setAccessible(prev);
                 } catch (Exception e) {

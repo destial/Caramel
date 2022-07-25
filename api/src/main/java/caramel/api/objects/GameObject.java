@@ -29,8 +29,9 @@ public abstract class GameObject implements Update, Render {
     protected final Set<Component> components;
     public final LinkedList<GameObject> children;
     public final ArrayList<String> tags;
+    public transient Transform transform;
+
     public StringWrapper name;
-    public Transform transform;
     public Transform parent;
     public Scene scene;
     public boolean active = true;
@@ -129,7 +130,7 @@ public abstract class GameObject implements Update, Render {
      * @return The set of {@link Component}. It cannot be null.
      */
     public <C extends Component> Set<C> getComponents(Class<C> clazz) {
-        return (Set<C>) components.stream().filter(c -> clazz.isAssignableFrom(clazz)).collect(Collectors.toSet());
+        return (Set<C>) components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).collect(Collectors.toSet());
     }
 
     /**

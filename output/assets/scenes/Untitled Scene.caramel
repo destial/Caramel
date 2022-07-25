@@ -197,6 +197,7 @@
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": false,
           "isTrigger": false,
@@ -283,22 +284,23 @@
         {
           "velocity": {
             "joml": {
-              "x": 2.2273154,
-              "y": -1.8626451E-9
+              "x": 0.0,
+              "y": -0.38765612
             },
             "jbox2d": {
-              "x": 2.2273154,
-              "y": -1.8626451E-9
+              "x": 0.0,
+              "y": -0.38765612
             },
             "imgui": {
-              "x": 2.2273154,
-              "y": -1.8626451E-9
+              "x": 0.0,
+              "y": -0.38765612
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 0.5,
-          "fixedRotation": false,
+          "friction": 0.0,
+          "fixedRotation": true,
           "continuousCollision": false,
           "isTrigger": false,
           "bodyType": "DYNAMIC",
@@ -337,13 +339,13 @@
             "path": "assets/textures/player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 2,
+            "currentIndex": 1,
             "currentAnimation": "anim5"
           },
           "texture": {
             "path": "assets/textures/player.png"
           },
-          "index": 2,
+          "index": 1,
           "animation": "anim0",
           "columns": 3,
           "rows": 6,
@@ -401,7 +403,12 @@
         {
           "clazz": "scripts.AnimationUpdate",
           "id": 53,
-          "enabled": true
+          "enabled": true,
+          "rb": {
+            "id": 27,
+            "clazz": "caramel.api.components.RigidBody2D",
+            "scene": "Untitled Scene"
+          }
         },
         {
           "file": {
@@ -1486,21 +1493,22 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.88415,
-              "y": -0.5911794
+              "x": -1.5553432,
+              "y": 1.259238E-9
             },
             "jbox2d": {
-              "x": 0.88415,
-              "y": -0.5911794
+              "x": -1.5553432,
+              "y": 1.259238E-9
             },
             "imgui": {
-              "x": 0.88415,
-              "y": -0.5911794
+              "x": -1.5553432,
+              "y": 1.259238E-9
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,
@@ -2593,21 +2601,22 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.06414787,
-              "y": 3.9835868E-10
+              "x": 1.7936447,
+              "y": 1.7844286E-9
             },
             "jbox2d": {
-              "x": 0.06414787,
-              "y": 3.9835868E-10
+              "x": 1.7936447,
+              "y": 1.7844286E-9
             },
             "imgui": {
-              "x": 0.06414787,
-              "y": 3.9835868E-10
+              "x": 1.7936447,
+              "y": 1.7844286E-9
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,
@@ -3700,21 +3709,22 @@
         {
           "velocity": {
             "joml": {
-              "x": -0.08319439,
-              "y": 3.9835868E-10
+              "x": -1.7936447,
+              "y": 1.7844286E-9
             },
             "jbox2d": {
-              "x": -0.08319439,
-              "y": 3.9835868E-10
+              "x": -1.7936447,
+              "y": 1.7844286E-9
             },
             "imgui": {
-              "x": -0.08319439,
-              "y": 3.9835868E-10
+              "x": -1.7936447,
+              "y": 1.7844286E-9
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,
@@ -4807,21 +4817,22 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.06440316,
-              "y": 3.9835868E-10
+              "x": 0.0,
+              "y": 1.7844286E-9
             },
             "jbox2d": {
-              "x": 0.06440316,
-              "y": 3.9835868E-10
+              "x": 0.0,
+              "y": 1.7844286E-9
             },
             "imgui": {
-              "x": 0.06440316,
-              "y": 3.9835868E-10
+              "x": 0.0,
+              "y": 1.7844286E-9
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,
@@ -5914,21 +5925,22 @@
         {
           "velocity": {
             "joml": {
-              "x": 1.197016,
-              "y": -8.131514
+              "x": 0.7776715,
+              "y": 1.7844286E-9
             },
             "jbox2d": {
-              "x": 1.197016,
-              "y": -8.131514
+              "x": 0.7776715,
+              "y": 1.7844286E-9
             },
             "imgui": {
-              "x": 1.197016,
-              "y": -8.131514
+              "x": 0.7776715,
+              "y": 1.7844286E-9
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,
@@ -7033,21 +7045,22 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.94921684,
-              "y": -9.061332
+              "x": 0.0,
+              "y": 0.0
             },
             "jbox2d": {
-              "x": 0.94921684,
-              "y": -9.061332
+              "x": 0.0,
+              "y": 0.0
             },
             "imgui": {
-              "x": 0.94921684,
-              "y": -9.061332
+              "x": 0.0,
+              "y": 0.0
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,
@@ -8140,21 +8153,22 @@
         {
           "velocity": {
             "joml": {
-              "x": 1.1742435,
-              "y": -8.6146145
+              "x": 0.7776715,
+              "y": 1.7844286E-9
             },
             "jbox2d": {
-              "x": 1.1742435,
-              "y": -8.6146145
+              "x": 0.7776715,
+              "y": 1.7844286E-9
             },
             "imgui": {
-              "x": 1.1742435,
-              "y": -8.6146145
+              "x": 0.7776715,
+              "y": 1.7844286E-9
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 1.0,
+          "friction": 0.0,
           "fixedRotation": false,
           "continuousCollision": true,
           "isTrigger": false,

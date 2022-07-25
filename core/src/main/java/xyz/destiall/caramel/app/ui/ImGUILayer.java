@@ -2,12 +2,12 @@ package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Input;
 import caramel.api.Time;
-import caramel.api.objects.SceneImpl;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
 import imgui.extension.imguizmo.ImGuizmo;
+import imgui.extension.imnodes.ImNodes;
 import imgui.flag.ImGuiBackendFlags;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiConfigFlags;
@@ -18,9 +18,7 @@ import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugLine;
-import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
-import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -58,8 +56,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 public final class ImGUILayer {
     private final ApplicationImpl window;
     private final long glfwWindow;
-    private ScenePanel scenePanel;
-    private GamePanel gamePanel;
 
     public final List<DebugLine> lines = new ArrayList<>();
 
@@ -73,6 +69,7 @@ public final class ImGUILayer {
     // Initialize Dear ImGui.
     public void initImGui() {
         ImGui.createContext();
+        ImNodes.createContext();
 
         final ImGuiIO io = ImGui.getIO();
 
@@ -251,6 +248,7 @@ public final class ImGUILayer {
     public void destroyImGui() {
         imGuiGl3.dispose();
         ImGui.getIO().getFonts().destroy();
+        ImNodes.destroyContext();
         ImGui.destroyContext();
     }
 }

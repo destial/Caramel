@@ -5,8 +5,11 @@ import caramel.api.objects.GameObject;
 import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
 import caramel.api.physics.info.RaycastInfo2D;
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 
 public final class RigidBody2D extends RigidBody {
     public final Vector2 velocity = new Vector2();
@@ -14,6 +17,8 @@ public final class RigidBody2D extends RigidBody {
     public transient Body rawBody = null;
     public transient Box2DCollider box2DCollider;
     public transient Circle2DCollider circle2DCollider;
+
+    public transient Fixture fixture;
 
     public RigidBody2D(GameObject gameObject) {
         super(gameObject);
@@ -24,6 +29,32 @@ public final class RigidBody2D extends RigidBody {
         if (rawBody == null) return;
         rawBody.setTransform(new Vec2(x, y), rawBody.getAngle());
         // transform.setPosition(x, y, z);
+    }
+
+    @Override
+    protected void updateBody() {
+        if (fixture == null || rawBody == null) return;
+        rawBody.setAngularDamping(angularDamping);
+        rawBody.setLinearDamping(linearDamping);
+        rawBody.setFixedRotation(fixedRotation);
+        rawBody.setBullet(continuousCollision);
+        fixture.setSensor(isTrigger);
+        fixture.setFriction(friction);
+        switch (bodyType) {
+            case KINEMATIC:
+                rawBody.setType(BodyType.KINEMATIC);
+                break;
+            case STATIC:
+                rawBody.setType(BodyType.STATIC);
+                break;
+            case DYNAMIC:
+                rawBody.setType(BodyType.DYNAMIC);
+                break;
+        }
+        MassData massData = new MassData();
+        fixture.getMassData(massData);
+        massData.mass = mass;
+        rawBody.setMassData(massData);
     }
 
     @Override
