@@ -12,8 +12,6 @@ import caramel.api.scripts.Script;
 
 public class ButtonScript extends Script {
     private transient Button button;
-    private transient Text text;
-    public int score = 0;
     public ButtonScript(GameObject gameObject) {
         super(gameObject);
     }
@@ -22,18 +20,16 @@ public class ButtonScript extends Script {
     @Override
     public void start() {
         button = getComponent(Button.class);
-        text = getComponentInChildren(Text.class);
-        if (button == null || text == null) return;
         button.onClick.add(this::onClick);
     }
 
     // This method is called on every frame
     @Override
     public void update() {
-        
+        if (button == null) return;
     }
 
     public void onClick() {
-        text.text = "Score: " + ++score;
+        Debug.log("click");
     }
 }

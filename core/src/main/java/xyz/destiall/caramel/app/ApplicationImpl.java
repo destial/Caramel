@@ -10,6 +10,7 @@ import caramel.api.components.EditorCamera;
 import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
+import caramel.api.events.FullscreenEvent;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
 import caramel.api.render.BatchRenderer;
@@ -82,15 +83,7 @@ import static org.lwjgl.openal.ALC10.alcDestroyContext;
 import static org.lwjgl.openal.ALC10.alcGetString;
 import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
 import static org.lwjgl.openal.ALC10.alcOpenDevice;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -412,6 +405,7 @@ public final class ApplicationImpl extends Application {
 
         if (EDITOR_MODE && ImGui.isKeyPressed(Input.Key.F11)) {
             fullscreen = !fullscreen;
+            eventHandler.call(new FullscreenEvent(fullscreen));
         }
 
         if (EDITOR_MODE && !fullscreen) {
@@ -438,7 +432,7 @@ public final class ApplicationImpl extends Application {
 
         if (EDITOR_MODE) imGui.update();
 
-        else {
+        if (fullscreen || !EDITOR_MODE) {
             mouseListener.setGameViewportPos(new Vector2f(0, 0));
             mouseListener.setGameViewportSize(new Vector2f(width, height));
         }
@@ -636,7 +630,8 @@ public final class ApplicationImpl extends Application {
         return focused;
     }
 
-    public boolean isFullscreen() {
+    @Override
+    public boolean isFullScreen() {
         return fullscreen;
     }
 }

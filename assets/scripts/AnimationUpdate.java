@@ -11,6 +11,7 @@ import caramel.api.scripts.Script;
 public class AnimationUpdate extends Script {
     public transient SpriteRenderer sp;
     public RigidBody2D rb;
+    public transient Camera camera;
     public AnimationUpdate(GameObject gameObject) {
         super(gameObject);
     }
@@ -19,7 +20,7 @@ public class AnimationUpdate extends Script {
     @Override
     public void start() {
         sp = getComponent(SpriteRenderer.class);
-        // rb = getComponent(RigidBody2D.class);
+        camera = getComponent(Camera.class);
     }
 
     // This method is called on every frame
@@ -31,7 +32,6 @@ public class AnimationUpdate extends Script {
         float frameTime = 0.3f / Math.abs(vel.x());
         sp.timePerAnimation = frameTime;
         if (vel.x() < 0 && !sp.animation.equals("anim3")) {
-
             sp.setAnimation("anim3");
         } else if (vel.x() > 0 && !sp.animation.equals("anim2")) {
             sp.setAnimation("anim2");

@@ -10,7 +10,7 @@ import caramel.api.texture.Texture;
 
 public final class SpriteRenderer extends Renderer {
     public Spritesheet spritesheet;
-    public Texture texture;
+    @InvokeOnEdit("buildAnimation") public Texture texture;
 
     @InvokeOnEdit("setIndex") public int index = 0;
     @InvokeOnEdit("setAnim") public String animation = "";

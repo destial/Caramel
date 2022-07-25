@@ -80,7 +80,11 @@ public final class Button extends Renderer {
                 Color.lerp(targetColor, currentColor, Time.deltaTime * colorChangeTime);
             }
             setColor();
-            mesh.render(transform, camera);
+            if (BatchRenderer.USE_BATCH) {
+                mesh.renderBatch(transform, camera);
+            } else {
+                mesh.render(transform, camera);
+            }
         }
     }
 

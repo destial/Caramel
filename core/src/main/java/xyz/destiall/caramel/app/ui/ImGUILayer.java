@@ -145,15 +145,13 @@ public final class ImGUILayer {
             io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused())
-                window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
+            window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
         });
 
         glfwSetCursorPosCallback(glfwWindow, (w, x, y) -> {
             io.setMousePos((float) x, (float) y);
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused())
-                window.getMouseListener().mousePosCallback(w, x, y);
+            window.getMouseListener().mousePosCallback(w, x, y);
         });
 
         io.setSetClipboardTextFn(new ImStrConsumer() {
@@ -177,7 +175,7 @@ public final class ImGUILayer {
     public void update() {
         startFrame(Time.deltaTime);
 
-        if (!window.isFullscreen()) {
+        if (!window.isFullScreen()) {
             setupDockspace();
             window.getCurrentScene().__imguiLayer();
         }
@@ -234,7 +232,7 @@ public final class ImGUILayer {
             ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
         }
 
-        if (!window.isFullscreen()) {
+        if (!window.isFullScreen()) {
             ImGui.end();
         }
         ImGui.render();

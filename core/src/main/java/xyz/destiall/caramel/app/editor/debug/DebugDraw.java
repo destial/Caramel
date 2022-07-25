@@ -75,9 +75,8 @@ public final class DebugDraw implements Update, Render {
                 i--;
             }
         }
-
-        if (lines.isEmpty()) return;
         vertexArray = new float[lines.size() * 2 * 6];
+        if (lines.isEmpty()) return;
 
         int index = 0;
         for (DebugLine line : lines) {

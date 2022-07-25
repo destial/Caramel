@@ -213,7 +213,12 @@ public final class SceneImpl extends Scene {
                 });
 
         if (playing) {
-            for (GameObject go : gameObjects) go.update();
+            for (GameObject go : gameObjects) {
+                go.update();
+                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
+                    gameCamera = go.getComponentInChildren(Camera.class);
+                }
+            }
             physics.get(physicsMode).update();
             for (GameObject go : gameObjects) go.lateUpdate();
 
@@ -251,11 +256,14 @@ public final class SceneImpl extends Scene {
             }
             physics.get(physicsMode).addGameObject(clone);
         }
+        gameCamera = null;
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }
 
     public void stop() {
         if (!playing) return;
+        Application.getApp().getEventHandler().call(new SceneStopEvent(this));
+
         playing = false;
         gameObjects.clear();
         gameObjects.addAll(defaultGameObjects);
@@ -270,8 +278,6 @@ public final class SceneImpl extends Scene {
             p.reset();
         }
         gameCamera = null;
-
-        Application.getApp().getEventHandler().call(new SceneStopEvent(this));
     }
 
     public void __imguiLayer() {

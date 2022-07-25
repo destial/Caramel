@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.ui;
 
-import sun.swing.FilePane;
+// import sun.swing.FilePane;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -46,6 +46,7 @@ public final class FileChooser extends JFileChooser {
 
         super.updateUI();
 
+        /*
         if (old != null) {
             FilePane filePane = findFilePane(this);
             filePane.setViewType(FilePane.VIEWTYPE_DETAILS);
@@ -59,8 +60,11 @@ public final class FileChooser extends JFileChooser {
                 UIManager.setLookAndFeel(old);
             } catch (UnsupportedLookAndFeelException ignored) {} // shouldn't get here
         }
+
+         */
     }
 
+    /*
     private static FilePane findFilePane(Container parent) {
         for (Component comp : parent.getComponents()) {
             if (FilePane.class.isInstance(comp)) {
@@ -79,4 +83,6 @@ public final class FileChooser extends JFileChooser {
 
         return null;
     }
+
+     */
 }

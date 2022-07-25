@@ -282,7 +282,7 @@ public final class HierarchyPanel extends Panel {
             editingGameObject = true;
             editingGo = gameObject;
             popupMousePos = new ImVec2(Application.getApp().getMouseListener().getX(), Application.getApp().getMouseListener().getY());
-            if (!Input.isKeyDown(Input.Key.L_CONTROL)) {
+            if (!ImGui.isKeyDown(Input.Key.L_CONTROL)) {
                 scene.getSelectedGameObject().clear();
             }
             scene.getSelectedGameObject().add(gameObject);

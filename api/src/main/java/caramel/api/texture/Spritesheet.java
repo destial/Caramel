@@ -4,6 +4,7 @@ import caramel.api.components.Camera;
 import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
 import caramel.api.render.Animation;
+import caramel.api.render.BatchRenderer;
 import caramel.api.utils.Pair;
 import org.joml.Vector2f;
 
@@ -64,7 +65,6 @@ public final class Spritesheet {
 
             Sprite sprite = new Sprite(texCoords);
             sprites.add(sprite);
-
             currentX += spriteWidth;
             if (currentX >= texture.getWidth()) {
                 currentX = 0;
@@ -133,7 +133,11 @@ public final class Spritesheet {
 
     public void render(Transform transform, Camera camera) {
         if (sprites == null || sprites.isEmpty()) return;
-        mesh.render(transform, camera);
+        if (BatchRenderer.USE_BATCH) {
+            mesh.renderBatch(transform, camera);
+        } else {
+            mesh.render(transform, camera);
+        }
     }
 
     public void step() {

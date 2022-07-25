@@ -1,8 +1,8 @@
 {
   "width": 1788,
   "height": 906,
-  "windowPosX": 451,
-  "windowPosY": 52,
-  "fullscreen": false,
+  "windowPosX": 81,
+  "windowPosY": 75,
+  "fullscreen": true,
   "lastScene": "assets/scenes/Untitled Scene.caramel"
 }

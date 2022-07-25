@@ -33,28 +33,30 @@ public final class RigidBody2D extends RigidBody {
 
     @Override
     protected void updateBody() {
-        if (fixture == null || rawBody == null) return;
-        rawBody.setAngularDamping(angularDamping);
-        rawBody.setLinearDamping(linearDamping);
-        rawBody.setFixedRotation(fixedRotation);
-        rawBody.setBullet(continuousCollision);
-        fixture.setSensor(isTrigger);
-        fixture.setFriction(friction);
-        switch (bodyType) {
-            case KINEMATIC:
-                rawBody.setType(BodyType.KINEMATIC);
-                break;
-            case STATIC:
-                rawBody.setType(BodyType.STATIC);
-                break;
-            case DYNAMIC:
-                rawBody.setType(BodyType.DYNAMIC);
-                break;
+        if (false) {
+            if (fixture == null || rawBody == null) return;
+            rawBody.setAngularDamping(angularDamping);
+            rawBody.setLinearDamping(linearDamping);
+            rawBody.setFixedRotation(fixedRotation);
+            rawBody.setBullet(continuousCollision);
+            fixture.setSensor(isTrigger);
+            fixture.setFriction(friction);
+            switch (bodyType) {
+                case KINEMATIC:
+                    rawBody.setType(BodyType.KINEMATIC);
+                    break;
+                case STATIC:
+                    rawBody.setType(BodyType.STATIC);
+                    break;
+                case DYNAMIC:
+                    rawBody.setType(BodyType.DYNAMIC);
+                    break;
+            }
+            MassData massData = new MassData();
+            fixture.getMassData(massData);
+            massData.mass = mass;
+            rawBody.setMassData(massData);
         }
-        MassData massData = new MassData();
-        fixture.getMassData(massData);
-        massData.mass = mass;
-        rawBody.setMassData(massData);
     }
 
     @Override
