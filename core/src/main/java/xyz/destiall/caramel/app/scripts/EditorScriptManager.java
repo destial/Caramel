@@ -6,6 +6,8 @@ import caramel.api.events.FileEvent;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.objects.GameObject;
+import caramel.api.objects.Scene;
+import caramel.api.objects.SceneImpl;
 import caramel.api.scripts.InternalScript;
 import caramel.api.scripts.Script;
 import caramel.api.scripts.ScriptManager;
@@ -16,6 +18,7 @@ import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandler;
 import xyz.destiall.java.events.Listener;
 
+import javax.script.ScriptException;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -29,7 +32,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class EditorScriptManager implements ScriptManager, Listener {
     private final File scriptsRootFolder;
-    private final Map<String, InternalScript> compiledScripts;
     private final Set<String> awaitingCompilation;
     private FileWatcher watcher;
     private final ScriptLoader loader;
@@ -40,14 +42,13 @@ public final class EditorScriptManager implements ScriptManager, Listener {
             FileIO.saveResource("CharacterController2D.java", "assets/scripts/CharacterController2D.java");
         }
 
-        compiledScripts = new ConcurrentHashMap<>();
         awaitingCompilation = ConcurrentHashMap.newKeySet();
 
         if (ApplicationImpl.getApp().EDITOR_MODE) {
             watcher = new FileWatcher(scriptsRootFolder);
         }
 
-        loader = new ScriptLoader();
+        loader = new ScriptLoader(this);
     }
 
     @Override
@@ -72,7 +73,16 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         File[] files = folder.listFiles();
         if (files == null || files.length == 0) return;
         List<File> sort = Arrays.asList(files);
-        loadSort(sort);
+        //loadSort(sort);
+        try {
+            loadIntoLoader(sort);
+        } catch (ScriptException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void loadIntoLoader(List<File> files) throws ScriptException {
+        loader.compileAll(files);
     }
 
     private void loadSort(List<File> files) {
@@ -98,19 +108,19 @@ public final class EditorScriptManager implements ScriptManager, Listener {
 
     @Override
     public InternalScript getScript(String name) {
-        return compiledScripts.get(name);
+        return loader.get(name);
     }
 
     @Override
     public InternalScript getInternalScript(Class<?> clazz) {
-        return compiledScripts.values().stream().filter(c -> c.getCompiledClass().isAssignableFrom(clazz)).findFirst().orElse(null);
+        return loader.getByClass(clazz);
     }
 
     @Override
     public InternalScript reloadScript(File file) {
         if (file.getName().endsWith(".java")) {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
-            InternalScript previous = compiledScripts.remove(scriptName);
+            InternalScript previous = loader.removeScript(scriptName);
             if (previous != null) {
                 Payload.COMPONENTS.remove(previous.getCompiledClass());
             }
@@ -120,13 +130,11 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                     DebugImpl.logError("Script " + scriptName + " does not inherit Script class!");
                     return null;
                 }
-                compiledScripts.put(scriptName, compiledScript);
                 Payload.COMPONENTS.add(compiledScript.getCompiledClass());
                 return compiledScript;
             } catch (Exception e) {
-                DebugImpl.logError(e.getLocalizedMessage());
+                DebugImpl.logError(e.getMessage());
                 if (previous != null) {
-                    compiledScripts.put(scriptName, previous);
                     Payload.COMPONENTS.add(previous.getCompiledClass());
                 }
             }
@@ -138,7 +146,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     public InternalScript reloadScript(File file, String contents) {
         if (file.getName().endsWith(".java")) {
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
-            InternalScript previous = compiledScripts.remove(scriptName);
+            InternalScript previous = getScript(scriptName);
             if (previous != null) {
                 Payload.COMPONENTS.remove(previous.getCompiledClass());
             }
@@ -148,13 +156,11 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                     DebugImpl.logError("Script " + scriptName + " does not inherit Script class!");
                     return null;
                 }
-                compiledScripts.put(scriptName, compiledScript);
                 Payload.COMPONENTS.add(compiledScript.getCompiledClass());
                 return compiledScript;
             } catch (Exception e) {
-                DebugImpl.logError(e.getLocalizedMessage());
+                DebugImpl.logError(e.getMessage());
                 if (previous != null) {
-                    compiledScripts.put(scriptName, previous);
                     Payload.COMPONENTS.add(previous.getCompiledClass());
                 }
             }
@@ -162,24 +168,27 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         return null;
     }
 
-    private void loadComponents(InternalScript oldScript, InternalScript newScript) {
+    public void loadComponents(InternalScript oldScript, InternalScript newScript) {
         try {
-            for (GameObject go : ApplicationImpl.getApp().getCurrentScene().getGameObjects()) {
+            SceneImpl scene = ApplicationImpl.getApp().getCurrentScene();
+            if (scene == null) return;
+            for (GameObject go : scene.getGameObjects()) {
                 Component instance;
                 if ((instance = go.getComponent(oldScript.getCompiledClass())) != null) {
                     Field[] fields = oldScript.getCompiledClass().getFields();
                     if (go.removeComponent(oldScript.getCompiledClass())) {
                         Component component = newScript.getAsComponent(go);
                         for (Field field : fields) {
-                            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers()))
+                            if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
                                 continue;
+                            }
                             Field newField = component.getClass().getField(field.getName());
                             if (newField.getType() == field.getType()) {
                                 newField.setAccessible(true);
                                 try {
                                     newField.set(component, field.get(instance));
-                                } catch (IllegalAccessException e) {
-                                    DebugImpl.logError(e.getMessage());
+                                } catch (Exception e) {
+                                    DebugImpl.logError("Error setting field on script component " + newScript.getFile().getName());
                                     e.printStackTrace();
                                 }
                             }
@@ -189,7 +198,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 }
             }
         } catch (Exception e) {
-            DebugImpl.logError(e.getMessage());
+            DebugImpl.logError("Error reloading script component " + newScript.getFile().getName());
             e.printStackTrace();
         }
     }
@@ -216,13 +225,12 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         if (event.getFile().getName().endsWith(".java")) {
             File file = new File(scriptsRootFolder, event.getFile().getName());
             String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
-            InternalScript script = compiledScripts.get(scriptName);
+            InternalScript script = getScript(scriptName);
             if (isPlaying) {
                 awaitingEvents.put(file.getPath(), event);
                 return;
             }
             if (event.getType() == FileEvent.Type.MODIFY || event.getType() == FileEvent.Type.CREATE) {
-
                 if (!awaitingCompilation.add(file.getName())) {
                     return;
                 }
@@ -244,8 +252,11 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 awaitingCompilation.remove(file.getName());
             } else {
                 if (script != null) {
-                    ApplicationImpl.getApp().getCurrentScene().forEachGameObject(go -> go.removeComponent(script.getCompiledClass()));
-                    compiledScripts.remove(scriptName);
+                    Scene scene = ApplicationImpl.getApp().getCurrentScene();
+                    if (scene != null) {
+                        scene.forEachGameObject(go -> go.removeComponent(script.getCompiledClass()));
+                    }
+                    loader.removeScript(scriptName);
                     Payload.COMPONENTS.remove(script.getCompiledClass());
                 }
             }

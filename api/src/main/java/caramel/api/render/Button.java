@@ -29,8 +29,10 @@ public final class Button extends Renderer {
 
     public transient boolean hovered = false;
     public transient boolean clicked = false;
+    private transient boolean isHovering = false;
     public transient final List<Runnable> onClick;
     public transient final List<Runnable> onHover;
+    public transient final List<Runnable> onExit;
 
     public float colorChangeTime = 1f;
 
@@ -38,6 +40,8 @@ public final class Button extends Renderer {
         super(gameObject);
         onClick = new ArrayList<>();
         onHover = new ArrayList<>();
+        onExit = new ArrayList<>();
+        renderState = State.UI;
     }
 
     @Override
@@ -73,6 +77,8 @@ public final class Button extends Renderer {
             mesh.build();
         }
 
+        isHovering = isHovered(camera);
+
         if (mesh != null) {
             if (colorChangeTime <= 0) {
                 currentColor.set(targetColor);
@@ -90,20 +96,30 @@ public final class Button extends Renderer {
 
     @Override
     public void update() {
-        boolean isHovering = isHovered();
         if (isHovering && (!hovered || clicked)) {
             targetColor.set(hoverColor);
             setColor();
             hovered = true;
-            for (Runnable runnable : onHover) {
-                runnable.run();
+            if (clicked) {
+                clicked = false;
+            } else {
+                for (Runnable runnable : onHover) {
+                    runnable.run();
+                }
             }
-            clicked = false;
-        } else if (!isHovering && (hovered || clicked)) {
+        }
+
+        if (!isHovering && (hovered || clicked)) {
             targetColor.set(normalColor);
             setColor();
             hovered = false;
-            clicked = false;
+            if (clicked) {
+                clicked = false;
+            } else {
+                for (Runnable runnable : onExit) {
+                    runnable.run();
+                }
+            }
         }
 
         if (isHovering && ImGui.isMouseClicked(Input.Mouse.LEFT)) {
@@ -116,9 +132,9 @@ public final class Button extends Renderer {
         }
     }
 
-    public boolean isHovered() {
-        float x = Input.getMouseWorldX();
-        float y = Input.getMouseWorldY();
+    public boolean isHovered(Camera camera) {
+        float x = Input.getMouseWorldX(camera);
+        float y = Input.getMouseWorldY(camera);
 
         Vector3f max = new Vector3f(0.5f, 0.5f, 1f);
         Vector3f min = new Vector3f(-0.5f, -0.5f, 1f);
@@ -137,4 +153,16 @@ public final class Button extends Renderer {
 
     @Override
     public void start() {}
+
+    @Override
+    public Button clone(GameObject gameObject, boolean copyId) {
+        Button clone = (Button) super.clone(gameObject, copyId);
+        clone.currentColor = new Color(currentColor);
+        clone.targetColor = new Color(targetColor);
+        clone.hoverColor = new Color(hoverColor);
+        clone.normalColor = new Color(normalColor);
+        clone.onClick.clear();
+        clone.onHover.clear();
+        return clone;
+    }
 }

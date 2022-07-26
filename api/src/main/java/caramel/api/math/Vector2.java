@@ -35,6 +35,10 @@ public final class Vector2 {
         imgui = new ImVec2(x, y);
     }
 
+    public Vector2(Vector2 value) {
+        this(value.x(), value.y());
+    }
+
     public void set(float x, float y) {
         joml.set(x, y);
         jbox2d.set(x, y);
@@ -74,5 +78,9 @@ public final class Vector2 {
     @Override
     public String toString() {
         return joml.toString();
+    }
+
+    public void set(Vector2 value) {
+        set(value.x(), value.y());
     }
 }

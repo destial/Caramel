@@ -7,12 +7,16 @@ import caramel.api.JoystickListener;
 import caramel.api.Time;
 import caramel.api.audio.AudioListener;
 import caramel.api.components.EditorCamera;
+import caramel.api.components.Light;
+import caramel.api.components.RigidBody3D;
 import caramel.api.components.Transform;
+import caramel.api.components.UICamera;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FullscreenEvent;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
+import caramel.api.physics.components.Box3DCollider;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
@@ -64,6 +68,7 @@ import static org.lwjgl.glfw.GLFW.glfwGetTime;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
+import static org.lwjgl.glfw.GLFW.glfwSetErrorCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowIcon;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
@@ -83,7 +88,15 @@ import static org.lwjgl.openal.ALC10.alcDestroyContext;
 import static org.lwjgl.openal.ALC10.alcGetString;
 import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
 import static org.lwjgl.openal.ALC10.alcOpenDevice;
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -144,6 +157,8 @@ public final class ApplicationImpl extends Application {
         listeners = new ArrayList<>();
         listeners.add(new AudioListener());
         focused = true;
+
+        DebugImpl.log("Loading Editor");
     }
 
     @Override
@@ -330,7 +345,7 @@ public final class ApplicationImpl extends Application {
         sorted.sort(Comparator.comparing(Class::getName));
         for (Class<? extends Component> c : sorted) {
             if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
-            if (c == Transform.class || c == EditorCamera.class) continue;
+            if (c == Transform.class || c == EditorCamera.class || c == UICamera.class || c == RigidBody3D.class || c == Light.class || c == Box3DCollider.class) continue;
             Payload.COMPONENTS.add(c);
         }
     }
@@ -408,6 +423,8 @@ public final class ApplicationImpl extends Application {
             eventHandler.call(new FullscreenEvent(fullscreen));
         }
 
+        if (EDITOR_MODE) imGui.update();
+
         if (EDITOR_MODE && !fullscreen) {
             getSceneViewFramebuffer().bind();
             glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
@@ -416,9 +433,8 @@ public final class ApplicationImpl extends Application {
             DebugDraw.INSTANCE.render(scene.getEditorCamera());
             getSceneViewFramebuffer().unbind();
         }
-
+        BatchRenderer.DRAW_CALLS = 0;
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().bind();
-
         if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
             glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -427,18 +443,17 @@ public final class ApplicationImpl extends Application {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getGameCamera());
         }
-
+        scene.render(scene.getUICamera());
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().unbind();
-
-        if (EDITOR_MODE) imGui.update();
 
         if (fullscreen || !EDITOR_MODE) {
             mouseListener.setGameViewportPos(new Vector2f(0, 0));
             mouseListener.setGameViewportSize(new Vector2f(width, height));
         }
 
+        if (EDITOR_MODE) imGui.render();
+
         scene.endFrame();
-        BatchRenderer.DRAW_CALLS = 0;
 
         if (EDITOR_MODE && ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.S)) {
             if (scene.isPlaying()) scene.stop();
@@ -448,7 +463,6 @@ public final class ApplicationImpl extends Application {
         mouseListener.endFrame();
         keyListener.endFrame();
         joystickListener.endFrame();
-
         glfwSwapBuffers(glfwWindow);
         return false;
     }
@@ -493,6 +507,7 @@ public final class ApplicationImpl extends Application {
 
         // Free GLFW callbacks and destroy the window (if not yet destroyed)
         glfwFreeCallbacks(glfwWindow);
+        glfwSetErrorCallback(null).free();
         glfwDestroyWindow(glfwWindow);
 
         // Terminate the window
@@ -536,6 +551,7 @@ public final class ApplicationImpl extends Application {
 
     @Override
     public SceneImpl getCurrentScene() {
+        if (scenes.isEmpty()) return null;
         return scenes.get(sceneIndex);
     }
 
@@ -546,7 +562,12 @@ public final class ApplicationImpl extends Application {
             sceneIndex = scenes.indexOf(scene);
             return scene;
         }
-        scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
+        try {
+            scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
+        } catch (Exception e) {
+            Debug.logError("Unable to load possibly corrupted scene file: " + file.getPath());
+            return getCurrentScene();
+        }
 
         SceneImpl finalScene = scene;
         if (!scenes.removeIf(s -> s.name.equals(finalScene.name))) {

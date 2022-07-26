@@ -3,6 +3,10 @@ package caramel.api.debug;
 import caramel.api.components.Transform;
 import org.joml.Vector3f;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public abstract class Debug {
     protected static Debug inst;
 
@@ -73,6 +77,12 @@ public abstract class Debug {
 
     public static void drawDotScreen(float x, float y, Vector3f color) {
         inst._drawDotScreen(x, y, color);
+    }
+
+    public static void console(Object message) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance();
+        System.out.println("[" + dateFormat.format(cal.getTime()) + "]: " + message);
     }
 
     protected abstract void _log(Object log);

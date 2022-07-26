@@ -4,10 +4,12 @@ import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.objects.GameObject;
+import caramel.api.render.Renderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public class Camera extends Component {
+    protected transient Renderer.State state = Renderer.State.WORLD;
     public transient Matrix4f projection, view;
     public Vector3f target;
     public boolean rotate = false;
@@ -73,5 +75,12 @@ public class Camera extends Component {
 
     public float getRatio() {
         return Application.getApp().isFullScreen() ? (Application.getApp().getWidth() / (float) Application.getApp().getHeight())  : 16 / 9f;
+    }
+
+    public Renderer.State getState() {
+        if (state == null) {
+            state = Renderer.State.WORLD;
+        }
+        return state;
     }
 }

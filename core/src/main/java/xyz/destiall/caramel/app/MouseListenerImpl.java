@@ -148,11 +148,20 @@ public final class MouseListenerImpl implements MouseListener {
 
     @Override
     public float getScreenX() {
+        return getScreenX(ApplicationImpl.getApp().getCurrentScene().getGameCamera());
+    }
+
+    @Override
+    public float getScreenY() {
+        return getScreenY(ApplicationImpl.getApp().getCurrentScene().getGameCamera());
+    }
+
+    @Override
+    public float getScreenX(Camera camera) {
         float currentX = ImGui.getMousePosX() - gameViewportPos.x;
         currentX = (currentX / gameViewportSize.x) * 2.0f - 1.0f;
         Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
 
-        Camera camera = ApplicationImpl.getApp().getCurrentScene().getGameCamera();
         Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);
@@ -162,12 +171,11 @@ public final class MouseListenerImpl implements MouseListener {
     }
 
     @Override
-    public float getScreenY() {
+    public float getScreenY(Camera camera) {
         float currentY = ImGui.getMousePosY() - gameViewportPos.y;
         currentY = -((currentY / gameViewportSize.y) * 2.0f - 1.0f);
         Vector4f tmp = new Vector4f(0, currentY, 0, 1);
 
-        Camera camera = ApplicationImpl.getApp().getCurrentScene().getGameCamera();
         Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);

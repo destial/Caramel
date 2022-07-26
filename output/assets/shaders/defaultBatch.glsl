@@ -37,6 +37,9 @@ void main() {
         color = fColor;
     } else {
         vec4 tex = texture(texSampler[id], fTexCoords);
+        if (tex.a < 0.1) {
+            discard;
+        }
         color = tex * fColor;
     }
 }

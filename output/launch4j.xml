@@ -34,24 +34,39 @@
     <cp>imgui-java-binding-1.86.4.jar</cp>
     <cp>imgui-java-lwjgl3-1.86.4.jar</cp>
     <cp>imgui-java-natives-windows-ft-1.86.4.jar</cp>
-    <cp>lwjgl-3.2.3.jar</cp>
-    <cp>lwjgl-nfd-3.2.3.jar</cp>
-    <cp>lwjgl-assimp-3.2.3.jar</cp>
-    <cp>lwjgl-glfw-3.2.3.jar</cp>
-    <cp>lwjgl-openal-3.2.3.jar</cp>
-    <cp>lwjgl-opengl-3.2.3.jar</cp>
-    <cp>lwjgl-stb-3.2.3.jar</cp>
-    <cp>lwjgl-3.2.3-natives-windows.jar</cp>
-    <cp>lwjgl-assimp-3.2.3-natives-windows.jar</cp>
-    <cp>lwjgl-glfw-3.2.3-natives-windows.jar</cp>
-    <cp>lwjgl-openal-3.2.3-natives-windows.jar</cp>
-    <cp>lwjgl-opengl-3.2.3-natives-windows.jar</cp>
-    <cp>lwjgl-stb-3.2.3-natives-windows.jar</cp>
-    <cp>lwjgl-nfd-3.2.3-natives-windows.jar</cp>
     <cp>joml-1.9.24.jar</cp>
     <cp>java-data-front-v2.0.1.jar</cp>
     <cp>jbox2d-library-2.2.1.1.jar</cp>
     <cp>core-0.4.0.jar</cp>
+    <cp>lwjgl-3.2.3.jar</cp>
+    <cp>lwjgl-assimp-3.2.3.jar</cp>
+    <cp>lwjgl-bgfx-3.2.3.jar</cp>
+    <cp>lwjgl-egl-3.2.3.jar</cp>
+    <cp>lwjgl-glfw-3.2.3.jar</cp>
+    <cp>lwjgl-nanovg-3.2.3.jar</cp>
+    <cp>lwjgl-nfd-3.2.3.jar</cp>
+    <cp>lwjgl-nuklear-3.2.3.jar</cp>
+    <cp>lwjgl-openal-3.2.3.jar</cp>
+    <cp>lwjgl-opencl-3.2.3.jar</cp>
+    <cp>lwjgl-opengl-3.2.3.jar</cp>
+    <cp>lwjgl-opengles-3.2.3.jar</cp>
+    <cp>lwjgl-par-3.2.3.jar</cp>
+    <cp>lwjgl-stb-3.2.3.jar</cp>
+    <cp>lwjgl-vma-3.2.3.jar</cp>
+    <cp>lwjgl-vulkan-3.2.3.jar</cp>
+    <cp>lwjgl-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-assimp-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-bgfx-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-glfw-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-nanovg-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-nfd-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-nuklear-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-openal-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-opengl-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-opengles-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-par-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-stb-3.2.3-natives-windows.jar</cp>
+    <cp>lwjgl-vma-3.2.3-natives-windows.jar</cp>
   </classPath>
   <jre>
     <path>jdk</path>

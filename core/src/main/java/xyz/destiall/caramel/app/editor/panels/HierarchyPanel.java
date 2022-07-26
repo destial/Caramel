@@ -180,6 +180,23 @@ public final class HierarchyPanel extends Panel {
                 addingGameObjectHierarchy = false;
             }
 
+            if (ImGui.selectable("New 3D Sphere")) {
+                GameObject go = new GameObjectImpl(scene);
+                go.name.set("Sphere");
+                MeshRenderer renderer = new MeshRenderer(go);
+                Mesh mesh = MeshBuilder.createIcosahedron(1, 2);
+                renderer.setMesh(mesh);
+                mesh.build();
+
+                go.addComponent(renderer);
+
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
             if (ImGui.selectable("New 2D Circle")) {
                 GameObject go = new GameObjectImpl(scene);
                 go.name.set("Circle");

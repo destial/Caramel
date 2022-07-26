@@ -64,7 +64,11 @@ public abstract class GameObject implements Update, Render {
         for (Component component : components) {
             if (!component.enabled) continue;
             if (!component.alreadyEnabled) {
-                component.start();
+                try {
+                    component.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 component.alreadyEnabled = true;
             }
             component.update();
@@ -121,6 +125,15 @@ public abstract class GameObject implements Update, Render {
     public <C extends Component> C getComponent(Class<C> clazz) {
         Component component = components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
         return clazz.cast(component);
+    }
+
+    /**
+     * Get a {@link Component} that is linked to this object.
+     * @param clazz The class of the {@link Component}.
+     * @return The {@link Component} if it exists, null if none.
+     */
+    public Component getComponent(String clazz) {
+        return components.stream().filter(c -> c.getClass().getSimpleName().equals(clazz)).findFirst().orElse(null);
     }
 
     /**
@@ -290,8 +303,13 @@ public abstract class GameObject implements Update, Render {
     public void render(Camera camera) {
         if (!active) return;
         for (Component component : components) {
-            if (component instanceof Render)
-                ((Render) component).render(camera);
+            if (component instanceof Render) {
+                Render render = ((Render) component);
+                if (render instanceof Renderer) {
+                    if (((Renderer) render).getRenderState() != camera.getState()) continue;
+                }
+                render.render(camera);
+            }
         }
         for (GameObject ch : children) {
             ch.render(camera);

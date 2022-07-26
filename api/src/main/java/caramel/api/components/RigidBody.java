@@ -13,7 +13,10 @@ public abstract class RigidBody extends Component {
     @InvokeOnEdit("updateBody") public boolean fixedRotation = false;
     @InvokeOnEdit("updateBody") public boolean continuousCollision = false;
     @InvokeOnEdit("updateBody") public boolean isTrigger = false;
+    @InvokeOnEdit("updateBody") public boolean gravity = true;
+    public boolean bounce = true;
     @InvokeOnEdit("updateBody") public RigidBodyType bodyType = RigidBodyType.DYNAMIC;
+
 
     public RigidBody(GameObject gameObject) {
         super(gameObject);

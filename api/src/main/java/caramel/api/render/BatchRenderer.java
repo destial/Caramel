@@ -1,8 +1,10 @@
 package caramel.api.render;
 
+import caramel.api.components.Camera;
 import caramel.api.math.Vertex;
 import caramel.api.texture.Mesh;
 import caramel.api.texture.Texture;
+import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +26,7 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class BatchRenderer extends Mesh {
     public static final int MAX_TEXTURES = 8;
-    public static final int MAX_BATCH_SIZE = 1000;
+    public static final int MAX_BATCH_SIZE = 500;
     public static boolean USE_BATCH = true;
     public static int DRAW_CALLS = 0;
     private static Map<Shader, List<BatchRenderer>> shaderMapping;
@@ -119,16 +121,21 @@ public final class BatchRenderer extends Mesh {
         shaderMapping.clear();
     }
 
-    public static void render() {
+    public static void render(Camera camera) {
         if (shaderMapping == null) return;
         int[] texSlots = new int[MAX_TEXTURES];
         for (int t = 0; t < MAX_TEXTURES; t++) {
             texSlots[t] = t;
         }
 
+        Matrix4f uVP = camera.getProjection().mul(camera.getView());
+
         for (Map.Entry<Shader, List<BatchRenderer>> entry : shaderMapping.entrySet()) {
             Shader shader = entry.getKey();
             List<BatchRenderer> rendererList = entry.getValue();
+            shader.attach();
+            shader.uploadIntArray("texSampler", texSlots);
+            shader.uploadMat4f("uVP", uVP);
 
             for (int index = 0; index < rendererList.size(); index++) {
                 BatchRenderer renderer = rendererList.get(index);
@@ -139,22 +146,20 @@ public final class BatchRenderer extends Mesh {
                     continue;
                 }
 
-                shader.attach();
                 List<Texture> textures = Texture.getTextures();
                 int offset = index * MAX_TEXTURES;
                 for (int i = offset; i < textures.size() && i + offset < MAX_TEXTURES; i++) {
                     glActiveTexture(GL_TEXTURE0 + i - offset);
                     textures.get(i).bind();
                 }
-                shader.uploadIntArray("texSampler", texSlots);
 
                 glBindBuffer(GL_ARRAY_BUFFER, renderer.vboId);
-                float[] vertexBuffer = renderer.getVertexBuffer();
-                glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer);
+                glBufferSubData(GL_ARRAY_BUFFER, 0, renderer.getVertexBuffer());
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
                 if (renderer.withIndices) {
                     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.eboId);
-                    int[] indexBuffer = renderer.getIndexBuffer();
-                    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexBuffer);
+                    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, renderer.getIndexBuffer());
+                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 }
 
                 glBindVertexArray(renderer.vaoId);
@@ -180,12 +185,11 @@ public final class BatchRenderer extends Mesh {
                 }
 
                 // flush
-                shader.detach();
-
                 renderer.resetArrays();
                 renderer.resetIndices();
                 renderer.setDirty(false);
             }
+            shader.detach();
         }
     }
 }

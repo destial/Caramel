@@ -25,6 +25,10 @@ public final class Vector3 {
         this((float) vect.get0(), (float) vect.get1(), (float) vect.get2());
     }
 
+    public Vector3(Vector3 value) {
+        this(value.x(), value.y(), value.z());
+    }
+
     public Vector3(Vec3 vect) {
         this(vect.x, vect.y, vect.z);
     }
@@ -80,5 +84,9 @@ public final class Vector3 {
     @Override
     public String toString() {
         return joml.toString();
+    }
+
+    public void set(Vector3 value) {
+        set(value.x(), value.y(), value.z());
     }
 }

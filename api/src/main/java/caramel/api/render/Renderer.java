@@ -9,6 +9,9 @@ public abstract class Renderer extends Component implements Render {
     protected final Vector3f pos;
     protected final Vector3f rot;
     protected final Vector3f sca;
+
+    public State renderState = State.WORLD;
+
     public Renderer(GameObject gameObject) {
         super(gameObject);
         pos = new Vector3f(transform.position);
@@ -22,4 +25,16 @@ public abstract class Renderer extends Component implements Render {
     }
 
     public abstract void build();
+
+    public State getRenderState() {
+        if (renderState == null) {
+            renderState = Renderer.State.WORLD;
+        }
+        return renderState;
+    }
+
+    public enum State {
+        WORLD,
+        UI
+    }
 }

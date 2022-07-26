@@ -13,7 +13,6 @@ import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 
 
@@ -40,6 +39,7 @@ public final class Physics2D implements Physics {
         bodyDef.linearDamping = rigidBody.linearDamping;
         bodyDef.fixedRotation = rigidBody.fixedRotation;
         bodyDef.bullet = rigidBody.continuousCollision;
+        bodyDef.gravityScale = rigidBody.gravity ? 1f : 0f;
 
         switch (rigidBody.bodyType) {
             case KINEMATIC:
@@ -94,7 +94,8 @@ public final class Physics2D implements Physics {
         world.setContactListener(new ContactListener(scene));
         world.setAllowSleep(true);
         world.setAutoClearForces(true);
-        world.setSubStepping(true);
+        // world.setSubStepping(true);
+        world.setContinuousPhysics(true);
     }
 
     @Override

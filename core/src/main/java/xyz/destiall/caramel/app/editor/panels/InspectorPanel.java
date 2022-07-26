@@ -25,7 +25,6 @@ import imgui.extension.texteditor.TextEditorLanguageDefinition;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
-import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.AddComponents;
 import xyz.destiall.caramel.app.editor.action.DeleteComponents;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
@@ -35,8 +34,6 @@ import java.awt.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
 
 public final class InspectorPanel extends Panel {
     private static final TextEditor editor = new TextEditor();

@@ -2,6 +2,7 @@ package caramel.api.text;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.Shader;
 import caramel.api.render.Text;
@@ -188,7 +189,7 @@ public final class TextMesh {
             char c = text.charAt(i);
             CharInfo charInfo = font.getCharacter(c);
             if (charInfo.width == 0) {
-                System.out.println("Unknown character " + c);
+                Debug.console("Unknown character " + c);
                 continue;
             }
             height = Math.max(height, charInfo.height);
@@ -201,7 +202,7 @@ public final class TextMesh {
             char c = text.charAt(i);
             CharInfo charInfo = font.getCharacter(c);
             if (charInfo.width == 0) {
-                System.out.println("Unknown character " + c);
+                Debug.console("Unknown character " + c);
                 continue;
             }
             float xPos = x;

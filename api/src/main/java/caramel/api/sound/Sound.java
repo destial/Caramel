@@ -87,7 +87,6 @@ public final class Sound {
     }
 
     public void stop() {
-        System.out.println("stopping " + this);
         alSourcef(sourceId, AL_GAIN, 0);
         alSourcei(sourceId, AL_LOOPING, 0);
         alSourceStop(sourceId);

@@ -4,7 +4,6 @@ import caramel.api.math.Vector3;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.components.Box3DCollider;
 import org.ode4j.ode.DBody;
-import org.ode4j.ode.DGeom;
 
 public final class RigidBody3D extends RigidBody {
     public final Vector3 velocity = new Vector3();

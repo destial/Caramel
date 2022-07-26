@@ -11,7 +11,8 @@ import caramel.api.scripts.Script;
 public class AnimationUpdate extends Script {
     public transient SpriteRenderer sp;
     public RigidBody2D rb;
-    public transient Camera camera;
+    public transient Button button;
+    public int score = 0;
     public AnimationUpdate(GameObject gameObject) {
         super(gameObject);
     }
@@ -20,7 +21,7 @@ public class AnimationUpdate extends Script {
     @Override
     public void start() {
         sp = getComponent(SpriteRenderer.class);
-        camera = getComponent(Camera.class);
+        button = findGameObject("Button").getComponent(Button.class);
     }
 
     // This method is called on every frame
@@ -41,6 +42,14 @@ public class AnimationUpdate extends Script {
             if (vel.x() < 0) sp.setAnimation("anim1");
             else sp.setAnimation("anim0");
         }
-        
+        button.getComponentInChildren(Text.class).text = "Hit " + score;
+    }
+
+    @Override
+    public void onCollisionEnter(RigidBody2D other) {
+        if (other.gameObject.name.equals("Circle")) {
+            score++;
+            int test = 0;
+        }
     }
 }

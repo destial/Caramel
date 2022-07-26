@@ -1,7 +1,9 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
+import caramel.api.debug.Debug;
 import caramel.api.scripts.InternalScript;
 import caramel.api.utils.FileIO;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 
 import javax.script.ScriptException;
 import javax.tools.DiagnosticCollector;
@@ -11,8 +13,11 @@ import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -23,11 +28,12 @@ public final class ScriptLoader {
     private final Map<String, Class<?>> classes = new ConcurrentHashMap<>();
     private final Map<String, ScriptClassLoader> loaders = new ConcurrentHashMap<>();
     private final JavaCompiler compiler;
+    private EditorScriptManager scriptManager;
 
     private ScriptMemoryManager scriptMemoryManager;
     private DiagnosticCollector<JavaFileObject> diagnostics;
 
-    public ScriptLoader() {
+    public ScriptLoader(EditorScriptManager scriptManager) {
         compiler = ToolProvider.getSystemJavaCompiler();
         if (compiler == null) {
             return;
@@ -35,6 +41,27 @@ public final class ScriptLoader {
         diagnostics = new DiagnosticCollector<>();
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
         scriptMemoryManager = new ScriptMemoryManager(standardFileManager, getClass().getClassLoader());
+        this.scriptManager = scriptManager;
+    }
+
+    public InternalScript get(String name) {
+        Debug.console("Searching for script " + name);
+        Map.Entry<String, ScriptClassLoader> entry = loaders.entrySet().stream().filter(en -> en.getKey().endsWith(name)).findFirst().orElse(null);
+        if (entry == null) return null;
+        return entry.getValue().script;
+    }
+
+    public InternalScript getByClass(Class<?> clazz) {
+        return get(clazz.getName());
+    }
+
+    public InternalScript removeScript(String name) {
+        Map.Entry<String, ScriptClassLoader> entry = loaders.entrySet().stream().filter(en -> en.getKey().endsWith(name)).findFirst().orElse(null);
+        if (entry == null) return null;
+        Debug.console("Removing script " + name);
+        loaders.remove(entry.getKey());
+        classes.remove(entry.getKey());
+        return entry.getValue().script;
     }
 
     Class<?> getClassByName(final String name) {
@@ -56,8 +83,8 @@ public final class ScriptLoader {
         return null;
     }
 
-    Iterable<String> getClasses() {
-        return classes.keySet();
+    Class<?> getClass(String name) {
+        return classes.get(name);
     }
 
     void setClass(final String name, final Class<?> clazz) {
@@ -76,25 +103,47 @@ public final class ScriptLoader {
         }
 
         String fullClassName = getFullName(file, code);
-        String simpleClassName = extractSimpleName(fullClassName);
-        loaders.remove(fullClassName);
-        removeClass(fullClassName);
 
-        FileScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(null, simpleClassName, code);
-        Collection<FileScriptMemoryJavaObject> otherScripts = loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList());
+        FileScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
+        Collection<FileScriptMemoryJavaObject> otherScripts = loaders.values().stream().filter(l -> !l.getFullClassName().equals(fullClassName)).map(ScriptClassLoader::getSource).collect(Collectors.toList());
         otherScripts.add(scriptSource);
         JavaCompiler.CompilationTask task = compiler.getTask(null, scriptMemoryManager, diagnostics, null, null, otherScripts);
-
         if (!task.call()) {
             String message = "Error while compiling " + file.getPath() + ": " + diagnostics.getDiagnostics().stream()
                     .map(Object::toString)
                     .collect(Collectors.joining("\n"));
             throw new ScriptException(message);
         }
-        System.out.println("Successfully compiled " + file.getName());
+
+        for (Map.Entry<String, ScriptClassLoader> entry : loaders.entrySet()) {
+            ScriptClassLoader previous = entry.getValue();
+            Debug.console("Recompiling " + previous.getFile().getName());
+            removeClass(previous.getFullClassName());
+            ScriptClassLoader newLoader = scriptMemoryManager.getClassLoader(this, previous.getFile(), previous.getFullClassName(), previous.getSource());
+            entry.setValue(newLoader);
+            setClass(previous.getFullClassName(), newLoader.script.getCompiledClass());
+            scriptManager.loadComponents(previous.script, newLoader.script);
+            try {
+                previous.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        ScriptClassLoader previous = loaders.get(fullClassName);
         ScriptClassLoader loader = scriptMemoryManager.getClassLoader(this, file, fullClassName, scriptSource);
+        if (previous != null) {
+            removeClass(previous.getFullClassName());
+            setClass(fullClassName, loader.script.getCompiledClass());
+            try {
+                previous.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         loaders.put(fullClassName, loader);
         setClass(fullClassName, loader.script.getCompiledClass());
+        Debug.console("Recompiled " + file.getName());
         return loader.script;
     }
 
@@ -123,8 +172,7 @@ public final class ScriptLoader {
                 return fullPackage + "." + name;
             }
         }
-
-        throw new ScriptException("Error while compiling " + file.getPath() + ": Could not determine fully qualified class name");
+        return "scripts." + file.getName().substring(0, file.getName().length() - "java".length());
     }
 
     private String extractSimpleName(String fullName) {
@@ -133,5 +181,41 @@ public final class ScriptLoader {
             return fullName;
         }
         return fullName.substring(lastDotIndex + 1);
+    }
+
+    public void compileAll(List<File> files) throws ScriptException {
+        if (compiler == null) {
+            throw new ScriptException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+        }
+        List<FileScriptMemoryJavaObject> sources = new ArrayList<>(files.size());
+        for (File file : files) {
+            if (!file.exists()) continue;
+            String code = FileIO.readData(file);
+            String fullClassName = getFullName(file, code);
+            FileScriptMemoryJavaObject object = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
+            sources.add(object);
+        }
+
+        JavaCompiler.CompilationTask task = compiler.getTask(null, scriptMemoryManager, diagnostics, null, null, sources);
+        if (!task.call()) {
+            String message = "Error while compiling sources: " + diagnostics.getDiagnostics().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining("\n"));
+            throw new ScriptException(message);
+        }
+
+        for (FileScriptMemoryJavaObject source : sources) {
+            Debug.console("Compiling " + source.getOrigin().getName());
+            ScriptClassLoader loader = null;
+            try {
+                loader = scriptMemoryManager.getClassLoader(this, source.getOrigin(), source.getName(), source);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            if (loader == null) continue;
+
+            loaders.put(source.getName(), loader);
+            setClass(source.getName(), loader.script.getCompiledClass());
+        }
     }
 }

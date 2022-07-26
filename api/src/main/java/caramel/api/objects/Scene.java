@@ -24,7 +24,6 @@ public abstract class Scene implements Update, Render {
     protected Camera gameCamera;
     protected File file;
     protected boolean playing = false;
-    protected boolean saved = true;
 
     protected final Set<GameObject> selectedGameObject;
     protected final Set<GameObject> selectedDefaultGameObject;

@@ -5,7 +5,7 @@ import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.math.Vector2;
 import caramel.api.math.Vector3;
 import caramel.api.objects.GameObject;
-import caramel.api.objects.Scene;
+import caramel.api.objects.SceneImpl;
 import caramel.api.render.Animation;
 import caramel.api.texture.Mesh;
 import caramel.api.texture.Spritesheet;
@@ -20,13 +20,14 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImBoolean;
 import imgui.type.ImInt;
 import imgui.type.ImString;
-import org.checkerframework.checker.units.qual.C;
 import org.joml.Quaternionf;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
-import xyz.destiall.caramel.app.utils.Payload;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.util.nfd.NFDPathSet;
+import org.lwjgl.util.nfd.NativeFileDialog;
+import xyz.destiall.caramel.app.editor.action.EditorAction;
 
-import javax.swing.*;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -36,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static org.lwjgl.util.nfd.NativeFileDialog.NFD_OKAY;
 
 public final class ImGuiUtils {
     private static final float width = 110f;
@@ -287,7 +290,6 @@ public final class ImGuiUtils {
                         if (ImGui.selectable(name)) {
                             find = component;
                             ImGui.closeCurrentPopup();
-                            System.out.println(name);
                             break;
                         }
                     }
@@ -523,18 +525,48 @@ public final class ImGuiUtils {
             Class<?> type = field.getType();
             Object value = field.get(component);
             String name = field.getName();
+            SceneImpl scene = (SceneImpl) component.gameObject.scene;
 
-            String[] invokeMethods = null;
-            if (field.isAnnotationPresent(InvokeOnEdit.class)) {
-                invokeMethods = field.getAnnotation(InvokeOnEdit.class).value();
-            }
+            String[] invokeMethods = field.isAnnotationPresent(InvokeOnEdit.class) ? field.getAnnotation(InvokeOnEdit.class).value() : null;
 
             if (type == boolean.class) {
                 boolean previous = (boolean) value;
                 boolean now = drawCheckBox(name, previous);
-                if (invokeMethods != null && previous != now) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                if (previous != now) {
+                    EditorAction action = new EditorAction(scene) {
+                        @Override
+                        public void undo() {
+                            try {
+                                field.setBoolean(component, previous);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.setBoolean(component, now);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
                 field.setBoolean(component, now);
@@ -542,9 +574,41 @@ public final class ImGuiUtils {
             } else if (type == int.class) {
                 int previous = (int) value;
                 int now = dragInt(name, previous);
-                if (invokeMethods != null && previous != now) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                if (previous != now) {
+                    EditorAction action = new EditorAction(scene) {
+                        @Override
+                        public void undo() {
+                            try {
+                                field.setInt(component, previous);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.setInt(component, now);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
                 field.setInt(component, now);
@@ -552,9 +616,41 @@ public final class ImGuiUtils {
             } else if (type == float.class) {
                 float previous = (float) value;
                 float now = dragFloat(name, previous);
-                if (invokeMethods != null && previous != now) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                if (previous != now) {
+                    EditorAction action = new EditorAction(scene) {
+                        @Override
+                        public void undo() {
+                            try {
+                                field.setFloat(component, previous);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.setFloat(component, now);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
                 field.setFloat(component, now);
@@ -562,52 +658,246 @@ public final class ImGuiUtils {
             } else if (type == String.class) {
                 String previous = (String) value;
                 String now = inputText(name, previous);
-                if (invokeMethods != null && previous.equals(now)) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                if (previous.equals(now)) {
+                    EditorAction action = new EditorAction(scene) {
+                        @Override
+                        public void undo() {
+                            try {
+                                field.set(component, previous);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.set(component, now);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
                 field.set(component, now);
 
             } else if (type == Vector3f.class) {
-                if (drawVec3Control(name, (Vector3f) value, 1f) && invokeMethods != null) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                Vector3f previous = new Vector3f((Vector3f) value);
+                if (drawVec3Control(name, (Vector3f) value, 1f)) {
+                    EditorAction action = new EditorAction(scene) {
+                        final Vector3f redo = new Vector3f();
+                        @Override
+                        public void undo() {
+                            redo.set((Vector3f) value);
+                            ((Vector3f) value).set(previous);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            ((Vector3f) value).set(redo);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
 
             } else if (type == Vector3.class) {
-                if (drawVec3Control(name, ((Vector3) value).getJoml(), 1f) && invokeMethods != null) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                Vector3 previous = new Vector3((Vector3) value);
+                if (drawVec3Control(name, ((Vector3) value).getJoml(), 1f)) {
+                    EditorAction action = new EditorAction(scene) {
+                        final Vector3 redo = new Vector3();
+                        @Override
+                        public void undo() {
+                            redo.set((Vector3) value);
+                            ((Vector3) value).set(previous);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            ((Vector3) value).set(redo);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
 
             } else if (type == Vector2f.class) {
-                if (drawVec2Control(name, (Vector2f) value, 1f) && invokeMethods != null) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                Vector2f previous = new Vector2f((Vector2f) value);
+                if (drawVec2Control(name, (Vector2f) value, 1f)) {
+                    EditorAction action = new EditorAction(scene) {
+                        final Vector2f redo = new Vector2f();
+                        @Override
+                        public void undo() {
+                            redo.set((Vector2f) value);
+                            ((Vector2f) value).set(previous);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            ((Vector2f) value).set(redo);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
 
             } else if (type == Vector2.class) {
-                if (drawVec2Control(name, ((Vector2) value).getJoml(), 1f) && invokeMethods != null) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                Vector2 previous = new Vector2((Vector2) value);
+                if (drawVec2Control(name, ((Vector2) value).getJoml(), 1f)) {
+                    EditorAction action = new EditorAction(scene) {
+                        final Vector2 redo = new Vector2();
+                        @Override
+                        public void undo() {
+                            redo.set((Vector2) value);
+                            ((Vector2) value).set(previous);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            ((Vector2) value).set(redo);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
 
             } else if (type == Color.class) {
-               if (ImGuiUtils.colorPicker4(name, (Color) value) && invokeMethods != null) {
-                   for (String method : invokeMethods) {
-                       component.sendMessage(method);
-                   }
+                Color previous = new Color((Color) value);
+                if (ImGuiUtils.colorPicker4(name, (Color) value)) {
+                    EditorAction action = new EditorAction(scene) {
+                        final Color redo = new Color();
+                        @Override
+                        public void undo() {
+                            redo.set((Color) value);
+                            ((Color) value).set(previous);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            ((Color) value).set(redo);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
+                    }
                }
 
             } else if (type == Quaternionf.class) {
-                if (drawQuatControl(name, (Quaternionf) value, 0.f) && invokeMethods != null) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                Quaternionf previous = new Quaternionf((Quaternionf) value);
+                if (drawQuatControl(name, (Quaternionf) value, 0.f)) {
+                    EditorAction action = new EditorAction(scene) {
+                        final Quaternionf redo = new Quaternionf();
+                        @Override
+                        public void undo() {
+                            redo.set((Quaternionf) value);
+                            ((Quaternionf) value).set(previous);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            ((Quaternionf) value).set(redo);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
 
@@ -622,10 +912,65 @@ public final class ImGuiUtils {
                 }
 
                 if (path != null) {
-                    File absolute = new File(path);
-                    String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
-                    if (Texture.getTexture(relative) != null) {
-                        mesh.setTexture(path);
+                    String previous = mesh.getTexture() != null ? mesh.getTexturePath() : null;
+                    if (path.isEmpty()) {
+                        EditorAction action = new EditorAction(scene) {
+                            @Override
+                            public void undo() {
+                                try {
+                                    mesh.setTexture(previous);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void redo() {
+                                try {
+                                    mesh.setTexture(null);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+                        scene.addUndoAction(action);
+                        mesh.setTexture(null);
+                        if (invokeMethods != null) {
+                            for (String method : invokeMethods) {
+                                component.sendMessage(method);
+                            }
+                        }
+                    } else {
+                        File absolute = new File(path);
+                        String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
+                        if (Texture.getTexture(relative) != null) {
+                            EditorAction action = new EditorAction(scene) {
+                                @Override
+                                public void undo() {
+                                    try {
+                                        mesh.setTexture(previous);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void redo() {
+                                    try {
+                                        mesh.setTexture(null);
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+                            scene.addUndoAction(action);
+                            mesh.setTexture(path);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
                     }
                 }
 
@@ -640,18 +985,175 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Texture.class) {
-                Texture texture = (Texture) value;
+                Texture previous = (Texture) value;
                 String path = findFile(name, "Load Texture", ".png,.jpeg,.jpg");
 
-                if (texture != null) {
+                if (previous != null) {
                     ImGui.sameLine();
-                    ImGui.text(texture.getPath());
+                    ImGui.text(previous.getPath());
                 }
 
                 if (path != null) {
-                    texture = Texture.getTexture(path);
-                    if (texture.buildTexture()) {
-                        field.set(component, texture);
+                    if (path.isEmpty()) {
+                        EditorAction action = new EditorAction(scene) {
+                            @Override
+                            public void undo() {
+                                try {
+                                    field.set(component, previous);
+                                    if (invokeMethods != null) {
+                                        for (String method : invokeMethods) {
+                                            component.sendMessage(method);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void redo() {
+                                try {
+                                    field.set(component, null);
+                                    if (invokeMethods != null) {
+                                        for (String method : invokeMethods) {
+                                            component.sendMessage(method);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+                        scene.addUndoAction(action);
+                        field.set(component, null);
+                        if (invokeMethods != null) {
+                            for (String method : invokeMethods) {
+                                component.sendMessage(method);
+                            }
+                        }
+                    } else {
+                        Texture texture = Texture.getTexture(path);
+                        if (texture.buildTexture()) {
+                            EditorAction action = new EditorAction(scene) {
+                                @Override
+                                public void undo() {
+                                    try {
+                                        field.set(component, previous);
+                                        if (invokeMethods != null) {
+                                            for (String method : invokeMethods) {
+                                                component.sendMessage(method);
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+
+                                @Override
+                                public void redo() {
+                                    try {
+                                        field.set(component, texture);
+                                        if (invokeMethods != null) {
+                                            for (String method : invokeMethods) {
+                                                component.sendMessage(method);
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+                            scene.addUndoAction(action);
+                            field.set(component, texture);
+                            if (invokeMethods != null) {
+                                for (String method : invokeMethods) {
+                                    component.sendMessage(method);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } else if (type == File.class) {
+                File previous = (File) value;
+                String path = findFile(name, ".*");
+
+                if (previous != null) {
+                    ImGui.sameLine();
+                    ImGui.text(previous.getPath());
+                }
+
+                if (path != null) {
+                    if (path.isEmpty()) {
+                        EditorAction action = new EditorAction(scene) {
+                            @Override
+                            public void undo() {
+                                try {
+                                    field.set(component, previous);
+                                    if (invokeMethods != null) {
+                                        for (String method : invokeMethods) {
+                                            component.sendMessage(method);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void redo() {
+                                try {
+                                    field.set(component, null);
+                                    if (invokeMethods != null) {
+                                        for (String method : invokeMethods) {
+                                            component.sendMessage(method);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+                        scene.addUndoAction(action);
+                        field.set(component, null);
+                        if (invokeMethods != null) {
+                            for (String method : invokeMethods) {
+                                component.sendMessage(method);
+                            }
+                        }
+                    } else {
+                        File now = new File(path);
+                        EditorAction action = new EditorAction(scene) {
+                            @Override
+                            public void undo() {
+                                try {
+                                    field.set(component, previous);
+                                    if (invokeMethods != null) {
+                                        for (String method : invokeMethods) {
+                                            component.sendMessage(method);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            @Override
+                            public void redo() {
+                                try {
+                                    field.set(component, now);
+                                    if (invokeMethods != null) {
+                                        for (String method : invokeMethods) {
+                                            component.sendMessage(method);
+                                        }
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        };
+                        scene.addUndoAction(action);
+                        field.set(component, now);
                         if (invokeMethods != null) {
                             for (String method : invokeMethods) {
                                 component.sendMessage(method);
@@ -660,29 +1162,40 @@ public final class ImGuiUtils {
                     }
                 }
 
-            } else if (type == File.class) {
-                File file = (File) value;
-                String path = findFile(name, ".*");
-
-                if (file != null) {
-                    ImGui.sameLine();
-                    ImGui.text(file.getPath());
-                }
-
-                if (path != null) {
-                    field.set(component, new File(path));
-                    if (invokeMethods != null) {
-                        for (String method : invokeMethods) {
-                            component.sendMessage(method);
-                        }
-                    }
-                }
-
             } else if (Component.class.isAssignableFrom(type)) {
                 Component previous = (Component) value;
                 Component find = findComponent(name, component.gameObject, previous, (Class<? extends Component>) type);
                 if (find != null && find != previous) {
-                    System.out.println("setting");
+                    EditorAction action = new EditorAction(scene) {
+                        @Override
+                        public void undo() {
+                            try {
+                                field.set(component, previous);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.set(component, find);
+                                if (invokeMethods != null) {
+                                    for (String method : invokeMethods) {
+                                        component.sendMessage(method);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
                     field.set(component, find);
                     if (invokeMethods != null) {
                         for (String method : invokeMethods) {
@@ -702,12 +1215,35 @@ public final class ImGuiUtils {
                     }
                 }
                 int currentItem = drawListSelectableBox(name, previousItem, items);
-                if (invokeMethods != null && currentItem != previousItem) {
-                    for (String method : invokeMethods) {
-                        component.sendMessage(method);
+                if (currentItem != previousItem) {
+                    int finalPreviousItem = previousItem;
+                    EditorAction action = new EditorAction(scene) {
+                        @Override
+                        public void undo() {
+                            try {
+                                field.set(component, values[finalPreviousItem]);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.set(component, values[currentItem]);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    field.set(component, values[currentItem]);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
                     }
                 }
-                field.set(component, values[currentItem]);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -720,7 +1256,12 @@ public final class ImGuiUtils {
         ImGui.setColumnWidth(0, width);
         ImGui.text(label);
         ImGui.nextColumn();
-
+        if (ImGui.button("Clear")) {
+            ImGui.columns(1);
+            ImGui.popID();
+            return "";
+        }
+        ImGui.sameLine();
         if (ImGui.button(button)) {
             if (USE_IMGUI_FILE_CHOOSER) {
                 ImGuiFileDialog.openModal(label, button, filter, ".", new ImGuiFileDialogPaneFun() {
@@ -755,26 +1296,37 @@ public final class ImGuiUtils {
     }
 
     public static String openFileJava(String title, String filter) {
+        NFDPathSet pointer = NFDPathSet.callocStack();
+        PointerBuffer pointerBuffer = PointerBuffer.create(pointer.address(), pointer.sizeof());
         String[] extensions = filter.split(",");
-        JFileChooser chooser = new FileChooser(title, extensions);
-
-        chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-        int result = chooser.showOpenDialog(null);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
+        String[] wrap = new String[extensions.length];
+        int i = 0;
+        for (String e : extensions) {
+            wrap[i++] = e.substring(1);
+        }
+        String f = String.join(",", wrap);
+        int result = NativeFileDialog.NFD_OpenDialog(f, System.getProperty("user.dir"), pointerBuffer);
+        if (result == NFD_OKAY) {
+            File file = new File(pointerBuffer.getStringASCII());
             return new File("").toURI().relativize(file.toURI()).getPath();
         }
         return null;
     }
 
     public static String saveFileJava(String title, String filter) {
+        NFDPathSet pointer = NFDPathSet.calloc();
+        PointerBuffer pointerBuffer = PointerBuffer.create(pointer.address(), pointer.sizeof());
         String[] extensions = filter.split(",");
-        JFileChooser chooser = new FileChooser(title, extensions);
+        String[] wrap = new String[extensions.length];
+        int i = 0;
+        for (String e : extensions) {
+            wrap[i++] = e.substring(1);
+        }
+        String f = String.join(",", wrap);
 
-        chooser.setDialogType(JFileChooser.SAVE_DIALOG);
-        int result = chooser.showSaveDialog(null);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File file = chooser.getSelectedFile();
+        int result = NativeFileDialog.NFD_SaveDialog(f, System.getProperty("user.dir"), pointerBuffer);
+        if (result == NFD_OKAY) {
+            File file = new File(pointerBuffer.getStringASCII());
             return new File("").toURI().relativize(file.toURI()).getPath();
         }
         return null;

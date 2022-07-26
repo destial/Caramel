@@ -16,12 +16,12 @@ public final class DebugImpl extends Debug {
     }
 
     public static void log(Object log) {
-        System.out.println(log);
+        console(log);
         ConsolePanel.addLog(""+log);
     }
 
     public static void logError(Object error) {
-        System.out.println(error);
+        System.err.println(error);
         ConsolePanel.addError("ERROR: " + error);
     }
 
@@ -59,23 +59,23 @@ public final class DebugImpl extends Debug {
 
         Matrix4f model = transform.getModel();
         drawLine(
-                new Vector3f(-0.5f, 0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
-                new Vector3f(0.5f, 0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(-0.5f, 0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(0.5f, 0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
                 color
         );
         drawLine(
-                new Vector3f(-0.5f, -0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
-                new Vector3f(-0.5f, 0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(-0.5f, -0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(-0.5f, 0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
                 color
         );
         drawLine(
-                new Vector3f(-0.5f, -0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
-                new Vector3f(0.5f, -0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(-0.5f, -0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(0.5f, -0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
                 color
         );
         drawLine(
-                new Vector3f(0.5f, -0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
-                new Vector3f(0.5f, 0.5f, -z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(0.5f, -0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
+                new Vector3f(0.5f, 0.5f, z).mul(model.get3x3(new Matrix3d())).add(x, y, 0),
                 color
         );
     }

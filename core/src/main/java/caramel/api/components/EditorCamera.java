@@ -66,7 +66,7 @@ public final class EditorCamera extends Camera {
                 up.normalize();
 
             } else {
-                float scroll = Input.getMouseScroll();
+                float scroll = -Input.getMouseScroll();
                 zoom += (scroll * 0.1f);
                 transform.position.add(up.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
                 Vector3f right = target.cross(up, new Vector3f());

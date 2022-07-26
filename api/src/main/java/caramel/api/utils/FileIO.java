@@ -113,7 +113,7 @@ public final class FileIO {
                 f.createNewFile();
                 InputStream stream = FileIO.class.getResourceAsStream("/" + path);
                 if (stream == null) return;
-                System.out.println("Writing resource file " + path);
+                Debug.console("Writing resource file " + path);
                 OutputStream outputStream = new FileOutputStream(f);
                 byte[] b = new byte[8 * 1024];
                 int bytesRead;

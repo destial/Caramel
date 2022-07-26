@@ -1,5 +1,6 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
+import caramel.api.debug.Debug;
 import caramel.api.utils.CompositeIterator;
 
 import javax.script.ScriptException;
@@ -11,15 +12,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static javax.tools.StandardLocation.CLASS_OUTPUT;
 
 public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFileManager> {
 
-    private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new ConcurrentHashMap<>();
+    private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new HashMap<>();
     private final ClassLoader parentClassLoader;
 
     public ScriptMemoryManager(JavaFileManager fileManager, ClassLoader parentClassLoader) {
@@ -32,18 +33,12 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
         return mapNameToClasses.values();
     }
 
-    public FileScriptMemoryJavaObject createSourceFileObject(Object origin, String name, String code) {
+    public FileScriptMemoryJavaObject createSourceFileObject(File origin, String name, String code) {
         return new FileScriptMemoryJavaObject(origin, name, JavaFileObject.Kind.SOURCE, code);
     }
 
     public ScriptClassLoader getClassLoader(ScriptLoader loader, File file, String fullClassName, FileScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
-        Map<String, byte[]> mapNameToBytes = new ConcurrentHashMap<>();
-        for (ClassScriptMemoryJavaObject outputMemoryJavaFileObject : memoryClasses()) {
-            mapNameToBytes.put(
-                    outputMemoryJavaFileObject.getName(),
-                    outputMemoryJavaFileObject.getBytes());
-        }
-        return new ScriptClassLoader(loader, mapNameToBytes, parentClassLoader, file, fullClassName, source);
+        return new ScriptClassLoader(loader, mapNameToClasses, parentClassLoader, file, fullClassName, source);
     }
 
     @Override
@@ -74,15 +69,11 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
     }
 
     @Override
-    public JavaFileObject getJavaFileForOutput(
-            JavaFileManager.Location location,
-            String className,
-            JavaFileObject.Kind kind,
-            FileObject sibling)
-            throws IOException {
+    public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location, String className, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
         if (kind == JavaFileObject.Kind.CLASS) {
             ClassScriptMemoryJavaObject file = new ClassScriptMemoryJavaObject(className);
             mapNameToClasses.put(className, file);
+            Debug.console("Mapping class " + className);
             return file;
         }
 

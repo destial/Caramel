@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app.editor.panels;
 import caramel.api.Input;
 import caramel.api.Time;
 import caramel.api.components.EditorCamera;
+import caramel.api.debug.DebugImpl;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
 import caramel.api.render.BatchRenderer;
@@ -21,7 +22,6 @@ import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.editor.action.EditTransformComponent;
-import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 
@@ -228,22 +228,22 @@ public final class ScenePanel extends Panel {
         }
 
         if (dragging) {
-            DebugDraw.INSTANCE.addLine(
+            DebugImpl.drawLine(
                     new Vector3f(startMouseCoords.x, startMouseCoords.y, 1),
                     new Vector3f(window.getMouseListener().getOrthoX(), startMouseCoords.y, 1),
                     selectionColor
             );
-            DebugDraw.INSTANCE.addLine(
+            DebugImpl.drawLine(
                     new Vector3f(startMouseCoords.x, startMouseCoords.y, 1),
                     new Vector3f(startMouseCoords.x, window.getMouseListener().getOrthoY(), 1),
                     selectionColor
             );
-            DebugDraw.INSTANCE.addLine(
+            DebugImpl.drawLine(
                     new Vector3f(window.getMouseListener().getOrthoX(), startMouseCoords.y, 1),
                     new Vector3f(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY(), 1),
                     selectionColor
             );
-            DebugDraw.INSTANCE.addLine(
+            DebugImpl.drawLine(
                     new Vector3f(startMouseCoords.x, window.getMouseListener().getOrthoY(), 1),
                     new Vector3f(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY(), 1),
                     selectionColor

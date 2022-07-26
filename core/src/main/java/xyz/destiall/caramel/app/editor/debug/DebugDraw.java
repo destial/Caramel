@@ -9,7 +9,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
@@ -32,7 +31,8 @@ public final class DebugDraw implements Update, Render {
     public static DebugDraw INSTANCE = new DebugDraw();
 
     private final List<DebugLine> lines = new ArrayList<>();
-    private float[] vertexArray = new float[500 * 6 * 2];
+    private int MAX_SIZE = 500 * 6 * 2;
+    private float[] vertexArray = new float[MAX_SIZE];
 
     private int vaoID;
     private int vboID;
@@ -46,7 +46,7 @@ public final class DebugDraw implements Update, Render {
 
         vboID = glGenBuffers();
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, (long) vertexArray.length * Float.BYTES, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_DYNAMIC_DRAW);
 
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
         glEnableVertexAttribArray(0);
@@ -75,8 +75,10 @@ public final class DebugDraw implements Update, Render {
                 i--;
             }
         }
-        vertexArray = new float[lines.size() * 2 * 6];
+
         if (lines.isEmpty()) return;
+        int size = lines.size() * 2 * 6;
+        vertexArray = new float[size];
 
         int index = 0;
         for (DebugLine line : lines) {
@@ -99,7 +101,12 @@ public final class DebugDraw implements Update, Render {
         if (lines.isEmpty()) return;
 
         glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
+        if (vertexArray.length > MAX_SIZE) {
+            MAX_SIZE = vertexArray.length;
+            glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_DYNAMIC_DRAW);
+        } else {
+            glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
+        }
 
         shader.attach();
         Matrix4f vp = camera.getProjection().mul(camera.getView());
@@ -115,6 +122,8 @@ public final class DebugDraw implements Update, Render {
         glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glBindVertexArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         shader.detach();
     }

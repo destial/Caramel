@@ -1,5 +1,7 @@
 package caramel.api;
 
+import caramel.api.components.Camera;
+
 public interface MouseListener {
 
     void mousePosCallback(long window, double xPos, double yPos);
@@ -31,6 +33,10 @@ public interface MouseListener {
     float getScreenX();
 
     float getScreenY();
+
+    float getScreenX(Camera camera);
+
+    float getScreenY(Camera camera);
 
     boolean isButtonDown(int button);
 

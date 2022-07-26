@@ -2,7 +2,6 @@ package caramel.api.texture;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
-import caramel.api.debug.Debug;
 import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
@@ -12,11 +11,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
-import org.ode4j.ode.internal.Matrix;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -134,6 +129,10 @@ public class Mesh {
             if (index < vertexArray.size()) break;
         }
         return vertexArray.get(index);
+    }
+
+    public int getIndex(int index) {
+        return elementArray.get(index);
     }
 
     public Mesh pushVertex(Vector3f position, Color color, Vector2f texCoords, Vector3f normal, float texSlot) {
@@ -266,7 +265,6 @@ public class Mesh {
     public void invalidate() {
         glDeleteVertexArrays(vaoId);
         glDeleteBuffers(vboId);
-
         vaoId = 0;
         vboId = 0;
         if (eboId != 0) {
@@ -344,7 +342,7 @@ public class Mesh {
     public void renderBatch(Transform transform, Camera camera) {
         shader = "defaultBatch";
         Shader s = Shader.getShader(shader);
-        Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
+        Matrix4f mvp = transform.getModel();
         dirtyVertexArray.clear();
 
         Texture t = texture != null ? Texture.getTexture(texture) : null;
@@ -407,7 +405,9 @@ public class Mesh {
             if (withIndices) {
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, getIndexBuffer());
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
             dirty = false;
         }
 
@@ -423,7 +423,6 @@ public class Mesh {
 
         if (drawArrays) glDrawArrays(type, 0, vertexArray.size());
         else glDrawElements(type, elementArray.size(), GL_UNSIGNED_INT, 0);
-
         BatchRenderer.DRAW_CALLS++;
 
         glDisableVertexAttribArray(0);
@@ -431,13 +430,11 @@ public class Mesh {
         glDisableVertexAttribArray(2);
         glDisableVertexAttribArray(3);
         glDisableVertexAttribArray(4);
-
         glBindVertexArray(0);
 
         if (texture != null) {
             Texture tex = Texture.getTexture(texture);
             tex.unbind();
-            glActiveTexture(0);
         }
 
         s.detach();

@@ -183,6 +183,23 @@ public final class ImGUILayer {
         endFrame();
     }
 
+    private void endFrame() {
+        for (int i = 0; i < lines.size(); i++) {
+            DebugLine l = lines.get(i);
+            if (l.beginFrame() < 0) {
+                lines.remove(i);
+                i--;
+                continue;
+            }
+
+            ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
+        }
+
+        if (!window.isFullScreen()) {
+            ImGui.end();
+        }
+    }
+
     private void setupDockspace() {
         int windowFlags =
                 ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
@@ -220,21 +237,7 @@ public final class ImGUILayer {
         Panel.reset();
     }
 
-    private void endFrame() {
-        for (int i = 0; i < lines.size(); i++) {
-            DebugLine l = lines.get(i);
-            if (l.beginFrame() < 0) {
-                lines.remove(i);
-                i--;
-                continue;
-            }
-
-            ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
-        }
-
-        if (!window.isFullScreen()) {
-            ImGui.end();
-        }
+    public void render() {
         ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());
 

@@ -52,6 +52,15 @@ public abstract class Component implements Update {
     }
 
     /**
+     * Get a {@link Component} that is linked to this object.
+     * @param clazz The class of the {@link Component}.
+     * @return The {@link Component} if it exists, null if none.
+     */
+    public Component getComponent(String clazz) {
+        return gameObject.getComponent(clazz);
+    }
+
+    /**
      * Get a {@link Component} that is linked to this object's parent.
      * If this object does not have a parent, it will return null.
      * @param clazz The class of the {@link Component}.
@@ -144,11 +153,7 @@ public abstract class Component implements Update {
                     e.printStackTrace();
                 }
             }
-            if (copyId) {
-                clone.id = id;
-            } else {
-                clone.id = gameObject.scene.generateId();
-            }
+            clone.id = copyId ? id : gameObject.scene.generateId();
             return clone;
         } catch (Exception e) {
             e.printStackTrace();

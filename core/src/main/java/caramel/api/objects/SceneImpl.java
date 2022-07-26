@@ -5,6 +5,7 @@ import caramel.api.Input;
 import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Light;
+import caramel.api.components.UICamera;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
@@ -20,7 +21,6 @@ import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.panels.InspectorPanel;
 import xyz.destiall.caramel.app.editor.panels.MenuBarPanel;
-import xyz.destiall.caramel.app.editor.panels.NodePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.physics.Physics;
@@ -35,7 +35,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
@@ -50,8 +49,9 @@ public final class SceneImpl extends Scene {
     private final Map<Class<?>, Panel> panels;
     private final List<EditorAction> actions;
     private final List<EditorAction> redoActions;
-    private boolean saved = true;
+    private final UICamera uiCamera;
 
+    private boolean saved = true;
     private EditorCamera editorCamera;
     private Physics.Mode physicsMode = Physics.Mode._2D;
 
@@ -82,6 +82,10 @@ public final class SceneImpl extends Scene {
         physics = new HashMap<>();
         physics.put(Physics.Mode._2D, new Physics2D(this));
         physics.put(Physics.Mode._3D, new Physics3D(this));
+
+        GameObject ui = new GameObjectImpl(this);
+        uiCamera = new UICamera(ui);
+        ui.addComponent(uiCamera);
     }
 
     public <P extends Panel> P getEditorPanel(Class<P> clazz) {
@@ -138,18 +142,22 @@ public final class SceneImpl extends Scene {
         if (playing) {
             for (GameObject go : gameObjects) go.render(camera);
 
-            if (BatchRenderer.USE_BATCH) BatchRenderer.render();
+            if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
         } else {
             if (ImGui.isKeyDown(Input.Key.G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             for (GameObject go : gameObjects) go.render(camera);
 
-            if (BatchRenderer.USE_BATCH) BatchRenderer.render();
+            if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
+    }
+
+    public UICamera getUICamera() {
+        return uiCamera;
     }
 
     public boolean canUndo() {

@@ -45,9 +45,4 @@ public class CharacterController2D extends Script {
             rb.addVelocity(0, jumpForce * Time.deltaTime);
         }
     }
-
-    @Override
-    public void onCollisionEnter(RigidBody2D other) {
-
-    }
 }
