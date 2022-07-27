@@ -6,11 +6,16 @@ import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
+import caramel.api.texture.mesh.CircleMesh;
+import caramel.api.texture.mesh.IcosahedronMesh;
+import caramel.api.texture.mesh.QuadMesh;
+import caramel.api.texture.mesh.TriangleMesh;
 import caramel.api.utils.Color;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import xyz.destiall.java.reflection.Reflect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +43,14 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
 public class Mesh {
-
+    public static final Class<? extends Mesh>[] MESHES = new Class[] {
+            CircleMesh.class, QuadMesh.class, TriangleMesh.class
+    };
     protected transient final List<Vertex> dirtyVertexArray;
     protected transient int vaoId, vboId, eboId;
     protected final List<Vertex> vertexArray;
     protected final List<Integer> elementArray;
-    public int type;
+
     protected String shader;
     protected String texture;
     protected Color color = new Color();
@@ -51,7 +58,11 @@ public class Mesh {
     protected boolean drawArrays = false;
     protected boolean withIndices = false;
 
+    public String name;
+    public int type;
+
     public Mesh() {
+        name = "Custom";
         vertexArray = new ArrayList<>();
         dirtyVertexArray = new ArrayList<>();
         elementArray = new ArrayList<>(6);
@@ -80,7 +91,13 @@ public class Mesh {
     }
 
     public Mesh copy() {
-        Mesh mesh = new Mesh(drawArrays);
+        Mesh mesh = new Mesh();
+        mesh.name = name;
+        mesh.drawArrays = drawArrays;
+        mesh.type = type;
+        mesh.texture = texture;
+        mesh.shader = shader;
+        mesh.dirty = dirty;
         for (Vertex vertex : vertexArray) {
             Vertex copy = new Vertex();
             copy.position.set(vertex.position);
@@ -90,10 +107,6 @@ public class Mesh {
             copy.texSlot = vertex.texSlot;
             mesh.vertexArray.add(copy);
         }
-        mesh.type = type;
-        mesh.texture = texture;
-        mesh.shader = shader;
-        mesh.dirty = dirty;
         mesh.elementArray.addAll(elementArray);
         mesh.build(withIndices);
         return mesh;
@@ -209,6 +222,9 @@ public class Mesh {
 
     public void build(boolean with_indices) {
         this.withIndices = with_indices;
+        if (name == null) {
+            name = "Custom";
+        }
         if (shader == null) {
             if (texture != null) {
                 shader = "default";

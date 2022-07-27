@@ -2,17 +2,25 @@ package caramel.api.texture.mesh;
 
 import caramel.api.math.Vertex;
 import caramel.api.texture.Mesh;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 
 public final class IcosahedronMesh extends Mesh {
+    private static final float t = (float)(1 + Math.sqrt(5.0)) / 2.0f;;
     private ArrayList<Vertex> baseVertices = new ArrayList<>();
     private ArrayList<Triangle> baseTriangles = new ArrayList<>();
-    private final float height;
+    private final float radius;
+    private final int subdivisions;
+
+    public IcosahedronMesh() {
+        this(1, 2);
+    }
 
     public IcosahedronMesh(float radius, int subdivisions) {
-        float t = (float)(1 + Math.sqrt(5.0)) / 2.0f;
-        height = radius;
+        name = "Icosahedron";
+        this.subdivisions = subdivisions;
+        this.radius = radius;
         Vertex v1 = new Vertex(-1, t, 0.0f);
         Vertex v2 = new Vertex(1, t, 0.0f);
         Vertex v3 = new Vertex(-1, -t, 0.0f);
@@ -54,22 +62,22 @@ public final class IcosahedronMesh extends Mesh {
         v16.normalize();
         v16.texCoords.x = 0;
 
-        v1.adjustHeight(height);
-        v2.adjustHeight(height);
-        v3.adjustHeight(height);
-        v4.adjustHeight(height);
-        v5.adjustHeight(height);
-        v6.adjustHeight(height);
-        v7.adjustHeight(height);
-        v8.adjustHeight(height);
-        v9.adjustHeight(height);
-        v10.adjustHeight(height);
-        v11.adjustHeight(height);
-        v12.adjustHeight(height);
-        v13.adjustHeight(height);
-        v14.adjustHeight(height);
-        v15.adjustHeight(height);
-        v16.adjustHeight(height);
+        v1.adjustHeight(this.radius);
+        v2.adjustHeight(this.radius);
+        v3.adjustHeight(this.radius);
+        v4.adjustHeight(this.radius);
+        v5.adjustHeight(this.radius);
+        v6.adjustHeight(this.radius);
+        v7.adjustHeight(this.radius);
+        v8.adjustHeight(this.radius);
+        v9.adjustHeight(this.radius);
+        v10.adjustHeight(this.radius);
+        v11.adjustHeight(this.radius);
+        v12.adjustHeight(this.radius);
+        v13.adjustHeight(this.radius);
+        v14.adjustHeight(this.radius);
+        v15.adjustHeight(this.radius);
+        v16.adjustHeight(this.radius);
 
         baseVertices.add(v1);
         baseVertices.add(v2);
@@ -127,11 +135,10 @@ public final class IcosahedronMesh extends Mesh {
         }
     }
 
-    void subdivide() {
+    public void subdivide() {
         ArrayList<Triangle> newTriangles = new ArrayList<>();
         ArrayList<Vertex> newVertices = new ArrayList<>(baseVertices);
-        for(int i=0;i<baseTriangles.size();)
-        {
+        for (int i = 0; i < baseTriangles.size(); ) {
             Triangle aTriangle = baseTriangles.get(i);
             baseTriangles.remove(aTriangle);
             subdivideTri(aTriangle, newTriangles, newVertices);
@@ -150,43 +157,43 @@ public final class IcosahedronMesh extends Mesh {
 
         Vertex v12 = v1.getMidVertex(v2);
         v12.normalize();
-        v12.adjustHeight(height);
+        v12.adjustHeight(radius);
         Vertex v23 = v2.getMidVertex(v3);
         v23.normalize();
-        v23.adjustHeight(height);
+        v23.adjustHeight(radius);
         Vertex v31 = v3.getMidVertex(v1);
         v31.normalize();
-        v31.adjustHeight(height);
+        v31.adjustHeight(radius);
 
-        if(tri.v1.texCoords.x == 0 && tri.v2.texCoords.x == 0)
+        if (tri.v1.texCoords.x == 0 && tri.v2.texCoords.x == 0)
             v12.texCoords.x = 0;
-        if(tri.v2.texCoords.x == 0 && tri.v3.texCoords.x == 0)
+        if (tri.v2.texCoords.x == 0 && tri.v3.texCoords.x == 0)
             v23.texCoords.x = 0;
-        if(tri.v1.texCoords.x == 0 && tri.v3.texCoords.x == 0)
+        if (tri.v1.texCoords.x == 0 && tri.v3.texCoords.x == 0)
             v31.texCoords.x = 0;
 
-        if(tri.v1.texCoords.x == 1 && tri.v2.texCoords.x == 1)
+        if (tri.v1.texCoords.x == 1 && tri.v2.texCoords.x == 1)
             v12.texCoords.x = 1;
-        if(tri.v2.texCoords.x == 1 && tri.v3.texCoords.x == 1)
+        if (tri.v2.texCoords.x == 1 && tri.v3.texCoords.x == 1)
             v23.texCoords.x = 1;
-        if(tri.v1.texCoords.x == 1 && tri.v3.texCoords.x == 1)
+        if (tri.v1.texCoords.x == 1 && tri.v3.texCoords.x == 1)
             v31.texCoords.x = 1;
 
         setPole(tri.v1,tri.v2,v12);
         setPole(tri.v2,tri.v3,v23);
         setPole(tri.v1,tri.v3,v31);
 
-        if(!nVertices.contains(v12))
+        if (!nVertices.contains(v12))
             nVertices.add(v12);
         else
             v12 = nVertices.get(nVertices.indexOf(v12));
 
-        if(!nVertices.contains(v23))
+        if (!nVertices.contains(v23))
             nVertices.add(v23);
         else
             v23 = nVertices.get(nVertices.indexOf(v23));
 
-        if(!nVertices.contains(v31))
+        if (!nVertices.contains(v31))
             nVertices.add(v31);
         else
             v31 = nVertices.get(nVertices.indexOf(v31));
@@ -199,5 +206,60 @@ public final class IcosahedronMesh extends Mesh {
 
     void setPole(Vertex v1, Vertex v2, Vertex v12) {
         v12.texCoords.x = (v1.texCoords.x + v2.texCoords.x)/2;
+    }
+
+    public static class Triangle {
+        public final Vertex v1,v2,v3;
+        public final Vector3f normal;
+        public Triangle(Vertex vert1, Vertex vert2, Vertex vert3) {
+            v1 = vert1;
+            v2 = vert2;
+            v3 = vert3;
+
+            Vertex v12 = new Vertex(v2);
+            v12.position.sub(v1.position);
+            Vertex v23 = new Vertex(v3);
+            v23.position.sub(v2.position);
+            normal = v12.position.cross(v23.position);
+            normal.normalize();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o)
+                return true;
+            if (o == null)
+                return false;
+            if (getClass() != o.getClass()) {
+                Vertex vert = (Vertex) o;
+                return vert.equals(v1) || vert.equals(v2) || vert.equals(v3);
+            } else {
+                Triangle tri = (Triangle) o;
+                return tri.v1.equals(v1) || tri.v2.equals(v2) || tri.v3.equals(v3);
+            }
+        }
+    }
+
+    @Override
+    public Mesh copy() {
+        IcosahedronMesh mesh = new IcosahedronMesh(radius, subdivisions);
+        mesh.name = name;
+        mesh.drawArrays = drawArrays;
+        mesh.type = type;
+        mesh.texture = texture;
+        mesh.shader = shader;
+        mesh.dirty = dirty;
+        for (Vertex vertex : vertexArray) {
+            Vertex copy = new Vertex();
+            copy.position.set(vertex.position);
+            copy.normal.set(vertex.normal);
+            copy.color.set(vertex.color);
+            copy.texCoords.set(vertex.texCoords);
+            copy.texSlot = vertex.texSlot;
+            mesh.vertexArray.add(copy);
+        }
+        mesh.elementArray.addAll(elementArray);
+        mesh.build(withIndices);
+        return mesh;
     }
 }

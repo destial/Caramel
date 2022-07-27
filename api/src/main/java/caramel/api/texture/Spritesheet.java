@@ -5,6 +5,7 @@ import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
 import caramel.api.render.Animation;
 import caramel.api.render.BatchRenderer;
+import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.Pair;
 import org.joml.Vector2f;
 
@@ -16,7 +17,6 @@ import java.util.Map;
 public final class Spritesheet {
     private transient List<Sprite> sprites;
     private transient Map<String, Animation> animations;
-    private transient Mesh mesh;
     private transient boolean loaded = false;
 
     private Map<String, Pair<Integer, Integer>> serializedAnimation;
@@ -26,6 +26,7 @@ public final class Spritesheet {
 
     public int currentIndex = 0;
     public String currentAnimation;
+    public Mesh mesh;
 
     public Spritesheet(String path, int columns, int rows) {
         this.columns = columns;
@@ -38,9 +39,11 @@ public final class Spritesheet {
         if (loaded) return;
         sprites = new ArrayList<>();
         animations = new HashMap<>();
-        mesh = MeshBuilder.createQuad(1);
-        mesh.build();
-        mesh.setTexture(path);
+        if (mesh == null) {
+            mesh = new QuadMesh(1);
+            mesh.setTexture(path);
+            mesh.build();
+        }
         Texture texture = mesh.getTexture();
         if (texture == null) return;
 
@@ -176,6 +179,9 @@ public final class Spritesheet {
 
     public Spritesheet copy() {
         Spritesheet spritesheet = new Spritesheet(path, columns, rows);
+        spritesheet.mesh = mesh.copy();
+        spritesheet.mesh.setTexture(path);
+        spritesheet.mesh.build();
         spritesheet.build();
         spritesheet.currentAnimation = currentAnimation;
         spritesheet.currentIndex = currentIndex;

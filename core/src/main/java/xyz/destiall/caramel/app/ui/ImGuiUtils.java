@@ -27,6 +27,7 @@ import org.lwjgl.PointerBuffer;
 import org.lwjgl.util.nfd.NFDPathSet;
 import org.lwjgl.util.nfd.NativeFileDialog;
 import xyz.destiall.caramel.app.editor.action.EditorAction;
+import xyz.destiall.java.reflection.Reflect;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -305,6 +306,52 @@ public final class ImGuiUtils {
         if (previous != null) {
             ImGui.sameLine();
             String name = previous.getClass().getSimpleName() + " (" + previous.gameObject.name + ")";
+            ImGui.text(name);
+        }
+
+        ImGui.columns(1);
+        ImGui.popID();
+
+        return find;
+    }
+
+    public static Mesh findMesh(String label, Mesh previous) {
+        ImGui.pushID(label);
+
+        ImGui.columns(2);
+        ImGui.setColumnWidth(0, width);
+        ImGui.text(label);
+        ImGui.nextColumn();
+        String id = "mesh_load";
+
+        if (ImGui.button("load")) {
+            ImGui.openPopup(id);
+        }
+
+        Mesh find = null;
+        if (ImGui.isPopupOpen(id)) {
+            if (ImGui.beginPopup(id)) {
+                if (ImGui.beginListBox("##list mesh")) {
+                    for (Class<? extends Mesh> clazz : Mesh.MESHES) {
+                        String name = clazz.getSimpleName().replace("Mesh", "");
+                        if (ImGui.selectable(name)) {
+                            find = (Mesh) Reflect.newInstance(clazz);
+                            ImGui.closeCurrentPopup();
+                            break;
+                        }
+                    }
+                }
+                if (ImGui.button("Close")) {
+                    ImGui.closeCurrentPopup();
+                }
+                ImGui.endListBox();
+            }
+            ImGui.endPopup();
+        }
+
+        if (previous != null) {
+            ImGui.sameLine();
+            String name = previous.name;
             ImGui.text(name);
         }
 
@@ -904,6 +951,41 @@ public final class ImGuiUtils {
             } else if (type == Mesh.class) {
                 Mesh mesh = (Mesh) value;
                 ImGui.text("shader: " + mesh.getShader().getPath());
+                Mesh newMesh = findMesh(name, mesh);
+                if (newMesh != null) {
+                    newMesh.setTexture(mesh.getTexture() != null ? mesh.getTexturePath() : null);
+                    newMesh.build();
+                    Mesh finalMesh = mesh;
+                    EditorAction action = new EditorAction(scene) {
+                        private final Mesh redo = finalMesh;
+                        @Override
+                        public void undo() {
+                            try {
+                                field.set(component, redo);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        @Override
+                        public void redo() {
+                            try {
+                                field.set(component, newMesh);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+                    scene.addUndoAction(action);
+                    field.set(component, newMesh);
+                    if (invokeMethods != null) {
+                        for (String method : invokeMethods) {
+                            component.sendMessage(method);
+                        }
+                    }
+                    mesh = newMesh;
+                }
+
                 String path = findFile("texture", "Load Texture", ".png,.jpeg,.jpg");
 
                 if (mesh.getTexture() != null) {
@@ -911,6 +993,7 @@ public final class ImGuiUtils {
                     ImGui.text(mesh.getTexturePath());
                 }
 
+                Mesh finalMesh = mesh;
                 if (path != null) {
                     String previous = mesh.getTexture() != null ? mesh.getTexturePath() : null;
                     if (path.isEmpty()) {
@@ -918,7 +1001,7 @@ public final class ImGuiUtils {
                             @Override
                             public void undo() {
                                 try {
-                                    mesh.setTexture(previous);
+                                    finalMesh.setTexture(previous);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -927,7 +1010,7 @@ public final class ImGuiUtils {
                             @Override
                             public void redo() {
                                 try {
-                                    mesh.setTexture(null);
+                                    finalMesh.setTexture(null);
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -948,7 +1031,7 @@ public final class ImGuiUtils {
                                 @Override
                                 public void undo() {
                                     try {
-                                        mesh.setTexture(previous);
+                                        finalMesh.setTexture(previous);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -957,7 +1040,7 @@ public final class ImGuiUtils {
                                 @Override
                                 public void redo() {
                                     try {
-                                        mesh.setTexture(null);
+                                        finalMesh.setTexture(null);
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -981,6 +1064,31 @@ public final class ImGuiUtils {
                     if (map != null) {
                         List<String> animation = map.values().stream().map(Animation::toString).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
                         drawList(name, animation);
+                    }
+
+                    Mesh newMesh = findMesh("mesh", sheet.mesh);
+                    if (newMesh != null) {
+                        newMesh.setTexture(sheet.mesh.getTexture() != null ? sheet.mesh.getTexturePath() : null);
+                        newMesh.build();
+                        Mesh finalMesh = sheet.mesh;
+                        EditorAction action = new EditorAction(scene) {
+                            @Override
+                            public void undo() {
+                                sheet.mesh = newMesh;
+                            }
+
+                            @Override
+                            public void redo() {
+                                sheet.mesh = finalMesh;
+                            }
+                        };
+                        scene.addUndoAction(action);
+                        sheet.mesh = newMesh;
+                        if (invokeMethods != null) {
+                            for (String method : invokeMethods) {
+                                component.sendMessage(method);
+                            }
+                        }
                     }
                 }
 

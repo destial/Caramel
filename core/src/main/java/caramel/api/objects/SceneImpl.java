@@ -1,15 +1,18 @@
 package caramel.api.objects;
 
 import caramel.api.Application;
+import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Light;
 import caramel.api.components.UICamera;
+import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.render.BatchRenderer;
+import caramel.api.scripts.Script;
 import caramel.api.utils.Pair;
 import imgui.ImGui;
 import org.joml.Vector3f;
@@ -28,7 +31,10 @@ import xyz.destiall.caramel.app.physics.Physics2D;
 import xyz.destiall.caramel.app.physics.Physics3D;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -204,21 +210,7 @@ public final class SceneImpl extends Scene {
 
     @Override
     public void editorUpdate() {
-        if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Z)) {
-            undoLastAction();
-        }
-
-        if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Y)) {
-            redoLastAction();
-        }
-
         editorCamera.gameObject.update();
-        lights = gameObjects.stream()
-                .map(g -> g.getComponentsInChildren(Light.class))
-                .reduce(new HashSet<>(), (s, l) -> {
-                    s.addAll(l);
-                    return s;
-                });
 
         if (playing) {
             for (GameObject go : gameObjects) {
@@ -231,6 +223,14 @@ public final class SceneImpl extends Scene {
             for (GameObject go : gameObjects) go.lateUpdate();
 
         } else {
+            if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Z)) {
+                undoLastAction();
+            }
+
+            if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Y)) {
+                redoLastAction();
+            }
+
             for (GameObject go : gameObjects) {
                 go.editorUpdate();
                 if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
@@ -264,6 +264,37 @@ public final class SceneImpl extends Scene {
             }
             physics.get(physicsMode).addGameObject(clone);
         }
+
+        for (GameObject clone : gameObjects) {
+            for (Component component : clone.getMutableComponents()) {
+                if (component instanceof Script) {
+                    try {
+                        for (Field field : component.getClass().getDeclaredFields()) {
+                            if (Modifier.isTransient(field.getModifiers()) || !Component.class.isAssignableFrom(field.getType())) continue;
+                            field.setAccessible(true);
+                            Component value = (Component) field.get(component);
+                            if (value != null) {
+                                for (GameObject def : defaultGameObjects) {
+                                    boolean b = false;
+                                    for (Component c : def.getMutableComponents()) {
+                                        if (value == c) {
+                                            Component clonedComponent = gameObjects.stream().filter(g -> g.id == def.id).findFirst().get().getComponent((Class<? extends Component>) field.getType());
+                                            field.set(component, clonedComponent);
+                                            b = true;
+                                            break;
+                                        }
+                                    }
+                                    if (b) break;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
         gameCamera = null;
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }

@@ -7,7 +7,7 @@ import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.objects.GameObject;
 import caramel.api.texture.Mesh;
-import caramel.api.texture.MeshBuilder;
+import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.Color;
 import imgui.ImGui;
 import org.joml.Matrix3d;
@@ -72,7 +72,7 @@ public final class Button extends Renderer {
     @Override
     public void render(Camera camera) {
         if (mesh == null) {
-            mesh = MeshBuilder.createQuad(1);
+            mesh = new QuadMesh(1);
             setColor();
             mesh.build();
         }

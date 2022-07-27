@@ -152,7 +152,6 @@
               1,
               3
             ],
-            "type": 4,
             "shader": "defaultBatch",
             "color": {
               "r": 1.0,
@@ -162,7 +161,9 @@
             },
             "dirty": false,
             "drawArrays": false,
-            "withIndices": true
+            "withIndices": true,
+            "name": "Custom",
+            "type": 4
           },
           "pos": {
             "x": -3.889916,
@@ -275,22 +276,22 @@
         {
           "velocity": {
             "joml": {
-              "x": -0.085321985,
-              "y": 0.0
+              "x": -6.378976,
+              "y": 1.7284598
             },
             "jbox2d": {
-              "x": -0.085321985,
-              "y": 0.0
+              "x": -6.378976,
+              "y": 1.7284598
             },
             "imgui": {
-              "x": -0.085321985,
-              "y": 0.0
+              "x": -6.378976,
+              "y": 1.7284598
             }
           },
           "angularDamping": 0.8,
           "linearDamping": 0.9,
           "mass": 0.5,
-          "friction": 0.0,
+          "friction": 0.2,
           "fixedRotation": true,
           "continuousCollision": false,
           "isTrigger": false,
@@ -332,13 +333,134 @@
             "path": "assets/textures/player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 2,
-            "currentAnimation": "anim5"
+            "currentIndex": 0,
+            "currentAnimation": "anim0",
+            "mesh": {
+              "vertexArray": [
+                {
+                  "position": {
+                    "x": 0.5,
+                    "y": -0.5,
+                    "z": 0.0
+                  },
+                  "texCoords": {
+                    "x": 0.33333334,
+                    "y": 0.16666667
+                  },
+                  "color": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  },
+                  "normal": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "texSlot": 0.0,
+                  "height": 0.0
+                },
+                {
+                  "position": {
+                    "x": -0.5,
+                    "y": 0.5,
+                    "z": 0.0
+                  },
+                  "texCoords": {
+                    "x": 0.0,
+                    "y": 0.0
+                  },
+                  "color": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  },
+                  "normal": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "texSlot": 0.0,
+                  "height": 0.0
+                },
+                {
+                  "position": {
+                    "x": 0.5,
+                    "y": 0.5,
+                    "z": 0.0
+                  },
+                  "texCoords": {
+                    "x": 0.33333334,
+                    "y": 0.0
+                  },
+                  "color": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  },
+                  "normal": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "texSlot": 0.0,
+                  "height": 0.0
+                },
+                {
+                  "position": {
+                    "x": -0.5,
+                    "y": -0.5,
+                    "z": 0.0
+                  },
+                  "texCoords": {
+                    "x": 0.0,
+                    "y": 0.16666667
+                  },
+                  "color": {
+                    "r": 1.0,
+                    "g": 1.0,
+                    "b": 1.0,
+                    "a": 1.0
+                  },
+                  "normal": {
+                    "x": 0.0,
+                    "y": 0.0,
+                    "z": 0.0
+                  },
+                  "texSlot": 0.0,
+                  "height": 0.0
+                }
+              ],
+              "elementArray": [
+                2,
+                1,
+                0,
+                0,
+                1,
+                3
+              ],
+              "shader": "defaultBatch",
+              "texture": "assets/textures/player.png",
+              "color": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+              },
+              "dirty": true,
+              "drawArrays": false,
+              "withIndices": true,
+              "name": "Quad",
+              "type": 4
+            }
           },
           "texture": {
             "path": "assets/textures/uvmap.jpg"
           },
-          "index": 2,
+          "index": 0,
           "animation": "anim0",
           "columns": 3,
           "rows": 6,
@@ -371,6 +493,7 @@
         },
         {
           "score": 0,
+          "maxScore": 0,
           "clazz": "scripts.AnimationUpdate",
           "id": 53,
           "enabled": true,
@@ -392,32 +515,6 @@
           "enabled": true
         },
         {
-          "target": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0
-          },
-          "rotate": false,
-          "isEditor": false,
-          "forward": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": -1.0
-          },
-          "up": {
-            "x": 0.0,
-            "y": 1.0,
-            "z": 0.0
-          },
-          "fov": 60.0,
-          "near": 0.1,
-          "far": 1000.0,
-          "zoom": 1.0,
-          "clazz": "caramel.api.components.Camera",
-          "id": 1083,
-          "enabled": true
-        },
-        {
           "radius": 0.5,
           "offset": {
             "x": 0.0,
@@ -426,7 +523,7 @@
           },
           "collisionRender": false,
           "clazz": "caramel.api.physics.components.Circle2DCollider",
-          "id": 1096,
+          "id": 1343,
           "enabled": true
         }
       ],
@@ -592,7 +689,6 @@
               1,
               3
             ],
-            "type": 4,
             "shader": "defaultBatch",
             "color": {
               "r": 1.0,
@@ -602,7 +698,9 @@
             },
             "dirty": true,
             "drawArrays": false,
-            "withIndices": true
+            "withIndices": true,
+            "name": "Custom",
+            "type": 4
           },
           "hoverColor": {
             "r": 1.0,
@@ -1791,7 +1889,6 @@
               36,
               37
             ],
-            "type": 4,
             "shader": "defaultBatch",
             "texture": "assets/textures/floosh.png",
             "color": {
@@ -1800,9 +1897,11 @@
               "b": 1.0,
               "a": 1.0
             },
-            "dirty": false,
+            "dirty": true,
             "drawArrays": false,
-            "withIndices": true
+            "withIndices": true,
+            "name": "Circle",
+            "type": 4
           },
           "pos": {
             "x": -6.6333976,
@@ -1839,16 +1938,16 @@
         {
           "velocity": {
             "joml": {
-              "x": 0.37768602,
-              "y": -16.709858
+              "x": -6.561018,
+              "y": 6.9113955
             },
             "jbox2d": {
-              "x": 0.37768602,
-              "y": -16.709858
+              "x": -6.561018,
+              "y": 6.9113955
             },
             "imgui": {
-              "x": 0.37768602,
-              "y": -16.709858
+              "x": -6.561018,
+              "y": 6.9113955
             }
           },
           "angularDamping": 0.2,
@@ -1869,6 +1968,32 @@
           "clazz": "scripts.FloorHit",
           "id": 1318,
           "enabled": true
+        },
+        {
+          "target": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "rotate": false,
+          "isEditor": false,
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "fov": 60.0,
+          "near": 0.01,
+          "far": 1000.0,
+          "zoom": 1.5,
+          "clazz": "caramel.api.components.Camera",
+          "id": 1319,
+          "enabled": true
         }
       ],
       "children": [],
@@ -1880,8 +2005,8 @@
       "components": [
         {
           "position": {
-            "x": 3.0191412,
-            "y": 2.5648909,
+            "x": 2.2995362,
+            "y": 2.564891,
             "z": -1.0
           },
           "localPosition": {
@@ -1891,12 +2016,12 @@
           },
           "rotation": {
             "x": 0.0,
-            "y": 0.0,
-            "z": -1.57648
+            "y": -0.0,
+            "z": -1.3824928
           },
           "scale": {
-            "x": 13.839712,
-            "y": 0.6492983,
+            "x": 13.839714,
+            "y": 0.6492985,
             "z": 1.0
           },
           "forward": {
@@ -2027,7 +2152,6 @@
               1,
               3
             ],
-            "type": 4,
             "shader": "defaultBatch",
             "color": {
               "r": 1.0,
@@ -2037,21 +2161,23 @@
             },
             "dirty": false,
             "drawArrays": false,
-            "withIndices": true
+            "withIndices": true,
+            "name": "Custom",
+            "type": 4
           },
           "pos": {
-            "x": 3.0191412,
-            "y": 2.5648909,
+            "x": 2.2995362,
+            "y": 2.564891,
             "z": -1.0
           },
           "rot": {
             "x": 0.0,
-            "y": 0.0,
-            "z": -1.57648
+            "y": -0.0,
+            "z": -1.3824928
           },
           "sca": {
-            "x": 13.839712,
-            "y": 0.6492983,
+            "x": 13.839714,
+            "y": 0.6492985,
             "z": 1.0
           },
           "renderState": "WORLD",
@@ -2306,7 +2432,6 @@
               1,
               3
             ],
-            "type": 4,
             "shader": "defaultBatch",
             "color": {
               "r": 1.0,
@@ -2316,7 +2441,9 @@
             },
             "dirty": false,
             "drawArrays": false,
-            "withIndices": true
+            "withIndices": true,
+            "name": "Custom",
+            "type": 4
           },
           "pos": {
             "x": -3.735556,
@@ -2348,8 +2475,8 @@
       "components": [
         {
           "position": {
-            "x": -10.49363,
-            "y": 2.6416981,
+            "x": -9.808293,
+            "y": 2.5740106,
             "z": -1.0
           },
           "localPosition": {
@@ -2359,12 +2486,12 @@
           },
           "rotation": {
             "x": 0.0,
-            "y": -0.0,
-            "z": -1.57648
+            "y": 0.0,
+            "z": -1.7953401
           },
           "scale": {
             "x": 13.839712,
-            "y": 0.6492983,
+            "y": 0.6492987,
             "z": 1.0
           },
           "forward": {
@@ -2540,7 +2667,6 @@
               1,
               3
             ],
-            "type": 4,
             "shader": "defaultBatch",
             "color": {
               "r": 1.0,
@@ -2550,21 +2676,23 @@
             },
             "dirty": false,
             "drawArrays": false,
-            "withIndices": true
+            "withIndices": true,
+            "name": "Custom",
+            "type": 4
           },
           "pos": {
-            "x": -10.49363,
-            "y": 2.6416981,
+            "x": -9.808293,
+            "y": 2.5740106,
             "z": -1.0
           },
           "rot": {
             "x": 0.0,
-            "y": -0.0,
-            "z": -1.57648
+            "y": 0.0,
+            "z": -1.7953401
           },
           "sca": {
             "x": 13.839712,
-            "y": 0.6492983,
+            "y": 0.6492987,
             "z": 1.0
           },
           "renderState": "WORLD",
@@ -2583,8 +2711,8 @@
     "components": [
       {
         "position": {
-          "x": -0.008084379,
-          "y": 0.24682945,
+          "x": -1.4688114,
+          "y": 1.6673336,
           "z": 0.696156
         },
         "localPosition": {
@@ -2622,9 +2750,9 @@
         "mouseY": 0.0,
         "sensitivity": 0.5,
         "target": {
-          "x": 2.1317258E-14,
-          "y": 9.911852E-15,
-          "z": -0.9999969
+          "x": 1.4E-45,
+          "y": 1.4E-45,
+          "z": -1.0
         },
         "rotate": false,
         "isEditor": true,

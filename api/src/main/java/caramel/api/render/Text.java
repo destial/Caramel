@@ -37,6 +37,7 @@ public final class Text extends Renderer {
 
     public Text(GameObject gameObject) {
         super(gameObject);
+        renderState = State.UI;
     }
 
     @Override

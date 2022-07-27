@@ -12,9 +12,12 @@ import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
 import caramel.api.render.Button;
 import caramel.api.render.MeshRenderer;
+import caramel.api.render.Renderer;
 import caramel.api.render.Text;
 import caramel.api.texture.Mesh;
-import caramel.api.texture.MeshBuilder;
+import caramel.api.texture.mesh.CircleMesh;
+import caramel.api.texture.mesh.IcosahedronMesh;
+import caramel.api.texture.mesh.TriangleMesh;
 import imgui.ImGui;
 import imgui.ImVec2;
 import imgui.flag.ImGuiCol;
@@ -180,28 +183,11 @@ public final class HierarchyPanel extends Panel {
                 addingGameObjectHierarchy = false;
             }
 
-            if (ImGui.selectable("New 3D Sphere")) {
-                GameObject go = new GameObjectImpl(scene);
-                go.name.set("Sphere");
-                MeshRenderer renderer = new MeshRenderer(go);
-                Mesh mesh = MeshBuilder.createIcosahedron(1, 2);
-                renderer.setMesh(mesh);
-                mesh.build();
-
-                go.addComponent(renderer);
-
-                AddGameObjects addGameObjects = new AddGameObjects(scene);
-                scene.addGameObject(go);
-                addGameObjects.added.add(go);
-                scene.addUndoAction(addGameObjects);
-                addingGameObjectHierarchy = false;
-            }
-
             if (ImGui.selectable("New 2D Circle")) {
                 GameObject go = new GameObjectImpl(scene);
                 go.name.set("Circle");
                 MeshRenderer renderer = new MeshRenderer(go);
-                Mesh mesh = MeshBuilder.createCircle(0.5f, 36);
+                Mesh mesh = new CircleMesh(0.5f, 36);
                 renderer.setMesh(mesh);
                 mesh.build();
                 RigidBody2D rigidBody = new RigidBody2D(go);
@@ -210,6 +196,44 @@ public final class HierarchyPanel extends Panel {
                 go.addComponent(renderer);
                 go.addComponent(rigidBody);
                 go.addComponent(CircleCollider);
+
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.selectable("New 2D Triangle")) {
+                GameObject go = new GameObjectImpl(scene);
+                go.name.set("Circle");
+                MeshRenderer renderer = new MeshRenderer(go);
+                Mesh mesh = new TriangleMesh();
+                renderer.setMesh(mesh);
+                mesh.build();
+                RigidBody2D rigidBody = new RigidBody2D(go);
+                Circle2DCollider CircleCollider = new Circle2DCollider(go);
+
+                go.addComponent(renderer);
+                go.addComponent(rigidBody);
+                go.addComponent(CircleCollider);
+
+                AddGameObjects addGameObjects = new AddGameObjects(scene);
+                scene.addGameObject(go);
+                addGameObjects.added.add(go);
+                scene.addUndoAction(addGameObjects);
+                addingGameObjectHierarchy = false;
+            }
+
+            if (ImGui.selectable("New 3D Sphere")) {
+                GameObject go = new GameObjectImpl(scene);
+                go.name.set("Sphere");
+                MeshRenderer renderer = new MeshRenderer(go);
+                Mesh mesh = new IcosahedronMesh(1, 2);
+                renderer.setMesh(mesh);
+                mesh.build();
+
+                go.addComponent(renderer);
 
                 AddGameObjects addGameObjects = new AddGameObjects(scene);
                 scene.addGameObject(go);
@@ -244,8 +268,6 @@ public final class HierarchyPanel extends Panel {
                 Text renderer = new Text(text);
                 text.transform.scale.x = 0.025f;
                 text.transform.scale.y = 0.025f;
-                text.transform.localPosition.x = -1.25f;
-                text.transform.localPosition.y = -0.2f;
                 text.addComponent(renderer);
 
                 button.children.add(text);
