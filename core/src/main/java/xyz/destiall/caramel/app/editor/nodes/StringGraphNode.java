@@ -3,7 +3,7 @@ package xyz.destiall.caramel.app.editor.nodes;
 import caramel.api.components.VisualScript;
 
 public class StringGraphNode extends GraphNode<String> {
-    public String value;
+    public String value = "string";
     public StringGraphNode(int nodeId) {
         super(nodeId);
     }

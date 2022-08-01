@@ -20,7 +20,6 @@ public class FloatGraphNode extends GraphNode<Float> {
 
     @Override
     public boolean execute(VisualScript script, Graph graph) {
-
         return false;
     }
 }

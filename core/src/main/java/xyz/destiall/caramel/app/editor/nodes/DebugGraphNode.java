@@ -4,7 +4,7 @@ import caramel.api.components.VisualScript;
 import caramel.api.debug.Debug;
 
 public class DebugGraphNode extends GraphNode<String> {
-    public String value;
+    public String value = "Debug";
     public DebugGraphNode(int nodeId) {
         super(nodeId);
     }
@@ -21,7 +21,7 @@ public class DebugGraphNode extends GraphNode<String> {
 
     @Override
     public boolean execute(VisualScript script, Graph graph) {
-        Debug.log("Debugger");
+        Debug.log(value);
         return false;
     }
 }

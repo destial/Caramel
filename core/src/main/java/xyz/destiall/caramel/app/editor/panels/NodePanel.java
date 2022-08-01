@@ -69,8 +69,6 @@ public final class NodePanel extends Panel {
 
             boolean save = ImGui.button("save");
 
-
-
             if (ImGui.button("close")) {
                 currentGraph.save(ImNodes.saveCurrentEditorStateToIniString());
                 currentGraph = null;
@@ -97,15 +95,15 @@ public final class NodePanel extends Panel {
                 if (!(node instanceof UpdateGraphNode) && !(node instanceof StartGraphNode)) {
                     if (node instanceof BooleanGraphNode) {
                         ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
-                        ImGui.text("run");
+                        ImGui.text("Run");
                         ImNodes.endInputAttribute();
 
                         ImNodes.beginInputAttribute(((BooleanGraphNode) node).getInputPinLeft(), ImNodesPinShape.CircleFilled);
-                        ImGui.text("first");
+                        ImGui.text("First");
                         ImNodes.endInputAttribute();
 
                         ImNodes.beginInputAttribute(((BooleanGraphNode) node).getInputPinRight(), ImNodesPinShape.CircleFilled);
-                        ImGui.text("second");
+                        ImGui.text("Second");
 
                     } else if (node instanceof IntGraphNode) {
                         ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
@@ -127,10 +125,10 @@ public final class NodePanel extends Panel {
                         ImGui.inputText("string", string);
                         ((StringGraphNode) node).setValue(string.get());
                     }
-                } else {
-                    if (node.getValue() != null) {
-                        ImGui.text(node.getValue().toString());
-                    }
+                } else if (node instanceof DebugGraphNode) {
+                    ImString string = new ImString(((DebugGraphNode) node).getValue());
+                    ImGui.inputText("debug", string);
+                    ((DebugGraphNode) node).setValue(string.get());
                 }
 
                 if (!(node instanceof DebugGraphNode)) {
@@ -189,7 +187,7 @@ public final class NodePanel extends Panel {
                     GraphNode<?> node = currentGraph.getNode(targetNode);
                     if (node != null) {
                         if (ImGui.button("Delete " + node.getName())) {
-                            currentGraph.getNodes().remove(node);
+                            currentGraph.deleteNode(targetNode);
                             ImGui.closeCurrentPopup();
                         }
                     }

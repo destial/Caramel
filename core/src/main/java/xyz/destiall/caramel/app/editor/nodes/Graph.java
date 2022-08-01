@@ -1,7 +1,6 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
 import caramel.api.components.VisualScript;
-import caramel.api.debug.Debug;
 
 import java.util.Collection;
 import java.util.Set;
@@ -13,7 +12,7 @@ public final class Graph {
     private int nextLinkId = 1;
     private final Set<GraphNode<?>> nodes;
     private final Set<Link> links;
-    public String ini = "";
+    public String ini;
 
     public Graph() {
         nodes = ConcurrentHashMap.newKeySet();
@@ -122,19 +121,21 @@ public final class Graph {
 
     public GraphNode<?> findNodeByInput(int pin) {
         return nodes.stream().filter(n -> {
-            if (n.getInputPinId() == pin) {
-                return true;
-            }
             if (n instanceof BooleanGraphNode) {
                 BooleanGraphNode b = (BooleanGraphNode) n;
                 return b.getInputPinLeft() == pin || b.getInputPinRight() == pin;
             }
-            return false;
+            return n.getInputPinId() == pin;
         }).findFirst().orElse(null);
     }
 
     public void unlink(int id) {
         links.removeIf(l -> l.getId() == id);
+    }
+
+    public void deleteNode(int id) {
+        GraphNode<?> node = getNode(id);
+        nodes.remove(node);
     }
 
     public Collection<Link> getLinks() {
