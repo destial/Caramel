@@ -2,16 +2,20 @@ package xyz.destiall.caramel.app.editor.panels;
 
 import caramel.api.debug.DebugImpl;
 import caramel.api.objects.SceneImpl;
+import caramel.api.render.Shader;
 import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
+import imgui.flag.ImGuiWindowFlags;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 
 import java.io.File;
+import java.util.Map;
 
 public final class MenuBarPanel extends Panel {
+    private boolean shaderTools = false;
     public MenuBarPanel(SceneImpl scene) {
         super(scene);
     }
@@ -93,6 +97,28 @@ public final class MenuBarPanel extends Panel {
             ImGui.endMenu();
         }
 
+        if (ImGui.beginMenu("Tools")) {
+            if (ImGui.menuItem("Shaders")) {
+                shaderTools = true;
+            }
+            ImGui.endMenu();
+        }
+
+        if (shaderTools && ImGui.begin("Shader Tools", ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoSavedSettings)) {
+            for (Map.Entry<String, Shader> entry : Shader.getShaders().entrySet()) {
+                if (ImGui.button("Recompile")) {
+                    entry.getValue().recompile();
+                }
+                ImGui.sameLine();
+                ImGui.text(entry.getKey());
+            }
+            ImGui.separator();
+            if (ImGui.button("Close")) {
+                shaderTools = false;
+            }
+            ImGui.end();
+        }
+
         if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
             if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
                 if (ImGuiFileDialog.isOk()) {
@@ -123,6 +149,7 @@ public final class MenuBarPanel extends Panel {
         } else if (scene.isPlaying() && ImGui.button("Stop")) {
             scene.stop();
         }
+
         ImGui.endMainMenuBar();
     }
 }

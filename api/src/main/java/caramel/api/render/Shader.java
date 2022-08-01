@@ -11,6 +11,7 @@ import java.nio.FloatBuffer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_FALSE;
@@ -50,9 +51,14 @@ public final class Shader {
 
     private Shader(String filePath) {
         this.path = filePath;
+        loadSource();
+    }
+
+    public void loadSource() {
+        if (compiled) return;
         String source = null;
-        String path = "assets/shaders/" + filePath;
-        FileIO.saveResource(filePath, path);
+        String path = "assets/shaders/" + this.path;
+        FileIO.saveResource(this.path, path);
         try {
             source = new String(Files.readAllBytes(Paths.get(path)));
         } catch (IOException e) {
@@ -132,6 +138,13 @@ public final class Shader {
         return true;
     }
 
+    public void recompile() {
+        detach();
+        invalidate(false);
+        loadSource();
+        compile();
+    }
+
     public void attach() {
         glUseProgram(shaderProgram);
     }
@@ -140,14 +153,14 @@ public final class Shader {
         glUseProgram(0);
     }
 
-    public void invalidate() {
-        glDeleteProgram(shaderProgram);
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+    public void invalidate(boolean remove) {
+        if (shaderProgram != 0) glDeleteProgram(shaderProgram);
+        if (vertexShader != 0) glDeleteShader(vertexShader);
+        if (fragmentShader != 0) glDeleteShader(fragmentShader);
         shaderProgram = 0;
         vertexShader = 0;
         fragmentShader = 0;
-        SHADERS.remove(path.substring(0, path.length() - ".glsl".length()));
+        if (remove) SHADERS.remove(path.substring(0, path.length() - ".glsl".length()));
         compiled = false;
     }
 
@@ -182,7 +195,7 @@ public final class Shader {
         return path;
     }
 
-    private static final HashMap<String, Shader> SHADERS = new HashMap<>();
+    private static final Map<String, Shader> SHADERS = new HashMap<>();
 
     public static void invalidateAll() {
         for (Shader shader : SHADERS.values()) {
@@ -194,6 +207,10 @@ public final class Shader {
             shader.fragmentShader = 0;
         }
         SHADERS.clear();
+    }
+
+    public static Map<String, Shader> getShaders() {
+        return SHADERS;
     }
 
     public static Shader getShader(String name) {

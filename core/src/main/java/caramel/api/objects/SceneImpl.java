@@ -12,6 +12,7 @@ import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.render.BatchRenderer;
+import caramel.api.render.Shader;
 import caramel.api.scripts.Script;
 import caramel.api.utils.Pair;
 import imgui.ImGui;

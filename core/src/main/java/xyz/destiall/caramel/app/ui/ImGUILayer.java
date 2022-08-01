@@ -246,7 +246,7 @@ public final class ImGUILayer {
                 ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBringToFrontOnFocus |
-                ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground;
+                ImGuiWindowFlags.NoNavFocus;
 
         ImGui.setNextWindowPos(0f, 0f, ImGuiCond.Always);
         ImGui.setNextWindowSize(window.getWidth(), window.getHeight());
