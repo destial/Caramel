@@ -1,9 +1,14 @@
 package caramel.api.objects;
 
+import caramel.api.Component;
 import caramel.api.components.Transform;
 
 import java.io.File;
 
+/**
+ * This represents a group of {@link Component}s in one object that is not linked to any scene.
+ * This can also contain children {@link Prefab}s.
+ */
 public abstract class Prefab extends GameObject {
     protected final File file;
 

@@ -66,7 +66,7 @@ public final class Shader {
 
         String[] shadertype = new String[splitString.length - 1];
         int count = 1;
-        int startPos = 0;
+        int startPos;
         int endPos = 0;
         while (count < splitString.length) {
             startPos = source.indexOf("#type", endPos) + 6;
@@ -148,6 +148,7 @@ public final class Shader {
         vertexShader = 0;
         fragmentShader = 0;
         SHADERS.remove(path.substring(0, path.length() - ".glsl".length()));
+        compiled = false;
     }
 
     public void uploadMat4f(String name, Matrix4f matrix) {

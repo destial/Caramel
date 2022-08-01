@@ -4,6 +4,9 @@ import imgui.ImVec2;
 import org.jbox2d.common.Vec2;
 import org.joml.Vector2f;
 
+/**
+ * Math wrapper for the API to convert into each specific library.
+ */
 public final class Vector2 {
     private final Vector2f joml;
     private final Vec2 jbox2d;
@@ -36,7 +39,7 @@ public final class Vector2 {
     }
 
     public Vector2(Vector2 value) {
-        this(value.x(), value.y());
+        this(value == null ? 0f : value.x(), value == null ? 0f : value.y());
     }
 
     public void set(float x, float y) {

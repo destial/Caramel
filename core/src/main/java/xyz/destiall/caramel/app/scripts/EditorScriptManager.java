@@ -118,28 +118,9 @@ public final class EditorScriptManager implements ScriptManager, Listener {
 
     @Override
     public InternalScript reloadScript(File file) {
-        if (file.getName().endsWith(".java")) {
-            String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
-            InternalScript previous = loader.removeScript(scriptName);
-            if (previous != null) {
-                Payload.COMPONENTS.remove(previous.getCompiledClass());
-            }
-            try {
-                InternalScript compiledScript = loader.compile(file);
-                if (compiledScript.getCompiledClass().isAssignableFrom(Script.class)) {
-                    DebugImpl.logError("Script " + scriptName + " does not inherit Script class!");
-                    return null;
-                }
-                Payload.COMPONENTS.add(compiledScript.getCompiledClass());
-                return compiledScript;
-            } catch (Exception e) {
-                DebugImpl.logError(e.getMessage());
-                if (previous != null) {
-                    Payload.COMPONENTS.add(previous.getCompiledClass());
-                }
-            }
-        }
-        return null;
+        String contents = FileIO.readData(file);
+        if (contents == null) return null;
+        return reloadScript(file, contents);
     }
 
     @Override
@@ -236,10 +217,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 }
                 if (script != null && event.getType() == FileEvent.Type.MODIFY) {
                     try {
-                        InternalScript newScript = reloadScript(file);
-                        if (newScript != null) {
-                            loadComponents(script, newScript);
-                        }
+                        reloadScript(file);
                         System.gc();
                     } catch (Exception e) {
                         DebugImpl.logError(e.getMessage());
@@ -252,8 +230,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 awaitingCompilation.remove(file.getName());
             } else {
                 if (script != null) {
-                    Scene scene = ApplicationImpl.getApp().getCurrentScene();
-                    if (scene != null) {
+                    for (Scene scene : ApplicationImpl.getApp().getScenes()) {
                         scene.forEachGameObject(go -> go.removeComponent(script.getCompiledClass()));
                     }
                     loader.removeScript(scriptName);

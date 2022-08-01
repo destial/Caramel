@@ -22,6 +22,11 @@ public final class MenuBarPanel extends Panel {
         Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
         Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
         if (ImGui.beginMenu("File")) {
+            if (ImGui.menuItem("New Scene")) {
+                SceneImpl newScene = ApplicationImpl.getApp().newScene();
+                ApplicationImpl.getApp().setTitle(newScene.name);
+            }
+
             if (ImGui.menuItem("Open Scene")) {
                 if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
                     ImGuiFileDialog.openModal("open-scene", "Open Scene", ".caramel", ".", new ImGuiFileDialogPaneFun() {

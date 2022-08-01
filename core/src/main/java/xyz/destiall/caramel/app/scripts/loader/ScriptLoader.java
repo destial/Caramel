@@ -45,7 +45,6 @@ public final class ScriptLoader {
     }
 
     public InternalScript get(String name) {
-        Debug.console("Searching for script " + name);
         Map.Entry<String, ScriptClassLoader> entry = loaders.entrySet().stream().filter(en -> en.getKey().endsWith(name)).findFirst().orElse(null);
         if (entry == null) return null;
         return entry.getValue().script;
@@ -141,6 +140,7 @@ public final class ScriptLoader {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            scriptManager.loadComponents(previous.script, loader.script);
         }
         loaders.put(fullClassName, loader);
         setClass(fullClassName, loader.script.getCompiledClass());
@@ -148,16 +148,11 @@ public final class ScriptLoader {
         return loader.script;
     }
 
-    public InternalScript compile(File file) throws ScriptException, FileNotFoundException, MalformedURLException {
-        if (!file.exists()) throw new FileNotFoundException();
-        String code = FileIO.readData(file);
-        return compile(file, code);
-    }
-
     private static final Pattern NAME_PATTERN = Pattern.compile("public\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
+    private static final Pattern NAME_FINAL_PATTERN = Pattern.compile("public\\s+final\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");
 
-    private String getFullName(File file, String script) throws ScriptException {
+    private String getFullName(File file, String script) {
         String fullPackage = null;
         Matcher packageMatcher = PACKAGE_PATTERN.matcher(script);
         if (packageMatcher.find()) {
@@ -173,15 +168,18 @@ public final class ScriptLoader {
                 return fullPackage + "." + name;
             }
         }
-        return "scripts." + file.getName().substring(0, file.getName().length() - "java".length());
-    }
 
-    private String extractSimpleName(String fullName) {
-        int lastDotIndex = fullName.lastIndexOf('.');
-        if (lastDotIndex < 0) {
-            return fullName;
+        nameMatcher = NAME_FINAL_PATTERN.matcher(script);
+        if (nameMatcher.find()) {
+            String name = nameMatcher.group(1);
+            if (fullPackage == null) {
+                return name;
+            } else {
+                return fullPackage + "." + name;
+            }
         }
-        return fullName.substring(lastDotIndex + 1);
+
+        return "scripts." + file.getName().substring(0, file.getName().length() - "java".length());
     }
 
     public void compileAll(List<File> files) throws ScriptException {

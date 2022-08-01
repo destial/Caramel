@@ -3,6 +3,7 @@ package xyz.destiall.caramel.app.editor.panels;
 import caramel.api.Input;
 import caramel.api.objects.SceneImpl;
 import imgui.ImGui;
+import imgui.ImVec2;
 import imgui.extension.imnodes.ImNodes;
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation;
 import imgui.extension.imnodes.flag.ImNodesPinShape;
@@ -79,11 +80,13 @@ public final class NodePanel extends Panel {
             ImGui.sameLine();
             ImNodes.beginNodeEditor();
 
+            float nodeWidth = 100f;
+
             for (GraphNode<?> node : currentGraph.getNodes()) {
                 ImNodes.beginNode(node.getId());
 
                 ImNodes.beginNodeTitleBar();
-                ImGui.pushItemWidth(100);
+                ImGui.pushItemWidth(nodeWidth);
                 ImString name = node.getName().imString();
                 ImGui.inputText("##rename", name, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.NoHorizontalScroll);
                 ImGui.popItemWidth();
@@ -134,13 +137,21 @@ public final class NodePanel extends Panel {
                 if (!(node instanceof DebugGraphNode)) {
                     if (node instanceof BooleanGraphNode) {
                         ImNodes.beginOutputAttribute(((BooleanGraphNode) node).getOutputPinTrue());
+                        ImVec2 vec2 = new ImVec2();
+                        ImGui.calcTextSize(vec2, "true");
+                        ImGui.indent(nodeWidth - vec2.x);
                         ImGui.text("true");
                         ImNodes.endOutputAttribute();
 
                         ImNodes.beginOutputAttribute(((BooleanGraphNode) node).getOutputPinFalse());
+                        ImGui.calcTextSize(vec2, "false");
+                        ImGui.indent(nodeWidth - vec2.x);
                         ImGui.text("false");
                     } else {
                         ImNodes.beginOutputAttribute(node.getOutputPinId());
+                        ImVec2 vec2 = new ImVec2();
+                        ImGui.calcTextSize(vec2, output);
+                        ImGui.indent(nodeWidth - vec2.x);
                         ImGui.text(output);
                     }
                     ImNodes.endOutputAttribute();

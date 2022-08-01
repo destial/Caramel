@@ -6,7 +6,6 @@ import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
 import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
-import caramel.api.physics.internals.ContactListener;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;

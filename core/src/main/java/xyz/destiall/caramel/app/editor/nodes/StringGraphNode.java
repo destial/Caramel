@@ -20,7 +20,6 @@ public class StringGraphNode extends GraphNode<String> {
 
     @Override
     public boolean execute(VisualScript script, Graph graph) {
-
         return false;
     }
 }

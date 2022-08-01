@@ -35,11 +35,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import static xyz.destiall.caramel.app.ui.ImGUILayer.PRIMARY_COLOR;
+import static xyz.destiall.caramel.app.ui.ImGUILayer.SECONDARY_COLOR;
+
 public final class InspectorPanel extends Panel {
-    private static final TextEditor editor = new TextEditor();
+    private static final TextEditor editor;
     static {
+        editor = new TextEditor();
         TextEditorLanguageDefinition lang = new TextEditorLanguageDefinition();
-        lang.setAutoIdentation(false);
+        lang.setAutoIdentation(true);
         lang.setName("java");
         lang.setSingleLineComment("//");
         lang.setCommentStart("/*");
@@ -72,8 +76,10 @@ public final class InspectorPanel extends Panel {
             selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
             ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
             for (Component component : selected.getComponents()) {
+                ImGui.pushStyleColor(ImGuiCol.Header, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
                 if (selectedComponent == component) {
-                    ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.3f, 0.3f, 0.7f, 1.0f);
+                    ImGui.pushStyleColor(ImGuiCol.HeaderActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+                    ImGui.pushStyleColor(ImGuiCol.HeaderHovered, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
                 }
                 if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
                     ImGui.text("id: " + component.id);
@@ -117,8 +123,9 @@ public final class InspectorPanel extends Panel {
                     }
                 }
                 if (selectedComponent == component) {
-                    ImGui.popStyleColor();
+                    ImGui.popStyleColor(2);
                 }
+                ImGui.popStyleColor();
                 if (component instanceof Transform) continue;
 
                 if (ImGui.isItemHovered() && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {

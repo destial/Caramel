@@ -5,6 +5,9 @@ import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.RigidBodyType;
 
+/**
+ * This {@link Component} is for physics dimension abstraction.
+ */
 public abstract class RigidBody extends Component {
     @InvokeOnEdit("updateBody") public float angularDamping = 0.8f;
     @InvokeOnEdit("updateBody") public float linearDamping = 0.9f;

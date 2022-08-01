@@ -1,5 +1,6 @@
 package caramel.api.components;
 
+import caramel.api.Component;
 import caramel.api.math.Vector2;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.components.Box2DCollider;
@@ -11,6 +12,9 @@ import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.Fixture;
 
+/**
+ * This {@link Component} is used for two-dimensional physics.
+ */
 public final class RigidBody2D extends RigidBody {
     public final Vector2 velocity = new Vector2();
 

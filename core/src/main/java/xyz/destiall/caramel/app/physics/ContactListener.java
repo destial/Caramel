@@ -1,4 +1,4 @@
-package caramel.api.physics.internals;
+package xyz.destiall.caramel.app.physics;
 
 import caramel.api.Component;
 import caramel.api.components.RigidBody2D;

@@ -30,6 +30,8 @@ import xyz.destiall.caramel.app.utils.Payload;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static xyz.destiall.caramel.app.ui.ImGUILayer.TERTIARY_COLOR;
+
 public final class HierarchyPanel extends Panel {
     private boolean addingGameObjectHierarchy;
     private boolean editingGameObject;
@@ -293,7 +295,7 @@ public final class HierarchyPanel extends Panel {
         }
 
         if (scene.getSelectedGameObject().contains(gameObject)) {
-            ImGui.pushStyleColor(ImGuiCol.Text, 0.1f, 0.3f, 0.5f, 1.0f);
+            ImGui.pushStyleColor(ImGuiCol.Text, TERTIARY_COLOR.x, TERTIARY_COLOR.y, TERTIARY_COLOR.z, 1.f);
         }
 
         boolean treeNode = ImGui.treeNodeEx(index.incrementAndGet(), ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.FramePadding, gameObjectName.get());

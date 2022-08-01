@@ -4,6 +4,9 @@ import caramel.api.utils.Color;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+/**
+ * Used for mesh rendering. Each mesh contains a list of vertex.
+ */
 public final class Vertex {
     public Vector3f position;
     public Vector2f texCoords;

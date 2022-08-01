@@ -6,6 +6,9 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Fixture;
 import org.joml.Vector2f;
 
+/**
+ * Represents a ray-cast from a {@link GameObject}.
+ */
 public final class RaycastInfo2D implements RayCastCallback {
     private final GameObject requestingObject;
     public Fixture fixture;

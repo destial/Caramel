@@ -35,7 +35,7 @@ public class FloorHit extends Script {
         if (other.gameObject.name.equals("Floor")) {
             animation.score = 0;
             animation.button.getComponent(Text.class).text = "Hit " + animation.score;
-            int test = 0;
+            int test = 3;
         }
     }
 }

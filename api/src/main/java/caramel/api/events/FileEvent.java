@@ -5,6 +5,10 @@ import xyz.destiall.java.events.Event;
 import java.io.File;
 import java.util.Objects;
 
+/**
+ * This event is called whenever a script file is modified / created / deleted.
+ * This is most useful in recompiling scripts on the fly.
+ */
 public final class FileEvent extends Event {
     private final File file;
     private final Type type;

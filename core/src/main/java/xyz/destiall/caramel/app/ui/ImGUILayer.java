@@ -9,6 +9,7 @@ import imgui.callback.ImStrSupplier;
 import imgui.extension.imguizmo.ImGuizmo;
 import imgui.extension.imnodes.ImNodes;
 import imgui.flag.ImGuiBackendFlags;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.flag.ImGuiKey;
@@ -16,6 +17,7 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
+import org.joml.Vector4f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugLine;
 import xyz.destiall.caramel.app.editor.panels.Panel;
@@ -23,6 +25,7 @@ import xyz.destiall.caramel.app.editor.panels.Panel;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
@@ -56,10 +59,12 @@ import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
 public final class ImGUILayer {
     private final ApplicationImpl window;
     private final long glfwWindow;
-
     public final List<DebugLine> lines = new ArrayList<>();
-
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
+
+    public static final Vector4f SECONDARY_COLOR = new Vector4f(237 / 255f, 143 / 256f, 35 / 256f, 1.f);
+    public static final Vector4f PRIMARY_COLOR = new Vector4f(255 / 255f, 137 / 256f, 2 / 256f, 1.f);
+    public static final Vector4f TERTIARY_COLOR = new Vector4f(102 / 255f, 54 / 256f, 0 / 256f, 0.5f);
 
     public ImGUILayer(ApplicationImpl window) {
         this.window = window;
@@ -113,7 +118,7 @@ public final class ImGUILayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused()) {
+            if (Objects.requireNonNull(window.getCurrentScene()).isPlaying() && window.isFocused()) {
                 window.getKeyListener().keyCallback(w, key, scancode, action, mods);
             }
         });
@@ -137,7 +142,7 @@ public final class ImGUILayer {
                 ImGui.setWindowFocus(null);
             }
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused())
+            if (Objects.requireNonNull(window.getCurrentScene()).isPlaying() && window.isFocused())
                 window.getMouseListener().mouseButtonCallback(w, button, action, mods);
         });
 
@@ -177,13 +182,49 @@ public final class ImGUILayer {
 
         if (!window.isFullScreen()) {
             setupDockspace();
-            window.getCurrentScene().__imguiLayer();
+            if (window.getCurrentScene() != null) {
+                window.getCurrentScene().__imguiLayer();
+            }
         }
 
         endFrame();
     }
 
+    private void startFrame(final float deltaTime) {
+        float[] winWidth = { ApplicationImpl.getApp().getWidth() };
+        float[] winHeight = { ApplicationImpl.getApp().getHeight() };
+        double[] mousePosX = { 0 };
+        double[] mousePosY = { 0 };
+        glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
+
+        final ImGuiIO io = ImGui.getIO();
+        io.setDisplaySize(winWidth[0], winHeight[0]);
+        io.setDisplayFramebufferScale(1f, 1f);
+        io.setMousePos((float) mousePosX[0], (float) mousePosY[0]);
+        io.setDeltaTime(deltaTime);
+
+        glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        ImGui.newFrame();
+        ImGuizmo.beginFrame();
+        Panel.reset();
+
+        ImGui.pushStyleColor(ImGuiCol.Button, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.CheckMark, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TitleBg, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TitleBgActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabHovered, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.Tab, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabUnfocused, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabUnfocusedActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TextSelectedBg, TERTIARY_COLOR.x, TERTIARY_COLOR.y, TERTIARY_COLOR.z, TERTIARY_COLOR.w);
+    }
+
     private void endFrame() {
+        ImGui.popStyleColor(12);
+
         for (int i = 0; i < lines.size(); i++) {
             DebugLine l = lines.get(i);
             if (l.beginFrame() < 0) {
@@ -205,7 +246,7 @@ public final class ImGUILayer {
                 ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBringToFrontOnFocus |
-                ImGuiWindowFlags.NoNavFocus;
+                ImGuiWindowFlags.NoNavFocus | ImGuiWindowFlags.NoBackground;
 
         ImGui.setNextWindowPos(0f, 0f, ImGuiCond.Always);
         ImGui.setNextWindowSize(window.getWidth(), window.getHeight());
@@ -216,25 +257,6 @@ public final class ImGUILayer {
         ImGui.popStyleVar(2);
 
         ImGui.dockSpace(ImGui.getID("Dockspace"));
-    }
-
-    private void startFrame(final float deltaTime) {
-        float[] winWidth = { ApplicationImpl.getApp().getWidth() };
-        float[] winHeight = { ApplicationImpl.getApp().getHeight() };
-        double[] mousePosX = { 0 };
-        double[] mousePosY = { 0 };
-        glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
-
-        final ImGuiIO io = ImGui.getIO();
-        io.setDisplaySize(winWidth[0], winHeight[0]);
-        io.setDisplayFramebufferScale(1f, 1f);
-        io.setMousePos((float) mousePosX[0], (float) mousePosY[0]);
-        io.setDeltaTime(deltaTime);
-
-        glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        ImGui.newFrame();
-        ImGuizmo.beginFrame();
-        Panel.reset();
     }
 
     public void render() {

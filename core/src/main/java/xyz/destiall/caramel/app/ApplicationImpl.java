@@ -14,6 +14,8 @@ import caramel.api.components.UICamera;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FullscreenEvent;
+import caramel.api.objects.GameObject;
+import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
 import caramel.api.physics.components.Box3DCollider;
@@ -23,6 +25,7 @@ import caramel.api.render.Shader;
 import caramel.api.render.Text;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
+import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.FileIO;
 import imgui.ImGui;
 import org.joml.Vector2f;
@@ -409,8 +412,10 @@ public final class ApplicationImpl extends Application {
     }
 
     private boolean process() {
-        glfwPollEvents();
         SceneImpl scene = getCurrentScene();
+        if (scene == null) return true;
+
+        glfwPollEvents();
         joystickListener.startFrame();
 
         if (EDITOR_MODE && ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.P)) {
@@ -558,6 +563,19 @@ public final class ApplicationImpl extends Application {
         return scenes.get(sceneIndex);
     }
 
+    public SceneImpl newScene() {
+        SceneImpl scene = new SceneImpl();
+        GameObject gameObject = new GameObjectImpl(scene);
+        MeshRenderer meshRenderer = new MeshRenderer(gameObject);
+        meshRenderer.setMesh(new QuadMesh(1));
+        meshRenderer.build();
+        gameObject.addComponent(meshRenderer);
+        scene.addGameObject(gameObject);
+        scenes.add(scene);
+        sceneIndex++;
+        return scene;
+    }
+
     @Override
     public SceneImpl loadScene(File file) {
         SceneImpl scene = scenes.stream().filter(s -> s.getFile().equals(file)).findFirst().orElse(null);
@@ -566,7 +584,11 @@ public final class ApplicationImpl extends Application {
             return scene;
         }
         try {
-            scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
+            if (file.exists()) {
+                scene = serializer.fromJson(FileIO.readData(file), SceneImpl.class);
+            } else {
+                scene = newScene();
+            }
         } catch (Exception e) {
             Debug.logError("Unable to load possibly corrupted scene file: " + file.getPath());
             e.printStackTrace();
@@ -589,6 +611,10 @@ public final class ApplicationImpl extends Application {
         }
         sceneIndex = index;
         return getCurrentScene();
+    }
+
+    public List<SceneImpl> getScenes() {
+        return scenes;
     }
 
     @Override

@@ -8,6 +8,9 @@ import caramel.api.render.Renderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * This {@link Component} is used to render a scene.
+ */
 public class Camera extends Component {
     protected transient Renderer.State state = Renderer.State.WORLD;
     public transient Matrix4f projection, view;
