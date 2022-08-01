@@ -107,6 +107,7 @@ public final class ScriptLoader {
         FileScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
         Collection<FileScriptMemoryJavaObject> otherScripts = loaders.values().stream().filter(l -> !l.getFullClassName().equals(fullClassName)).map(ScriptClassLoader::getSource).collect(Collectors.toList());
         otherScripts.add(scriptSource);
+
         JavaCompiler.CompilationTask task = compiler.getTask(null, scriptMemoryManager, diagnostics, null, null, otherScripts);
         if (!task.call()) {
             String message = "Error while compiling " + file.getPath() + ": " + diagnostics.getDiagnostics().stream()

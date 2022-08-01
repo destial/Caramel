@@ -7,6 +7,8 @@ layout (location=2) in vec2 aTexCoords;
 layout (location=3) in vec3 aNormal;
 layout (location=4) in float aTexSlot;
 
+uniform mat4 uVP;
+
 out vec4 fColor;
 out vec2 fTexCoords;
 out vec3 fNormal;
@@ -16,7 +18,7 @@ void main() {
     fColor = aColor;
     fTexCoords = aTexCoords;
     fTexSlot = aTexSlot;
-    gl_Position = vec4(aPos, 1.0);
+    gl_Position = uVP * vec4(aPos, 1.0);
 }
 
 #type fragment

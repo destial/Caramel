@@ -11,6 +11,7 @@ import caramel.api.scripts.Script;
 
 public class AnimationUpdate extends Script {
     public transient SpriteRenderer sp;
+    public transient AudioPlayer ap;
     public RigidBody2D rb;
     public transient Button button;
     public int score = 0;
@@ -26,6 +27,7 @@ public class AnimationUpdate extends Script {
         sp = getComponent(SpriteRenderer.class);
         button = findGameObject("Button").getComponent(Button.class);
         circle = findGameObject("Circle");
+        ap = getComponent(AudioPlayer.class);
         // rb = getComponent(RigidBody2D.class);
     }
 
@@ -53,7 +55,7 @@ public class AnimationUpdate extends Script {
             diffX = Math.min(Math.abs(diffX), 7.5f) * multiplier;
             rb.setVelocity(diffX, y);
             if (rb.isOnGround() && diffY < 2) {
-                rb.addVelocity(0, 200f * Time.deltaTime);
+                rb.addVelocity(0, 500f * Time.deltaTime);
             }
         }
 
@@ -76,6 +78,7 @@ public class AnimationUpdate extends Script {
     public void onCollisionEnter(RigidBody2D other) {
         if (other.gameObject.name.equals("Circle")) {
             score++;
+            ap.play();
             if (score > maxScore) {
                 maxScore = score;
             }

@@ -276,16 +276,16 @@
         {
           "velocity": {
             "joml": {
-              "x": 1.1485544,
-              "y": -2.1833124
+              "x": -2.8463926,
+              "y": -1.9460272
             },
             "jbox2d": {
-              "x": 1.1485544,
-              "y": -2.1833124
+              "x": -2.8463926,
+              "y": -1.9460272
             },
             "imgui": {
-              "x": 1.1485544,
-              "y": -2.1833124
+              "x": -2.8463926,
+              "y": -1.9460272
             }
           },
           "angularDamping": 0.8,
@@ -333,7 +333,7 @@
             "path": "assets/textures/player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 2,
+            "currentIndex": 0,
             "currentAnimation": "anim5",
             "mesh": {
               "vertexArray": [
@@ -344,7 +344,7 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 1.0,
+                    "x": 0.33333334,
                     "y": 1.0
                   },
                   "color": {
@@ -368,7 +368,7 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 0.6666667,
+                    "x": 0.0,
                     "y": 0.8333333
                   },
                   "color": {
@@ -392,7 +392,7 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 1.0,
+                    "x": 0.33333334,
                     "y": 0.8333333
                   },
                   "color": {
@@ -416,7 +416,7 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 0.6666667,
+                    "x": 0.0,
                     "y": 1.0
                   },
                   "color": {
@@ -460,7 +460,7 @@
           "texture": {
             "path": "assets/textures/uvmap.jpg"
           },
-          "index": 2,
+          "index": 0,
           "animation": "anim0",
           "columns": 3,
           "rows": 6,
@@ -505,7 +505,7 @@
         },
         {
           "file": {
-            "path": "assets/sounds/chestclosed.ogg"
+            "path": "assets/sounds/explosion.ogg"
           },
           "loop": false,
           "volume": 1.9,
@@ -1997,16 +1997,16 @@
         {
           "velocity": {
             "joml": {
-              "x": 1.1886852,
-              "y": 9.402808
+              "x": -2.9782317,
+              "y": 12.589687
             },
             "jbox2d": {
-              "x": 1.1886852,
-              "y": 9.402808
+              "x": -2.9782317,
+              "y": 12.589687
             },
             "imgui": {
-              "x": 1.1886852,
-              "y": 9.402808
+              "x": -2.9782317,
+              "y": 12.589687
             }
           },
           "angularDamping": 0.2,
