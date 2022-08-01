@@ -705,7 +705,7 @@ public final class ImGuiUtils {
             } else if (type == String.class) {
                 String previous = (String) value;
                 String now = inputText(name, previous);
-                if (previous.equals(now)) {
+                if (previous != null && previous.equals(now)) {
                     EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {

@@ -3,9 +3,12 @@ package xyz.destiall.caramel.app.serialize;
 import caramel.api.Component;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
+import caramel.api.interfaces.StringWrapper;
 import caramel.api.objects.GameObject;
+import caramel.api.objects.StringWrapperImpl;
 import caramel.api.scripts.InternalScript;
 import xyz.destiall.caramel.app.ApplicationImpl;
+import xyz.destiall.caramel.app.editor.nodes.GraphNode;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
 import xyz.destiall.java.gson.JsonDeserializationContext;
@@ -32,7 +35,10 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
     private final Gson defaultGson = new GsonBuilder()
             .enableComplexMapKeySerialization()
             .registerTypeAdapter(File.class, new FileSerializer())
+            .registerTypeAdapter(StringWrapper.class, new StringWrapperSerializer())
+            .registerTypeAdapter(StringWrapperImpl.class, new StringWrapperSerializer())
             .registerTypeAdapter(Component.class, FIELD_COMPONENT_SERIALIZER)
+            .registerTypeAdapter(GraphNode.class, new NodeSerializer())
             .setPrettyPrinting().create();
 
     public static final FieldComponentSerializer FIELD_COMPONENT_SERIALIZER = new FieldComponentSerializer();
@@ -88,6 +94,9 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
             if (!accessible) field.setAccessible(true);
             try {
                 Object value = field.get(gsonComponent);
+                if (field.getName().equalsIgnoreCase("links")) {
+                    System.out.println(value);
+                }
                 if (Component.class.isAssignableFrom(field.getType())) {
                     JsonObject componentField = object.get(field.getName()).getAsJsonObject();
                     Component fieldDeserialized = FIELD_COMPONENT_SERIALIZER.deserialize(componentField, null, null);

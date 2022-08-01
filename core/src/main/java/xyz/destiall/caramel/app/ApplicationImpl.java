@@ -381,8 +381,11 @@ public final class ApplicationImpl extends Application {
             if (process()) break;
 
             endTime = (float) glfwGetTime();
-            Time.deltaTime = endTime - startTime;
-            Time.deltaTime = Math.max(Time.deltaTime, Time.minDeltaTime);
+            float delta = endTime - startTime;
+            if (delta <= 0) continue;
+
+            Time.deltaTime = delta;
+            // Time.deltaTime = Math.max(Time.deltaTime, Time.minDeltaTime);
             startTime = endTime;
 
             second += Time.deltaTime;
@@ -566,6 +569,7 @@ public final class ApplicationImpl extends Application {
             scene = file.exists() ? serializer.fromJson(FileIO.readData(file), SceneImpl.class) : new SceneImpl();
         } catch (Exception e) {
             Debug.logError("Unable to load possibly corrupted scene file: " + file.getPath());
+            e.printStackTrace();
             return getCurrentScene();
         }
 

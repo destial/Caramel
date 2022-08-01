@@ -19,7 +19,6 @@ public final class FieldComponentSerializer implements JsonSerializer<Component>
     public Component deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         JsonObject object = jsonElement.getAsJsonObject();
         int id = object.get("id").getAsInt();
-        String clazz = object.get("clazz").getAsString();
         String scene = object.get("scene").getAsString();
         Map.Entry<SceneImpl, Map<Integer, Component>> entry = SceneSerializer.COMPONENT_MAP.entrySet().stream().filter(en -> en.getKey().name.equals(scene)).findFirst().orElse(null);
         if (entry == null) return null;

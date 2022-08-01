@@ -26,7 +26,7 @@ public final class Vector3 {
     }
 
     public Vector3(Vector3 value) {
-        this(value.x(), value.y(), value.z());
+        this(value == null ? 0 : value.x(), value == null ? 0 : value.y(), value == null ? 0 : value.z());
     }
 
     public Vector3(Vec3 vect) {

@@ -1,9 +1,11 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
+import caramel.api.components.VisualScript;
+
 public class MethodGraphNode extends GraphNode<String> {
     public String value;
-    public MethodGraphNode(int nodeId, int inputPinId, int outputPintId) {
-        super(nodeId, inputPinId, outputPintId);
+    public MethodGraphNode(int nodeId) {
+        super(nodeId);
     }
 
     @Override
@@ -14,5 +16,11 @@ public class MethodGraphNode extends GraphNode<String> {
     @Override
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean execute(VisualScript script, Graph graph) {
+
+        return false;
     }
 }

@@ -1,30 +1,43 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
+import caramel.api.components.VisualScript;
+import caramel.api.objects.StringWrapperImpl;
+
 public abstract class GraphNode<T> {
-    public final int nodeId;
-    public final int inputPinId;
-    public final int outputPinId;
+    private final String clazz = getClass().getName();
+    private final int nodeId;
+    private StringWrapperImpl name;
 
-    public int outputNodeId = -1;
-
-    public GraphNode(final int nodeId, final int inputPinId, final int outputPintId) {
+    public GraphNode(final int nodeId) {
         this.nodeId = nodeId;
-        this.inputPinId = inputPinId;
-        this.outputPinId = outputPintId;
-    }
-
-    public int getInputPinId() {
-        return inputPinId;
+        this.name = new StringWrapperImpl("Node " + (char) (64 + nodeId));
     }
 
     public int getOutputPinId() {
-        return outputPinId;
+        return nodeId << 24;
     }
 
-    public String getName() {
-        return "Node " + (char) (64 + nodeId);
+    public int getInputPinId() {
+        return nodeId << 8;
+    }
+
+    public int getId() {
+        return nodeId;
+    }
+
+    public StringWrapperImpl getName() {
+        if (name == null) {
+            name = new StringWrapperImpl("Node " + (char) (64 + nodeId));
+        }
+        return name;
     }
 
     public abstract T getValue();
     public abstract void setValue(T value);
+
+    public void setName(String s) {
+        this.name.set(s);
+    }
+
+    public abstract boolean execute(VisualScript script, Graph graph);
 }

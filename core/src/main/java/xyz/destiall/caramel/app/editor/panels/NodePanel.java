@@ -1,39 +1,44 @@
 package xyz.destiall.caramel.app.editor.panels;
 
 import caramel.api.Input;
-import caramel.api.components.VisualScript;
-import caramel.api.objects.GameObject;
-import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.SceneImpl;
-import caramel.api.utils.Pair;
 import imgui.ImGui;
 import imgui.extension.imnodes.ImNodes;
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation;
 import imgui.extension.imnodes.flag.ImNodesPinShape;
+import imgui.flag.ImGuiInputTextFlags;
 import imgui.type.ImInt;
 import imgui.type.ImString;
+import xyz.destiall.caramel.app.editor.nodes.BooleanGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.DebugGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.FloatGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.Graph;
 import xyz.destiall.caramel.app.editor.nodes.GraphNode;
 import xyz.destiall.caramel.app.editor.nodes.IntGraphNode;
-
-import java.util.Map;
+import xyz.destiall.caramel.app.editor.nodes.Link;
+import xyz.destiall.caramel.app.editor.nodes.MethodGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.StartGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.StringGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.UpdateGraphNode;
 
 public final class NodePanel extends Panel {
-    private VisualScript currentVisualScript;
+    private Graph currentGraph;
     private final ImInt LINK_A = new ImInt();
     private final ImInt LINK_B = new ImInt();
 
+    private static final String CREATE_NODE = "node_create_node";
+    private static final String DELETE_NODE = "node_delete_node";
+    private static final String DELETE_LINK = "node_delete_link";
+
     public NodePanel(SceneImpl scene) {
         super(scene);
-        GameObject dummy = new GameObjectImpl(scene);
-        currentVisualScript = new VisualScript(dummy);
     }
 
-    public VisualScript getCurrentVisualScript() {
-        return currentVisualScript;
-    }
-
-    public void setCurrentVisualScript(VisualScript currentVisualScript) {
-        this.currentVisualScript = currentVisualScript;
+    public void setCurrentGraph(Graph graph) {
+        this.currentGraph = graph;
+        if (currentGraph.ini != null) {
+            ImNodes.loadCurrentEditorStateFromIniString(currentGraph.ini, currentGraph.ini.length());
+        }
     }
 
     public static String text(String label, String text) {
@@ -56,37 +61,98 @@ public final class NodePanel extends Panel {
 
     @Override
     public void __imguiLayer() {
+        if (currentGraph == null) return;
+
         if (ImGui.begin("NodeEditor")) {
             Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
-            text("text", "text");
+
+            boolean save = ImGui.button("save");
+
+
+
+            if (ImGui.button("close")) {
+                currentGraph.save(ImNodes.saveCurrentEditorStateToIniString());
+                currentGraph = null;
+                ImGui.end();
+                return;
+            }
+
             ImGui.sameLine();
             ImNodes.beginNodeEditor();
 
-            for (GraphNode<?> node : currentVisualScript.nodes.values()) {
-                ImNodes.beginNode(node.nodeId);
+            for (GraphNode<?> node : currentGraph.getNodes()) {
+                ImNodes.beginNode(node.getId());
 
                 ImNodes.beginNodeTitleBar();
-                ImGui.text(node.getName());
+                ImGui.pushItemWidth(100);
+                ImString name = node.getName().imString();
+                ImGui.inputText("##rename", name, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.NoHorizontalScroll);
+                ImGui.popItemWidth();
                 ImNodes.endNodeTitleBar();
 
-                ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
-                ImGui.text("In");
-                ImNodes.endInputAttribute();
+                String input = "In";
+                String output = "Out";
 
-                ImGui.text(node.getValue().toString());
+                if (!(node instanceof UpdateGraphNode) && !(node instanceof StartGraphNode)) {
+                    if (node instanceof BooleanGraphNode) {
+                        ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
+                        ImGui.text("run");
+                        ImNodes.endInputAttribute();
 
-                ImNodes.beginOutputAttribute(node.getOutputPinId());
-                ImGui.text("Out");
-                ImNodes.endOutputAttribute();
+                        ImNodes.beginInputAttribute(((BooleanGraphNode) node).getInputPinLeft(), ImNodesPinShape.CircleFilled);
+                        ImGui.text("first");
+                        ImNodes.endInputAttribute();
+
+                        ImNodes.beginInputAttribute(((BooleanGraphNode) node).getInputPinRight(), ImNodesPinShape.CircleFilled);
+                        ImGui.text("second");
+
+                    } else if (node instanceof IntGraphNode) {
+                        ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
+                        int[] ints = {((IntGraphNode) node).getValue()};
+                        if (ImGui.dragInt(input, ints)) {
+                            ((IntGraphNode) node).setValue(ints[0]);
+                        }
+                    } else {
+                        ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
+                        ImGui.text(input);
+                    }
+
+                    ImNodes.endInputAttribute();
+                }
+
+                if (node instanceof StringGraphNode) {
+                    if (node.getValue() != null) {
+                        ImString string = new ImString(((StringGraphNode) node).getValue());
+                        ImGui.inputText("string", string);
+                        ((StringGraphNode) node).setValue(string.get());
+                    }
+                } else {
+                    if (node.getValue() != null) {
+                        ImGui.text(node.getValue().toString());
+                    }
+                }
+
+                if (!(node instanceof DebugGraphNode)) {
+                    if (node instanceof BooleanGraphNode) {
+                        ImNodes.beginOutputAttribute(((BooleanGraphNode) node).getOutputPinTrue());
+                        ImGui.text("true");
+                        ImNodes.endOutputAttribute();
+
+                        ImNodes.beginOutputAttribute(((BooleanGraphNode) node).getOutputPinFalse());
+                        ImGui.text("false");
+                    } else {
+                        ImNodes.beginOutputAttribute(node.getOutputPinId());
+                        ImGui.text(output);
+                    }
+                    ImNodes.endOutputAttribute();
+                }
 
                 ImNodes.endNode();
             }
 
-            for (Map.Entry<Integer, Pair<GraphNode<?>, GraphNode<?>>> link : currentVisualScript.links.entrySet()) {
-                GraphNode<?> source = link.getValue().getKey();
-                GraphNode<?> target = link.getValue().getValue();
-                ImNodes.link(link.getKey(), source.outputNodeId, target.inputPinId);
+            for (Link link : currentGraph.getLinks()) {
+                ImNodes.link(link.getId(), link.getStart(), link.getEnd());
             }
 
             final boolean isEditorHovered = ImNodes.isEditorHovered();
@@ -95,61 +161,94 @@ public final class NodePanel extends Panel {
             ImNodes.endNodeEditor();
 
             if (ImNodes.isLinkCreated(LINK_A, LINK_B)) {
-                final GraphNode<?> source = currentVisualScript.findByOutput(LINK_A.get());
-                final GraphNode<?> target = currentVisualScript.findByInput(LINK_B.get());
-                currentVisualScript.link(source, target);
+                currentGraph.link(LINK_A.get(), LINK_B.get());
             }
 
-            int[] nodeIds = new int[currentVisualScript.nodes.size()];
+            int[] nodeIds = new int[currentGraph.getNodes().size()];
             ImNodes.getSelectedNodes(nodeIds);
-            int[] linkIds = new int[currentVisualScript.nodes.size()];
+            int[] linkIds = new int[currentGraph.getNodes().size()];
             ImNodes.getSelectedLinks(linkIds);
 
             if (ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
                 final int hoveredNode = ImNodes.getHoveredNode();
                 final int hoveredLink = ImNodes.getHoveredLink();
                 if (hoveredNode != -1) {
-                    ImGui.openPopup("node_context");
-                    ImGui.getStateStorage().setInt(ImGui.getID("delete_node_id"), hoveredNode);
+                    ImGui.openPopup(DELETE_NODE);
+                    ImGui.getStateStorage().setInt(ImGui.getID(DELETE_NODE), hoveredNode);
                 } else if (hoveredLink != -1) {
-                    ImGui.openPopup("link_context");
-                    ImGui.getStateStorage().setInt(ImGui.getID("delete_link_id"), hoveredLink);
+                    ImGui.openPopup(DELETE_LINK);
+                    ImGui.getStateStorage().setInt(ImGui.getID(DELETE_LINK), hoveredLink);
                 } else if (isEditorHovered) {
-                    ImGui.openPopup("node_editor_context");
+                    ImGui.openPopup(CREATE_NODE);
                 }
             }
 
-            if (ImGui.isPopupOpen("node_context")) {
-                final int targetNode = ImGui.getStateStorage().getInt(ImGui.getID("delete_node_id"));
-                if (ImGui.beginPopup("node_context")) {
-                    if (ImGui.button("Delete " + currentVisualScript.nodes.get(targetNode).getName())) {
-                        currentVisualScript.nodes.remove(targetNode);
-                        ImGui.closeCurrentPopup();
+            if (ImGui.isPopupOpen(DELETE_NODE)) {
+                final int targetNode = ImGui.getStateStorage().getInt(ImGui.getID(DELETE_NODE));
+                if (ImGui.beginPopup(DELETE_NODE)) {
+                    GraphNode<?> node = currentGraph.getNode(targetNode);
+                    if (node != null) {
+                        if (ImGui.button("Delete " + node.getName())) {
+                            currentGraph.getNodes().remove(node);
+                            ImGui.closeCurrentPopup();
+                        }
                     }
                     ImGui.endPopup();
                 }
             }
 
-            if (ImGui.isPopupOpen("link_context")) {
-                final int targetLink = ImGui.getStateStorage().getInt(ImGui.getID("delete_link_id"));
-                if (ImGui.beginPopup("link_context")) {
+            if (ImGui.isPopupOpen(DELETE_LINK)) {
+                final int targetLink = ImGui.getStateStorage().getInt(ImGui.getID(DELETE_LINK));
+                if (ImGui.beginPopup(DELETE_LINK)) {
                     if (ImGui.button("Delete Link")) {
+                        currentGraph.unlink(targetLink);
                         ImGui.closeCurrentPopup();
                     }
                     ImGui.endPopup();
                 }
             }
 
-            if (ImGui.beginPopup("node_editor_context")) {
+            if (ImGui.beginPopup(CREATE_NODE)) {
                 if (ImGui.button("Create New Int Node")) {
-                    final IntGraphNode node = currentVisualScript.createIntGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.nodeId, ImGui.getMousePosX(), ImGui.getMousePosY());
+                    final IntGraphNode node = currentGraph.createIntGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New Float Node")) {
+                    final FloatGraphNode node = currentGraph.createFloatGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New String Node")) {
+                    final StringGraphNode node = currentGraph.createStringGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New Boolean Node")) {
+                    final BooleanGraphNode node = currentGraph.createBooleanGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New Method Node")) {
+                    final MethodGraphNode node = currentGraph.createMethodGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New Start Node")) {
+                    final StartGraphNode node = currentGraph.createStartGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New Update Node")) {
+                    final UpdateGraphNode node = currentGraph.createUpdateGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                    ImGui.closeCurrentPopup();
+                } else if (ImGui.button("Create New Debug Node")) {
+                    final DebugGraphNode node = currentGraph.createDebugGraphNode();
+                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
                     ImGui.closeCurrentPopup();
                 }
                 ImGui.endPopup();
             }
+
+            if (save) {
+                currentGraph.save(ImNodes.saveCurrentEditorStateToIniString());
+            }
         }
         ImGui.end();
     }
-
 }

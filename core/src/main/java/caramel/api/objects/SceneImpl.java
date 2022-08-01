@@ -24,6 +24,7 @@ import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.panels.InspectorPanel;
 import xyz.destiall.caramel.app.editor.panels.MenuBarPanel;
+import xyz.destiall.caramel.app.editor.panels.NodePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.physics.Physics;
@@ -79,7 +80,7 @@ public final class SceneImpl extends Scene {
             panels.put(ConsolePanel.class, new ConsolePanel(this));
             panels.put(ScenePanel.class, new ScenePanel(this));
             panels.put(GamePanel.class, new GamePanel(this));
-            // panels.put(NodePanel.class, new NodePanel(this));
+            panels.put(NodePanel.class, new NodePanel(this));
         }
 
         GameObjectImpl go = new GameObjectImpl(this);

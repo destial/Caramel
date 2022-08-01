@@ -276,16 +276,16 @@
         {
           "velocity": {
             "joml": {
-              "x": -6.378976,
-              "y": 1.7284598
+              "x": 1.1485544,
+              "y": -2.1833124
             },
             "jbox2d": {
-              "x": -6.378976,
-              "y": 1.7284598
+              "x": 1.1485544,
+              "y": -2.1833124
             },
             "imgui": {
-              "x": -6.378976,
-              "y": 1.7284598
+              "x": 1.1485544,
+              "y": -2.1833124
             }
           },
           "angularDamping": 0.8,
@@ -333,8 +333,8 @@
             "path": "assets/textures/player.png",
             "columns": 3,
             "rows": 6,
-            "currentIndex": 0,
-            "currentAnimation": "anim0",
+            "currentIndex": 2,
+            "currentAnimation": "anim5",
             "mesh": {
               "vertexArray": [
                 {
@@ -344,8 +344,8 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 0.33333334,
-                    "y": 0.16666667
+                    "x": 1.0,
+                    "y": 1.0
                   },
                   "color": {
                     "r": 1.0,
@@ -368,8 +368,8 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 0.0,
-                    "y": 0.0
+                    "x": 0.6666667,
+                    "y": 0.8333333
                   },
                   "color": {
                     "r": 1.0,
@@ -392,8 +392,8 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 0.33333334,
-                    "y": 0.0
+                    "x": 1.0,
+                    "y": 0.8333333
                   },
                   "color": {
                     "r": 1.0,
@@ -416,8 +416,8 @@
                     "z": 0.0
                   },
                   "texCoords": {
-                    "x": 0.0,
-                    "y": 0.16666667
+                    "x": 0.6666667,
+                    "y": 1.0
                   },
                   "color": {
                     "r": 1.0,
@@ -460,7 +460,7 @@
           "texture": {
             "path": "assets/textures/uvmap.jpg"
           },
-          "index": 0,
+          "index": 2,
           "animation": "anim0",
           "columns": 3,
           "rows": 6,
@@ -524,6 +524,65 @@
           "collisionRender": false,
           "clazz": "caramel.api.physics.components.Circle2DCollider",
           "id": 1343,
+          "enabled": true
+        },
+        {
+          "graph": {
+            "nextNodeId": 9,
+            "nextLinkId": 6,
+            "nodes": [
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.BooleanGraphNode",
+                "nodeId": 6,
+                "name": "Node F"
+              },
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.UpdateGraphNode",
+                "nodeId": 3,
+                "name": "Update"
+              },
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.IntGraphNode",
+                "nodeId": 7,
+                "name": "Node G"
+              },
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.IntGraphNode",
+                "nodeId": 5,
+                "name": "Node E"
+              },
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.DebugGraphNode",
+                "nodeId": 8,
+                "name": "Node H"
+              }
+            ],
+            "links": [
+              {
+                "id": 4,
+                "start": 117440512,
+                "end": 384
+              },
+              {
+                "id": 2,
+                "start": 50331648,
+                "end": 1536
+              },
+              {
+                "id": 3,
+                "start": 83886080,
+                "end": 48
+              },
+              {
+                "id": 5,
+                "start": 12288,
+                "end": 2048
+              }
+            ],
+            "ini": "[editor]\npanning\u003d0,0\n\n[node.5]\norigin\u003d8,268\n\n[node.3]\norigin\u003d39,30\n\n[node.6]\norigin\u003d531,45\n\n[node.7]\norigin\u003d10,400\n\n[node.8]\norigin\u003d651,255\n"
+          },
+          "clazz": "caramel.api.components.VisualScript",
+          "id": 1344,
           "enabled": true
         }
       ],
@@ -1938,16 +1997,16 @@
         {
           "velocity": {
             "joml": {
-              "x": -6.561018,
-              "y": 6.9113955
+              "x": 1.1886852,
+              "y": 9.402808
             },
             "jbox2d": {
-              "x": -6.561018,
-              "y": 6.9113955
+              "x": 1.1886852,
+              "y": 9.402808
             },
             "imgui": {
-              "x": -6.561018,
-              "y": 6.9113955
+              "x": 1.1886852,
+              "y": 9.402808
             }
           },
           "angularDamping": 0.2,
@@ -2750,8 +2809,8 @@
         "mouseY": 0.0,
         "sensitivity": 0.5,
         "target": {
-          "x": 1.4E-45,
-          "y": 1.4E-45,
+          "x": 0.0,
+          "y": 0.0,
           "z": -1.0
         },
         "rotate": false,
