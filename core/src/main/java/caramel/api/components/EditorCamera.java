@@ -82,7 +82,7 @@ public final class EditorCamera extends Camera {
         }
 
         if (ImGui.isKeyPressed(Input.Key.C)) {
-            toggleCameraView();
+            // toggleCameraView();
         }
     }
 

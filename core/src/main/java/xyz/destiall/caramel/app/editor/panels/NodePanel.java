@@ -8,6 +8,7 @@ import imgui.extension.imnodes.ImNodes;
 import imgui.extension.imnodes.flag.ImNodesMiniMapLocation;
 import imgui.extension.imnodes.flag.ImNodesPinShape;
 import imgui.flag.ImGuiInputTextFlags;
+import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImInt;
 import imgui.type.ImString;
 import xyz.destiall.caramel.app.editor.nodes.BooleanGraphNode;
@@ -64,7 +65,11 @@ public final class NodePanel extends Panel {
     public void __imguiLayer() {
         if (currentGraph == null) return;
 
-        if (ImGui.begin("NodeEditor")) {
+        int flags = 0;
+        if (window.getScriptManager().isRecompiling()) {
+            flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
+        }
+        if (ImGui.begin("NodeEditor", flags)) {
             Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
 

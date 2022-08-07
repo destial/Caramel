@@ -239,6 +239,24 @@ public abstract class GameObject implements Update, Render {
     }
 
     /**
+     * Remove a {@link Component} linked to this object.
+     * @param clazz The class of the {@link Component}.
+     * @return true if it successfully removed, else false.
+     */
+    public boolean removeComponent(String clazz) {
+        Component component = getComponent(clazz);
+        if (component == null) return false;
+        if (component instanceof Transform) return false;
+        components.remove(component);
+        if (scene != null) {
+            if (component instanceof Camera && scene.getGameCamera() == component) {
+                scene.setGameCamera(null);
+            }
+        }
+        return true;
+    }
+
+    /**
      * Get every {@link Component} linked to this object.
      * This collection is mutable.
      * @return A mutable copy.

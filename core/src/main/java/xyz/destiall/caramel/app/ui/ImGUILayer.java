@@ -2,6 +2,7 @@ package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Input;
 import caramel.api.Time;
+import caramel.api.events.WindowFocusEvent;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -55,6 +56,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetJoystickCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 
 public final class ImGUILayer {
     private final ApplicationImpl window;
@@ -182,8 +184,30 @@ public final class ImGUILayer {
 
         if (!window.isFullScreen()) {
             setupDockspace();
+            boolean recompiling = window.getScriptManager().isRecompiling();
+            if (recompiling) {
+                ImGui.pushAllowKeyboardFocus(false);
+            }
             if (window.getCurrentScene() != null) {
                 window.getCurrentScene().__imguiLayer();
+            }
+            if (recompiling) {
+                ImGui.popAllowKeyboardFocus();
+            }
+        }
+
+        if (window.getScriptManager().isRecompiling()) {
+            if (ImGui.begin("##recompile",
+                    ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize |
+                    ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove |
+                    ImGuiWindowFlags.NoMouseInputs)) {
+                float width = ImGui.getWindowWidth();
+                float height = ImGui.getWindowWidth();
+                ImGui.setWindowPos((
+                        ApplicationImpl.getApp().getWidth() / 2f) - (width / 2f),
+                        (ApplicationImpl.getApp().getHeight() / 2f) - height / 2f);
+                ImGui.text("Recompiling scripts...");
+                ImGui.end();
             }
         }
 

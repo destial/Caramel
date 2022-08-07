@@ -14,6 +14,7 @@ import caramel.api.components.UICamera;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FullscreenEvent;
+import caramel.api.events.WindowFocusEvent;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Scene;
@@ -297,6 +298,7 @@ public final class ApplicationImpl extends Application {
 
         glfwSetWindowFocusCallback(glfwWindow, (window, focused) -> {
             this.focused = focused;
+            eventHandler.call(new WindowFocusEvent(focused));
         });
 
         // Create audio handler

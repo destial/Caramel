@@ -82,7 +82,7 @@ public class AnimationUpdate extends Script {
             if (score > maxScore) {
                 maxScore = score;
             }
-            int test = 2;
+            int test = 2121122231;
         }
     }
 }

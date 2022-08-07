@@ -4,6 +4,7 @@ import caramel.api.debug.Debug;
 import caramel.api.scripts.InternalScript;
 import caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
+import xyz.destiall.caramel.app.utils.Payload;
 
 import javax.script.ScriptException;
 import javax.tools.DiagnosticCollector;
@@ -92,8 +93,8 @@ public final class ScriptLoader {
         }
     }
 
-    void removeClass(String name) {
-        classes.remove(name);
+    boolean removeClass(String name) {
+        return classes.remove(name) != null;
     }
 
     public InternalScript compile(File file, String code) throws ScriptException, MalformedURLException {
@@ -102,6 +103,7 @@ public final class ScriptLoader {
         }
 
         String fullClassName = getFullName(file, code);
+        Debug.console("Building " + fullClassName);
 
         FileScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
         Collection<FileScriptMemoryJavaObject> otherScripts = loaders.values().stream().filter(l -> !l.getFullClassName().equals(fullClassName)).map(ScriptClassLoader::getSource).collect(Collectors.toList());
@@ -130,17 +132,16 @@ public final class ScriptLoader {
             }
         }
 
-        ScriptClassLoader previous = loaders.get(fullClassName);
+        ScriptClassLoader previous = loaders.remove(fullClassName);
         ScriptClassLoader loader = scriptMemoryManager.getClassLoader(this, file, fullClassName, scriptSource);
         if (previous != null) {
             removeClass(previous.getFullClassName());
-            setClass(fullClassName, loader.script.getCompiledClass());
+            scriptManager.loadComponents(previous.script, loader.script);
             try {
                 previous.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            scriptManager.loadComponents(previous.script, loader.script);
         }
         loaders.put(fullClassName, loader);
         setClass(fullClassName, loader.script.getCompiledClass());
@@ -179,7 +180,7 @@ public final class ScriptLoader {
             }
         }
 
-        return "scripts." + file.getName().substring(0, file.getName().length() - "java".length());
+        return "scripts." + file.getName().substring(0, file.getName().length() - ".java".length());
     }
 
     public void compileAll(List<File> files) throws ScriptException {
@@ -205,6 +206,8 @@ public final class ScriptLoader {
 
         for (FileScriptMemoryJavaObject source : sources) {
             Debug.console("Compiling " + source.getOrigin().getName());
+            ScriptClassLoader previous = loaders.get(source.getName());
+            removeClass(source.getName());
             ScriptClassLoader loader = null;
             try {
                 loader = scriptMemoryManager.getClassLoader(this, source.getOrigin(), source.getName(), source);
@@ -212,9 +215,20 @@ public final class ScriptLoader {
                 e.printStackTrace();
             }
             if (loader == null) continue;
+            removeClass(source.getName());
+            if (previous != null) {
+                Payload.COMPONENTS.remove(previous.script.getCompiledClass());
+                scriptManager.loadComponents(previous.script, loader.script);
+                try {
+                    previous.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
             loaders.put(source.getName(), loader);
             setClass(source.getName(), loader.script.getCompiledClass());
+            Payload.COMPONENTS.add(loader.script.getCompiledClass());
         }
     }
 }
