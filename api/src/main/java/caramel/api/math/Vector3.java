@@ -1,5 +1,6 @@
 package caramel.api.math;
 
+import caramel.api.interfaces.Copyable;
 import org.jbox2d.common.Vec3;
 import org.joml.Vector3f;
 import org.ode4j.math.DVector3;
@@ -7,7 +8,7 @@ import org.ode4j.math.DVector3;
 /**
  * Math wrapper for the API to convert into each specific library.
  */
-public final class Vector3 {
+public final class Vector3 implements Copyable<Vector3> {
     private final Vector3f joml;
     private final Vec3 jbox2d;
     private final DVector3 ode;
@@ -91,5 +92,10 @@ public final class Vector3 {
 
     public void set(Vector3 value) {
         set(value.x(), value.y(), value.z());
+    }
+
+    @Override
+    public Vector3 copy() {
+        return new Vector3(x(), y(), z());
     }
 }

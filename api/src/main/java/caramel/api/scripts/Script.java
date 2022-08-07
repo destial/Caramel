@@ -4,6 +4,7 @@ import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.debug.Debug;
 import caramel.api.objects.GameObject;
+import caramel.api.objects.Scene;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -15,11 +16,21 @@ public abstract class Script extends Component {
         super(gameObject);
     }
 
-    protected GameObject findGameObject(String name) {
+    /**
+     * Find a {@link GameObject} that matches this name in this {@link Scene}.
+     * @param name The name of the {@link GameObject} to find.
+     * @return The matching {@link GameObject}, null if none found.
+     */
+    public GameObject findGameObject(String name) {
         return gameObject.scene.findGameObject(name);
     }
 
-    protected <C extends Component> List<C> findWithComponent(Class<C> clazz) {
+    /**
+     * Find a list of {@link Component} in every GameObjects that this Component Class.
+     * @param clazz The {@link Component} class.
+     * @return A list of matching {@link GameObject}s. Never null, can be empty.
+     */
+    public <C extends Component> List<C> findWithComponent(Class<C> clazz) {
         return gameObject.scene.getGameObjects().stream().filter(g -> g.hasComponent(clazz)).map(g -> g.getComponent(clazz)).collect(Collectors.toList());
     }
 

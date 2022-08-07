@@ -9,7 +9,7 @@ import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
 
 public final class SpriteRenderer extends Renderer {
-    public Spritesheet spritesheet;
+    public transient Spritesheet spritesheet;
     @InvokeOnEdit("buildAnimation") public Texture texture;
 
     @InvokeOnEdit("setIndex") public int index = 0;
@@ -17,7 +17,6 @@ public final class SpriteRenderer extends Renderer {
     public int columns = 1;
     public int rows = 1;
     public float timePerAnimation = 1f;
-
 
     private transient float timeElapsed = 0;
 
@@ -27,7 +26,11 @@ public final class SpriteRenderer extends Renderer {
 
     @Override
     public void build() {
-        if (spritesheet != null) spritesheet.build();
+        if (spritesheet == null) {
+            buildAnimation();
+        } else {
+            spritesheet.build();
+        }
     }
 
     public void setIndex() {

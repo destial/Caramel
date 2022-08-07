@@ -39,7 +39,7 @@ public class CharacterController2D extends Script {
             x = -5f;
         }
 
-	    // rb.setVelocity(x, y);
+	    rb.setVelocity(x, y);
 
         if (rb.isOnGround() && (Input.isJoystickPressed(Input.Joystick.Button.CIRCLE) || Input.isKeyDown(Input.Key.SPACE))) {
             rb.addVelocity(0, jumpForce * Time.deltaTime);

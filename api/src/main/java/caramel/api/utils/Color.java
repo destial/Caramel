@@ -1,8 +1,9 @@
 package caramel.api.utils;
 
+import caramel.api.interfaces.Copyable;
 import org.joml.Math;
 
-public final class Color {
+public final class Color implements Copyable<Color> {
     public float r = 1f, g = 1f, b = 1f, a = 1f;
 
     public Color() {}
@@ -50,5 +51,10 @@ public final class Color {
                 ", b=" + b +
                 ", a=" + a +
                 '}';
+    }
+
+    @Override
+    public Color copy() {
+        return new Color(r, g, b, a);
     }
 }

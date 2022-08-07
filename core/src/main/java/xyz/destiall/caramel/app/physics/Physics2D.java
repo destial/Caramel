@@ -14,7 +14,6 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.World;
 
-
 public final class Physics2D implements Physics {
     private final Vec2 gravity = new Vec2(0, -10f);
 
@@ -57,7 +56,7 @@ public final class Physics2D implements Physics {
         if (gameObject.hasComponent(Box2DCollider.class)) {
             shape = new PolygonShape();
             Box2DCollider collider = gameObject.getComponent(Box2DCollider.class);
-            ((PolygonShape) shape).setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.bounds.x * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.bounds.y * 0.5f);
+            ((PolygonShape) shape).setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.bounds.x() * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.bounds.y() * 0.5f);
             Vec2 pos = bodyDef.position;
             float x = pos.x + collider.offset.x;
             float y = pos.y + collider.offset.y;

@@ -117,7 +117,7 @@ public final class RigidBody2D extends RigidBody {
         if (rawBody == null) return false;
         Vec2 raycastStart = new Vec2(transform.position.x, transform.position.y);
         if (box2DCollider != null) {
-            raycastStart.y -= box2DCollider.useScale ? transform.scale.y * 0.5f : box2DCollider.bounds.y * 0.5f;
+            raycastStart.y -= box2DCollider.useScale ? transform.scale.y * 0.5f : box2DCollider.bounds.y() * 0.5f;
         } else if (circle2DCollider != null) {
             raycastStart.y -= circle2DCollider.radius;
         }

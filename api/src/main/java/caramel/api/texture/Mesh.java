@@ -2,6 +2,7 @@ package caramel.api.texture;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.interfaces.Copyable;
 import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
@@ -42,7 +43,7 @@ import static org.lwjgl.opengl.GL30.glGenBuffers;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
-public class Mesh {
+public class Mesh implements Copyable<Mesh> {
     public static final Class<? extends Mesh>[] MESHES = new Class[] {
             CircleMesh.class, QuadMesh.class, TriangleMesh.class
     };
@@ -90,6 +91,7 @@ public class Mesh {
         drawArrays = arrays;
     }
 
+    @Override
     public Mesh copy() {
         Mesh mesh = new Mesh();
         mesh.name = name;
@@ -255,20 +257,10 @@ public class Mesh {
         int vertexSizeBytes = (positionSize + colorSize + texSize + normalSize + texIdSize) * floatSizeBytes;
 
         glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
-        glEnableVertexAttribArray(0);
-
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
-        glEnableVertexAttribArray(1);
-
         glVertexAttribPointer(2, texSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes + colorSize * floatSizeBytes);
-        glEnableVertexAttribArray(2);
-
         glVertexAttribPointer(3, normalSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes);
-        glEnableVertexAttribArray(3);
-
         glVertexAttribPointer(4, texIdSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes + normalSize * floatSizeBytes);
-        glEnableVertexAttribArray(4);
-
         glBindVertexArray(0);
 
         if (texture != null) {
@@ -421,9 +413,7 @@ public class Mesh {
             if (withIndices) {
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, getIndexBuffer());
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
             dirty = false;
         }
 

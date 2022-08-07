@@ -26,8 +26,8 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 public final class BatchRenderer extends Mesh {
     public static final int MAX_TEXTURES = 8;
-    public static final int MAX_BATCH_SIZE = 500;
-    public static boolean USE_BATCH = true;
+    public static final int MAX_BATCH_SIZE = 1000;
+    public static boolean USE_BATCH = false;
     public static int DRAW_CALLS = 0;
     private static Map<Shader, List<BatchRenderer>> shaderMapping;
 

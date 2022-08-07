@@ -16,6 +16,7 @@ public class AnimationUpdate extends Script {
     public int score = 0;
     public int maxScore = 0;
     public transient GameObject circle;
+    public boolean ai = false;
     public AnimationUpdate(GameObject gameObject) {
         super(gameObject);
     }
@@ -34,29 +35,37 @@ public class AnimationUpdate extends Script {
     public void update() {
         if (rb == null || sp == null) return;
         Vector2 vel = rb.getVelocity();
-        float circleY = circle.transform.position.y;
-        float nowY = transform.position.y;
-        float diffY = circleY - nowY;
+        if (ai) {
+            float circleY = circle.transform.position.y;
+            float nowY = transform.position.y;
+            float diffY = circleY - nowY;
 
-        if (diffY > 0) {
-            float circleX = circle.transform.position.x;
-            float nowX = transform.position.x;
-            float diffX = circleX - nowX;
+            if (diffY > 0) {
+                float circleX = circle.transform.position.x;
+                float nowX = transform.position.x;
+                float diffX = circleX - nowX;
 
-            float y = rb.getVelocity().y();
-            if (Math.abs(diffX) > 0.1f) {
-                diffX *= 10f;
-            } else {
-                diffX = rb.getVelocity().x();
-            }
-            int multiplier = diffX < 0 ? -1 : 1;
-            diffX = Math.min(Math.abs(diffX), 7.5f) * multiplier;
-            rb.setVelocity(diffX, y);
-            if (rb.isOnGround() && diffY < 2) {
-                rb.addVelocity(0, 500f * Time.deltaTime);
+                float y = rb.getVelocity().y();
+                if (Math.abs(diffX) > 0.1f) {
+                    diffX *= 10f;
+                } else {
+                    diffX = rb.getVelocity().x();
+                }
+                int multiplier = diffX < 0 ? -1 : 1;
+                diffX = Math.min(Math.abs(diffX), 7.5f) * multiplier;
+                rb.setVelocity(diffX, y);
+                if (rb.isOnGround() && diffY < 2) {
+                    rb.addVelocity(0, 500f * Time.deltaTime);
+                }
             }
         }
+        button.getComponentInChildren(Text.class).text = "Hit " + score + " (" + maxScore + ")";
+    }
 
+    @Override
+    public void lateUpdate() {
+        if (rb == null || sp == null) return;
+        Vector2 vel = rb.getVelocity();
         float frameTime = 0.3f / Math.abs(vel.x());
         sp.timePerAnimation = frameTime;
         if (vel.x() < 0 && !sp.animation.equals("anim3")) {
@@ -69,7 +78,6 @@ public class AnimationUpdate extends Script {
             if (vel.x() < 0) sp.setAnimation("anim1");
             else sp.setAnimation("anim0");
         }
-        button.getComponentInChildren(Text.class).text = "Hit " + score + " (" + maxScore + ")";
     }
 
     @Override

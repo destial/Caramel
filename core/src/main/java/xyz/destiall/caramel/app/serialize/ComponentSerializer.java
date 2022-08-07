@@ -98,15 +98,18 @@ public final class ComponentSerializer implements JsonSerializer<Component>, Jso
                     System.out.println(value);
                 }
                 if (Component.class.isAssignableFrom(field.getType())) {
-                    JsonObject componentField = object.get(field.getName()).getAsJsonObject();
-                    Component fieldDeserialized = FIELD_COMPONENT_SERIALIZER.deserialize(componentField, null, null);
-                    if (fieldDeserialized != null) {
-                        value = fieldDeserialized;
-                    } else {
-                        UnknownFieldComponent ufc = new UnknownFieldComponent(field, component);
-                        int id = componentField.get("id").getAsInt();
-                        FIELD_MAP.putIfAbsent(id, new ArrayList<>());
-                        FIELD_MAP.get(id).add(ufc);
+                    JsonElement element = object.get(field.getName());
+                    if (element != null) {
+                        JsonObject componentField = element.getAsJsonObject();
+                        Component fieldDeserialized = FIELD_COMPONENT_SERIALIZER.deserialize(componentField, null, null);
+                        if (fieldDeserialized != null) {
+                            value = fieldDeserialized;
+                        } else {
+                            UnknownFieldComponent ufc = new UnknownFieldComponent(field, component);
+                            int id = componentField.get("id").getAsInt();
+                            FIELD_MAP.putIfAbsent(id, new ArrayList<>());
+                            FIELD_MAP.get(id).add(ufc);
+                        }
                     }
                 }
                 field.set(component, value);

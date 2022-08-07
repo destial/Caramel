@@ -3,10 +3,10 @@ package caramel.api.texture;
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
+import caramel.api.interfaces.Copyable;
 import caramel.api.render.Animation;
 import caramel.api.render.BatchRenderer;
 import caramel.api.texture.mesh.QuadMesh;
-import caramel.api.utils.Pair;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
@@ -14,12 +14,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Spritesheet {
+public final class Spritesheet implements Copyable<Spritesheet> {
     private transient List<Sprite> sprites;
-    private transient Map<String, Animation> animations;
     private transient boolean loaded = false;
 
-    private Map<String, Pair<Integer, Integer>> serializedAnimation;
+    private Map<String, Animation> animations;
     private final String path;
     private final int columns;
     private final int rows;
@@ -32,7 +31,6 @@ public final class Spritesheet {
         this.columns = columns;
         this.rows = rows;
         this.path = path;
-        serializedAnimation = new HashMap<>();
     }
 
     public void build() {
@@ -79,11 +77,6 @@ public final class Spritesheet {
                 break;
             }
         }
-        if (serializedAnimation != null) {
-            for (Map.Entry<String, Pair<Integer, Integer>> entry : serializedAnimation.entrySet()) {
-                addAnimation(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
-            }
-        }
         autoDetect();
         step();
         loaded = true;
@@ -120,11 +113,8 @@ public final class Spritesheet {
         anim.start = indexStart;
         anim.end = indexEnd;
         animations.put(name, anim);
-        if (serializedAnimation == null) {
-            serializedAnimation = new HashMap<>();
-        }
-        serializedAnimation.put(name, new Pair<>(indexStart, indexEnd));
         currentAnimation = name;
+        currentIndex = -1;
         return anim;
     }
 
@@ -177,6 +167,7 @@ public final class Spritesheet {
         mesh.resetIndices();
     }
 
+    @Override
     public Spritesheet copy() {
         Spritesheet spritesheet = new Spritesheet(path, columns, rows);
         spritesheet.mesh = mesh.copy();

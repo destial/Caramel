@@ -5,6 +5,7 @@ import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.interfaces.ShowInEditor;
 import caramel.api.objects.GameObject;
 import caramel.api.texture.Mesh;
+import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.Color;
 
 import java.util.HashSet;
@@ -30,6 +31,7 @@ public final class MeshRenderer extends Renderer {
 
     public MeshRenderer(GameObject gameObject) {
         super(gameObject);
+        mesh = new QuadMesh();
     }
 
     @Override

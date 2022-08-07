@@ -1,5 +1,6 @@
 package caramel.api.math;
 
+import caramel.api.interfaces.Copyable;
 import caramel.api.utils.Color;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
@@ -7,7 +8,7 @@ import org.joml.Vector3f;
 /**
  * Used for mesh rendering. Each mesh contains a list of vertex.
  */
-public final class Vertex {
+public final class Vertex implements Copyable<Vertex> {
     public Vector3f position;
     public Vector2f texCoords;
     public Color color;
@@ -76,4 +77,9 @@ public final class Vertex {
     }
 
     public static final int SIZE = 3 + 2 + 4 + 3 + 1;
+
+    @Override
+    public Vertex copy() {
+        return new Vertex(this);
+    }
 }
