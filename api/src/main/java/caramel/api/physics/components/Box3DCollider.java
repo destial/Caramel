@@ -7,6 +7,9 @@ import caramel.api.objects.GameObject;
 import org.joml.Vector3f;
 import org.ode4j.ode.DMass;
 
+/**
+ * Unused component. Was meant to be for 3D environments, but that has halted.
+ */
 public final class Box3DCollider extends Collider {
     public Vector3f bounds = new Vector3f(0.5f);
     private transient final Vector3f debugColor = new Vector3f(0, 255, 0);

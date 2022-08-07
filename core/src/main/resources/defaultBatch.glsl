@@ -29,14 +29,17 @@ in vec2 fTexCoords;
 in vec3 fNormal;
 in float fTexSlot;
 
-out vec4 color;
+out vec4 FragColor;
 
 void main() {
     int id = int(fTexSlot);
     if (id < 0) {
-        color = fColor;
+        FragColor = fColor;
     } else {
         vec4 tex = texture(texSampler[id], fTexCoords);
-        color = tex * fColor;
+        if (tex.a < 0.1) {
+            discard;
+        }
+        FragColor = tex * fColor;
     }
 }

@@ -1,10 +1,14 @@
 package caramel.api.math;
 
+import caramel.api.interfaces.Copyable;
 import org.jbox2d.common.Vec3;
 import org.joml.Vector3f;
 import org.ode4j.math.DVector3;
 
-public final class Vector3 {
+/**
+ * Math wrapper for the API to convert into each specific library.
+ */
+public final class Vector3 implements Copyable<Vector3> {
     private final Vector3f joml;
     private final Vec3 jbox2d;
     private final DVector3 ode;
@@ -23,6 +27,10 @@ public final class Vector3 {
 
     public Vector3(DVector3 vect) {
         this((float) vect.get0(), (float) vect.get1(), (float) vect.get2());
+    }
+
+    public Vector3(Vector3 value) {
+        this(value == null ? 0 : value.x(), value == null ? 0 : value.y(), value == null ? 0 : value.z());
     }
 
     public Vector3(Vec3 vect) {
@@ -80,5 +88,14 @@ public final class Vector3 {
     @Override
     public String toString() {
         return joml.toString();
+    }
+
+    public void set(Vector3 value) {
+        set(value.x(), value.y(), value.z());
+    }
+
+    @Override
+    public Vector3 copy() {
+        return new Vector3(x(), y(), z());
     }
 }

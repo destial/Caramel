@@ -1,5 +1,7 @@
 package caramel.api;
 
+import caramel.api.components.Camera;
+
 import java.lang.reflect.Field;
 import java.util.List;
 
@@ -81,6 +83,14 @@ public interface Input {
 
     static float getMouseWorldX() {
         return Application.getApp().getMouseListener().getScreenX();
+    }
+
+    static float getMouseWorldX(Camera camera) {
+        return Application.getApp().getMouseListener().getScreenX(camera);
+    }
+
+    static float getMouseWorldY(Camera camera) {
+        return Application.getApp().getMouseListener().getScreenY(camera);
     }
 
     static float getMouseWorldY() {

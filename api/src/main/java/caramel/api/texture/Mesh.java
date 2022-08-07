@@ -2,21 +2,22 @@ package caramel.api.texture;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
-import caramel.api.debug.Debug;
+import caramel.api.interfaces.Copyable;
 import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
+import caramel.api.texture.mesh.CircleMesh;
+import caramel.api.texture.mesh.IcosahedronMesh;
+import caramel.api.texture.mesh.QuadMesh;
+import caramel.api.texture.mesh.TriangleMesh;
 import caramel.api.utils.Color;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import org.lwjgl.BufferUtils;
-import org.ode4j.ode.internal.Matrix;
+import xyz.destiall.java.reflection.Reflect;
 
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,13 +43,15 @@ import static org.lwjgl.opengl.GL30.glGenBuffers;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
-public class Mesh {
-
+public class Mesh implements Copyable<Mesh> {
+    public static final Class<? extends Mesh>[] MESHES = new Class[] {
+            CircleMesh.class, QuadMesh.class, TriangleMesh.class
+    };
     protected transient final List<Vertex> dirtyVertexArray;
     protected transient int vaoId, vboId, eboId;
     protected final List<Vertex> vertexArray;
     protected final List<Integer> elementArray;
-    public int type;
+
     protected String shader;
     protected String texture;
     protected Color color = new Color();
@@ -56,7 +59,11 @@ public class Mesh {
     protected boolean drawArrays = false;
     protected boolean withIndices = false;
 
+    public String name;
+    public int type;
+
     public Mesh() {
+        name = "Custom";
         vertexArray = new ArrayList<>();
         dirtyVertexArray = new ArrayList<>();
         elementArray = new ArrayList<>(6);
@@ -84,8 +91,15 @@ public class Mesh {
         drawArrays = arrays;
     }
 
+    @Override
     public Mesh copy() {
-        Mesh mesh = new Mesh(drawArrays);
+        Mesh mesh = new Mesh();
+        mesh.name = name;
+        mesh.drawArrays = drawArrays;
+        mesh.type = type;
+        mesh.texture = texture;
+        mesh.shader = shader;
+        mesh.dirty = dirty;
         for (Vertex vertex : vertexArray) {
             Vertex copy = new Vertex();
             copy.position.set(vertex.position);
@@ -95,10 +109,6 @@ public class Mesh {
             copy.texSlot = vertex.texSlot;
             mesh.vertexArray.add(copy);
         }
-        mesh.type = type;
-        mesh.texture = texture;
-        mesh.shader = shader;
-        mesh.dirty = dirty;
         mesh.elementArray.addAll(elementArray);
         mesh.build(withIndices);
         return mesh;
@@ -134,6 +144,10 @@ public class Mesh {
             if (index < vertexArray.size()) break;
         }
         return vertexArray.get(index);
+    }
+
+    public int getIndex(int index) {
+        return elementArray.get(index);
     }
 
     public Mesh pushVertex(Vector3f position, Color color, Vector2f texCoords, Vector3f normal, float texSlot) {
@@ -210,6 +224,9 @@ public class Mesh {
 
     public void build(boolean with_indices) {
         this.withIndices = with_indices;
+        if (name == null) {
+            name = "Custom";
+        }
         if (shader == null) {
             if (texture != null) {
                 shader = "default";
@@ -240,20 +257,10 @@ public class Mesh {
         int vertexSizeBytes = (positionSize + colorSize + texSize + normalSize + texIdSize) * floatSizeBytes;
 
         glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
-        glEnableVertexAttribArray(0);
-
         glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
-        glEnableVertexAttribArray(1);
-
         glVertexAttribPointer(2, texSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes + colorSize * floatSizeBytes);
-        glEnableVertexAttribArray(2);
-
         glVertexAttribPointer(3, normalSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes);
-        glEnableVertexAttribArray(3);
-
         glVertexAttribPointer(4, texIdSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes + normalSize * floatSizeBytes);
-        glEnableVertexAttribArray(4);
-
         glBindVertexArray(0);
 
         if (texture != null) {
@@ -266,7 +273,6 @@ public class Mesh {
     public void invalidate() {
         glDeleteVertexArrays(vaoId);
         glDeleteBuffers(vboId);
-
         vaoId = 0;
         vboId = 0;
         if (eboId != 0) {
@@ -344,7 +350,7 @@ public class Mesh {
     public void renderBatch(Transform transform, Camera camera) {
         shader = "defaultBatch";
         Shader s = Shader.getShader(shader);
-        Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
+        Matrix4f mvp = transform.getModel();
         dirtyVertexArray.clear();
 
         Texture t = texture != null ? Texture.getTexture(texture) : null;
@@ -423,7 +429,6 @@ public class Mesh {
 
         if (drawArrays) glDrawArrays(type, 0, vertexArray.size());
         else glDrawElements(type, elementArray.size(), GL_UNSIGNED_INT, 0);
-
         BatchRenderer.DRAW_CALLS++;
 
         glDisableVertexAttribArray(0);
@@ -431,13 +436,11 @@ public class Mesh {
         glDisableVertexAttribArray(2);
         glDisableVertexAttribArray(3);
         glDisableVertexAttribArray(4);
-
         glBindVertexArray(0);
 
         if (texture != null) {
             Texture tex = Texture.getTexture(texture);
             tex.unbind();
-            glActiveTexture(0);
         }
 
         s.detach();

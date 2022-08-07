@@ -14,6 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+/**
+ * This {@link Scene} represents a collection of {@link GameObject}s.
+ */
 public abstract class Scene implements Update, Render {
     public final AtomicInteger entityIds = new AtomicInteger(0);
     protected List<GameObject> gameObjects;
@@ -24,7 +27,6 @@ public abstract class Scene implements Update, Render {
     protected Camera gameCamera;
     protected File file;
     protected boolean playing = false;
-    protected boolean saved = true;
 
     protected final Set<GameObject> selectedGameObject;
     protected final Set<GameObject> selectedDefaultGameObject;

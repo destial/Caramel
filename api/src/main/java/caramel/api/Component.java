@@ -2,10 +2,14 @@ package caramel.api;
 
 import caramel.api.components.RigidBody2D;
 import caramel.api.components.Transform;
+import caramel.api.interfaces.Copyable;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.Update;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.info.ContactPoint2D;
+import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import xyz.destiall.java.reflection.Reflect;
 
 import java.lang.reflect.Field;
@@ -48,6 +52,15 @@ public abstract class Component implements Update {
      * @return The {@link Component} if it exists, null if none.
      */
     public <C extends Component> C getComponent(Class<C> clazz) {
+        return gameObject.getComponent(clazz);
+    }
+
+    /**
+     * Get a {@link Component} that is linked to this object.
+     * @param clazz The class of the {@link Component}.
+     * @return The {@link Component} if it exists, null if none.
+     */
+    public Component getComponent(String clazz) {
         return gameObject.getComponent(clazz);
     }
 
@@ -137,17 +150,23 @@ public abstract class Component implements Update {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
                     boolean prev = field.isAccessible();
                     field.setAccessible(true);
-                    field.set(clone, field.get(this));
+                    if (field.getType().isAssignableFrom(Copyable.class)) {
+                        field.set(clone, ((Copyable<?>) field.get(this)).copy());
+                    } else if (field.getType().isAssignableFrom(Vector2f.class)) {
+                        field.set(clone, new Vector2f((Vector2f) field.get(this)));
+                    } else if (field.getType().isAssignableFrom(Vector3f.class)) {
+                        field.set(clone, new Vector3f((Vector3f) field.get(this)));
+                    } else if (field.getType().isAssignableFrom(Matrix4f.class)) {
+                        field.set(clone, new Matrix4f((Matrix4f) field.get(this)));
+                    } else {
+                        field.set(clone, field.get(this));
+                    }
                     field.setAccessible(prev);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-            if (copyId) {
-                clone.id = id;
-            } else {
-                clone.id = gameObject.scene.generateId();
-            }
+            clone.id = copyId ? id : gameObject.scene.generateId();
             return clone;
         } catch (Exception e) {
             e.printStackTrace();

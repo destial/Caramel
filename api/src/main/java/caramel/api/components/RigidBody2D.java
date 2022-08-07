@@ -1,19 +1,28 @@
 package caramel.api.components;
 
+import caramel.api.Component;
 import caramel.api.math.Vector2;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
 import caramel.api.physics.info.RaycastInfo2D;
+import org.jbox2d.collision.shapes.MassData;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
+import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.Fixture;
 
+/**
+ * This {@link Component} is used for two-dimensional physics.
+ */
 public final class RigidBody2D extends RigidBody {
     public final Vector2 velocity = new Vector2();
 
     public transient Body rawBody = null;
     public transient Box2DCollider box2DCollider;
     public transient Circle2DCollider circle2DCollider;
+
+    public transient Fixture fixture;
 
     public RigidBody2D(GameObject gameObject) {
         super(gameObject);
@@ -24,6 +33,33 @@ public final class RigidBody2D extends RigidBody {
         if (rawBody == null) return;
         rawBody.setTransform(new Vec2(x, y), rawBody.getAngle());
         // transform.setPosition(x, y, z);
+    }
+
+    @Override
+    protected void updateBody() {
+        if (fixture == null || rawBody == null) return;
+        rawBody.setAngularDamping(angularDamping);
+        rawBody.setLinearDamping(linearDamping);
+        rawBody.setFixedRotation(fixedRotation);
+        rawBody.setBullet(continuousCollision);
+        rawBody.setGravityScale(gravity ? 1f : 0f);
+        fixture.setSensor(isTrigger);
+        fixture.setFriction(friction);
+        switch (bodyType) {
+            case KINEMATIC:
+                rawBody.setType(BodyType.KINEMATIC);
+                break;
+            case STATIC:
+                rawBody.setType(BodyType.STATIC);
+                break;
+            case DYNAMIC:
+                rawBody.setType(BodyType.DYNAMIC);
+                break;
+        }
+        MassData massData = new MassData();
+        fixture.getMassData(massData);
+        massData.mass = mass;
+        rawBody.setMassData(massData);
     }
 
     @Override
@@ -81,7 +117,7 @@ public final class RigidBody2D extends RigidBody {
         if (rawBody == null) return false;
         Vec2 raycastStart = new Vec2(transform.position.x, transform.position.y);
         if (box2DCollider != null) {
-            raycastStart.y -= box2DCollider.useScale ? transform.scale.y * 0.5f : box2DCollider.bounds.y * 0.5f;
+            raycastStart.y -= box2DCollider.useScale ? transform.scale.y * 0.5f : box2DCollider.bounds.y() * 0.5f;
         } else if (circle2DCollider != null) {
             raycastStart.y -= circle2DCollider.radius;
         }

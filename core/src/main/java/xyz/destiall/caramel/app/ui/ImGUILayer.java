@@ -2,13 +2,15 @@ package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Input;
 import caramel.api.Time;
-import caramel.api.objects.SceneImpl;
+import caramel.api.events.WindowFocusEvent;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
 import imgui.callback.ImStrSupplier;
 import imgui.extension.imguizmo.ImGuizmo;
+import imgui.extension.imnodes.ImNodes;
 import imgui.flag.ImGuiBackendFlags;
+import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiCond;
 import imgui.flag.ImGuiConfigFlags;
 import imgui.flag.ImGuiKey;
@@ -16,15 +18,15 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.gl3.ImGuiImplGl3;
 import imgui.type.ImBoolean;
+import org.joml.Vector4f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugLine;
-import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
-import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR;
 import static org.lwjgl.glfw.GLFW.GLFW_CURSOR_NORMAL;
@@ -54,16 +56,17 @@ import static org.lwjgl.glfw.GLFW.glfwSetJoystickCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
+import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 
 public final class ImGUILayer {
     private final ApplicationImpl window;
     private final long glfwWindow;
-    private ScenePanel scenePanel;
-    private GamePanel gamePanel;
-
     public final List<DebugLine> lines = new ArrayList<>();
-
     private final ImGuiImplGl3 imGuiGl3 = new ImGuiImplGl3();
+
+    public static final Vector4f SECONDARY_COLOR = new Vector4f(237 / 255f, 143 / 256f, 35 / 256f, 1.f);
+    public static final Vector4f PRIMARY_COLOR = new Vector4f(255 / 255f, 137 / 256f, 2 / 256f, 1.f);
+    public static final Vector4f TERTIARY_COLOR = new Vector4f(102 / 255f, 54 / 256f, 0 / 256f, 0.5f);
 
     public ImGUILayer(ApplicationImpl window) {
         this.window = window;
@@ -73,6 +76,7 @@ public final class ImGUILayer {
     // Initialize Dear ImGui.
     public void initImGui() {
         ImGui.createContext();
+        ImNodes.createContext();
 
         final ImGuiIO io = ImGui.getIO();
 
@@ -116,7 +120,7 @@ public final class ImGUILayer {
             io.setKeyAlt(io.getKeysDown(GLFW_KEY_LEFT_ALT) || io.getKeysDown(GLFW_KEY_RIGHT_ALT));
             io.setKeySuper(io.getKeysDown(GLFW_KEY_LEFT_SUPER) || io.getKeysDown(GLFW_KEY_RIGHT_SUPER));
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused()) {
+            if (Objects.requireNonNull(window.getCurrentScene()).isPlaying() && window.isFocused()) {
                 window.getKeyListener().keyCallback(w, key, scancode, action, mods);
             }
         });
@@ -140,7 +144,7 @@ public final class ImGUILayer {
                 ImGui.setWindowFocus(null);
             }
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused())
+            if (Objects.requireNonNull(window.getCurrentScene()).isPlaying() && window.isFocused())
                 window.getMouseListener().mouseButtonCallback(w, button, action, mods);
         });
 
@@ -148,15 +152,13 @@ public final class ImGUILayer {
             io.setMouseWheelH(io.getMouseWheelH() + (float) xOffset);
             io.setMouseWheel(io.getMouseWheel() + (float) yOffset);
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused())
-                window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
+            window.getMouseListener().mouseScrollCallback(w, xOffset, yOffset);
         });
 
         glfwSetCursorPosCallback(glfwWindow, (w, x, y) -> {
             io.setMousePos((float) x, (float) y);
 
-            if (window.getCurrentScene().isPlaying() && window.isFocused())
-                window.getMouseListener().mousePosCallback(w, x, y);
+            window.getMouseListener().mousePosCallback(w, x, y);
         });
 
         io.setSetClipboardTextFn(new ImStrConsumer() {
@@ -180,12 +182,87 @@ public final class ImGUILayer {
     public void update() {
         startFrame(Time.deltaTime);
 
-        if (!window.isFullscreen()) {
+        if (!window.isFullScreen()) {
             setupDockspace();
-            window.getCurrentScene().__imguiLayer();
+            boolean recompiling = window.getScriptManager().isRecompiling();
+            if (recompiling) {
+                ImGui.pushAllowKeyboardFocus(false);
+            }
+            if (window.getCurrentScene() != null) {
+                window.getCurrentScene().__imguiLayer();
+            }
+            if (recompiling) {
+                ImGui.popAllowKeyboardFocus();
+            }
+        }
+
+        if (window.getScriptManager().isRecompiling()) {
+            if (ImGui.begin("##recompile",
+                    ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize |
+                    ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove |
+                    ImGuiWindowFlags.NoMouseInputs)) {
+                float width = ImGui.getWindowWidth();
+                float height = ImGui.getWindowWidth();
+                ImGui.setWindowPos((
+                        ApplicationImpl.getApp().getWidth() / 2f) - (width / 2f),
+                        (ApplicationImpl.getApp().getHeight() / 2f) - height / 2f);
+                ImGui.text("Recompiling scripts...");
+                ImGui.end();
+            }
         }
 
         endFrame();
+    }
+
+    private void startFrame(final float deltaTime) {
+        float[] winWidth = { ApplicationImpl.getApp().getWidth() };
+        float[] winHeight = { ApplicationImpl.getApp().getHeight() };
+        double[] mousePosX = { 0 };
+        double[] mousePosY = { 0 };
+        glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
+
+        final ImGuiIO io = ImGui.getIO();
+        io.setDisplaySize(winWidth[0], winHeight[0]);
+        io.setDisplayFramebufferScale(1f, 1f);
+        io.setMousePos((float) mousePosX[0], (float) mousePosY[0]);
+        io.setDeltaTime(deltaTime);
+
+        glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        ImGui.newFrame();
+        ImGuizmo.beginFrame();
+        Panel.reset();
+
+        ImGui.pushStyleColor(ImGuiCol.Button, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.ButtonActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.ButtonHovered, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.CheckMark, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TitleBg, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TitleBgActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabHovered, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.Tab, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabUnfocused, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TabUnfocusedActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+        ImGui.pushStyleColor(ImGuiCol.TextSelectedBg, TERTIARY_COLOR.x, TERTIARY_COLOR.y, TERTIARY_COLOR.z, TERTIARY_COLOR.w);
+    }
+
+    private void endFrame() {
+        ImGui.popStyleColor(12);
+
+        for (int i = 0; i < lines.size(); i++) {
+            DebugLine l = lines.get(i);
+            if (l.beginFrame() < 0) {
+                lines.remove(i);
+                i--;
+                continue;
+            }
+
+            ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
+        }
+
+        if (!window.isFullScreen()) {
+            ImGui.end();
+        }
     }
 
     private void setupDockspace() {
@@ -206,40 +283,7 @@ public final class ImGUILayer {
         ImGui.dockSpace(ImGui.getID("Dockspace"));
     }
 
-    private void startFrame(final float deltaTime) {
-        float[] winWidth = { ApplicationImpl.getApp().getWidth() };
-        float[] winHeight = { ApplicationImpl.getApp().getHeight() };
-        double[] mousePosX = { 0 };
-        double[] mousePosY = { 0 };
-        glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
-
-        final ImGuiIO io = ImGui.getIO();
-        io.setDisplaySize(winWidth[0], winHeight[0]);
-        io.setDisplayFramebufferScale(1f, 1f);
-        io.setMousePos((float) mousePosX[0], (float) mousePosY[0]);
-        io.setDeltaTime(deltaTime);
-
-        glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        ImGui.newFrame();
-        ImGuizmo.beginFrame();
-        Panel.reset();
-    }
-
-    private void endFrame() {
-        for (int i = 0; i < lines.size(); i++) {
-            DebugLine l = lines.get(i);
-            if (l.beginFrame() < 0) {
-                lines.remove(i);
-                i--;
-                continue;
-            }
-
-            ImGui.getForegroundDrawList().addCircle(l.from.x, l.from.y, 5f, Color.red.getRGB());
-        }
-
-        if (!window.isFullscreen()) {
-            ImGui.end();
-        }
+    public void render() {
         ImGui.render();
         imGuiGl3.renderDrawData(ImGui.getDrawData());
 
@@ -251,6 +295,7 @@ public final class ImGUILayer {
     public void destroyImGui() {
         imGuiGl3.dispose();
         ImGui.getIO().getFonts().destroy();
+        ImNodes.destroyContext();
         ImGui.destroyContext();
     }
 }

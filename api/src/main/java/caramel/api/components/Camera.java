@@ -1,12 +1,18 @@
 package caramel.api.components;
 
+import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.objects.GameObject;
+import caramel.api.render.Renderer;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+/**
+ * This {@link Component} is used to render a scene.
+ */
 public class Camera extends Component {
+    protected transient Renderer.State state = Renderer.State.WORLD;
     public transient Matrix4f projection, view;
     public Vector3f target;
     public boolean rotate = false;
@@ -15,8 +21,9 @@ public class Camera extends Component {
     @HideInEditor public Vector3f forward;
     @HideInEditor public Vector3f up;
     @HideInEditor public float fov = 60f;
-    @HideInEditor public float near = 0.1f;
+    @HideInEditor public float near = 0.01f;
     @HideInEditor public float far = 1000f;
+    public float zoom = 1f;
 
     public Camera(GameObject gameObject) {
         super(gameObject);
@@ -39,9 +46,12 @@ public class Camera extends Component {
     public void editorUpdate() {}
 
     public Matrix4f getProjection() {
-        float ratio = 16 / 9f;
+        float ratio = getRatio();
         projection.identity();
-        projection.ortho(-4.5f * ratio, 4.5f * ratio, -2.5f * ratio, 2.5f * ratio, near, far, true);
+        if (zoom <= 0) {
+            zoom = 1f;
+        }
+        projection.ortho(-4.5f * ratio * zoom, 4.5f * ratio * zoom, -2.5f * ratio * zoom, 2.5f * ratio * zoom, near, far, true);
         return new Matrix4f(projection);
     }
 
@@ -64,5 +74,16 @@ public class Camera extends Component {
 
     public Matrix4f getInverseView() {
         return new Matrix4f(getView()).invert();
+    }
+
+    public float getRatio() {
+        return Application.getApp().isFullScreen() ? (Application.getApp().getWidth() / (float) Application.getApp().getHeight())  : 16 / 9f;
+    }
+
+    public Renderer.State getState() {
+        if (state == null) {
+            state = Renderer.State.WORLD;
+        }
+        return state;
     }
 }

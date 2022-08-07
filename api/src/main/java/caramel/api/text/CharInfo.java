@@ -8,7 +8,6 @@ public final class CharInfo {
     public final int sourceY;
     public final int width;
     public final int height;
-
     public CharInfo(int sourceX, int sourceY, int width, int height) {
         this.sourceX = sourceX;
         this.sourceY = sourceY;

@@ -10,6 +10,9 @@ import caramel.api.sound.SoundSource;
 
 import java.io.File;
 
+/**
+ * This {@link Component} is used to play audio files. Only accepts .ogg files.
+ */
 public final class AudioPlayer extends Component {
     private transient SoundSource source;
     private transient Sound sound;

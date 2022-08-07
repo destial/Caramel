@@ -29,8 +29,9 @@ public abstract class GameObject implements Update, Render {
     protected final Set<Component> components;
     public final LinkedList<GameObject> children;
     public final ArrayList<String> tags;
+    public transient Transform transform;
+
     public StringWrapper name;
-    public Transform transform;
     public Transform parent;
     public Scene scene;
     public boolean active = true;
@@ -63,7 +64,11 @@ public abstract class GameObject implements Update, Render {
         for (Component component : components) {
             if (!component.enabled) continue;
             if (!component.alreadyEnabled) {
-                component.start();
+                try {
+                    component.start();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 component.alreadyEnabled = true;
             }
             component.update();
@@ -123,13 +128,22 @@ public abstract class GameObject implements Update, Render {
     }
 
     /**
+     * Get a {@link Component} that is linked to this object.
+     * @param clazz The class of the {@link Component}.
+     * @return The {@link Component} if it exists, null if none.
+     */
+    public Component getComponent(String clazz) {
+        return components.stream().filter(c -> c.getClass().getSimpleName().equals(clazz)).findFirst().orElse(null);
+    }
+
+    /**
      * Get a set of {@link Component}s that is linked to this object.
      * @param clazz The class of the {@link Component}.
      * @param <C> {@link Component}
      * @return The set of {@link Component}. It cannot be null.
      */
     public <C extends Component> Set<C> getComponents(Class<C> clazz) {
-        return (Set<C>) components.stream().filter(c -> clazz.isAssignableFrom(clazz)).collect(Collectors.toSet());
+        return (Set<C>) components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).collect(Collectors.toSet());
     }
 
     /**
@@ -225,6 +239,24 @@ public abstract class GameObject implements Update, Render {
     }
 
     /**
+     * Remove a {@link Component} linked to this object.
+     * @param clazz The class of the {@link Component}.
+     * @return true if it successfully removed, else false.
+     */
+    public boolean removeComponent(String clazz) {
+        Component component = getComponent(clazz);
+        if (component == null) return false;
+        if (component instanceof Transform) return false;
+        components.remove(component);
+        if (scene != null) {
+            if (component instanceof Camera && scene.getGameCamera() == component) {
+                scene.setGameCamera(null);
+            }
+        }
+        return true;
+    }
+
+    /**
      * Get every {@link Component} linked to this object.
      * This collection is mutable.
      * @return A mutable copy.
@@ -289,8 +321,13 @@ public abstract class GameObject implements Update, Render {
     public void render(Camera camera) {
         if (!active) return;
         for (Component component : components) {
-            if (component instanceof Render)
-                ((Render) component).render(camera);
+            if (component instanceof Render) {
+                Render render = ((Render) component);
+                if (render instanceof Renderer) {
+                    if (((Renderer) render).getRenderState() != camera.getState()) continue;
+                }
+                render.render(camera);
+            }
         }
         for (GameObject ch : children) {
             ch.render(camera);

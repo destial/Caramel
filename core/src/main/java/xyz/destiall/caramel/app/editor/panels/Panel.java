@@ -1,14 +1,17 @@
 package xyz.destiall.caramel.app.editor.panels;
 
 import caramel.api.objects.SceneImpl;
+import xyz.destiall.caramel.app.ApplicationImpl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class Panel {
     protected final SceneImpl scene;
+    protected final ApplicationImpl window;
     public Panel(SceneImpl scene) {
         this.scene = scene;
+        window = ApplicationImpl.getApp();
     }
 
     public abstract void __imguiLayer();

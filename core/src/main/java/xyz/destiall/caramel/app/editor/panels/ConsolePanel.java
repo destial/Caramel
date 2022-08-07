@@ -66,15 +66,15 @@ public final class ConsolePanel extends Panel {
 
     @Override
     public void __imguiLayer() {
-        ImGui.begin("Console");
-        Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
-        Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
-        for (int i = 0; i < LOGS.size(); i++) {
-            Pair<String, Level> log = LOGS.get(i);
-            ImGui.textColored(getColor(log.getValue()), log.getKey());
+        if (ImGui.begin("Console")) {
+            Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
+            Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
+            for (int i = 0; i < LOGS.size(); i++) {
+                Pair<String, Level> log = LOGS.get(i);
+                ImGui.textColored(getColor(log.getValue()), log.getKey());
+            }
         }
         ImGui.end();
-
     }
 
     private int getColor(Level level) {

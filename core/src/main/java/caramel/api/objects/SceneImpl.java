@@ -1,14 +1,19 @@
 package caramel.api.objects;
 
 import caramel.api.Application;
+import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Light;
+import caramel.api.components.UICamera;
+import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.render.BatchRenderer;
+import caramel.api.render.Shader;
+import caramel.api.scripts.Script;
 import caramel.api.utils.Pair;
 import imgui.ImGui;
 import org.joml.Vector3f;
@@ -20,6 +25,7 @@ import xyz.destiall.caramel.app.editor.panels.GamePanel;
 import xyz.destiall.caramel.app.editor.panels.HierarchyPanel;
 import xyz.destiall.caramel.app.editor.panels.InspectorPanel;
 import xyz.destiall.caramel.app.editor.panels.MenuBarPanel;
+import xyz.destiall.caramel.app.editor.panels.NodePanel;
 import xyz.destiall.caramel.app.editor.panels.Panel;
 import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 import xyz.destiall.caramel.app.physics.Physics;
@@ -27,14 +33,16 @@ import xyz.destiall.caramel.app.physics.Physics2D;
 import xyz.destiall.caramel.app.physics.Physics3D;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_FILL;
 import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
@@ -49,8 +57,9 @@ public final class SceneImpl extends Scene {
     private final Map<Class<?>, Panel> panels;
     private final List<EditorAction> actions;
     private final List<EditorAction> redoActions;
-    private boolean saved = true;
+    private final UICamera uiCamera;
 
+    private boolean saved = true;
     private EditorCamera editorCamera;
     private Physics.Mode physicsMode = Physics.Mode._2D;
 
@@ -72,6 +81,7 @@ public final class SceneImpl extends Scene {
             panels.put(ConsolePanel.class, new ConsolePanel(this));
             panels.put(ScenePanel.class, new ScenePanel(this));
             panels.put(GamePanel.class, new GamePanel(this));
+            panels.put(NodePanel.class, new NodePanel(this));
         }
 
         GameObjectImpl go = new GameObjectImpl(this);
@@ -80,6 +90,10 @@ public final class SceneImpl extends Scene {
         physics = new HashMap<>();
         physics.put(Physics.Mode._2D, new Physics2D(this));
         physics.put(Physics.Mode._3D, new Physics3D(this));
+
+        GameObject ui = new GameObjectImpl(this);
+        uiCamera = new UICamera(ui);
+        ui.addComponent(uiCamera);
     }
 
     public <P extends Panel> P getEditorPanel(Class<P> clazz) {
@@ -96,7 +110,6 @@ public final class SceneImpl extends Scene {
                 });
 
         for (GameObject go : gameObjects) go.update();
-
         physics.get(physicsMode).update();
         for (GameObject go : gameObjects) go.lateUpdate();
     }
@@ -137,18 +150,22 @@ public final class SceneImpl extends Scene {
         if (playing) {
             for (GameObject go : gameObjects) go.render(camera);
 
-            if (BatchRenderer.USE_BATCH) BatchRenderer.render();
+            if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
         } else {
             if (ImGui.isKeyDown(Input.Key.G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             for (GameObject go : gameObjects) go.render(camera);
 
-            if (BatchRenderer.USE_BATCH) BatchRenderer.render();
+            if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
 
             glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
+    }
+
+    public UICamera getUICamera() {
+        return uiCamera;
     }
 
     public boolean canUndo() {
@@ -195,28 +212,27 @@ public final class SceneImpl extends Scene {
 
     @Override
     public void editorUpdate() {
-        if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Z)) {
-            undoLastAction();
-        }
-
-        if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Y)) {
-            redoLastAction();
-        }
-
         editorCamera.gameObject.update();
-        lights = gameObjects.stream()
-                .map(g -> g.getComponentsInChildren(Light.class))
-                .reduce(new HashSet<>(), (s, l) -> {
-                    s.addAll(l);
-                    return s;
-                });
 
         if (playing) {
-            for (GameObject go : gameObjects) go.update();
+            for (GameObject go : gameObjects) {
+                go.update();
+                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
+                    gameCamera = go.getComponentInChildren(Camera.class);
+                }
+            }
             physics.get(physicsMode).update();
             for (GameObject go : gameObjects) go.lateUpdate();
 
         } else {
+            if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Z)) {
+                undoLastAction();
+            }
+
+            if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Y)) {
+                redoLastAction();
+            }
+
             for (GameObject go : gameObjects) {
                 go.editorUpdate();
                 if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
@@ -237,39 +253,72 @@ public final class SceneImpl extends Scene {
         if (playing) return;
         playing = true;
         ConsolePanel.LOGS.clear();
-        for (GameObject go : gameObjects) {
-            if (ApplicationImpl.getApp().EDITOR_MODE) {
-                GameObject clone = go.clone(true);
-                defaultGameObjects.add(clone);
-                if (selectedGameObject.contains(go)) {
-                    selectedDefaultGameObject.add(clone);
+        defaultGameObjects.addAll(gameObjects);
+        selectedDefaultGameObject.addAll(selectedGameObject);
+
+        gameObjects.clear();
+        selectedGameObject.clear();
+        for (GameObject go : defaultGameObjects) {
+            GameObject clone = go.clone(true);
+            gameObjects.add(clone);
+            if (selectedDefaultGameObject.contains(go)) {
+                selectedGameObject.add(clone);
+            }
+            physics.get(physicsMode).addGameObject(clone);
+        }
+
+        for (GameObject clone : gameObjects) {
+            for (Component component : clone.getMutableComponents()) {
+                if (component instanceof Script) {
+                    try {
+                        for (Field field : component.getClass().getDeclaredFields()) {
+                            if (Modifier.isTransient(field.getModifiers()) || !Component.class.isAssignableFrom(field.getType())) continue;
+                            field.setAccessible(true);
+                            Component value = (Component) field.get(component);
+                            if (value != null) {
+                                for (GameObject def : defaultGameObjects) {
+                                    boolean b = false;
+                                    for (Component c : def.getMutableComponents()) {
+                                        if (value == c) {
+                                            Component clonedComponent = gameObjects.stream().filter(g -> g.id == def.id).findFirst().get().getComponent((Class<? extends Component>) field.getType());
+                                            field.set(component, clonedComponent);
+                                            b = true;
+                                            break;
+                                        }
+                                    }
+                                    if (b) break;
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
-            physics.get(physicsMode).addGameObject(go);
         }
-        selectedGameObject.clear();
+
+        gameCamera = null;
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }
 
     public void stop() {
         if (!playing) return;
-        playing = false;
-        if (ApplicationImpl.getApp().EDITOR_MODE) {
-            gameObjects.clear();
-            gameObjects.addAll(defaultGameObjects);
-
-            selectedGameObject.clear();
-            selectedGameObject.addAll(selectedDefaultGameObject);
-
-            defaultGameObjects.clear();
-            selectedDefaultGameObject.clear();
-
-            for (Physics p : physics.values()) {
-                p.reset();
-            }
-            gameCamera = null;
-        }
         Application.getApp().getEventHandler().call(new SceneStopEvent(this));
+
+        playing = false;
+        gameObjects.clear();
+        gameObjects.addAll(defaultGameObjects);
+
+        selectedGameObject.clear();
+        selectedGameObject.addAll(selectedDefaultGameObject);
+
+        defaultGameObjects.clear();
+        selectedDefaultGameObject.clear();
+
+        for (Physics p : physics.values()) {
+            p.reset();
+        }
+        gameCamera = null;
     }
 
     public void __imguiLayer() {

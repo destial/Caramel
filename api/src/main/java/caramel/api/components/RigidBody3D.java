@@ -5,6 +5,9 @@ import caramel.api.objects.GameObject;
 import caramel.api.physics.components.Box3DCollider;
 import org.ode4j.ode.DBody;
 
+/**
+ * Unused component. Was meant to be for 3D environments, but that has halted.
+ */
 public final class RigidBody3D extends RigidBody {
     public final Vector3 velocity = new Vector3();
 
@@ -17,6 +20,11 @@ public final class RigidBody3D extends RigidBody {
 
     @Override
     public void _setPosition(float x, float y, float z) {
+
+    }
+
+    @Override
+    protected void updateBody() {
 
     }
 

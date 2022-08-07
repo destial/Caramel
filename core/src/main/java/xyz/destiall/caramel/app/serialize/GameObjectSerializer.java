@@ -16,6 +16,7 @@ import xyz.destiall.java.gson.JsonSerializationContext;
 import xyz.destiall.java.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 public final class GameObjectSerializer implements JsonSerializer<GameObject>, JsonDeserializer<GameObject> {
     public int maxId = 0;
@@ -40,6 +41,7 @@ public final class GameObjectSerializer implements JsonSerializer<GameObject>, J
             if (component == null) continue;
             gameObject.transform = (Transform) component;
             gameObject.addComponent(gameObject.transform);
+            SceneSerializer.COMPONENT_MAP.get(scene).put(component.id, component);
             if (maxId < component.id) {
                 maxId = component.id;
             }
@@ -58,6 +60,19 @@ public final class GameObjectSerializer implements JsonSerializer<GameObject>, J
 
             Component component = SceneSerializer.COMPONENT_SERIALIZER.deserialize(c, gameObject);
             if (component == null) continue;
+            SceneSerializer.COMPONENT_MAP.get(scene).put(component.id, component);
+            List<UnknownFieldComponent> ufcs = ComponentSerializer.FIELD_MAP.get(component.id);
+            if (ufcs != null) {
+                System.out.println(ufcs);
+                for (UnknownFieldComponent ufc : ufcs) {
+                    try {
+                        ufc.getField().setAccessible(true);
+                        ufc.getField().set(ufc.getOwningComponent(), component);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             if (component instanceof Renderer) {
                 Renderer renderer = (Renderer) component;
                 renderer.build();

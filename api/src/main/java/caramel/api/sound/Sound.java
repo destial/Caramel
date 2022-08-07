@@ -1,5 +1,7 @@
 package caramel.api.sound;
 
+import caramel.api.interfaces.Copyable;
+
 import static org.lwjgl.openal.AL10.AL_BUFFER;
 import static org.lwjgl.openal.AL10.AL_GAIN;
 import static org.lwjgl.openal.AL10.AL_LOOPING;
@@ -16,7 +18,7 @@ import static org.lwjgl.openal.AL10.alSourceStop;
 import static org.lwjgl.openal.AL10.alSourcef;
 import static org.lwjgl.openal.AL10.alSourcei;
 
-public final class Sound {
+public final class Sound implements Copyable<Sound> {
     private final SoundSource source;
     private int sourceId;
     private boolean loop = false;
@@ -87,7 +89,6 @@ public final class Sound {
     }
 
     public void stop() {
-        System.out.println("stopping " + this);
         alSourcef(sourceId, AL_GAIN, 0);
         alSourcei(sourceId, AL_LOOPING, 0);
         alSourceStop(sourceId);
@@ -103,5 +104,14 @@ public final class Sound {
     public void invalidate() {
         stop();
         alDeleteSources(sourceId);
+    }
+
+    @Override
+    public Sound copy() {
+        Sound copy = new Sound(source);
+        copy.setPosition(getPosition());
+        copy.setLoop(isLooping());
+        copy.setVolume(getVolume());
+        return copy;
     }
 }

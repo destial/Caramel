@@ -1,10 +1,14 @@
 package caramel.api.math;
 
+import caramel.api.interfaces.Copyable;
 import imgui.ImVec2;
 import org.jbox2d.common.Vec2;
 import org.joml.Vector2f;
 
-public final class Vector2 {
+/**
+ * Math wrapper for the API to convert into each specific library.
+ */
+public final class Vector2 implements Copyable<Vector2> {
     private final Vector2f joml;
     private final Vec2 jbox2d;
     private final ImVec2 imgui;
@@ -33,6 +37,10 @@ public final class Vector2 {
         joml = new Vector2f(x, y);
         jbox2d = new Vec2(x, y);
         imgui = new ImVec2(x, y);
+    }
+
+    public Vector2(Vector2 value) {
+        this(value == null ? 0f : value.x(), value == null ? 0f : value.y());
     }
 
     public void set(float x, float y) {
@@ -74,5 +82,14 @@ public final class Vector2 {
     @Override
     public String toString() {
         return joml.toString();
+    }
+
+    public void set(Vector2 value) {
+        set(value.x(), value.y());
+    }
+
+    @Override
+    public Vector2 copy() {
+        return new Vector2(x(), y());
     }
 }

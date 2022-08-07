@@ -10,46 +10,49 @@ import org.joml.Vector2f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 
 public final class GamePanel extends Panel {
-    private final ApplicationImpl window;
     private float previousFps;
 
     public GamePanel(SceneImpl scene) {
         super(scene);
-        window = ApplicationImpl.getApp();
     }
 
     @Override
     public void __imguiLayer() {
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0f, 0f);
-        ImGui.begin("Game", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize);
-        Panel.setPanelFocused(GamePanel.class, ImGui.isWindowFocused());
-        Panel.setPanelHovered(GamePanel.class, ImGui.isWindowHovered());
-
-        if (Time.isSecond) {
-            previousFps = Time.getFPS();
+        int flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize;
+        if (window.getScriptManager().isRecompiling()) {
+            flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
-        ImGui.text("FPS: " + previousFps);
+        if (ImGui.begin("Game", flags)) {
+            Panel.setPanelFocused(GamePanel.class, ImGui.isWindowFocused());
+            Panel.setPanelHovered(GamePanel.class, ImGui.isWindowHovered());
 
-        ImVec2 windowSize = getLargestAspectRatioViewport();
-        ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
+            if (Time.isSecond) {
+                previousFps = Time.getFPS();
+            }
+            ImGui.text("FPS: " + previousFps);
 
-        ImGui.setCursorPos(windowPos.x, windowPos.y);
+            ImVec2 windowSize = getLargestAspectRatioViewport();
+            ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
 
-        ImVec2 bottomLeft = new ImVec2();
-        ImGui.getCursorScreenPos(bottomLeft);
-        bottomLeft.x -= ImGui.getScrollX();
-        bottomLeft.y -= ImGui.getScrollY();
+            ImGui.setCursorPos(windowPos.x, windowPos.y);
 
-        float leftX = bottomLeft.x;
-        float bottomY = bottomLeft.y;
+            ImVec2 bottomLeft = new ImVec2();
+            ImGui.getCursorScreenPos(bottomLeft);
+            bottomLeft.x -= ImGui.getScrollX();
+            bottomLeft.y -= ImGui.getScrollY();
 
-        int texId = window.getGameViewFramebuffer().getTexture().getTexId();
+            float leftX = bottomLeft.x;
+            float bottomY = bottomLeft.y;
 
-        ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
+            int texId = window.getGameViewFramebuffer().getTexture().getTexId();
 
-        window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
-        window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
+            ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
 
+            window.getMouseListener().setGameViewportPos(new Vector2f(leftX, bottomY));
+            window.getMouseListener().setGameViewportSize(new Vector2f(windowSize.x, windowSize.y));
+
+        }
         ImGui.end();
         ImGui.popStyleVar();
     }

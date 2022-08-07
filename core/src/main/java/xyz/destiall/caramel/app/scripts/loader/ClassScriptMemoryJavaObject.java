@@ -13,7 +13,6 @@ public final class ClassScriptMemoryJavaObject extends AbstractScriptJavaObject 
 
     ClassScriptMemoryJavaObject(String className) {
         super(className, JavaFileObject.Kind.CLASS);
-
         this.className = className;
     }
 

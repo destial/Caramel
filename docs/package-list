@@ -9,10 +9,10 @@ caramel.api.objects
 caramel.api.physics
 caramel.api.physics.components
 caramel.api.physics.info
-caramel.api.physics.internals
 caramel.api.render
 caramel.api.scripts
 caramel.api.sound
 caramel.api.text
 caramel.api.texture
+caramel.api.texture.mesh
 caramel.api.utils

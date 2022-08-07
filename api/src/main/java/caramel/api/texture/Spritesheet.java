@@ -3,8 +3,10 @@ package caramel.api.texture;
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
 import caramel.api.debug.Debug;
+import caramel.api.interfaces.Copyable;
 import caramel.api.render.Animation;
-import caramel.api.utils.Pair;
+import caramel.api.render.BatchRenderer;
+import caramel.api.texture.mesh.QuadMesh;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
@@ -12,34 +14,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class Spritesheet {
+public final class Spritesheet implements Copyable<Spritesheet> {
     private transient List<Sprite> sprites;
-    private transient Map<String, Animation> animations;
-    private transient Mesh mesh;
     private transient boolean loaded = false;
 
-    private Map<String, Pair<Integer, Integer>> serializedAnimation;
+    private Map<String, Animation> animations;
     private final String path;
     private final int columns;
     private final int rows;
 
     public int currentIndex = 0;
     public String currentAnimation;
+    public Mesh mesh;
 
     public Spritesheet(String path, int columns, int rows) {
         this.columns = columns;
         this.rows = rows;
         this.path = path;
-        serializedAnimation = new HashMap<>();
     }
 
     public void build() {
         if (loaded) return;
         sprites = new ArrayList<>();
         animations = new HashMap<>();
-        mesh = MeshBuilder.createQuad(1);
-        mesh.build();
-        mesh.setTexture(path);
+        if (mesh == null) {
+            mesh = new QuadMesh(1);
+            mesh.setTexture(path);
+            mesh.build();
+        }
         Texture texture = mesh.getTexture();
         if (texture == null) return;
 
@@ -64,7 +66,6 @@ public final class Spritesheet {
 
             Sprite sprite = new Sprite(texCoords);
             sprites.add(sprite);
-
             currentX += spriteWidth;
             if (currentX >= texture.getWidth()) {
                 currentX = 0;
@@ -74,11 +75,6 @@ public final class Spritesheet {
 
             if (currentY >= texture.getHeight()) {
                 break;
-            }
-        }
-        if (serializedAnimation != null) {
-            for (Map.Entry<String, Pair<Integer, Integer>> entry : serializedAnimation.entrySet()) {
-                addAnimation(entry.getKey(), entry.getValue().getKey(), entry.getValue().getValue());
             }
         }
         autoDetect();
@@ -117,11 +113,8 @@ public final class Spritesheet {
         anim.start = indexStart;
         anim.end = indexEnd;
         animations.put(name, anim);
-        if (serializedAnimation == null) {
-            serializedAnimation = new HashMap<>();
-        }
-        serializedAnimation.put(name, new Pair<>(indexStart, indexEnd));
         currentAnimation = name;
+        currentIndex = -1;
         return anim;
     }
 
@@ -133,7 +126,11 @@ public final class Spritesheet {
 
     public void render(Transform transform, Camera camera) {
         if (sprites == null || sprites.isEmpty()) return;
-        mesh.render(transform, camera);
+        if (BatchRenderer.USE_BATCH) {
+            mesh.renderBatch(transform, camera);
+        } else {
+            mesh.render(transform, camera);
+        }
     }
 
     public void step() {
@@ -170,8 +167,12 @@ public final class Spritesheet {
         mesh.resetIndices();
     }
 
+    @Override
     public Spritesheet copy() {
         Spritesheet spritesheet = new Spritesheet(path, columns, rows);
+        spritesheet.mesh = mesh.copy();
+        spritesheet.mesh.setTexture(path);
+        spritesheet.mesh.build();
         spritesheet.build();
         spritesheet.currentAnimation = currentAnimation;
         spritesheet.currentIndex = currentIndex;

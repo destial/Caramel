@@ -77,6 +77,9 @@ public final class FileWatcher implements Runnable {
         });
     }
 
+    private FileEvent lastEvent;
+    private long lastMillis;
+
     @Override
     public void run() {
         try {
@@ -113,6 +116,12 @@ public final class FileWatcher implements Runnable {
                         } else {
                             fileEvent = new FileEvent(toFile, FileEvent.Type.DELETE);
                         }
+
+                        if (fileEvent.equals(lastEvent) && lastMillis >= (System.currentTimeMillis() - 1000)) {
+                            continue;
+                        }
+                        lastEvent = fileEvent;
+                        lastMillis = System.currentTimeMillis();
 
                         ApplicationImpl.getApp().getEventHandler().call(fileEvent);
                     }

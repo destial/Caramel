@@ -25,7 +25,6 @@ import imgui.extension.texteditor.TextEditorLanguageDefinition;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
-import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.AddComponents;
 import xyz.destiall.caramel.app.editor.action.DeleteComponents;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
@@ -36,13 +35,15 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_BACKSPACE;
+import static xyz.destiall.caramel.app.ui.ImGUILayer.PRIMARY_COLOR;
+import static xyz.destiall.caramel.app.ui.ImGUILayer.SECONDARY_COLOR;
 
 public final class InspectorPanel extends Panel {
-    private static final TextEditor editor = new TextEditor();
+    private static final TextEditor editor;
     static {
+        editor = new TextEditor();
         TextEditorLanguageDefinition lang = new TextEditorLanguageDefinition();
-        lang.setAutoIdentation(false);
+        lang.setAutoIdentation(true);
         lang.setName("java");
         lang.setSingleLineComment("//");
         lang.setCommentStart("/*");
@@ -66,135 +67,139 @@ public final class InspectorPanel extends Panel {
 
     @Override
     public void __imguiLayer() {
-        ImGui.begin("Inspector");
-        Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
-        Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
+        int flags = 0;
+        if (window.getScriptManager().isRecompiling()) {
+            flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
+        }
+        if (ImGui.begin("Inspector", flags)) {
+            Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
+            Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
 
-        GameObject selected = scene.getSelectedGameObject().stream().findFirst().orElse(null);
-        if (selected != null) {
-            selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
-            ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
-            for (Component component : selected.getComponents()) {
-                if (selectedComponent == component) {
-                    ImGui.pushStyleColor(ImGuiCol.ButtonActive, 0.3f, 0.3f, 0.7f, 1.0f);
-                }
-                if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
-                    ImGui.text("id: " + component.id);
-                    for (Field field : component.getClass().getFields()) {
-                        if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) {
-                            continue;
+            GameObject selected = scene.getSelectedGameObject().stream().findFirst().orElse(null);
+            if (selected != null) {
+                selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
+                ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
+                for (Component component : selected.getComponents()) {
+                    ImGui.pushStyleColor(ImGuiCol.Header, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
+                    if (selectedComponent == component) {
+                        ImGui.pushStyleColor(ImGuiCol.HeaderActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+                        ImGui.pushStyleColor(ImGuiCol.HeaderHovered, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
+                    }
+                    if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
+                        ImGui.text("id: " + component.id);
+                        for (Field field : component.getClass().getFields()) {
+                            if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) {
+                                continue;
+                            }
+                            if (field.isAnnotationPresent(ShowInEditor.class) || Modifier.isPublic(field.getModifiers())) {
+                                field.setAccessible(true);
+                                ImGuiUtils.imguiLayer(field, component);
+                            }
                         }
-                        if (field.isAnnotationPresent(ShowInEditor.class) || Modifier.isPublic(field.getModifiers())) {
-                            field.setAccessible(true);
-                            ImGuiUtils.imguiLayer(field, component);
+                        ImGui.separator();
+                        for (Method method : component.getClass().getMethods()) {
+                            if (method.isAnnotationPresent(FunctionButton.class)) {
+                                method.setAccessible(true);
+                                ImGuiUtils.imguiLayer(method, component);
+                            }
+                        }
+
+                        if (component instanceof Script) {
+                            InternalScript s = Application.getApp().getScriptManager().getInternalScript(component.getClass());
+                            if (s != null && ImGui.button("Open Script")) {
+                                try {
+                                    Desktop.getDesktop().open(s.getFile());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+                            if (s != currentScript) {
+                                currentScript = s;
+                                if (s != null) {
+                                    editor.setText((String) currentScript.getCode());
+                                }
+                            }
+
+                            if (currentScript != null) {
+                                editor.render(editor.getText());
+                            }
+                        }
+                    }
+                    if (selectedComponent == component) {
+                        ImGui.popStyleColor(2);
+                    }
+                    ImGui.popStyleColor();
+                    if (component instanceof Transform) continue;
+
+                    if (ImGui.isItemHovered() && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
+                        selectedComponent = component;
+                        popupMousePos = new ImVec2(ImGui.getMousePosX(), ImGui.getMousePosY());
+                    } else if (ImGui.isWindowHovered() && ImGui.isMouseClicked(Input.Mouse.LEFT)) {
+                        selectedComponent = null;
+                    }
+                }
+
+                if (selectedComponent != null) {
+                    ImGui.begin("##removecomponent", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
+                    ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
+                    if (ImGui.selectable("Remove Component")) {
+                        selected.removeComponent(selectedComponent.getClass());
+                        DeleteComponents deleteComponents = new DeleteComponents(selected);
+                        deleteComponents.deleted.add(selectedComponent);
+                        scene.addUndoAction(deleteComponents);
+                        selectedComponent = null;
+                    }
+                    ImGui.end();
+                }
+
+                ImGui.separator();
+                if (ImGui.button("Add Component")) {
+                    addingComponents = !addingComponents;
+                }
+                if (addingComponents) {
+                    ImGui.beginListBox("##List Component");
+                    ImGui.inputText("Search", search);
+                    for (Class<?> c : Payload.COMPONENTS) {
+                        if (selected.hasComponent((Class<? extends Component>) c)) continue;
+                        if (search.isEmpty() || c.getSimpleName().toLowerCase().contains(search.get().toLowerCase())) {
+                            if (ImGui.selectable(c.getSimpleName())) {
+                                addComponent(selected, c);
+                                addingComponents = false;
+                            }
                         }
                     }
                     ImGui.separator();
-                    for (Method method : component.getClass().getMethods()) {
-                        if (method.isAnnotationPresent(FunctionButton.class)) {
-                            method.setAccessible(true);
-                            ImGuiUtils.imguiLayer(method, component);
-                        }
+                    if (ImGui.selectable("Create Script")) {
+                        addingScript = !addingScript;
+                        ImGui.setScrollHereY();
                     }
-
-                    if (component instanceof Script) {
-                        InternalScript s = Application.getApp().getScriptManager().getInternalScript(component.getClass());
-                        if (s != null && ImGui.button("Open Script")) {
-                            try {
-                                Desktop.getDesktop().open(s.getFile());
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                    if (addingScript) {
+                        ImGuiUtils.inputText("Script Name:", this.scriptName);
+                        if (ImGui.button("Create")) {
+                            InternalScript s = FileIO.writeScript(this.scriptName.get());
+                            if (s == null) {
+                                Debug.logError("Error while creating script file!");
+                            } else {
+                                try {
+                                    Component c = s.getAsComponent(selected);
+                                    selected.addComponent(c);
+                                    Desktop.getDesktop().open(s.getFile());
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    Debug.logError(e.getLocalizedMessage());
+                                }
+                                this.scriptName.clear();
                             }
-                        }
-
-                        if (s != currentScript) {
-                            currentScript = s;
-                            if (s != null) {
-                                editor.setText((String) currentScript.getCode());
-                            }
-                        }
-
-                        if (currentScript != null) {
-                            editor.render(editor.getText());
-                        }
-                    }
-                }
-                if (selectedComponent == component) {
-                    ImGui.popStyleColor();
-                }
-                if (component instanceof Transform) continue;
-
-                if (ImGui.isItemHovered() && ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
-                    selectedComponent = component;
-                    popupMousePos = new ImVec2(ImGui.getMousePosX(), ImGui.getMousePosY());
-                } else if (ImGui.isWindowHovered() && ImGui.isMouseClicked(Input.Mouse.LEFT)) {
-                    selectedComponent = null;
-                }
-            }
-
-            if (selectedComponent != null) {
-                ImGui.begin("##removecomponent", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoMove | ImGuiWindowFlags.HorizontalScrollbar | ImGuiWindowFlags.NoSavedSettings);
-                ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
-                if (ImGui.selectable("Remove Component")) {
-                    selected.removeComponent(selectedComponent.getClass());
-                    DeleteComponents deleteComponents = new DeleteComponents(selected);
-                    deleteComponents.deleted.add(selectedComponent);
-                    scene.addUndoAction(deleteComponents);
-                    selectedComponent = null;
-                }
-                ImGui.end();
-            }
-
-            ImGui.separator();
-            if (ImGui.button("Add Component")) {
-                addingComponents = !addingComponents;
-            }
-            if (addingComponents) {
-                ImGui.beginListBox("##List Component");
-                ImGui.inputText("Search", search);
-                if (ImGui.isKeyPressed(GLFW_KEY_BACKSPACE)) {
-                    String newInput = search.getLength() > 0 ? search.get().substring(0, search.getLength() - 1) : "";
-                    search.clear();
-                    search.set(newInput);
-                }
-                for (Class<?> c : Payload.COMPONENTS) {
-                    if (selected.hasComponent((Class<? extends Component>) c)) continue;
-                    if (search.isEmpty() || c.getSimpleName().toLowerCase().contains(search.get().toLowerCase())) {
-                        if (ImGui.selectable(c.getSimpleName())) {
-                            addComponent(selected, c);
                             addingComponents = false;
+                            addingScript = false;
                         }
                     }
+                    ImGui.endListBox();
+                } else {
+                    search.clear();
                 }
-                ImGui.separator();
-                if (ImGui.selectable("Create Script")) {
-                    addingScript = !addingScript;
-                }
-                if (addingScript) {
-                    ImGuiUtils.inputText("Script Name:", this.scriptName);
-                    if (ImGui.button("Create")) {
-                        InternalScript s = FileIO.writeScript(this.scriptName.get());
-                        if (s == null) {
-                            Debug.logError("Error while creating script file!");
-                        } else {
-                            try {
-                                Component c = s.getAsComponent(selected);
-                                selected.addComponent(c);
-                                Desktop.getDesktop().open(s.getFile());
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                Debug.logError(e.getLocalizedMessage());
-                            }
-                        }
-                        addingComponents = false;
-                        addingScript = false;
-                    }
-                }
-                ImGui.endListBox();
-            } else {
-                search.clear();
             }
-
         }
         ImGui.end();
     }

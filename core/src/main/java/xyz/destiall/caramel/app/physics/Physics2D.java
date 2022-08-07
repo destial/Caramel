@@ -6,16 +6,13 @@ import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
 import caramel.api.physics.components.Box2DCollider;
 import caramel.api.physics.components.Circle2DCollider;
-import caramel.api.physics.internals.ContactListener;
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.collision.shapes.Shape;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
-import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
-
 
 public final class Physics2D implements Physics {
     private final Vec2 gravity = new Vec2(0, -10f);
@@ -40,6 +37,7 @@ public final class Physics2D implements Physics {
         bodyDef.linearDamping = rigidBody.linearDamping;
         bodyDef.fixedRotation = rigidBody.fixedRotation;
         bodyDef.bullet = rigidBody.continuousCollision;
+        bodyDef.gravityScale = rigidBody.gravity ? 1f : 0f;
 
         switch (rigidBody.bodyType) {
             case KINEMATIC:
@@ -58,7 +56,7 @@ public final class Physics2D implements Physics {
         if (gameObject.hasComponent(Box2DCollider.class)) {
             shape = new PolygonShape();
             Box2DCollider collider = gameObject.getComponent(Box2DCollider.class);
-            ((PolygonShape) shape).setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.bounds.x * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.bounds.y * 0.5f);
+            ((PolygonShape) shape).setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.bounds.x() * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.bounds.y() * 0.5f);
             Vec2 pos = bodyDef.position;
             float x = pos.x + collider.offset.x;
             float y = pos.y + collider.offset.y;
@@ -75,8 +73,9 @@ public final class Physics2D implements Physics {
         }
 
         rigidBody.rawBody = world.createBody(bodyDef);
-        Fixture fixture = rigidBody.rawBody.createFixture(shape, rigidBody.mass);
-        fixture.setSensor(rigidBody.isTrigger);
+        rigidBody.fixture = rigidBody.rawBody.createFixture(shape, rigidBody.mass);
+        rigidBody.fixture.setSensor(rigidBody.isTrigger);
+        rigidBody.fixture.setFriction(rigidBody.friction);
     }
 
     @Override
@@ -93,7 +92,8 @@ public final class Physics2D implements Physics {
         world.setContactListener(new ContactListener(scene));
         world.setAllowSleep(true);
         world.setAutoClearForces(true);
-        world.setSubStepping(true);
+        // world.setSubStepping(true);
+        world.setContinuousPhysics(true);
     }
 
     @Override

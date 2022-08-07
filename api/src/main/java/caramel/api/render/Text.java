@@ -30,13 +30,14 @@ public final class Text extends Renderer {
 
     @ShowInEditor
     @InvokeOnEdit("setColor")
-    public Color color = new Color(1f, 1f, 1f, 1f);
+    public Color color = new Color(0f, 0f, 0f, 1f);
 
     @InvokeOnEdit("updateFontSize")
     public int fontSize = 24;
 
     public Text(GameObject gameObject) {
         super(gameObject);
+        renderState = State.UI;
     }
 
     @Override

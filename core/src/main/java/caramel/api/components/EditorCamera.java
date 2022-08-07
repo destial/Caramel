@@ -16,6 +16,7 @@ public final class EditorCamera extends Camera {
     @HideInEditor
     private static final float DELTA_ERROR = 0.0009f;
     private boolean perspective = false;
+    private float mouseX, mouseY;
     public float sensitivity = 0.5f;
 
     public EditorCamera(GameObject gameObject) {
@@ -25,9 +26,7 @@ public final class EditorCamera extends Camera {
     }
 
     @Override
-    public void start() {
-
-    }
+    public void start() {}
 
     @Override
     public void update() {
@@ -67,7 +66,8 @@ public final class EditorCamera extends Camera {
                 up.normalize();
 
             } else {
-
+                float scroll = -Input.getMouseScroll();
+                zoom += (scroll * 0.1f);
                 transform.position.add(up.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
                 Vector3f right = target.cross(up, new Vector3f());
                 transform.position.add(right.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseX));
@@ -82,7 +82,7 @@ public final class EditorCamera extends Camera {
         }
 
         if (ImGui.isKeyPressed(Input.Key.C)) {
-            toggleCameraView();
+            // toggleCameraView();
         }
     }
 

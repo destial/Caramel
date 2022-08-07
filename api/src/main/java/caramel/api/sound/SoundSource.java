@@ -21,8 +21,8 @@ import static org.lwjgl.system.libc.LibCStdlib.free;
 
 public final class SoundSource {
     private final String path;
-    private final Set<Sound> sounds;
-    int bufferId = -1;
+    private transient final Set<Sound> sounds;
+    transient int bufferId = -1;
 
     private SoundSource(String path) {
         this.path = path;

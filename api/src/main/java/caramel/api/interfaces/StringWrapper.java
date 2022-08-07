@@ -2,6 +2,9 @@ package caramel.api.interfaces;
 
 import java.io.Serializable;
 
+/**
+ * This is mainly used for compatibility with ImGui ImString. It wraps a normal String into an ImString.
+ */
 public interface StringWrapper extends CharSequence, Comparable<String>, Serializable {
     void set(String s);
     String get();

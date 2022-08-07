@@ -27,11 +27,13 @@ public final class TextFont {
     }
 
     public Texture generateTexture() {
+        this.characterMap.clear();
         Font font = new Font(filepath, Font.PLAIN, fontSize);
 
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
         g2d.setFont(font);
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         FontMetrics fontMetrics = g2d.getFontMetrics();
 
         int estimatedWidth = (int)Math.sqrt(font.getNumGlyphs()) * font.getSize() + 1;

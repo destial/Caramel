@@ -47,4 +47,6 @@ public abstract class Application implements Runnable {
     public abstract KeyListener getKeyListener();
 
     public abstract JoystickListener getJoystickListener();
+
+    public abstract boolean isFullScreen();
 }

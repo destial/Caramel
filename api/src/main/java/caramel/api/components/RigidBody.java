@@ -1,22 +1,31 @@
 package caramel.api.components;
 
 import caramel.api.Component;
+import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.RigidBodyType;
 
+/**
+ * This {@link Component} is for physics dimension abstraction.
+ */
 public abstract class RigidBody extends Component {
-    public float angularDamping = 0.8f;
-    public float linearDamping = 0.9f;
-    public float mass = 1f;
-    public boolean fixedRotation = false;
-    public boolean continuousCollision = false;
-    public boolean isTrigger = false;
+    @InvokeOnEdit("updateBody") public float angularDamping = 0.8f;
+    @InvokeOnEdit("updateBody") public float linearDamping = 0.9f;
+    @InvokeOnEdit("updateBody") public float mass = 1f;
+    @InvokeOnEdit("updateBody") public float friction = 1f;
+    @InvokeOnEdit("updateBody") public boolean fixedRotation = false;
+    @InvokeOnEdit("updateBody") public boolean continuousCollision = false;
+    @InvokeOnEdit("updateBody") public boolean isTrigger = false;
+    @InvokeOnEdit("updateBody") public boolean gravity = true;
+    public boolean bounce = true;
+    @InvokeOnEdit("updateBody") public RigidBodyType bodyType = RigidBodyType.DYNAMIC;
 
-    public RigidBodyType bodyType = RigidBodyType.DYNAMIC;
 
     public RigidBody(GameObject gameObject) {
         super(gameObject);
     }
 
     public abstract void _setPosition(float x, float y, float z);
+
+    protected abstract void updateBody();
 }

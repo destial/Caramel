@@ -22,11 +22,15 @@ import xyz.destiall.java.gson.JsonSerializer;
 
 import java.io.File;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDeserializer<SceneImpl> {
     public static final GameObjectSerializer GAME_OBJECT_SERIALIZER = new GameObjectSerializer();
     public static final PrefabSerializer PREFAB_SERIALIZER = new PrefabSerializer();
     public static final ComponentSerializer COMPONENT_SERIALIZER = new ComponentSerializer();
+
+    public static final Map<SceneImpl, Map<Integer, Component>> COMPONENT_MAP = new HashMap<>();
 
     static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(GameObject.class, GAME_OBJECT_SERIALIZER)
@@ -42,7 +46,10 @@ public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDes
     @Override
     public SceneImpl deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
         SceneImpl scene = new SceneImpl();
+        COMPONENT_MAP.put(scene, new HashMap<>());
         JsonObject object = jsonElement.getAsJsonObject();
+        scene.name = object.get("name").getAsString();
+
         JsonArray fabs = object.get("prefabs").getAsJsonArray();
         for (JsonElement element : fabs) {
             String path = element.getAsString();
@@ -62,8 +69,6 @@ public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDes
                 scene.setGameCamera(gameObject.getComponent(Camera.class));
             }
         }
-
-        scene.name = object.get("name").getAsString();
 
         EditorCamera camera = GAME_OBJECT_SERIALIZER.deserialize(scene, object.get("editorCamera")).getComponent(EditorCamera.class);
         scene.setEditorCamera(camera);
