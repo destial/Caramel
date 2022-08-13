@@ -7,12 +7,10 @@ import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Light;
 import caramel.api.components.UICamera;
-import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
 import caramel.api.render.BatchRenderer;
-import caramel.api.render.Shader;
 import caramel.api.scripts.Script;
 import caramel.api.utils.Pair;
 import imgui.ImGui;
@@ -36,7 +34,6 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -61,7 +58,6 @@ public final class SceneImpl extends Scene {
 
     private boolean saved = true;
     private EditorCamera editorCamera;
-    private Physics.Mode physicsMode = Physics.Mode._2D;
 
     public SceneImpl() {
         name = "Untitled Scene";
@@ -110,7 +106,9 @@ public final class SceneImpl extends Scene {
                 });
 
         for (GameObject go : gameObjects) go.update();
-        physics.get(physicsMode).update();
+        for (Physics world : physics.values()) {
+            world.update();
+        }
         for (GameObject go : gameObjects) go.lateUpdate();
     }
 
@@ -196,18 +194,14 @@ public final class SceneImpl extends Scene {
                 child.transform.position.set(parent.transform.position);
             }
 
-            if (playing) physics.get(physicsMode).addGameObject(child);
+            if (playing) {
+                for (Physics world : physics.values()) {
+                    world.addGameObject(child);
+                }
+            }
         }
 
         toAdd.clear();
-    }
-
-    public void setPhysicsMode(Physics.Mode physicsMode) {
-        if (!playing) this.physicsMode = physicsMode;
-    }
-
-    public Physics.Mode getPhysicsMode() {
-        return physicsMode;
     }
 
     @Override
@@ -221,7 +215,9 @@ public final class SceneImpl extends Scene {
                     gameCamera = go.getComponentInChildren(Camera.class);
                 }
             }
-            physics.get(physicsMode).update();
+            for (Physics world : physics.values()) {
+                world.update();
+            }
             for (GameObject go : gameObjects) go.lateUpdate();
 
         } else {
@@ -264,7 +260,9 @@ public final class SceneImpl extends Scene {
             if (selectedDefaultGameObject.contains(go)) {
                 selectedGameObject.add(clone);
             }
-            physics.get(physicsMode).addGameObject(clone);
+            for (Physics world : physics.values()) {
+                world.addGameObject(clone);
+            }
         }
 
         for (GameObject clone : gameObjects) {
@@ -354,7 +352,9 @@ public final class SceneImpl extends Scene {
         }
         selectedGameObject.remove(gameObject);
         selectedDefaultGameObject.remove(gameObject);
-        physics.get(physicsMode).removeGameObject(gameObject);
+        for (Physics world : physics.values()) {
+            world.removeGameObject(gameObject);
+        }
     }
 
     public void invalidate() {

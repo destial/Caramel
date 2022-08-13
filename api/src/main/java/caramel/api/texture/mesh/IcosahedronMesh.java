@@ -1,7 +1,6 @@
 package caramel.api.texture.mesh;
 
 import caramel.api.math.Vertex;
-import caramel.api.texture.Mesh;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;

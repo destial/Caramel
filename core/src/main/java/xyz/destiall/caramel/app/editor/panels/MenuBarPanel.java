@@ -145,6 +145,10 @@ public final class MenuBarPanel extends Panel {
                 }
             }
 
+            if (ImGui.button("Build")) {
+                ApplicationImpl.getApp().getScriptManager().build();
+            }
+
             if (!scene.isPlaying() && ImGui.button("Play")) {
                 scene.play();
             } else if (scene.isPlaying() && ImGui.button("Stop")) {

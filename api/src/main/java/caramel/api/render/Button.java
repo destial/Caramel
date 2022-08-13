@@ -6,7 +6,7 @@ import caramel.api.components.Camera;
 import caramel.api.interfaces.HideInEditor;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.objects.GameObject;
-import caramel.api.texture.Mesh;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.Color;
 import imgui.ImGui;

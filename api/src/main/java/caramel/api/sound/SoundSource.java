@@ -1,23 +1,19 @@
 package caramel.api.sound;
 
 import caramel.api.debug.Debug;
+import caramel.api.sound.decoder.MP3Decoder;
+import caramel.api.sound.decoder.OggDecoder;
+import caramel.api.sound.decoder.SoundFormat;
 
-import java.nio.IntBuffer;
+import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.lwjgl.openal.AL10.AL_FORMAT_MONO16;
-import static org.lwjgl.openal.AL10.AL_FORMAT_STEREO16;
 import static org.lwjgl.openal.AL10.alBufferData;
 import static org.lwjgl.openal.AL10.alDeleteBuffers;
 import static org.lwjgl.openal.AL10.alGenBuffers;
-import static org.lwjgl.stb.STBVorbis.stb_vorbis_decode_filename;
-import static org.lwjgl.system.MemoryStack.stackMallocInt;
-import static org.lwjgl.system.MemoryStack.stackPop;
-import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.libc.LibCStdlib.free;
 
 public final class SoundSource {
     private final String path;
@@ -30,37 +26,29 @@ public final class SoundSource {
     }
 
     public boolean build() {
-        stackPush();
-        IntBuffer channels = stackMallocInt(1);
-        stackPush();
-        IntBuffer sampleRate = stackMallocInt(1);
+        if (bufferId != -1) return true;
+        caramel.api.sound.decoder.Decoder decoder = null;
+        if (path.toLowerCase().endsWith(".ogg")) {
+            decoder = new OggDecoder();
+        } else if (path.toLowerCase().endsWith(".mp3")) {
+            decoder = new MP3Decoder();
+        }
 
-        ShortBuffer rawAudio = stb_vorbis_decode_filename(path, channels, sampleRate);
-
-        if (rawAudio == null) {
-            Debug.logError("Unable to load sound: " + path);
-            stackPop();
-            stackPop();
+        if (decoder == null) {
+            Debug.logError("Unsupported audio file type: " + path.substring(path.lastIndexOf(".")));
             return false;
         }
 
-        int c = channels.get();
-        int rate = sampleRate.get();
-
-        stackPop();
-        stackPop();
-
-        int format = -1;
-        if (c == 1) {
-            format = AL_FORMAT_MONO16;
-        } else if (c == 2) {
-            format = AL_FORMAT_STEREO16;
-        }
-
+        SoundFormat format = decoder.decode(path);
+        if (format == null) return false;
         bufferId = alGenBuffers();
-        alBufferData(bufferId, format, rawAudio, rate);
+        if (format.buffer instanceof ByteBuffer) {
+            alBufferData(bufferId, format.channels, (ByteBuffer) format.buffer, format.frequency);
+        } else if (format.buffer instanceof ShortBuffer) {
+            alBufferData(bufferId, format.channels, (ShortBuffer) format.buffer, format.frequency);
+        }
+        format.close();
 
-        free(rawAudio);
         return true;
     }
 
@@ -68,14 +56,13 @@ public final class SoundSource {
         return path;
     }
 
-    public Sound createSound(boolean loop) {
+    public Sound createSound() {
         if (bufferId == -1) {
             if (!build()) {
                 return null;
             }
         }
         Sound sound = new Sound(this);
-        sound.setLoop(loop);
         sounds.add(sound);
         return sound;
     }
@@ -113,5 +100,11 @@ public final class SoundSource {
             SOURCES.put(path, source);
         }
         return source;
+    }
+
+    public void invalidate(Sound sound) {
+        if (sounds.remove(sound)) {
+            sound.invalidate();
+        }
     }
 }

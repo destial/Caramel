@@ -92,7 +92,7 @@ public final class Physics2D implements Physics {
         world.setContactListener(new ContactListener(scene));
         world.setAllowSleep(true);
         world.setAutoClearForces(true);
-        // world.setSubStepping(true);
+        world.setSubStepping(true);
         world.setContinuousPhysics(true);
     }
 

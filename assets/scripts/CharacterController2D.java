@@ -24,7 +24,6 @@ public class CharacterController2D extends Script {
 
     @Override
     public void update() {
-        if (false) return;
         float x = Input.getJoystickAxis(Input.Joystick.Axis.LEFT_X);
         float y = rb.getVelocity().y();
         if (Math.abs(x) > 0.1f) {
@@ -39,7 +38,7 @@ public class CharacterController2D extends Script {
             x = -5f;
         }
 
-	    // rb.setVelocity(x, y);
+	    rb.setVelocity(x, y);
 
         if (rb.isOnGround() && (Input.isJoystickPressed(Input.Joystick.Button.CIRCLE) || Input.isKeyDown(Input.Key.SPACE))) {
             rb.addVelocity(0, jumpForce * Time.deltaTime);

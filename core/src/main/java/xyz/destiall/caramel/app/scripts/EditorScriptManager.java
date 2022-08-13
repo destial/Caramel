@@ -1,6 +1,7 @@
 package xyz.destiall.caramel.app.scripts;
 
 import caramel.api.Component;
+import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FileEvent;
 import caramel.api.events.ScenePlayEvent;
@@ -66,6 +67,17 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         loadScripts(scriptsRootFolder);
 
         if (watcher != null) watcher.watch();
+    }
+
+    public void build() {
+        try {
+            File root = new File("assets" + File.separator + "compiled" + File.separator);
+            if (!root.exists()) root.mkdir();
+            loader.build(root);
+        } catch (Exception e) {
+            Debug.logError(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     @Override

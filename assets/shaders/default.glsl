@@ -18,6 +18,7 @@ void main() {
     fColor = aColor;
     fTexCoords = aTexCoords;
     fTexSlot = aTexSlot;
+    fNormal = aNormal;
     gl_Position = uMVP * vec4(aPos, 1.0);
 }
 

@@ -15,7 +15,6 @@ import xyz.destiall.caramel.app.editor.panels.ScenePanel;
 public final class EditorCamera extends Camera {
     @HideInEditor
     private static final float DELTA_ERROR = 0.0009f;
-    private boolean perspective = false;
     private float mouseX, mouseY;
     public float sensitivity = 0.5f;
 
@@ -82,7 +81,7 @@ public final class EditorCamera extends Camera {
         }
 
         if (ImGui.isKeyPressed(Input.Key.C)) {
-            // toggleCameraView();
+            toggleCameraView();
         }
     }
 

@@ -2,7 +2,7 @@ package caramel.api.render;
 
 import caramel.api.components.Camera;
 import caramel.api.math.Vertex;
-import caramel.api.texture.Mesh;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.Texture;
 import org.joml.Matrix4f;
 

@@ -2,6 +2,7 @@ package caramel.api.components;
 
 import caramel.api.Component;
 import caramel.api.interfaces.InvokeOnEdit;
+import caramel.api.interfaces.ShowInEditor;
 import caramel.api.objects.GameObject;
 import caramel.api.physics.RigidBodyType;
 
@@ -17,7 +18,7 @@ public abstract class RigidBody extends Component {
     @InvokeOnEdit("updateBody") public boolean continuousCollision = false;
     @InvokeOnEdit("updateBody") public boolean isTrigger = false;
     @InvokeOnEdit("updateBody") public boolean gravity = true;
-    public boolean bounce = true;
+    @ShowInEditor public boolean bounce = true;
     @InvokeOnEdit("updateBody") public RigidBodyType bodyType = RigidBodyType.DYNAMIC;
 
 

@@ -6,6 +6,7 @@ import caramel.api.debug.Debug;
 import caramel.api.interfaces.Copyable;
 import caramel.api.render.Animation;
 import caramel.api.render.BatchRenderer;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.mesh.QuadMesh;
 import org.joml.Vector2f;
 

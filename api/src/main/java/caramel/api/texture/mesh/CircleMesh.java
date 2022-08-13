@@ -1,7 +1,6 @@
 package caramel.api.texture.mesh;
 
 import caramel.api.math.Vertex;
-import caramel.api.texture.Mesh;
 
 import static org.jbox2d.common.MathUtils.TWOPI;
 

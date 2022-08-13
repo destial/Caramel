@@ -15,8 +15,7 @@ import org.ode4j.ode.DWorld;
 import org.ode4j.ode.OdeHelper;
 
 public final class Physics3D implements Physics {
-    private final DVector3 gravity = new DVector3(0, -1f, 0);
-    private final float physicsTimeStep = Time.deltaTime;
+    private final DVector3 gravity = new DVector3(0, -98f, 0);
 
     private DWorld world;
     private final SceneImpl scene;
@@ -35,7 +34,6 @@ public final class Physics3D implements Physics {
 
         DBody bodyDef = OdeHelper.createBody(world);
         DMass mass = OdeHelper.createMass();
-        bodyDef.setMass(mass);
         mass.setMass(rigidBody.mass);
         bodyDef.setPosition(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
         Quaternionf rot = gameObject.transform.rotation.rotationTo(gameObject.transform.rotation, new Quaternionf());
@@ -66,6 +64,7 @@ public final class Physics3D implements Physics {
             mass.setBox(rigidBody.mass / (collider.bounds.x * collider.bounds.y * collider.bounds.z), collider.bounds.x * 0.5f, collider.bounds.y * 0.5f, collider.bounds.z * 0.5f);
         }
 
+        bodyDef.setMass(mass);
         rigidBody.rawBody = bodyDef;
     }
 
@@ -94,7 +93,7 @@ public final class Physics3D implements Physics {
     @Override
     public void update() {
         if (world != null && Time.deltaTime >= 0.f) {
-            world.step(physicsTimeStep);
+            world.step(Time.deltaTime);
         }
     }
 }

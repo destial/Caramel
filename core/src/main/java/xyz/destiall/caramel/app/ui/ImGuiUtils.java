@@ -1,13 +1,14 @@
 package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Component;
+import caramel.api.interfaces.FileExtensions;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.math.Vector2;
 import caramel.api.math.Vector3;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
 import caramel.api.render.Animation;
-import caramel.api.texture.Mesh;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
 import caramel.api.utils.Color;
@@ -1184,7 +1185,19 @@ public final class ImGuiUtils {
 
             } else if (type == File.class) {
                 File previous = (File) value;
-                String path = findFile(name, ".*");
+                StringBuilder filter = new StringBuilder(".*");
+                if (field.isAnnotationPresent(FileExtensions.class)) {
+                    String[] values = field.getAnnotation(FileExtensions.class).value();
+                    filter = new StringBuilder();
+                    for (int i = 0; i < values.length; i++) {
+                        String v = values[i];
+                        filter.append(v);
+                        if (i < values.length - 1) {
+                            filter.append(",");
+                        }
+                    }
+                }
+                String path = findFile(name, filter.toString());
 
                 if (previous != null) {
                     ImGui.sameLine();

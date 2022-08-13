@@ -5,10 +5,8 @@ import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.JoystickListener;
 import caramel.api.Time;
-import caramel.api.audio.AudioListener;
+import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
-import caramel.api.components.Light;
-import caramel.api.components.RigidBody3D;
 import caramel.api.components.Transform;
 import caramel.api.components.UICamera;
 import caramel.api.debug.Debug;
@@ -19,7 +17,6 @@ import caramel.api.objects.GameObject;
 import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
-import caramel.api.physics.components.Box3DCollider;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
@@ -40,6 +37,8 @@ import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
 import org.reflections.Reflections;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
+import xyz.destiall.caramel.app.editor.managers.BodyManager;
+import xyz.destiall.caramel.app.editor.managers.MeshManager;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
@@ -105,7 +104,7 @@ import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public final class ApplicationImpl extends Application {
+public final class ApplicationImpl extends Application implements Runnable {
     public boolean EDITOR_MODE = true;
     private boolean running = false;
 
@@ -159,7 +158,9 @@ public final class ApplicationImpl extends Application {
                 .setLenient()
                 .create();
         listeners = new ArrayList<>();
-        listeners.add(new AudioListener());
+        listeners.add(new AudioManager());
+        listeners.add(new MeshManager());
+        listeners.add(new BodyManager());
         focused = true;
 
         DebugImpl.log("Loading Editor");
@@ -350,7 +351,7 @@ public final class ApplicationImpl extends Application {
         sorted.sort(Comparator.comparing(Class::getName));
         for (Class<? extends Component> c : sorted) {
             if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
-            if (c == Transform.class || c == EditorCamera.class || c == UICamera.class || c == RigidBody3D.class || c == Light.class || c == Box3DCollider.class) continue;
+            if (c == Transform.class || c == EditorCamera.class || c == UICamera.class) continue;
             Payload.COMPONENTS.add(c);
         }
     }

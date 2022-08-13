@@ -1,17 +1,23 @@
 package caramel.api.sound;
 
+import caramel.api.audio.AudioListener;
+import caramel.api.components.Transform;
 import caramel.api.interfaces.Copyable;
+
+import javax.annotation.Nullable;
 
 import static org.lwjgl.openal.AL10.AL_BUFFER;
 import static org.lwjgl.openal.AL10.AL_GAIN;
 import static org.lwjgl.openal.AL10.AL_LOOPING;
 import static org.lwjgl.openal.AL10.AL_PLAYING;
 import static org.lwjgl.openal.AL10.AL_POSITION;
+import static org.lwjgl.openal.AL10.AL_RENDERER;
 import static org.lwjgl.openal.AL10.AL_SOURCE_STATE;
 import static org.lwjgl.openal.AL10.alDeleteSources;
 import static org.lwjgl.openal.AL10.alGenSources;
 import static org.lwjgl.openal.AL10.alGetSourcef;
 import static org.lwjgl.openal.AL10.alGetSourcei;
+import static org.lwjgl.openal.AL10.alSource3f;
 import static org.lwjgl.openal.AL10.alSourcePause;
 import static org.lwjgl.openal.AL10.alSourcePlay;
 import static org.lwjgl.openal.AL10.alSourceStop;
@@ -31,7 +37,7 @@ public final class Sound implements Copyable<Sound> {
         alSourcei(sourceId, AL_BUFFER, source.bufferId);
         setPosition(0);
         setLoop(false);
-        setVolume(0.4f);
+        setVolume(0.1f);
     }
 
     public void setVolume(float volume) {
@@ -104,6 +110,17 @@ public final class Sound implements Copyable<Sound> {
     public void invalidate() {
         stop();
         alDeleteSources(sourceId);
+    }
+
+    public void setLocation(@Nullable Transform transform) {
+        alSource3f(sourceId, AL_POSITION, transform == null ? 0f : transform.position.x, transform == null ? 0f : transform.position.y, transform == null ? 0f : transform.position.z);
+    }
+
+    public void setListener(@Nullable AudioListener listener) {
+        float x = listener == null ? 0f : listener.transform.position.x + listener.offset.x;
+        float y = listener == null ? 0f : listener.transform.position.y + listener.offset.y;
+        float z = listener == null ? 0f : listener.transform.position.z + listener.offset.z;
+        alSource3f(sourceId, AL_RENDERER, x, y, z);
     }
 
     @Override

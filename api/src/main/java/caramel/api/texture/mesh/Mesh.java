@@ -1,4 +1,4 @@
-package caramel.api.texture;
+package caramel.api.texture.mesh;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
@@ -7,16 +7,13 @@ import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
-import caramel.api.texture.mesh.CircleMesh;
-import caramel.api.texture.mesh.IcosahedronMesh;
-import caramel.api.texture.mesh.QuadMesh;
-import caramel.api.texture.mesh.TriangleMesh;
+import caramel.api.texture.Material;
+import caramel.api.texture.Texture;
 import caramel.api.utils.Color;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
-import xyz.destiall.java.reflection.Reflect;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +42,7 @@ import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
 
 public class Mesh implements Copyable<Mesh> {
     public static final Class<? extends Mesh>[] MESHES = new Class[] {
-            CircleMesh.class, QuadMesh.class, TriangleMesh.class
+            CircleMesh.class, QuadMesh.class, TriangleMesh.class, CubeMesh.class, IcosahedronMesh.class
     };
     protected transient final List<Vertex> dirtyVertexArray;
     protected transient int vaoId, vboId, eboId;
@@ -59,6 +56,7 @@ public class Mesh implements Copyable<Mesh> {
     protected boolean drawArrays = false;
     protected boolean withIndices = false;
 
+    public final Material material;
     public String name;
     public int type;
 
@@ -68,6 +66,7 @@ public class Mesh implements Copyable<Mesh> {
         dirtyVertexArray = new ArrayList<>();
         elementArray = new ArrayList<>(6);
         type = GL_TRIANGLES;
+        material = new Material();
     }
 
     public List<Vertex> getVertexArray() {

@@ -10,6 +10,7 @@ import caramel.api.physics.info.ContactPoint2D;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 import xyz.destiall.java.reflection.Reflect;
 
 import java.lang.reflect.Field;
@@ -150,16 +151,22 @@ public abstract class Component implements Update {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
                     boolean prev = field.isAccessible();
                     field.setAccessible(true);
-                    if (field.getType().isAssignableFrom(Copyable.class)) {
-                        field.set(clone, ((Copyable<?>) field.get(this)).copy());
-                    } else if (field.getType().isAssignableFrom(Vector2f.class)) {
-                        field.set(clone, new Vector2f((Vector2f) field.get(this)));
-                    } else if (field.getType().isAssignableFrom(Vector3f.class)) {
-                        field.set(clone, new Vector3f((Vector3f) field.get(this)));
-                    } else if (field.getType().isAssignableFrom(Matrix4f.class)) {
-                        field.set(clone, new Matrix4f((Matrix4f) field.get(this)));
-                    } else {
-                        field.set(clone, field.get(this));
+
+                    Object value = field.get(this);
+                    if (value != null) {
+                        if (field.getType().isAssignableFrom(Copyable.class)) {
+                            field.set(clone, ((Copyable<?>) value).copy());
+                        } else if (field.getType().isAssignableFrom(Vector2f.class)) {
+                            field.set(clone, new Vector2f((Vector2f) value));
+                        } else if (field.getType().isAssignableFrom(Vector3f.class)) {
+                            field.set(clone, new Vector3f((Vector3f) value));
+                        } else if (field.getType().isAssignableFrom(Vector4f.class)) {
+                            field.set(clone, new Vector4f((Vector4f) value));
+                        } else if (field.getType().isAssignableFrom(Matrix4f.class)) {
+                            field.set(clone, new Matrix4f((Matrix4f) value));
+                        } else {
+                            field.set(clone, value);
+                        }
                     }
                     field.setAccessible(prev);
                 } catch (Exception e) {

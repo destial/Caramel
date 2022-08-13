@@ -9,16 +9,21 @@ import xyz.destiall.caramel.app.utils.Payload;
 import javax.script.ScriptException;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
+import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
+import javax.tools.Tool;
 import javax.tools.ToolProvider;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
@@ -99,7 +104,7 @@ public final class ScriptLoader {
 
     public InternalScript compile(File file, String code) throws ScriptException, MalformedURLException {
         if (compiler == null) {
-            throw new ScriptException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+            throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
 
         String fullClassName = getFullName(file, code);
@@ -139,7 +144,8 @@ public final class ScriptLoader {
             scriptManager.loadComponents(previous.script, loader.script);
             try {
                 previous.close();
-            } catch (IOException e) {
+                previous.clearAssertionStatus();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -185,7 +191,7 @@ public final class ScriptLoader {
 
     public void compileAll(List<File> files) throws ScriptException {
         if (compiler == null) {
-            throw new ScriptException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+            throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
         List<FileScriptMemoryJavaObject> sources = new ArrayList<>(files.size());
         for (File file : files) {
@@ -221,7 +227,8 @@ public final class ScriptLoader {
                 scriptManager.loadComponents(previous.script, loader.script);
                 try {
                     previous.close();
-                } catch (IOException e) {
+                    previous.clearAssertionStatus();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -229,6 +236,38 @@ public final class ScriptLoader {
             loaders.put(source.getName(), loader);
             setClass(source.getName(), loader.script.getCompiledClass());
             Payload.COMPONENTS.add(loader.script.getCompiledClass());
+        }
+    }
+
+    public void build(File root) throws ScriptException {
+        if (compiler == null) {
+            throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+        }
+
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
+        JavaFileManager.Location loc = new JavaFileManager.Location() {
+            @Override
+            public String getName() {
+                return root.getPath();
+            }
+
+            @Override
+            public boolean isOutputLocation() {
+                return true;
+            }
+        };
+        try {
+            fileManager.setLocation(loc, Collections.singletonList(root));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, Collections.singletonList("-d"), null, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
+        if (!task.call()) {
+            String message = "Error while compiling sources: " + diagnostics.getDiagnostics().stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining("\n"));
+            throw new ScriptException(message);
         }
     }
 }

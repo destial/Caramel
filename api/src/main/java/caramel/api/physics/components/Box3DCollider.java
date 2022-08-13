@@ -30,7 +30,7 @@ public final class Box3DCollider extends Collider {
         if (rigidBody.rawBody == null) return;
         DMass mass = (DMass) rigidBody.rawBody.getMass();
         mass.setMass(rigidBody.mass);
-        mass.setBox(rigidBody.mass / (bounds.x * bounds.y * bounds.z), offset.x + bounds.x * 0.5f, offset.y + bounds.y * 0.5f, offset.z + bounds.y * 0.5f);
+        mass.setBox(rigidBody.mass / (bounds.x * bounds.y * bounds.z), offset.x + bounds.x * 0.5f, offset.y + bounds.y * 0.5f, offset.z + bounds.z * 0.5f);
     }
 
     @Override

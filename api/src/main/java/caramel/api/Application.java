@@ -7,7 +7,7 @@ import xyz.destiall.java.timer.Scheduler;
 
 import java.io.File;
 
-public abstract class Application implements Runnable {
+public abstract class Application {
     protected static Application inst;
 
     public static Application getApp() {

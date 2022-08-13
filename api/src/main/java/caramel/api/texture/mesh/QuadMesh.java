@@ -1,7 +1,6 @@
 package caramel.api.texture.mesh;
 
 import caramel.api.math.Vertex;
-import caramel.api.texture.Mesh;
 
 public final class QuadMesh extends Mesh {
     protected final float length;
