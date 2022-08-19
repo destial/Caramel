@@ -4,15 +4,33 @@ import org.lwjgl.system.MemoryUtil;
 
 import java.nio.Buffer;
 
-public class SoundFormat {
-    public int channels;
-    public int frequency;
-    public Buffer buffer;
+public final class SoundFormat {
+    private final int channels;
+    private final int frequency;
+    private Buffer buffer;
+
+    public SoundFormat(int channels, int frequency, Buffer buffer) {
+        this.channels = channels;
+        this.frequency = frequency;
+        this.buffer = buffer;
+    }
 
     public void close() {
         if (buffer != null) {
             MemoryUtil.memFree(buffer);
             buffer = null;
         }
+    }
+
+    public int getChannels() {
+        return channels;
+    }
+
+    public int getFrequency() {
+        return frequency;
+    }
+
+    public Buffer getBuffer() {
+        return buffer;
     }
 }

@@ -1,6 +1,6 @@
 package caramel.api.sound.decoder.utils;
 
-import caramel.api.sound.decoder.MP3Decoder;
+import caramel.api.sound.decoder.Mp3Decoder;
 import caramel.api.sound.decoder.utils.exceptions.DecoderException;
 
 public class LayerIDecoder implements FrameDecoder {
@@ -177,7 +177,7 @@ public class LayerIDecoder implements FrameDecoder {
          */
         public void read_allocation (Bitstream stream, Header header, Crc16 crc) throws DecoderException {
             if ((allocation = stream.get_bits(4)) == 15) // CGJ: catch this condition and throw appropriate exception
-                throw new DecoderException(MP3Decoder.ILLEGAL_SUBBAND_ALLOCATION, null);
+                throw new DecoderException(Mp3Decoder.ILLEGAL_SUBBAND_ALLOCATION, null);
             // cerr << "WARNING: stream contains an illegal allocation!\n";
             // MPEG-stream is corrupted!
 

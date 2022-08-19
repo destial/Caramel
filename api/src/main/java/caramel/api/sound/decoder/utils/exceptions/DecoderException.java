@@ -1,9 +1,9 @@
 package caramel.api.sound.decoder.utils.exceptions;
 
-import caramel.api.sound.decoder.MP3Decoder;
+import caramel.api.sound.decoder.Mp3Decoder;
 
 public class DecoderException extends JavaLayerException  {
-    private int errorcode = MP3Decoder.UNKNOWN_ERROR;
+    private int errorcode = Mp3Decoder.UNKNOWN_ERROR;
 
     public DecoderException (String msg, Throwable t) {
         super(msg, t);

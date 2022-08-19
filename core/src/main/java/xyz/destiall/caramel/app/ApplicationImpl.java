@@ -5,6 +5,7 @@ import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.JoystickListener;
 import caramel.api.Time;
+import caramel.api.sound.decoder.AudioDecoder;
 import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Transform;
@@ -164,6 +165,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         focused = true;
 
         DebugImpl.log("Loading Editor");
+        AudioDecoder.load();
     }
 
     @Override

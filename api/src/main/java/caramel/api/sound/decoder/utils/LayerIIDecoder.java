@@ -1,9 +1,7 @@
 package caramel.api.sound.decoder.utils;
 
 public class LayerIIDecoder extends LayerIDecoder implements FrameDecoder {
-
-    public LayerIIDecoder () {
-    }
+    public LayerIIDecoder () {}
 
     protected void createSubbands () {
         int i;

@@ -1,8 +1,7 @@
 package caramel.api.sound;
 
 import caramel.api.debug.Debug;
-import caramel.api.sound.decoder.MP3Decoder;
-import caramel.api.sound.decoder.OggDecoder;
+import caramel.api.sound.decoder.AudioDecoder;
 import caramel.api.sound.decoder.SoundFormat;
 
 import java.nio.ByteBuffer;
@@ -27,25 +26,22 @@ public final class SoundSource {
 
     public boolean build() {
         if (bufferId != -1) return true;
-        caramel.api.sound.decoder.Decoder decoder = null;
-        if (path.toLowerCase().endsWith(".ogg")) {
-            decoder = new OggDecoder();
-        } else if (path.toLowerCase().endsWith(".mp3")) {
-            decoder = new MP3Decoder();
-        }
-
+        String fileFormat = path.substring(path.lastIndexOf(".")).toLowerCase();
+        AudioDecoder decoder = AudioDecoder.getDecoder(fileFormat);
         if (decoder == null) {
-            Debug.logError("Unsupported audio file type: " + path.substring(path.lastIndexOf(".")));
+            Debug.logError("Unsupported audio file type: " + fileFormat);
             return false;
         }
-
         SoundFormat format = decoder.decode(path);
-        if (format == null) return false;
+        if (format == null) {
+            Debug.logError("Unable to read audio file: " + path);
+            return false;
+        }
         bufferId = alGenBuffers();
-        if (format.buffer instanceof ByteBuffer) {
-            alBufferData(bufferId, format.channels, (ByteBuffer) format.buffer, format.frequency);
-        } else if (format.buffer instanceof ShortBuffer) {
-            alBufferData(bufferId, format.channels, (ShortBuffer) format.buffer, format.frequency);
+        if (format.getBuffer() instanceof ByteBuffer) {
+            alBufferData(bufferId, format.getChannels(), (ByteBuffer) format.getBuffer(), format.getFrequency());
+        } else if (format.getBuffer() instanceof ShortBuffer) {
+            alBufferData(bufferId, format.getChannels(), (ShortBuffer) format.getBuffer(), format.getFrequency());
         }
         format.close();
 

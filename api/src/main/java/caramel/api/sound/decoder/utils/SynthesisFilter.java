@@ -7,37 +7,15 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.lang.reflect.Array;
 
-/**
- * A class for the synthesis filter bank. This class does a fast downsampling from 32, 44.1 or 48 kHz to 8 kHz, if ULAW is
- * defined. Frequencies above 4 kHz are removed by ignoring higher subbands.
- */
 public final class SynthesisFilter {
-    private float[] v1;
-    private float[] v2;
-    private float[] actual_v; // v1 or v2
-    private int actual_write_pos; // 0-15
-    private float[] samples; // 32 new subband samples
-    private int channel;
-    private float scalefactor;
+    private final float[] v1;
+    private final float[] v2;
+    private float[] actual_v;
+    private int actual_write_pos;
+    private final float[] samples;
+    private final int channel;
+    private final float scalefactor;
 
-    /**
-     * Quality value for controlling CPU usage/quality tradeoff.
-     */
-    /*
-     * private int quality;
-     *
-     * private int v_inc;
-     *
-     *
-     *
-     * public static final int HIGH_QUALITY = 1; public static final int MEDIUM_QUALITY = 2; public static final int LOW_QUALITY =
-     * 4;
-     */
-
-    /**
-     * Contructor. The scalefactor scales the calculated float pcm samples to short values (raw pcm samples are in [-1.0, 1.0], if
-     * no violations occur).
-     */
     public SynthesisFilter (int channelnumber, float factor, float[] eq0) {
         if (d == null) {
             d = load_d();
@@ -53,29 +31,10 @@ public final class SynthesisFilter {
         reset();
     }
 
-    /*
-     * private void setQuality(int quality0) { switch (quality0) { case HIGH_QUALITY: case MEDIUM_QUALITY: case LOW_QUALITY: v_inc
-     * = 16 quality0; quality = quality0; break; default : throw new IllegalArgumentException("Unknown quality value"); } }
-     *
-     * public int getQuality() { return quality; }
-     */
-
-    /**
-     * Reset the synthesis filter.
-     */
     public void reset () {
-        // float[] floatp;
-        // float[] floatp2;
-
-        // initialize v1[] and v2[]:
-        // for (floatp = v1 + 512, floatp2 = v2 + 512; floatp > v1; )
-        // *--floatp = *--floatp2 = 0.0;
         for (int p = 0; p < 512; p++)
             v1[p] = v2[p] = 0.0f;
 
-        // initialize samples[]:
-        // for (floatp = samples + 32; floatp > samples; )
-        // *--floatp = 0.0;
         for (int p2 = 0; p2 < 32; p2++)
             samples[p2] = 0.0f;
 
@@ -83,46 +42,19 @@ public final class SynthesisFilter {
         actual_write_pos = 15;
     }
 
-    /**
-     * Inject Sample.
-     */
     public void input_sample (float sample, int subbandnumber) {
         samples[subbandnumber] = sample;
     }
 
     public void input_samples (float[] s) {
-        for (int i = 31; i >= 0; i--)
-            samples[i] = s[i];
+        System.arraycopy(s, 0, samples, 0, 32);
     }
 
-    /**
-     * Compute new values via a fast cosine transform.
-     */
     private void compute_new_v () {
-        // p is fully initialized from x1
-        // float[] p = _p;
-        // pp is fully initialized from p
-        // float[] pp = _pp;
-
-        // float[] new_v = _new_v;
-
-        // float[] new_v = new float[32]; // new V[0-15] and V[33-48] of Figure 3-A.2 in ISO DIS 11172-3
-        // float[] p = new float[16];
-        // float[] pp = new float[16];
-
-        /*
-         * for (int i=31; i>=0; i--) { new_v[i] = 0.0f; }
-         */
-
         float new_v0, new_v1, new_v2, new_v3, new_v4, new_v5, new_v6, new_v7, new_v8, new_v9;
         float new_v10, new_v11, new_v12, new_v13, new_v14, new_v15, new_v16, new_v17, new_v18, new_v19;
         float new_v20, new_v21, new_v22, new_v23, new_v24, new_v25, new_v26, new_v27, new_v28, new_v29;
         float new_v30, new_v31;
-
-        // float[] new_v = new float[32]; // new V[0-15] and V[33-48] of Figure 3-A.2 in ISO DIS 11172-3
-        // float[] p = new float[16];
-        // float[] pp = new float[16];
-
         float[] s = samples;
 
         float s0 = s[0];
@@ -243,18 +175,17 @@ public final class SynthesisFilter {
         p14 = pp14 + pp15;
         p15 = (pp14 - pp15) * cos1_4;
 
-        // this is pretty insane coding
         float tmp1;
-        new_v19/* 36-17 */= -(new_v4 = (new_v12 = p7) + p5) - p6;
-        new_v27/* 44-17 */= -p6 - p7 - p4;
+        new_v19 = -(new_v4 = (new_v12 = p7) + p5) - p6;
+        new_v27 = -p6 - p7 - p4;
         new_v6 = (new_v10 = (new_v14 = p15) + p11) + p13;
-        new_v17/* 34-17 */= -(new_v2 = p15 + p13 + p9) - p14;
-        new_v21/* 38-17 */= (tmp1 = -p14 - p15 - p10 - p11) - p13;
-        new_v29/* 46-17 */= -p14 - p15 - p12 - p8;
-        new_v25/* 42-17 */= tmp1 - p12;
-        new_v31/* 48-17 */= -p0;
+        new_v17 = -(new_v2 = p15 + p13 + p9) - p14;
+        new_v21 = (tmp1 = -p14 - p15 - p10 - p11) - p13;
+        new_v29 = -p14 - p15 - p12 - p8;
+        new_v25 = tmp1 - p12;
+        new_v31 = -p0;
         new_v0 = p1;
-        new_v23/* 40-17 */= -(new_v8 = p3) - p2;
+        new_v23 = -(new_v8 = p3) - p2;
 
         p0 = (s0 - s31) * cos1_64;
         p1 = (s1 - s30) * cos3_64;
@@ -341,28 +272,23 @@ public final class SynthesisFilter {
         p14 = pp14 + pp15;
         p15 = (pp14 - pp15) * cos1_4;
 
-        // manually doing something that a compiler should handle sucks
-        // coding like this is hard to read
         float tmp2;
         new_v5 = (new_v11 = (new_v13 = (new_v15 = p15) + p7) + p11) + p5 + p13;
         new_v7 = (new_v9 = p15 + p11 + p3) + p13;
-        new_v16/* 33-17 */= -(new_v1 = (tmp1 = p13 + p15 + p9) + p1) - p14;
-        new_v18/* 35-17 */= -(new_v3 = tmp1 + p5 + p7) - p6 - p14;
+        new_v16 = -(new_v1 = (tmp1 = p13 + p15 + p9) + p1) - p14;
+        new_v18 = -(new_v3 = tmp1 + p5 + p7) - p6 - p14;
 
-        new_v22/* 39-17 */= (tmp1 = -p10 - p11 - p14 - p15) - p13 - p2 - p3;
-        new_v20/* 37-17 */= tmp1 - p13 - p5 - p6 - p7;
-        new_v24/* 41-17 */= tmp1 - p12 - p2 - p3;
-        new_v26/* 43-17 */= tmp1 - p12 - (tmp2 = p4 + p6 + p7);
-        new_v30/* 47-17 */= (tmp1 = -p8 - p12 - p14 - p15) - p0;
-        new_v28/* 45-17 */= tmp1 - tmp2;
+        new_v22 = (tmp1 = -p10 - p11 - p14 - p15) - p13 - p2 - p3;
+        new_v20 = tmp1 - p13 - p5 - p6 - p7;
+        new_v24 = tmp1 - p12 - p2 - p3;
+        new_v26 = tmp1 - p12 - (tmp2 = p4 + p6 + p7);
+        new_v30 = (tmp1 = -p8 - p12 - p14 - p15) - p0;
+        new_v28 = tmp1 - tmp2;
 
-        // insert V[0-15] (== new_v[0-15]) into actual v:
-        // float[] x2 = actual_v + actual_write_pos;
-        float dest[] = actual_v;
-
+        float[] dest = actual_v;
         int pos = actual_write_pos;
 
-        dest[0 + pos] = new_v0;
+        dest[pos] = new_v0;
         dest[16 + pos] = new_v1;
         dest[32 + pos] = new_v2;
         dest[48 + pos] = new_v3;
@@ -379,10 +305,8 @@ public final class SynthesisFilter {
         dest[224 + pos] = new_v14;
         dest[240 + pos] = new_v15;
 
-        // V[16] is always 0.0:
         dest[256 + pos] = 0.0f;
 
-        // insert V[17-31] (== -new_v[15-1]) into actual v:
         dest[272 + pos] = -new_v15;
         dest[288 + pos] = -new_v14;
         dest[304 + pos] = -new_v13;
@@ -398,12 +322,9 @@ public final class SynthesisFilter {
         dest[464 + pos] = -new_v3;
         dest[480 + pos] = -new_v2;
         dest[496 + pos] = -new_v1;
-
-        // insert V[32] (== -new_v[0]) into other v:
         dest = actual_v == v1 ? v2 : v1;
 
-        dest[0 + pos] = -new_v0;
-        // insert V[33-48] (== new_v[16-31]) into other v:
+        dest[pos] = -new_v0;
         dest[16 + pos] = new_v16;
         dest[32 + pos] = new_v17;
         dest[48 + pos] = new_v18;
@@ -421,7 +342,6 @@ public final class SynthesisFilter {
         dest[240 + pos] = new_v30;
         dest[256 + pos] = new_v31;
 
-        // insert V[49-63] (== new_v[30-16]) into other v:
         dest[272 + pos] = new_v30;
         dest[288 + pos] = new_v29;
         dest[304 + pos] = new_v28;
@@ -437,389 +357,295 @@ public final class SynthesisFilter {
         dest[464 + pos] = new_v18;
         dest[480 + pos] = new_v17;
         dest[496 + pos] = new_v16;
-        /*
-         * } else { v1[0 + actual_write_pos] = -new_v0; // insert V[33-48] (== new_v[16-31]) into other v: v1[16 + actual_write_pos]
-         * = new_v16; v1[32 + actual_write_pos] = new_v17; v1[48 + actual_write_pos] = new_v18; v1[64 + actual_write_pos] = new_v19;
-         * v1[80 + actual_write_pos] = new_v20; v1[96 + actual_write_pos] = new_v21; v1[112 + actual_write_pos] = new_v22; v1[128 +
-         * actual_write_pos] = new_v23; v1[144 + actual_write_pos] = new_v24; v1[160 + actual_write_pos] = new_v25; v1[176 +
-         * actual_write_pos] = new_v26; v1[192 + actual_write_pos] = new_v27; v1[208 + actual_write_pos] = new_v28; v1[224 +
-         * actual_write_pos] = new_v29; v1[240 + actual_write_pos] = new_v30; v1[256 + actual_write_pos] = new_v31;
-         *
-         * // insert V[49-63] (== new_v[30-16]) into other v: v1[272 + actual_write_pos] = new_v30; v1[288 + actual_write_pos] =
-         * new_v29; v1[304 + actual_write_pos] = new_v28; v1[320 + actual_write_pos] = new_v27; v1[336 + actual_write_pos] =
-         * new_v26; v1[352 + actual_write_pos] = new_v25; v1[368 + actual_write_pos] = new_v24; v1[384 + actual_write_pos] =
-         * new_v23; v1[400 + actual_write_pos] = new_v22; v1[416 + actual_write_pos] = new_v21; v1[432 + actual_write_pos] =
-         * new_v20; v1[448 + actual_write_pos] = new_v19; v1[464 + actual_write_pos] = new_v18; v1[480 + actual_write_pos] =
-         * new_v17; v1[496 + actual_write_pos] = new_v16; }
-         */
     }
-
-    /**
-     * Compute PCM Samples.
-     */
-    private float[] _tmpOut = new float[32];
+    private final float[] _tmpOut = new float[32];
 
     private void compute_pcm_samples0 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             float pcm_sample;
             final float[] dp = d16[i];
-            pcm_sample = ((vp[0 + dvp] * dp[0] + vp[15 + dvp] * dp[1] + vp[14 + dvp] * dp[2] + vp[13 + dvp] * dp[3] + vp[12 + dvp]
+            pcm_sample = ((vp[dvp] * dp[0] + vp[15 + dvp] * dp[1] + vp[14 + dvp] * dp[2] + vp[13 + dvp] * dp[3] + vp[12 + dvp]
                     * dp[4] + vp[11 + dvp] * dp[5] + vp[10 + dvp] * dp[6] + vp[9 + dvp] * dp[7] + vp[8 + dvp] * dp[8] + vp[7 + dvp]
                     * dp[9] + vp[6 + dvp] * dp[10] + vp[5 + dvp] * dp[11] + vp[4 + dvp] * dp[12] + vp[3 + dvp] * dp[13] + vp[2 + dvp]
                     * dp[14] + vp[1 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples1 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
-            pcm_sample = ((vp[1 + dvp] * dp[0] + vp[0 + dvp] * dp[1] + vp[15 + dvp] * dp[2] + vp[14 + dvp] * dp[3] + vp[13 + dvp]
+            pcm_sample = ((vp[1 + dvp] * dp[0] + vp[dvp] * dp[1] + vp[15 + dvp] * dp[2] + vp[14 + dvp] * dp[3] + vp[13 + dvp]
                     * dp[4] + vp[12 + dvp] * dp[5] + vp[11 + dvp] * dp[6] + vp[10 + dvp] * dp[7] + vp[9 + dvp] * dp[8] + vp[8 + dvp]
                     * dp[9] + vp[7 + dvp] * dp[10] + vp[6 + dvp] * dp[11] + vp[5 + dvp] * dp[12] + vp[4 + dvp] * dp[13] + vp[3 + dvp]
                     * dp[14] + vp[2 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples2 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
-            pcm_sample = ((vp[2 + dvp] * dp[0] + vp[1 + dvp] * dp[1] + vp[0 + dvp] * dp[2] + vp[15 + dvp] * dp[3] + vp[14 + dvp]
+            pcm_sample = ((vp[2 + dvp] * dp[0] + vp[1 + dvp] * dp[1] + vp[dvp] * dp[2] + vp[15 + dvp] * dp[3] + vp[14 + dvp]
                     * dp[4] + vp[13 + dvp] * dp[5] + vp[12 + dvp] * dp[6] + vp[11 + dvp] * dp[7] + vp[10 + dvp] * dp[8] + vp[9 + dvp]
                     * dp[9] + vp[8 + dvp] * dp[10] + vp[7 + dvp] * dp[11] + vp[6 + dvp] * dp[12] + vp[5 + dvp] * dp[13] + vp[4 + dvp]
                     * dp[14] + vp[3 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples3 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
-            pcm_sample = ((vp[3 + dvp] * dp[0] + vp[2 + dvp] * dp[1] + vp[1 + dvp] * dp[2] + vp[0 + dvp] * dp[3] + vp[15 + dvp]
+            pcm_sample = ((vp[3 + dvp] * dp[0] + vp[2 + dvp] * dp[1] + vp[1 + dvp] * dp[2] + vp[dvp] * dp[3] + vp[15 + dvp]
                     * dp[4] + vp[14 + dvp] * dp[5] + vp[13 + dvp] * dp[6] + vp[12 + dvp] * dp[7] + vp[11 + dvp] * dp[8] + vp[10 + dvp]
                     * dp[9] + vp[9 + dvp] * dp[10] + vp[8 + dvp] * dp[11] + vp[7 + dvp] * dp[12] + vp[6 + dvp] * dp[13] + vp[5 + dvp]
                     * dp[14] + vp[4 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples4 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
-            pcm_sample = ((vp[4 + dvp] * dp[0] + vp[3 + dvp] * dp[1] + vp[2 + dvp] * dp[2] + vp[1 + dvp] * dp[3] + vp[0 + dvp]
+            pcm_sample = ((vp[4 + dvp] * dp[0] + vp[3 + dvp] * dp[1] + vp[2 + dvp] * dp[2] + vp[1 + dvp] * dp[3] + vp[dvp]
                     * dp[4] + vp[15 + dvp] * dp[5] + vp[14 + dvp] * dp[6] + vp[13 + dvp] * dp[7] + vp[12 + dvp] * dp[8] + vp[11 + dvp]
                     * dp[9] + vp[10 + dvp] * dp[10] + vp[9 + dvp] * dp[11] + vp[8 + dvp] * dp[12] + vp[7 + dvp] * dp[13] + vp[6 + dvp]
                     * dp[14] + vp[5 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples5 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[5 + dvp] * dp[0] + vp[4 + dvp] * dp[1] + vp[3 + dvp] * dp[2] + vp[2 + dvp] * dp[3] + vp[1 + dvp]
-                    * dp[4] + vp[0 + dvp] * dp[5] + vp[15 + dvp] * dp[6] + vp[14 + dvp] * dp[7] + vp[13 + dvp] * dp[8] + vp[12 + dvp]
+                    * dp[4] + vp[dvp] * dp[5] + vp[15 + dvp] * dp[6] + vp[14 + dvp] * dp[7] + vp[13 + dvp] * dp[8] + vp[12 + dvp]
                     * dp[9] + vp[11 + dvp] * dp[10] + vp[10 + dvp] * dp[11] + vp[9 + dvp] * dp[12] + vp[8 + dvp] * dp[13] + vp[7 + dvp]
                     * dp[14] + vp[6 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples6 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[6 + dvp] * dp[0] + vp[5 + dvp] * dp[1] + vp[4 + dvp] * dp[2] + vp[3 + dvp] * dp[3] + vp[2 + dvp]
-                    * dp[4] + vp[1 + dvp] * dp[5] + vp[0 + dvp] * dp[6] + vp[15 + dvp] * dp[7] + vp[14 + dvp] * dp[8] + vp[13 + dvp]
+                    * dp[4] + vp[1 + dvp] * dp[5] + vp[dvp] * dp[6] + vp[15 + dvp] * dp[7] + vp[14 + dvp] * dp[8] + vp[13 + dvp]
                     * dp[9] + vp[12 + dvp] * dp[10] + vp[11 + dvp] * dp[11] + vp[10 + dvp] * dp[12] + vp[9 + dvp] * dp[13] + vp[8 + dvp]
                     * dp[14] + vp[7 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples7 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[7 + dvp] * dp[0] + vp[6 + dvp] * dp[1] + vp[5 + dvp] * dp[2] + vp[4 + dvp] * dp[3] + vp[3 + dvp]
-                    * dp[4] + vp[2 + dvp] * dp[5] + vp[1 + dvp] * dp[6] + vp[0 + dvp] * dp[7] + vp[15 + dvp] * dp[8] + vp[14 + dvp]
+                    * dp[4] + vp[2 + dvp] * dp[5] + vp[1 + dvp] * dp[6] + vp[dvp] * dp[7] + vp[15 + dvp] * dp[8] + vp[14 + dvp]
                     * dp[9] + vp[13 + dvp] * dp[10] + vp[12 + dvp] * dp[11] + vp[11 + dvp] * dp[12] + vp[10 + dvp] * dp[13] + vp[9 + dvp]
                     * dp[14] + vp[8 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples8 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[8 + dvp] * dp[0] + vp[7 + dvp] * dp[1] + vp[6 + dvp] * dp[2] + vp[5 + dvp] * dp[3] + vp[4 + dvp]
-                    * dp[4] + vp[3 + dvp] * dp[5] + vp[2 + dvp] * dp[6] + vp[1 + dvp] * dp[7] + vp[0 + dvp] * dp[8] + vp[15 + dvp]
+                    * dp[4] + vp[3 + dvp] * dp[5] + vp[2 + dvp] * dp[6] + vp[1 + dvp] * dp[7] + vp[dvp] * dp[8] + vp[15 + dvp]
                     * dp[9] + vp[14 + dvp] * dp[10] + vp[13 + dvp] * dp[11] + vp[12 + dvp] * dp[12] + vp[11 + dvp] * dp[13]
                     + vp[10 + dvp] * dp[14] + vp[9 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples9 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[9 + dvp] * dp[0] + vp[8 + dvp] * dp[1] + vp[7 + dvp] * dp[2] + vp[6 + dvp] * dp[3] + vp[5 + dvp]
-                    * dp[4] + vp[4 + dvp] * dp[5] + vp[3 + dvp] * dp[6] + vp[2 + dvp] * dp[7] + vp[1 + dvp] * dp[8] + vp[0 + dvp] * dp[9]
+                    * dp[4] + vp[4 + dvp] * dp[5] + vp[3 + dvp] * dp[6] + vp[2 + dvp] * dp[7] + vp[1 + dvp] * dp[8] + vp[dvp] * dp[9]
                     + vp[15 + dvp] * dp[10] + vp[14 + dvp] * dp[11] + vp[13 + dvp] * dp[12] + vp[12 + dvp] * dp[13] + vp[11 + dvp]
                     * dp[14] + vp[10 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples10 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[10 + dvp] * dp[0] + vp[9 + dvp] * dp[1] + vp[8 + dvp] * dp[2] + vp[7 + dvp] * dp[3] + vp[6 + dvp]
                     * dp[4] + vp[5 + dvp] * dp[5] + vp[4 + dvp] * dp[6] + vp[3 + dvp] * dp[7] + vp[2 + dvp] * dp[8] + vp[1 + dvp] * dp[9]
-                    + vp[0 + dvp] * dp[10] + vp[15 + dvp] * dp[11] + vp[14 + dvp] * dp[12] + vp[13 + dvp] * dp[13] + vp[12 + dvp]
+                    + vp[dvp] * dp[10] + vp[15 + dvp] * dp[11] + vp[14 + dvp] * dp[12] + vp[13 + dvp] * dp[13] + vp[12 + dvp]
                     * dp[14] + vp[11 + dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
-    private void compute_pcm_samples11 (OutputBuffer buffer) {
+    private void compute_pcm_samples11(OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[11 + dvp] * dp[0] + vp[10 + dvp] * dp[1] + vp[9 + dvp] * dp[2] + vp[8 + dvp] * dp[3] + vp[7 + dvp]
                     * dp[4] + vp[6 + dvp] * dp[5] + vp[5 + dvp] * dp[6] + vp[4 + dvp] * dp[7] + vp[3 + dvp] * dp[8] + vp[2 + dvp] * dp[9]
-                    + vp[1 + dvp] * dp[10] + vp[0 + dvp] * dp[11] + vp[15 + dvp] * dp[12] + vp[14 + dvp] * dp[13] + vp[13 + dvp] * dp[14] + vp[12 + dvp]
+                    + vp[1 + dvp] * dp[10] + vp[dvp] * dp[11] + vp[15 + dvp] * dp[12] + vp[14 + dvp] * dp[13] + vp[13 + dvp] * dp[14] + vp[12 + dvp]
                     * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples12 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[12 + dvp] * dp[0] + vp[11 + dvp] * dp[1] + vp[10 + dvp] * dp[2] + vp[9 + dvp] * dp[3] + vp[8 + dvp]
                     * dp[4] + vp[7 + dvp] * dp[5] + vp[6 + dvp] * dp[6] + vp[5 + dvp] * dp[7] + vp[4 + dvp] * dp[8] + vp[3 + dvp] * dp[9]
-                    + vp[2 + dvp] * dp[10] + vp[1 + dvp] * dp[11] + vp[0 + dvp] * dp[12] + vp[15 + dvp] * dp[13] + vp[14 + dvp] * dp[14] + vp[13 + dvp]
+                    + vp[2 + dvp] * dp[10] + vp[1 + dvp] * dp[11] + vp[dvp] * dp[12] + vp[15 + dvp] * dp[13] + vp[14 + dvp] * dp[14] + vp[13 + dvp]
                     * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples13 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[13 + dvp] * dp[0] + vp[12 + dvp] * dp[1] + vp[11 + dvp] * dp[2] + vp[10 + dvp] * dp[3] + vp[9 + dvp]
                     * dp[4] + vp[8 + dvp] * dp[5] + vp[7 + dvp] * dp[6] + vp[6 + dvp] * dp[7] + vp[5 + dvp] * dp[8] + vp[4 + dvp] * dp[9]
-                    + vp[3 + dvp] * dp[10] + vp[2 + dvp] * dp[11] + vp[1 + dvp] * dp[12] + vp[0 + dvp] * dp[13] + vp[15 + dvp] * dp[14] + vp[14 + dvp]
+                    + vp[3 + dvp] * dp[10] + vp[2 + dvp] * dp[11] + vp[1 + dvp] * dp[12] + vp[dvp] * dp[13] + vp[15 + dvp] * dp[14] + vp[14 + dvp]
                     * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
     private void compute_pcm_samples14 (OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             final float[] dp = d16[i];
             float pcm_sample;
 
             pcm_sample = ((vp[14 + dvp] * dp[0] + vp[13 + dvp] * dp[1] + vp[12 + dvp] * dp[2] + vp[11 + dvp] * dp[3] + vp[10 + dvp]
                     * dp[4] + vp[9 + dvp] * dp[5] + vp[8 + dvp] * dp[6] + vp[7 + dvp] * dp[7] + vp[6 + dvp] * dp[8] + vp[5 + dvp] * dp[9]
-                    + vp[4 + dvp] * dp[10] + vp[3 + dvp] * dp[11] + vp[2 + dvp] * dp[12] + vp[1 + dvp] * dp[13] + vp[0 + dvp] * dp[14] + vp[15 + dvp]
+                    + vp[4 + dvp] * dp[10] + vp[3 + dvp] * dp[11] + vp[2 + dvp] * dp[12] + vp[1 + dvp] * dp[13] + vp[dvp] * dp[14] + vp[15 + dvp]
                     * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
 
             dvp += 16;
-        } // for
+        }
     }
 
-    private void compute_pcm_samples15 (OutputBuffer buffer) {
+    private void compute_pcm_samples15(OutputBuffer buffer) {
         final float[] vp = actual_v;
-
-        // int inc = v_inc;
-        final float[] tmpOut = _tmpOut;
         int dvp = 0;
-
-        // fat chance of having this loop unroll
         for (int i = 0; i < 32; i++) {
             float pcm_sample;
-            final float dp[] = d16[i];
+            final float[] dp = d16[i];
             pcm_sample = ((vp[15 + dvp] * dp[0] + vp[14 + dvp] * dp[1] + vp[13 + dvp] * dp[2] + vp[12 + dvp] * dp[3] + vp[11 + dvp]
                     * dp[4] + vp[10 + dvp] * dp[5] + vp[9 + dvp] * dp[6] + vp[8 + dvp] * dp[7] + vp[7 + dvp] * dp[8] + vp[6 + dvp]
                     * dp[9] + vp[5 + dvp] * dp[10] + vp[4 + dvp] * dp[11] + vp[3 + dvp] * dp[12] + vp[2 + dvp] * dp[13] + vp[1 + dvp]
-                    * dp[14] + vp[0 + dvp] * dp[15]) * scalefactor);
+                    * dp[14] + vp[dvp] * dp[15]) * scalefactor);
 
-            tmpOut[i] = pcm_sample;
+            _tmpOut[i] = pcm_sample;
             dvp += 16;
-        } // for
+        }
     }
 
-    private void compute_pcm_samples (OutputBuffer buffer) {
+    private void compute_pcm_samples(OutputBuffer buffer) {
 
         switch (actual_write_pos) {
             case 0:
@@ -873,35 +699,14 @@ public final class SynthesisFilter {
         }
 
         if (buffer != null) buffer.appendSamples(channel, _tmpOut);
-
-        /*
-         * // MDM: I was considering putting in quality control for // low-spec CPUs, but the performance gain (about 10-15%) // did
-         * not justify the considerable drop in audio quality. switch (inc) { case 16: buffer.appendSamples(channel, tmpOut); break;
-         * case 32: for (int i=0; i<16; i++) { buffer.append(channel, (short)tmpOut[i]); buffer.append(channel, (short)tmpOut[i]); }
-         * break; case 64: for (int i=0; i<8; i++) { buffer.append(channel, (short)tmpOut[i]); buffer.append(channel,
-         * (short)tmpOut[i]); buffer.append(channel, (short)tmpOut[i]); buffer.append(channel, (short)tmpOut[i]); } break;
-         *
-         * }
-         */
     }
 
-    /**
-     * Calculate 32 PCM samples and put the into the Obuffer-object.
-     */
-
-    public void calculate_pcm_samples (OutputBuffer buffer) {
+    public void calculate_pcm_samples(OutputBuffer buffer) {
         compute_new_v();
         compute_pcm_samples(buffer);
 
         actual_write_pos = actual_write_pos + 1 & 0xf;
         actual_v = actual_v == v1 ? v2 : v1;
-
-        // initialize samples[]:
-        // for (register float *floatp = samples + 32; floatp > samples; )
-        // *--floatp = 0.0f;
-
-        // MDM: this may not be necessary. The Layer III decoder always
-        // outputs 32 subband samples, but I haven't checked layer I & II.
         for (int p = 0; p < 32; p++)
             samples[p] = 0.0f;
     }
@@ -939,25 +744,13 @@ public final class SynthesisFilter {
     private static final float cos3_8 = (float)(1.0 / (2.0 * Math.cos(MY_PI * 3.0 / 8.0)));
     private static final float cos1_4 = (float)(1.0 / (2.0 * Math.cos(MY_PI / 4.0)));
 
-    // Note: These values are not in the same order
-    // as in Annex 3-B.3 of the ISO/IEC DIS 11172-3
-    // private float d[] = {0.000000000, -4.000442505};
+    private static float[] d = null;
 
-    private static float d[] = null;
+    private static float[][] d16 = null;
 
-    /**
-     * d[] split into subarrays of length 16. This provides for more faster access by allowing a block of 16 to be addressed with
-     * constant offset.
-     **/
-    private static float d16[][] = null;
-
-    /**
-     * Loads the data for the d[] from the resource SFd.ser.
-     * @return the loaded values for d[].
-     */
-    static private float[] load_d () {
+    static private float[] load_d() {
         try {
-            Class elemType = Float.TYPE;
+            Class<?> elemType = Float.TYPE;
             Object o = deserializeArray(SynthesisFilter.class.getResourceAsStream("/sfd.ser"), elemType, 512);
             return (float[])o;
         } catch (IOException ex) {
@@ -965,26 +758,18 @@ public final class SynthesisFilter {
         }
     }
 
-    /**
-     * Deserializes an array from a given <code>InputStream</code>.
-     *
-     * @param in The <code>InputStream</code> to deserialize an object from.
-     *
-     * @param elemType The class denoting the type of the array elements.
-     * @param length The expected length of the array, or -1 if any length is expected.
-     */
-    static private Object deserializeArray (InputStream in, Class elemType, int length) throws IOException {
+    static private Object deserializeArray(InputStream in, Class<?> elemType, int length) throws IOException {
         if (elemType == null) throw new NullPointerException("elemType");
 
         if (length < -1) throw new IllegalArgumentException("length");
 
         Object obj = deserialize(in);
 
-        Class cls = obj.getClass();
+        Class<?> cls = obj.getClass();
 
         if (!cls.isArray()) throw new InvalidObjectException("object is not an array");
 
-        Class arrayElemType = cls.getComponentType();
+        Class<?> arrayElemType = cls.getComponentType();
         if (arrayElemType != elemType) throw new InvalidObjectException("unexpected array component type");
 
         if (length != -1) {
@@ -995,7 +780,7 @@ public final class SynthesisFilter {
         return obj;
     }
 
-    static public Object deserialize (InputStream in) throws IOException {
+    static public Object deserialize(InputStream in) throws IOException {
         if (in == null) throw new NullPointerException("in");
 
         ObjectInputStream objIn = new ObjectInputStream(in);
@@ -1010,15 +795,6 @@ public final class SynthesisFilter {
         return obj;
     }
 
-    /**
-     * Converts a 1D array into a number of smaller arrays. This is used to achieve offset + constant indexing into an array. Each
-     * sub-array represents a block of values of the original array.
-     * @param array The array to split up into blocks.
-     * @param blockSize The size of the blocks to split the array into. This must be an exact divisor of the length of the array,
-     *           or some data will be lost from the main array.
-     *
-     * @return An array of arrays in which each element in the returned array will be of length <code>blockSize</code>.
-     */
     static private float[][] splitArray (final float[] array, final int blockSize) {
         int size = array.length / blockSize;
         float[][] split = new float[size][];
@@ -1027,22 +803,13 @@ public final class SynthesisFilter {
         return split;
     }
 
-    /**
-     * Returns a subarray of an existing array.
-     *
-     * @param array The array to retrieve a subarra from.
-     * @param offs The offset in the array that corresponds to the first index of the subarray.
-     * @param len The number of indeces in the subarray.
-     * @return The subarray, which may be of length 0.
-     */
-    static private float[] subArray (final float[] array, final int offs, int len) {
+    static private float[] subArray(final float[] array, final int offs, int len) {
         if (offs + len > array.length) len = array.length - offs;
 
         if (len < 0) len = 0;
 
         float[] subarray = new float[len];
-        for (int i = 0; i < len; i++)
-            subarray[i] = array[offs + i];
+        System.arraycopy(array, offs, subarray, 0, len);
         return subarray;
     }
 }

@@ -46,7 +46,6 @@
             "a": 1.0
           },
           "mesh": {
-            "length": 1.0,
             "vertexArray": [
               {
                 "position": {
@@ -177,6 +176,9 @@
           "enabled": true
         },
         {
+          "file": {
+            "path": "assets/sounds/oof.mp3"
+          },
           "loop": false,
           "volume": 0.1,
           "playOnStart": true,

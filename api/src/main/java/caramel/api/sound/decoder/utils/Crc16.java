@@ -4,17 +4,11 @@ public final class Crc16 {
     private static final short polynomial = (short)0x8005;
     private short crc;
 
-    /**
-     * Dummy Constructor
-     */
-    public Crc16 () {
+    public Crc16() {
         crc = (short)0xFFFF;
     }
 
-    /**
-     * Feed a bitstring to the crc calculation (0 < length <= 32).
-     */
-    public void add_bits (int bitstring, int length) {
+    public void add_bits(int bitstring, int length) {
         int bitmask = 1 << length - 1;
         do
             if ((crc & 0x8000) == 0 ^ (bitstring & bitmask) == 0) {
@@ -25,10 +19,7 @@ public final class Crc16 {
         while ((bitmask >>>= 1) != 0);
     }
 
-    /**
-     * Return the calculated checksum. Erase it for next calls to add_bits().
-     */
-    public short checksum () {
+    public short checksum() {
         short sum = crc;
         crc = (short)0xFFFF;
         return sum;

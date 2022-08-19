@@ -30,7 +30,7 @@ public final class Sound implements Copyable<Sound> {
     private boolean loop = false;
     private float volume = 0f;
 
-    protected Sound(SoundSource source) {
+    Sound(SoundSource source) {
         this.source = source;
 
         sourceId = alGenSources();
@@ -67,8 +67,7 @@ public final class Sound implements Copyable<Sound> {
     }
 
     public boolean isPlaying() {
-        int state = alGetSourcei(sourceId, AL_SOURCE_STATE);
-        return state == AL_PLAYING;
+        return alGetSourcei(sourceId, AL_SOURCE_STATE) == AL_PLAYING;
     }
 
     public SoundSource getSource() {

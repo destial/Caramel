@@ -299,10 +299,6 @@ public final class LayerIIIDecoder implements FrameDecoder {
 
     }
 
-    /**
-     * Reads the side info from the stream, assuming the entire. frame has been read already. Mono : 136 bits (= 17 bytes) Stereo :
-     * 256 bits (= 32 bytes)
-     */
     private void get_side_info () {
         int ch, gr;
         if (header.version() == Header.MPEG1) {
@@ -338,10 +334,7 @@ public final class LayerIIIDecoder implements FrameDecoder {
                         si.ch[ch].gr[gr].subblock_gain[1] = stream.get_bits(3);
                         si.ch[ch].gr[gr].subblock_gain[2] = stream.get_bits(3);
 
-                        // Set region_count parameters since they are implicit in this case.
-
                         if (si.ch[ch].gr[gr].block_type == 0)
-                            // Side info bad: block_type == 0 in split block
                             return;
                         else if (si.ch[ch].gr[gr].block_type == 2 && si.ch[ch].gr[gr].mixed_block_flag == 0)
                             si.ch[ch].gr[gr].region0_count = 8;

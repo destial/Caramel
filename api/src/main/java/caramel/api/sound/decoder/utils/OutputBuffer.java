@@ -1,8 +1,5 @@
 package caramel.api.sound.decoder.utils;
 
-/**
- * Base Class for audio output.
- */
 public final class OutputBuffer {
     public static final int BUFFERSIZE = 2 * 1152; // max. 2 * 1152 samples per frame
     private static final int MAXCHANNELS = 2; // max. number of channels
@@ -21,9 +18,6 @@ public final class OutputBuffer {
         reset();
     }
 
-    /**
-     * Takes a 16 Bit PCM sample.
-     */
     private void append (int channel, short value) {
         byte firstByte;
         byte secondByte;
@@ -39,9 +33,6 @@ public final class OutputBuffer {
         channelPointer[channel] += channels * 2;
     }
 
-    /**
-     * Takes 32 PCM samples.
-     */
     public void appendSamples (int channel, float[] f) {
         short s;
         if (replayGainScale != null) {
@@ -80,7 +71,6 @@ public final class OutputBuffer {
         return channelPointer[1] == 2;
     }
 
-    // Clip to 16 bits.
     private short clip (float sample) {
         return sample > 32767.0f ? 32767 : sample < -32768.0f ? -32768 : (short)sample;
     }
