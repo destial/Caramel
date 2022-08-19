@@ -3,7 +3,7 @@ package caramel.api.texture.mesh;
 import caramel.api.math.Vertex;
 
 public final class QuadMesh extends Mesh {
-    protected final float length;
+    private final float length;
     public QuadMesh() {
         this(1);
     }

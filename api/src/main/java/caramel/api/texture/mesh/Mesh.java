@@ -2,6 +2,7 @@ package caramel.api.texture.mesh;
 
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.graphics.Graphics;
 import caramel.api.interfaces.Copyable;
 import caramel.api.math.Vertex;
 import caramel.api.render.BatchRenderer;
@@ -18,27 +19,13 @@ import org.joml.Vector4f;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.lwjgl.opengl.GL15.glDeleteBuffers;
-import static org.lwjgl.opengl.GL30.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL30.GL_DYNAMIC_DRAW;
-import static org.lwjgl.opengl.GL30.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL30.GL_FLOAT;
-import static org.lwjgl.opengl.GL30.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL30.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL30.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL30.glActiveTexture;
-import static org.lwjgl.opengl.GL30.glBindBuffer;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-import static org.lwjgl.opengl.GL30.glBufferData;
-import static org.lwjgl.opengl.GL30.glBufferSubData;
-import static org.lwjgl.opengl.GL30.glDeleteVertexArrays;
-import static org.lwjgl.opengl.GL30.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glDrawArrays;
-import static org.lwjgl.opengl.GL30.glDrawElements;
-import static org.lwjgl.opengl.GL30.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glGenBuffers;
-import static org.lwjgl.opengl.GL30.glGenVertexArrays;
-import static org.lwjgl.opengl.GL30.glVertexAttribPointer;
+import static caramel.api.graphics.GL20.GL_ARRAY_BUFFER;
+import static caramel.api.graphics.GL20.GL_DYNAMIC_DRAW;
+import static caramel.api.graphics.GL20.GL_ELEMENT_ARRAY_BUFFER;
+import static caramel.api.graphics.GL20.GL_FLOAT;
+import static caramel.api.graphics.GL20.GL_TEXTURE0;
+import static caramel.api.graphics.GL20.GL_TRIANGLES;
+import static caramel.api.graphics.GL20.GL_UNSIGNED_INT;
 
 public class Mesh implements Copyable<Mesh> {
     public static final Class<? extends Mesh>[] MESHES = new Class[] {
@@ -234,17 +221,17 @@ public class Mesh implements Copyable<Mesh> {
             }
         }
 
-        vaoId = glGenVertexArrays();
-        glBindVertexArray(vaoId);
+        vaoId = Graphics.get().glGenVertexArrays();
+        Graphics.get().glBindVertexArray(vaoId);
 
-        vboId = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboId);
-        glBufferData(GL_ARRAY_BUFFER, getVertexBuffer(), GL_DYNAMIC_DRAW);
+        vboId = Graphics.get().glGenBuffers();
+        Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vboId);
+        Graphics.get().glBufferData(GL_ARRAY_BUFFER, getVertexBuffer(), GL_DYNAMIC_DRAW);
 
         if (with_indices) {
-            eboId = glGenBuffers();
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexBuffer(), GL_DYNAMIC_DRAW);
+            eboId = Graphics.get().glGenBuffers();
+            Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+            Graphics.get().glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexBuffer(), GL_DYNAMIC_DRAW);
         }
 
         int positionSize = 3;
@@ -255,12 +242,12 @@ public class Mesh implements Copyable<Mesh> {
         int floatSizeBytes = 4;
         int vertexSizeBytes = (positionSize + colorSize + texSize + normalSize + texIdSize) * floatSizeBytes;
 
-        glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
-        glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
-        glVertexAttribPointer(2, texSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes + colorSize * floatSizeBytes);
-        glVertexAttribPointer(3, normalSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes);
-        glVertexAttribPointer(4, texIdSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes + normalSize * floatSizeBytes);
-        glBindVertexArray(0);
+        Graphics.get().glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
+        Graphics.get().glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
+        Graphics.get().glVertexAttribPointer(2, texSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes + colorSize * floatSizeBytes);
+        Graphics.get().glVertexAttribPointer(3, normalSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes);
+        Graphics.get().glVertexAttribPointer(4, texIdSize, GL_FLOAT, false, vertexSizeBytes,positionSize * floatSizeBytes + colorSize * floatSizeBytes + texSize * floatSizeBytes + normalSize * floatSizeBytes);
+        Graphics.get().glBindVertexArray(0);
 
         if (texture != null) {
             Texture.getTexture(texture);
@@ -270,12 +257,12 @@ public class Mesh implements Copyable<Mesh> {
     }
 
     public void invalidate() {
-        glDeleteVertexArrays(vaoId);
-        glDeleteBuffers(vboId);
+        Graphics.get().glDeleteVertexArrays(vaoId);
+        Graphics.get().glDeleteBuffers(vboId);
         vaoId = 0;
         vboId = 0;
         if (eboId != 0) {
-            glDeleteBuffers(eboId);
+            Graphics.get().glDeleteBuffers(eboId);
             eboId = 0;
         }
     }
@@ -401,17 +388,17 @@ public class Mesh implements Copyable<Mesh> {
         s.attach();
         if (texture != null) {
             Texture tex = Texture.getTexture(texture);
-            glActiveTexture(GL_TEXTURE0);
+            Graphics.get().glActiveTexture(GL_TEXTURE0);
             tex.bind();
             s.uploadTexture("texSampler", 0);
         }
 
         if (dirty) {
-            glBindBuffer(GL_ARRAY_BUFFER, vboId);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, getVertexBuffer());
+            Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vboId);
+            Graphics.get().glBufferSubData(GL_ARRAY_BUFFER, 0, getVertexBuffer());
             if (withIndices) {
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
-                glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, getIndexBuffer());
+                Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eboId);
+                Graphics.get().glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, getIndexBuffer());
             }
             dirty = false;
         }
@@ -419,23 +406,23 @@ public class Mesh implements Copyable<Mesh> {
         Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
         s.uploadMat4f("uMVP", mvp);
 
-        glBindVertexArray(vaoId);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glEnableVertexAttribArray(3);
-        glEnableVertexAttribArray(4);
+        Graphics.get().glBindVertexArray(vaoId);
+        Graphics.get().glEnableVertexAttribArray(0);
+        Graphics.get().glEnableVertexAttribArray(1);
+        Graphics.get().glEnableVertexAttribArray(2);
+        Graphics.get().glEnableVertexAttribArray(3);
+        Graphics.get().glEnableVertexAttribArray(4);
 
-        if (drawArrays) glDrawArrays(type, 0, vertexArray.size());
-        else glDrawElements(type, elementArray.size(), GL_UNSIGNED_INT, 0);
+        if (drawArrays) Graphics.get().glDrawArrays(type, 0, vertexArray.size());
+        else Graphics.get().glDrawElements(type, elementArray.size(), GL_UNSIGNED_INT, 0);
         BatchRenderer.DRAW_CALLS++;
 
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glDisableVertexAttribArray(2);
-        glDisableVertexAttribArray(3);
-        glDisableVertexAttribArray(4);
-        glBindVertexArray(0);
+        Graphics.get().glDisableVertexAttribArray(0);
+        Graphics.get().glDisableVertexAttribArray(1);
+        Graphics.get().glDisableVertexAttribArray(2);
+        Graphics.get().glDisableVertexAttribArray(3);
+        Graphics.get().glDisableVertexAttribArray(4);
+        Graphics.get().glBindVertexArray(0);
 
         if (texture != null) {
             Texture tex = Texture.getTexture(texture);

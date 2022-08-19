@@ -5,6 +5,8 @@ import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.JoystickListener;
 import caramel.api.Time;
+import caramel.api.graphics.Graphics;
+import caramel.api.graphics.opengl.OpenGL30;
 import caramel.api.sound.decoder.AudioDecoder;
 import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
@@ -166,6 +168,7 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         DebugImpl.log("Loading Editor");
         AudioDecoder.load();
+        new Graphics(new OpenGL30());
     }
 
     @Override
@@ -322,8 +325,8 @@ public final class ApplicationImpl extends Application implements Runnable {
         }
 
         // Enable blending
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Graphics.get().glEnable(GL_BLEND);
+        Graphics.get().glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Setup script manager
         scriptManager = new EditorScriptManager();
@@ -440,8 +443,8 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         if (EDITOR_MODE && !fullscreen) {
             getSceneViewFramebuffer().bind();
-            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Graphics.get().glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+            Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getEditorCamera());
             DebugDraw.INSTANCE.render(scene.getEditorCamera());
             getSceneViewFramebuffer().unbind();
@@ -449,11 +452,11 @@ public final class ApplicationImpl extends Application implements Runnable {
         BatchRenderer.DRAW_CALLS = 0;
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().bind();
         if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Graphics.get().glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
-            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Graphics.get().glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+            Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getGameCamera());
         }
         scene.render(scene.getUICamera());

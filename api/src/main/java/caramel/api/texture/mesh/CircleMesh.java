@@ -5,8 +5,8 @@ import caramel.api.math.Vertex;
 import static org.jbox2d.common.MathUtils.TWOPI;
 
 public final class CircleMesh extends Mesh {
-    protected final float radius;
-    protected final int sides;
+    private final float radius;
+    private final int sides;
     public CircleMesh() {
         this(0.5f, 36);
     }

@@ -2,7 +2,6 @@ package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Input;
 import caramel.api.Time;
-import caramel.api.events.WindowFocusEvent;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -56,7 +55,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetJoystickCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 
 public final class ImGUILayer {
     private final ApplicationImpl window;

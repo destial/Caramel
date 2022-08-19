@@ -1,6 +1,7 @@
 package caramel.api.render;
 
 import caramel.api.components.Camera;
+import caramel.api.graphics.Graphics;
 import caramel.api.math.Vertex;
 import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.Texture;
@@ -11,18 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferSubData;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static caramel.api.graphics.GL20.GL_ARRAY_BUFFER;
+import static caramel.api.graphics.GL20.GL_ELEMENT_ARRAY_BUFFER;
+import static caramel.api.graphics.GL20.GL_TEXTURE0;
+import static caramel.api.graphics.GL20.GL_TRIANGLES;
+import static caramel.api.graphics.GL20.GL_UNSIGNED_INT;
 
 public final class BatchRenderer extends Mesh {
     public static final int MAX_TEXTURES = 8;
@@ -149,36 +143,36 @@ public final class BatchRenderer extends Mesh {
                 List<Texture> textures = Texture.getTextures();
                 int offset = index * MAX_TEXTURES;
                 for (int i = offset; i < textures.size() && i + offset < MAX_TEXTURES; i++) {
-                    glActiveTexture(GL_TEXTURE0 + i - offset);
+                    Graphics.get().glActiveTexture(GL_TEXTURE0 + i - offset);
                     textures.get(i).bind();
                 }
 
-                glBindBuffer(GL_ARRAY_BUFFER, renderer.vboId);
-                glBufferSubData(GL_ARRAY_BUFFER, 0, renderer.getVertexBuffer());
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, renderer.vboId);
+                Graphics.get().glBufferSubData(GL_ARRAY_BUFFER, 0, renderer.getVertexBuffer());
+                Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, 0);
                 if (renderer.withIndices) {
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.eboId);
-                    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, renderer.getIndexBuffer());
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                    Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.eboId);
+                    Graphics.get().glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, renderer.getIndexBuffer());
+                    Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 }
 
-                glBindVertexArray(renderer.vaoId);
-                glEnableVertexAttribArray(0);
-                glEnableVertexAttribArray(1);
-                glEnableVertexAttribArray(2);
-                glEnableVertexAttribArray(3);
-                glEnableVertexAttribArray(4);
+                Graphics.get().glBindVertexArray(renderer.vaoId);
+                Graphics.get().glEnableVertexAttribArray(0);
+                Graphics.get().glEnableVertexAttribArray(1);
+                Graphics.get().glEnableVertexAttribArray(2);
+                Graphics.get().glEnableVertexAttribArray(3);
+                Graphics.get().glEnableVertexAttribArray(4);
 
-                glDrawElements(GL_TRIANGLES, renderer.elementArray.size(), GL_UNSIGNED_INT, 0);
+                Graphics.get().glDrawElements(GL_TRIANGLES, renderer.elementArray.size(), GL_UNSIGNED_INT, 0);
                 DRAW_CALLS++;
 
-                glDisableVertexAttribArray(0);
-                glDisableVertexAttribArray(1);
-                glDisableVertexAttribArray(2);
-                glDisableVertexAttribArray(3);
-                glDisableVertexAttribArray(4);
+                Graphics.get().glDisableVertexAttribArray(0);
+                Graphics.get().glDisableVertexAttribArray(1);
+                Graphics.get().glDisableVertexAttribArray(2);
+                Graphics.get().glDisableVertexAttribArray(3);
+                Graphics.get().glDisableVertexAttribArray(4);
 
-                glBindVertexArray(0);
+                Graphics.get().glBindVertexArray(0);
 
                 for (int i = offset; i < textures.size() && i + offset < MAX_TEXTURES; i++) {
                     textures.get(i).unbind();

@@ -3,7 +3,6 @@ package caramel.api.texture.mesh;
 import caramel.api.math.Vertex;
 
 public class CubeMesh extends Mesh {
-
     protected final float length;
     public CubeMesh() {
         this(1);

@@ -10,6 +10,7 @@ import caramel.api.components.UICamera;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
+import caramel.api.graphics.Graphics;
 import caramel.api.render.BatchRenderer;
 import caramel.api.scripts.Script;
 import caramel.api.utils.Pair;
@@ -144,20 +145,20 @@ public final class SceneImpl extends Scene {
 
     @Override
     public void render(Camera camera) {
-        glEnable(GL_DEPTH_TEST);
+        Graphics.get().glEnable(GL_DEPTH_TEST);
         if (playing) {
             for (GameObject go : gameObjects) go.render(camera);
 
             if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
         } else {
-            if (ImGui.isKeyDown(Input.Key.G)) glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-            else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            if (ImGui.isKeyDown(Input.Key.G)) Graphics.get().glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else Graphics.get().glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
             for (GameObject go : gameObjects) go.render(camera);
 
             if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
 
-            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            Graphics.get().glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         }
 
     }
