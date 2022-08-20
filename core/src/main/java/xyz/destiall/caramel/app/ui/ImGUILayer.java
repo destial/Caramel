@@ -21,6 +21,7 @@ import org.joml.Vector4f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugLine;
 import xyz.destiall.caramel.app.editor.panels.Panel;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -180,9 +181,9 @@ public final class ImGUILayer {
     public void update() {
         startFrame(Time.deltaTime);
 
+        boolean recompiling = window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling();
         if (!window.isFullScreen()) {
             setupDockspace();
-            boolean recompiling = window.getScriptManager().isRecompiling();
             if (recompiling) {
                 ImGui.pushAllowKeyboardFocus(false);
             }
@@ -194,7 +195,7 @@ public final class ImGUILayer {
             }
         }
 
-        if (window.getScriptManager().isRecompiling()) {
+        if (recompiling) {
             if (ImGui.begin("##recompile",
                     ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize |
                     ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove |

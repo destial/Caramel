@@ -126,6 +126,14 @@ public abstract class Scene implements Update, Render {
     }
 
     /**
+     * Get the first game {@link Camera}s that the {@link Scene} is rendering to.
+     * @return The game {@link Camera}s.
+     */
+    public Camera getGameCamera() {
+        return gameCameras.stream().findFirst().orElse(null);
+    }
+
+    /**
      * Get the main editor {@link Camera} that the {@link Scene} is rendering to.
      * @return The editor {@link Camera}.
      */

@@ -17,7 +17,12 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class FileIO {
     private FileIO() {}
@@ -53,7 +58,46 @@ public final class FileIO {
             "    }\n" +
             "}";
 
-    public static URI ROOT = new File("").toURI();
+    public static final URI ROOT = new File("").toURI();
+    public static final File ROOT_FILE = new File("");
+    private static final Pattern NAME_PATTERN = Pattern.compile("public\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
+    private static final Pattern NAME_FINAL_PATTERN = Pattern.compile("public\\s+final\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
+    private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");
+
+    public static String getPackage(String script) {
+        String fullPackage = null;
+        Matcher packageMatcher = PACKAGE_PATTERN.matcher(script);
+        if (packageMatcher.find()) {
+            fullPackage = packageMatcher.group(1);
+        }
+        return fullPackage;
+    }
+
+    public static String getFullName(File file, String script) {
+        String fullPackage = getPackage(script);
+
+        Matcher nameMatcher = NAME_PATTERN.matcher(script);
+        if (nameMatcher.find()) {
+            String name = nameMatcher.group(1);
+            if (fullPackage == null) {
+                return name;
+            } else {
+                return fullPackage + "." + name;
+            }
+        }
+
+        nameMatcher = NAME_FINAL_PATTERN.matcher(script);
+        if (nameMatcher.find()) {
+            String name = nameMatcher.group(1);
+            if (fullPackage == null) {
+                return name;
+            } else {
+                return fullPackage + "." + name;
+            }
+        }
+
+        return "scripts." + file.getName().substring(0, file.getName().length() - ".java".length());
+    }
 
     public static InternalScript writeScript(String className) {
         File scriptFolder = new File("assets/scripts/");
@@ -104,10 +148,6 @@ public final class FileIO {
         return null;
     }
 
-    public static ByteBuffer loadResourceBuffer(String path) {
-        return ByteBuffer.wrap(loadResource(path));
-    }
-
     public static void saveResource(String path, String targetPath) {
         Path p = Paths.get(targetPath);
         try {
@@ -123,7 +163,6 @@ public final class FileIO {
                 while ((bytesRead = stream.read(b)) > 0) {
                     outputStream.write(b, 0, bytesRead);
                 }
-                outputStream.flush();
                 stream.close();
                 outputStream.close();
             }
@@ -143,6 +182,27 @@ public final class FileIO {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public static List<File> traverse(File root) {
+        List<File> list = new ArrayList<>();
+        traverse(root, list);
+        return list;
+
+    }
+
+    private static void traverse(File root, List<File> files) {
+        File[] list = root.listFiles();
+        if (list == null || list.length == 0) {
+            return;
+        }
+
+        for (File f : list) {
+            files.add(f);
+            if (f.isDirectory()) {
+                traverse(f, files);
+            }
+        }
     }
 
     public static void copy(File source, File destination) throws IOException {
@@ -185,7 +245,7 @@ public final class FileIO {
 
     public static boolean delete(File f) {
         if (f.isDirectory()) {
-            for (File c : f.listFiles()) {
+            for (File c : Objects.requireNonNull(f.listFiles())) {
                 delete(c);
             }
         }

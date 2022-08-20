@@ -22,6 +22,7 @@ import xyz.destiall.caramel.app.editor.nodes.MethodGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.StartGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.StringGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.UpdateGraphNode;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 
 public final class NodePanel extends Panel {
     private Graph currentGraph;
@@ -66,7 +67,7 @@ public final class NodePanel extends Panel {
         if (currentGraph == null) return;
 
         int flags = 0;
-        if (window.getScriptManager().isRecompiling()) {
+        if (window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling()) {
             flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
         if (ImGui.begin("NodeEditor", flags)) {

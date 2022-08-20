@@ -31,6 +31,7 @@ import imgui.type.ImString;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.editor.action.EditorAction;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,7 +52,7 @@ public final class HierarchyPanel extends Panel {
     @Override
     public void __imguiLayer() {
         int flags = ImGuiWindowFlags.NoCollapse;
-        if (window.getScriptManager().isRecompiling()) {
+        if (window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling()) {
             flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
         if (ImGui.begin("Hierarchy", flags)) {

@@ -21,7 +21,7 @@ public final class DebugImpl extends Debug {
     }
 
     public static void logError(Object error) {
-        System.err.println(error);
+        consoleErr(error);
         ConsolePanel.addError("ERROR: " + error);
     }
 

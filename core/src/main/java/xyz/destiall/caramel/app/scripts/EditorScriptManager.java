@@ -44,9 +44,9 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     private boolean isPlaying = false;
 
     public EditorScriptManager() {
-        scriptsRootFolder = new File("assets/scripts/");
+        scriptsRootFolder = new File("assets" + File.separator + "scripts" + File.separator);
         if (scriptsRootFolder.mkdir()) {
-            FileIO.saveResource("CharacterController2D.java", "assets/scripts/CharacterController2D.java");
+            FileIO.saveResource("CharacterController2D.java", "assets" + File.separator + "scripts" + File.separator + "CharacterController2D.java");
         }
         awaitingCompilation = new ConcurrentHashMap<>();
         awaitingEvents = new HashMap<>();
@@ -61,7 +61,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     public void reloadAll() {
         if (!scriptsRootFolder.exists()) {
             if (scriptsRootFolder.mkdir()) {
-                FileIO.saveResource("CharacterController2D.java", "assets/scripts/CharacterController2D.java");
+                FileIO.saveResource("CharacterController2D.java", "assets" + File.separator + "scripts" + File.separator + "CharacterController2D.java");
             }
         }
         loadScripts(scriptsRootFolder);
@@ -69,11 +69,14 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         if (watcher != null) watcher.watch();
     }
 
-    public void build() {
+    public void build(File output) {
         try {
-            File root = new File("assets" + File.separator + "temp" + File.separator);
-            if (!root.exists()) root.mkdir();
-            loader.build(root);
+            File root = new File("temp" + File.separator);
+            if (root.exists()) {
+                FileIO.delete(root);
+            }
+            root.mkdir();
+            loader.build(root, output);
         } catch (Exception e) {
             Debug.logError(e.getMessage());
             e.printStackTrace();
@@ -90,7 +93,6 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         File[] files = folder.listFiles();
         if (files == null || files.length == 0) return;
         List<File> sort = Arrays.asList(files);
-        //loadSort(sort);
         try {
             loadIntoLoader(sort);
         } catch (ScriptException e) {
@@ -122,7 +124,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     @Override
     public InternalScript reloadScript(File file, String contents) {
         if (file.getName().endsWith(".java")) {
-            String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
+            String scriptName = file.getName().substring(0, file.getName().length() - 5 /* ".java".length() */);
             InternalScript previous = getScript(scriptName);
             if (previous != null) {
                 Payload.COMPONENTS.remove(previous.getCompiledClass());
@@ -221,6 +223,10 @@ public final class EditorScriptManager implements ScriptManager, Listener {
         }, 10);
     }
 
+    public void setCompileTask(Task task) {
+        this.compileTask = task;
+    }
+
     public boolean isRecompiling() {
         return compileTask != null;
     }
@@ -229,7 +235,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     private void onFileModify(FileEvent event) {
         if (event.getFile().getName().endsWith(".java")) {
             File file = new File(scriptsRootFolder, event.getFile().getName());
-            String scriptName = file.getName().substring(0, file.getName().length() - ".java".length());
+            String scriptName = file.getName().substring(0, file.getName().length() - 5 /* ".java".length() */);
             InternalScript script = getScript(scriptName);
             if (isPlaying) {
                 awaitingEvents.put(file.getPath(), event);

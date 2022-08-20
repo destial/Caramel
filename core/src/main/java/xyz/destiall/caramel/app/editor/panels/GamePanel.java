@@ -8,6 +8,7 @@ import imgui.flag.ImGuiStyleVar;
 import imgui.flag.ImGuiWindowFlags;
 import org.joml.Vector2f;
 import xyz.destiall.caramel.app.ApplicationImpl;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 
 public final class GamePanel extends Panel {
     private float previousFps;
@@ -20,7 +21,7 @@ public final class GamePanel extends Panel {
     public void __imguiLayer() {
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0f, 0f);
         int flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize;
-        if (window.getScriptManager().isRecompiling()) {
+        if (window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling()) {
             flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
         if (ImGui.begin("Game", flags)) {

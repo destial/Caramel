@@ -2,7 +2,6 @@ package xyz.destiall.caramel.app.scripts.build;
 
 import caramel.api.debug.Debug;
 import caramel.api.utils.FileIO;
-import com.google.common.collect.Lists;
 import xyz.destiall.caramel.app.scripts.loader.FileScriptMemoryJavaObject;
 
 import javax.tools.DiagnosticCollector;
@@ -23,19 +22,21 @@ public final class CompileStage implements Stage {
     private final Collection<FileScriptMemoryJavaObject> sources;
     private final DiagnosticCollector<JavaFileObject> diagnostics;
     private final File root;
-    public CompileStage(JavaCompiler compiler, DiagnosticCollector<JavaFileObject> diagnostics, File root, Collection<FileScriptMemoryJavaObject> sources) {
+    private final File output;
+    public CompileStage(JavaCompiler compiler, DiagnosticCollector<JavaFileObject> diagnostics, File root, File output, Collection<FileScriptMemoryJavaObject> sources) {
         this.compiler = compiler;
         this.sources = sources;
         this.diagnostics = diagnostics;
         this.root = root;
+        this.output = output;
     }
 
     @Override
     public Stage execute() {
         if (sources.isEmpty()) {
-            Debug.logError("Nothing to compile!");
-            return null;
+            return new JarStage(root, output);
         }
+
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
         JavaFileManager.Location loc = new JavaFileManager.Location() {
             @Override
@@ -63,6 +64,6 @@ public final class CompileStage implements Stage {
             return null;
         }
 
-        return new WaitStage(new MoveStage(root));
+        return new WaitStage(new MoveStage(root, output, sources));
     }
 }

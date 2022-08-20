@@ -27,6 +27,7 @@ import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import xyz.destiall.caramel.app.editor.action.AddComponents;
 import xyz.destiall.caramel.app.editor.action.DeleteComponents;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 
@@ -68,7 +69,7 @@ public final class InspectorPanel extends Panel {
     @Override
     public void __imguiLayer() {
         int flags = 0;
-        if (window.getScriptManager().isRecompiling()) {
+        if (window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling()) {
             flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
         if (ImGui.begin("Inspector", flags)) {

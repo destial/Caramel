@@ -8,6 +8,7 @@ import caramel.api.Time;
 import caramel.api.components.Camera;
 import caramel.api.graphics.Graphics;
 import caramel.api.graphics.opengl.OpenGL30;
+import caramel.api.scripts.ScriptManager;
 import caramel.api.sound.decoder.AudioDecoder;
 import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
@@ -44,6 +45,7 @@ import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.editor.managers.BodyManager;
 import xyz.destiall.caramel.app.editor.managers.MeshManager;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
+import xyz.destiall.caramel.app.scripts.RuntimeScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.Payload;
@@ -122,7 +124,7 @@ public final class ApplicationImpl extends Application implements Runnable {
 
     private ImGUILayer imGui;
     private Framebuffer[] framebuffer;
-    private EditorScriptManager scriptManager;
+    private ScriptManager scriptManager;
 
     private int width;
     private int height;
@@ -141,6 +143,12 @@ public final class ApplicationImpl extends Application implements Runnable {
     private int sceneIndex = -1;
 
     public long glfwWindow;
+
+    public static ApplicationImpl getRuntime() {
+        if (inst == null) inst = new ApplicationImpl();
+        ((ApplicationImpl) inst).EDITOR_MODE = false;
+        return (ApplicationImpl) inst;
+    }
 
     public static ApplicationImpl getApp() {
         if (inst == null) inst = new ApplicationImpl();
@@ -330,10 +338,14 @@ public final class ApplicationImpl extends Application implements Runnable {
         Graphics.get().glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Setup script manager
-        scriptManager = new EditorScriptManager();
+        if (EDITOR_MODE) {
+            scriptManager = new EditorScriptManager();
+            listeners.add((EditorScriptManager) scriptManager);
+        } else {
+            scriptManager = new RuntimeScriptManager();
+        }
 
         // Register event listeners
-        listeners.add(scriptManager);
         for (Listener listener : listeners) {
             eventHandler.registerListener(listener);
         }
@@ -680,7 +692,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     @Override
-    public EditorScriptManager getScriptManager() {
+    public ScriptManager getScriptManager() {
         return scriptManager;
     }
 

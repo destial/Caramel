@@ -22,6 +22,7 @@ import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
 import xyz.destiall.caramel.app.editor.action.EditTransformComponent;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import java.util.HashSet;
@@ -43,7 +44,7 @@ public final class ScenePanel extends Panel {
     public void __imguiLayer() {
         ImGui.pushStyleVar(ImGuiStyleVar.WindowPadding, 0f, 0f);
         int flags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.AlwaysAutoResize;
-        if (window.getScriptManager().isRecompiling()) {
+        if (window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling()) {
             flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
         if (ImGui.begin("Scene", flags)) {

@@ -9,6 +9,7 @@ import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
 import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
 import imgui.flag.ImGuiWindowFlags;
 import xyz.destiall.caramel.app.ApplicationImpl;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.ui.ImGuiUtils;
 
 import java.io.File;
@@ -146,7 +147,14 @@ public final class MenuBarPanel extends Panel {
             }
 
             if (ImGui.button("Build")) {
-                ApplicationImpl.getApp().getScriptManager().build();
+                String path = ImGuiUtils.saveFileJava("Build", ".jar");
+                if (path != null) {
+                    if (!path.toLowerCase().endsWith(".jar")) {
+                        path += ".jar";
+                    }
+                    File out = new File(path);
+                    ((EditorScriptManager) ApplicationImpl.getApp().getScriptManager()).build(out);
+                }
             }
 
             if (!scene.isPlaying() && ImGui.button("Play")) {

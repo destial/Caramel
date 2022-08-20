@@ -32,11 +32,6 @@
                 <filtering>true</filtering>
                 <directory>${basedir}/../core/src/main/resources/</directory>
             </resource>
-            <resource>
-                <targetPath>.</targetPath>
-                <filtering>true</filtering>
-                <directory>${basedir}/../dist/</directory>
-            </resource>
         </resources>
         <plugins>
             <plugin>

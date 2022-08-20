@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public abstract class Debug {
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
     protected static Debug inst;
 
     /**
@@ -96,9 +97,16 @@ public abstract class Debug {
      * Formats a message including its date and time sent.
      */
     public static void console(Object message) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Calendar cal = Calendar.getInstance();
         System.out.println("[" + dateFormat.format(cal.getTime()) + "]: " + message);
+    }
+
+    /**
+     * Formats an error message including its date and time sent.
+     */
+    public static void consoleErr(Object message) {
+        Calendar cal = Calendar.getInstance();
+        System.err.println("[" + dateFormat.format(cal.getTime()) + "]: ERROR: " + message);
     }
 
     protected abstract void _log(Object log);

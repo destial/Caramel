@@ -5,8 +5,8 @@
       "components": [
         {
           "position": {
-            "x": 1.0,
-            "y": 1.0,
+            "x": -1.5762715,
+            "y": 2.1048338,
             "z": -1.0
           },
           "localPosition": {
@@ -16,7 +16,7 @@
           },
           "rotation": {
             "x": 0.0,
-            "y": 0.0,
+            "y": -0.0,
             "z": 0.0
           },
           "scale": {
@@ -185,6 +185,33 @@
           "updatePosition": false,
           "clazz": "caramel.api.audio.AudioPlayer",
           "id": 10,
+          "enabled": true
+        },
+        {
+          "target": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "rotate": false,
+          "isEditor": false,
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "fov": 60.0,
+          "near": 0.01,
+          "far": 1000.0,
+          "perspective": false,
+          "zoom": 1.0,
+          "clazz": "caramel.api.components.Camera",
+          "id": 11,
           "enabled": true
         }
       ],

@@ -110,7 +110,7 @@ public final class ScriptLoader {
             throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
 
-        String fullClassName = getFullName(file, code);
+        String fullClassName = FileIO.getFullName(file, code);
         Debug.console("Building " + fullClassName);
 
         FileScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
@@ -158,40 +158,6 @@ public final class ScriptLoader {
         return loader.script;
     }
 
-    private static final Pattern NAME_PATTERN = Pattern.compile("public\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
-    private static final Pattern NAME_FINAL_PATTERN = Pattern.compile("public\\s+final\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
-    private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");
-
-    private String getFullName(File file, String script) {
-        String fullPackage = null;
-        Matcher packageMatcher = PACKAGE_PATTERN.matcher(script);
-        if (packageMatcher.find()) {
-            fullPackage = packageMatcher.group(1);
-        }
-
-        Matcher nameMatcher = NAME_PATTERN.matcher(script);
-        if (nameMatcher.find()) {
-            String name = nameMatcher.group(1);
-            if (fullPackage == null) {
-                return name;
-            } else {
-                return fullPackage + "." + name;
-            }
-        }
-
-        nameMatcher = NAME_FINAL_PATTERN.matcher(script);
-        if (nameMatcher.find()) {
-            String name = nameMatcher.group(1);
-            if (fullPackage == null) {
-                return name;
-            } else {
-                return fullPackage + "." + name;
-            }
-        }
-
-        return "scripts." + file.getName().substring(0, file.getName().length() - ".java".length());
-    }
-
     public void compileAll(List<File> files) throws ScriptException {
         if (compiler == null) {
             throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
@@ -200,7 +166,7 @@ public final class ScriptLoader {
         for (File file : files) {
             if (!file.exists()) continue;
             String code = FileIO.readData(file);
-            String fullClassName = getFullName(file, code);
+            String fullClassName = FileIO.getFullName(file, code);
             FileScriptMemoryJavaObject object = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
             sources.add(object);
         }
@@ -242,16 +208,17 @@ public final class ScriptLoader {
         }
     }
 
-    public void build(File root) throws ScriptException {
+    public void build(File root, File output) throws ScriptException {
         if (compiler == null) {
             throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
-        Application.getApp().getScheduler().runTask(() -> {
-            Stage next = new CompileStage(compiler, diagnostics, root, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
+        scriptManager.setCompileTask(Application.getApp().getScheduler().runTask(() -> {
+            Stage next = new CompileStage(compiler, diagnostics, root, output, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
             while (next != null) {
                 Debug.log("Starting " + next.getClass().getSimpleName());
                 next = next.execute();
             }
-        });
+            scriptManager.setCompileTask(null);
+        }));
     }
 }
