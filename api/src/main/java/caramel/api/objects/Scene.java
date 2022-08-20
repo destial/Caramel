@@ -8,6 +8,8 @@ import caramel.api.interfaces.Update;
 import caramel.api.utils.Pair;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +26,7 @@ public abstract class Scene implements Update, Render {
     protected List<GameObject> defaultGameObjects;
     protected List<Pair<GameObject, GameObject>> toAdd;
     protected Set<Light> lights;
-    protected Camera gameCamera;
+    protected Set<Camera> gameCameras;
     protected File file;
     protected boolean playing = false;
 
@@ -35,6 +37,7 @@ public abstract class Scene implements Update, Render {
     public Scene() {
         selectedGameObject = ConcurrentHashMap.newKeySet();
         selectedDefaultGameObject = ConcurrentHashMap.newKeySet();
+        gameCameras = ConcurrentHashMap.newKeySet();
     }
 
     /**
@@ -99,19 +102,27 @@ public abstract class Scene implements Update, Render {
     }
 
     /**
-     * Set the main game {@link Camera} to render the {@link Scene} to.
+     * Add a game {@link Camera} to render the {@link Scene} to.
      * @param camera The game {@link Camera}.
      */
-    public void setGameCamera(Camera camera) {
-        this.gameCamera = camera;
+    public void addGameCamera(Camera camera) {
+        gameCameras.add(camera);
     }
 
     /**
-     * Get the main game {@link Camera} that the {@link Scene} is rendering to.
-     * @return The game {@link Camera}.
+     * Remove a game {@link Camera} from the {@link Scene} to.
+     * @param camera The game {@link Camera}.
      */
-    public Camera getGameCamera() {
-        return gameCamera;
+    public void removeGameCamera(Camera camera) {
+        gameCameras.remove(camera);
+    }
+
+    /**
+     * Get the game {@link Camera}s that the {@link Scene} is rendering to.
+     * @return The game {@link Camera}s.
+     */
+    public Collection<Camera> getGameCameras() {
+        return gameCameras;
     }
 
     /**

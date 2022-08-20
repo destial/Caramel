@@ -5,6 +5,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 public interface GL20 {
+    int GL_FILL = 6914;
+    int GL_LINE = 6913;
     int GL_ES_VERSION_2_0 = 1;
     int GL_DEPTH_BUFFER_BIT = 0x00000100;
     int GL_STENCIL_BUFFER_BIT = 0x00000400;

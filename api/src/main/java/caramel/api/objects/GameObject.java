@@ -231,8 +231,8 @@ public abstract class GameObject implements Update, Render {
         if (component instanceof Transform) return false;
         components.remove(component);
         if (scene != null) {
-            if (component instanceof Camera && scene.getGameCamera() == component) {
-                scene.setGameCamera(null);
+            if (component instanceof Camera) {
+                scene.removeGameCamera((Camera) component);
             }
         }
         return true;
@@ -249,8 +249,8 @@ public abstract class GameObject implements Update, Render {
         if (component instanceof Transform) return false;
         components.remove(component);
         if (scene != null) {
-            if (component instanceof Camera && scene.getGameCamera() == component) {
-                scene.setGameCamera(null);
+            if (component instanceof Camera) {
+                scene.removeGameCamera((Camera) component);
             }
         }
         return true;

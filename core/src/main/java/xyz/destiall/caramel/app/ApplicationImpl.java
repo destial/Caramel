@@ -5,6 +5,7 @@ import caramel.api.Component;
 import caramel.api.Input;
 import caramel.api.JoystickListener;
 import caramel.api.Time;
+import caramel.api.components.Camera;
 import caramel.api.graphics.Graphics;
 import caramel.api.graphics.opengl.OpenGL30;
 import caramel.api.sound.decoder.AudioDecoder;
@@ -451,13 +452,16 @@ public final class ApplicationImpl extends Application implements Runnable {
         }
         BatchRenderer.DRAW_CALLS = 0;
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().bind();
-        if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
+        if (scene.getGameCameras().isEmpty()) {
             Graphics.get().glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
             Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
             Graphics.get().glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            scene.render(scene.getGameCamera());
+            for (Camera camera : scene.getGameCameras()) {
+                if (!camera.gameObject.active) continue;
+                scene.render(camera);
+            }
         }
         scene.render(scene.getUICamera());
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().unbind();
@@ -492,7 +496,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         object.addProperty("windowPosX", winPosX);
         object.addProperty("windowPosY", winPosY);
         object.addProperty("fullscreen", fullscreen);
-        object.addProperty("lastScene", new File("").toURI().relativize(getCurrentScene().getFile().toURI()).getPath());
+        object.addProperty("lastScene", FileIO.asRelative(getCurrentScene().getFile()));
         FileIO.writeData(settings, serializer.toJson(object));
 
         // Destroy and clean up any remaining objects

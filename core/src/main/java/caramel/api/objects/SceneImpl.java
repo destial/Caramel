@@ -41,12 +41,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_FILL;
-import static org.lwjgl.opengl.GL11.GL_FRONT_AND_BACK;
-import static org.lwjgl.opengl.GL11.GL_LINE;
-import static org.lwjgl.opengl.GL11.glEnable;
-import static org.lwjgl.opengl.GL11.glPolygonMode;
+import static caramel.api.graphics.GL20.GL_DEPTH_TEST;
+import static caramel.api.graphics.GL20.GL_FILL;
+import static caramel.api.graphics.GL20.GL_FRONT_AND_BACK;
+import static caramel.api.graphics.GL20.GL_LINE;
 
 public final class SceneImpl extends Scene {
     private final Vector3f selectionColor = new Vector3f(1, 0, 0);
@@ -212,8 +210,8 @@ public final class SceneImpl extends Scene {
         if (playing) {
             for (GameObject go : gameObjects) {
                 go.update();
-                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
-                    gameCamera = go.getComponentInChildren(Camera.class);
+                if (go.getComponentInChildren(Camera.class) != null) {
+                    gameCameras.add(go.getComponentInChildren(Camera.class));
                 }
             }
             for (Physics world : physics.values()) {
@@ -232,8 +230,8 @@ public final class SceneImpl extends Scene {
 
             for (GameObject go : gameObjects) {
                 go.editorUpdate();
-                if (gameCamera == null && go.getComponentInChildren(Camera.class) != null) {
-                    gameCamera = go.getComponentInChildren(Camera.class);
+                if (go.getComponentInChildren(Camera.class) != null) {
+                    gameCameras.add(go.getComponentInChildren(Camera.class));
                 }
             }
         }
@@ -296,7 +294,7 @@ public final class SceneImpl extends Scene {
             }
         }
 
-        gameCamera = null;
+        gameCameras.clear();
         Application.getApp().getEventHandler().call(new ScenePlayEvent(this));
     }
 
@@ -317,7 +315,7 @@ public final class SceneImpl extends Scene {
         for (Physics p : physics.values()) {
             p.reset();
         }
-        gameCamera = null;
+        gameCameras.clear();
     }
 
     public void __imguiLayer() {
@@ -342,14 +340,10 @@ public final class SceneImpl extends Scene {
         }
         Camera camera;
         if ((camera = gameObject.getComponentInChildren(Camera.class)) != null) {
-            if (camera == gameCamera) {
-                gameCamera = null;
-            }
+            gameCameras.remove(camera);
         }
         if ((camera = gameObject.getComponent(Camera.class)) != null) {
-            if (camera == gameCamera) {
-                gameCamera = null;
-            }
+            gameCameras.remove(camera);
         }
         selectedGameObject.remove(gameObject);
         selectedDefaultGameObject.remove(gameObject);

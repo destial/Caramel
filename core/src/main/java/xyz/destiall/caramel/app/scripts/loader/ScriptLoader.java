@@ -1,9 +1,12 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
+import caramel.api.Application;
 import caramel.api.debug.Debug;
 import caramel.api.scripts.InternalScript;
 import caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
+import xyz.destiall.caramel.app.scripts.build.CompileStage;
+import xyz.destiall.caramel.app.scripts.build.Stage;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import javax.script.ScriptException;
@@ -243,31 +246,12 @@ public final class ScriptLoader {
         if (compiler == null) {
             throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
-
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
-        JavaFileManager.Location loc = new JavaFileManager.Location() {
-            @Override
-            public String getName() {
-                return root.getPath();
+        Application.getApp().getScheduler().runTask(() -> {
+            Stage next = new CompileStage(compiler, diagnostics, root, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
+            while (next != null) {
+                Debug.log("Starting " + next.getClass().getSimpleName());
+                next = next.execute();
             }
-
-            @Override
-            public boolean isOutputLocation() {
-                return true;
-            }
-        };
-        try {
-            fileManager.setLocation(loc, Collections.singletonList(root));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, Collections.singletonList("-d"), null, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
-        if (!task.call()) {
-            String message = "Error while compiling sources: " + diagnostics.getDiagnostics().stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining("\n"));
-            throw new ScriptException(message);
-        }
+        });
     }
 }

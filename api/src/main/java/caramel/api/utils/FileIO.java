@@ -13,6 +13,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,6 +52,8 @@ public final class FileIO {
             "\n" +
             "    }\n" +
             "}";
+
+    public static URI ROOT = new File("").toURI();
 
     public static InternalScript writeScript(String className) {
         File scriptFolder = new File("assets/scripts/");
@@ -180,14 +183,18 @@ public final class FileIO {
         Files.copy(source, destination);
     }
 
-    public static void delete(File f) {
+    public static boolean delete(File f) {
         if (f.isDirectory()) {
             for (File c : f.listFiles()) {
                 delete(c);
             }
         }
 
-        f.delete();
+        return f.delete();
+    }
+
+    public static String asRelative(File file) {
+        return ROOT.relativize(file.toURI()).getPath();
     }
 
     public static boolean isHidden(File file) {

@@ -71,7 +71,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
 
     public void build() {
         try {
-            File root = new File("assets" + File.separator + "compiled" + File.separator);
+            File root = new File("assets" + File.separator + "temp" + File.separator);
             if (!root.exists()) root.mkdir();
             loader.build(root);
         } catch (Exception e) {

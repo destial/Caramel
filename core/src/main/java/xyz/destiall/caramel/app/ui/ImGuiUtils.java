@@ -12,6 +12,7 @@ import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
 import caramel.api.utils.Color;
+import caramel.api.utils.FileIO;
 import imgui.ImGui;
 import imgui.extension.imguifiledialog.ImGuiFileDialog;
 import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
@@ -1026,7 +1027,7 @@ public final class ImGuiUtils {
                         }
                     } else {
                         File absolute = new File(path);
-                        String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
+                        String relative = FileIO.asRelative(absolute);
                         if (Texture.getTexture(relative) != null) {
                             EditorAction action = new EditorAction(scene) {
                                 @Override
@@ -1405,7 +1406,7 @@ public final class ImGuiUtils {
                 if (ImGuiFileDialog.isOk()) {
                     String path = ImGuiFileDialog.getFilePathName();
                     File absolute = new File(path);
-                    String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
+                    String relative = FileIO.asRelative(absolute);
                     ImGuiFileDialog.close();
                     return relative;
                 }
@@ -1429,7 +1430,7 @@ public final class ImGuiUtils {
         int result = NativeFileDialog.NFD_OpenDialog(f, System.getProperty("user.dir"), pointerBuffer);
         if (result == NFD_OKAY) {
             File file = new File(pointerBuffer.getStringASCII());
-            return new File("").toURI().relativize(file.toURI()).getPath();
+            return FileIO.asRelative(file);
         }
         return null;
     }
@@ -1448,7 +1449,7 @@ public final class ImGuiUtils {
         int result = NativeFileDialog.NFD_SaveDialog(f, System.getProperty("user.dir"), pointerBuffer);
         if (result == NFD_OKAY) {
             File file = new File(pointerBuffer.getStringASCII());
-            return new File("").toURI().relativize(file.toURI()).getPath();
+            return FileIO.asRelative(file);
         }
         return null;
     }

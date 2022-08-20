@@ -1,6 +1,7 @@
 package xyz.destiall.caramel.app.editor.debug;
 
 import caramel.api.components.Camera;
+import caramel.api.graphics.Graphics;
 import caramel.api.interfaces.Render;
 import caramel.api.interfaces.Update;
 import caramel.api.render.BatchRenderer;
@@ -41,20 +42,20 @@ public final class DebugDraw implements Update, Render {
 
     private void init() {
         shader = Shader.getShader("line");
-        vaoID = glGenVertexArrays();
-        glBindVertexArray(vaoID);
+        vaoID = Graphics.get().glGenVertexArrays();
+        Graphics.get().glBindVertexArray(vaoID);
 
-        vboID = glGenBuffers();
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
-        glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_DYNAMIC_DRAW);
+        vboID = Graphics.get().glGenBuffers();
+        Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        Graphics.get().glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
-        glEnableVertexAttribArray(0);
+        Graphics.get().glVertexAttribPointer(0, 3, GL_FLOAT, false, 6 * Float.BYTES, 0);
+        Graphics.get().glEnableVertexAttribArray(0);
 
-        glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
-        glEnableVertexAttribArray(1);
+        Graphics.get().glVertexAttribPointer(1, 3, GL_FLOAT, false, 6 * Float.BYTES, 3 * Float.BYTES);
+        Graphics.get().glEnableVertexAttribArray(1);
 
-        glLineWidth(5.f);
+        Graphics.get().glLineWidth(5.f);
     }
 
     public void addLine(Vector3f from, Vector3f to, Vector3f color) {
@@ -100,30 +101,30 @@ public final class DebugDraw implements Update, Render {
     public void render(Camera camera) {
         if (lines.isEmpty()) return;
 
-        glBindBuffer(GL_ARRAY_BUFFER, vboID);
+        Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vboID);
         if (vertexArray.length > MAX_SIZE) {
             MAX_SIZE = vertexArray.length;
-            glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_DYNAMIC_DRAW);
+            Graphics.get().glBufferData(GL_ARRAY_BUFFER, vertexArray, GL_DYNAMIC_DRAW);
         } else {
-            glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
+            Graphics.get().glBufferSubData(GL_ARRAY_BUFFER, 0, vertexArray);
         }
 
         shader.attach();
         Matrix4f vp = camera.getProjection().mul(camera.getView());
         shader.uploadMat4f("uVP", vp);
 
-        glBindVertexArray(vaoID);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
+        Graphics.get().glBindVertexArray(vaoID);
+        Graphics.get().glEnableVertexAttribArray(0);
+        Graphics.get().glEnableVertexAttribArray(1);
 
-        glDrawArrays(GL_LINES, 0, lines.size() * 2);
+        Graphics.get().glDrawArrays(GL_LINES, 0, lines.size() * 2);
         BatchRenderer.DRAW_CALLS++;
 
-        glDisableVertexAttribArray(0);
-        glDisableVertexAttribArray(1);
-        glBindVertexArray(0);
+        Graphics.get().glDisableVertexAttribArray(0);
+        Graphics.get().glDisableVertexAttribArray(1);
+        Graphics.get().glBindVertexArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         shader.detach();
     }
