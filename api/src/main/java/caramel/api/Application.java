@@ -1,5 +1,8 @@
 package caramel.api;
 
+import caramel.api.input.JoystickListener;
+import caramel.api.input.KeyListener;
+import caramel.api.input.MouseListener;
 import caramel.api.objects.Scene;
 import caramel.api.scripts.ScriptManager;
 import xyz.destiall.java.events.EventHandling;

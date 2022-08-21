@@ -2,18 +2,14 @@ package xyz.destiall.caramel.app.scripts;
 
 import caramel.api.scripts.InternalScript;
 import caramel.api.scripts.ScriptManager;
-import caramel.api.utils.FileIO;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 public final class RuntimeScriptManager implements ScriptManager {
     private final File scriptsRootFolder;
@@ -21,43 +17,6 @@ public final class RuntimeScriptManager implements ScriptManager {
     private URLClassLoader scriptLoader;
 
     public RuntimeScriptManager() {
-        String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-        try {
-            ZipInputStream coreZip = new ZipInputStream(new FileInputStream(path));
-            ZipEntry zipEntry = coreZip.getNextEntry();
-            byte[] data = new byte[1024];
-            while (zipEntry != null) {
-                if (zipEntry.getName().startsWith("assets")) {
-                    File newFile = newFile(FileIO.ROOT_FILE, zipEntry);
-                    if (zipEntry.isDirectory()) {
-                        if (!newFile.isDirectory() && !newFile.mkdirs()) {
-                            throw new IOException("Failed to create directory " + newFile);
-                        }
-                    } else {
-
-                        // fix for Windows-created archives
-                        File parent = newFile.getParentFile();
-                        if (!parent.isDirectory() && !parent.mkdirs()) {
-                            throw new IOException("Failed to create directory " + parent);
-                        }
-
-                        // write file content
-                        FileOutputStream fos = new FileOutputStream(newFile);
-                        int len;
-                        while ((len = coreZip.read(data)) > 0) {
-                            fos.write(data, 0, len);
-                        }
-                        fos.close();
-                    }
-                }
-                zipEntry = coreZip.getNextEntry();
-            }
-            coreZip.closeEntry();
-            coreZip.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
         scriptsRootFolder = new File("scripts" + File.separator);
         scripts = new HashMap<>();
     }

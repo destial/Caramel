@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app;
 
-import caramel.api.KeyListener;
+import caramel.api.input.KeyListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;

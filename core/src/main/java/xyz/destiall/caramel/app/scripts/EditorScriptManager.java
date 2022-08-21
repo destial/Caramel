@@ -76,6 +76,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 FileIO.delete(root);
             }
             root.mkdir();
+            Debug.log("Building to " + output);
             loader.build(root, output);
         } catch (Exception e) {
             Debug.logError(e.getMessage());

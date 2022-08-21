@@ -109,6 +109,13 @@ public final class SceneImpl extends Scene {
             world.update();
         }
         for (GameObject go : gameObjects) go.lateUpdate();
+
+        for (GameObject go : gameObjects) {
+            go.editorUpdate();
+            if (go.getComponentInChildren(Camera.class) != null) {
+                gameCameras.add(go.getComponentInChildren(Camera.class));
+            }
+        }
     }
 
     public void undoLastAction() {
@@ -227,14 +234,15 @@ public final class SceneImpl extends Scene {
             if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Y)) {
                 redoLastAction();
             }
+        }
 
-            for (GameObject go : gameObjects) {
-                go.editorUpdate();
-                if (go.getComponentInChildren(Camera.class) != null) {
-                    gameCameras.add(go.getComponentInChildren(Camera.class));
-                }
+        for (GameObject go : gameObjects) {
+            go.editorUpdate();
+            if (go.getComponentInChildren(Camera.class) != null) {
+                gameCameras.add(go.getComponentInChildren(Camera.class));
             }
         }
+
         editorCamera.gameObject.lateUpdate();
 
         for (GameObject selected : selectedGameObject) {

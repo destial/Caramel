@@ -23,6 +23,7 @@ public final class CompileStage implements Stage {
     private final DiagnosticCollector<JavaFileObject> diagnostics;
     private final File root;
     private final File output;
+
     public CompileStage(JavaCompiler compiler, DiagnosticCollector<JavaFileObject> diagnostics, File root, File output, Collection<FileScriptMemoryJavaObject> sources) {
         this.compiler = compiler;
         this.sources = sources;
@@ -34,7 +35,8 @@ public final class CompileStage implements Stage {
     @Override
     public Stage execute() {
         if (sources.isEmpty()) {
-            return new JarStage(root, output);
+            Debug.log("No scripts to be found, skipping MoveStage...");
+            return new ExtractStage(root, output);
         }
 
         StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());

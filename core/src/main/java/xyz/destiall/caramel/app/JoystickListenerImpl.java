@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app;
 
 import caramel.api.Input;
-import caramel.api.JoystickListener;
+import caramel.api.input.JoystickListener;
 import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.nio.ByteBuffer;

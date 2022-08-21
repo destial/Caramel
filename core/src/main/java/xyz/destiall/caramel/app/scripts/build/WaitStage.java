@@ -1,5 +1,7 @@
 package xyz.destiall.caramel.app.scripts.build;
 
+import caramel.api.debug.Debug;
+
 public final class WaitStage implements Stage {
     private final Stage stageToExecute;
     public WaitStage(Stage stageToExecute) {
@@ -8,6 +10,10 @@ public final class WaitStage implements Stage {
 
     @Override
     public Stage execute() {
-        return stageToExecute.isReady() ? stageToExecute : this;
+        if (stageToExecute.isReady()) {
+            return stageToExecute;
+        }
+        Debug.log("Waiting on " + stageToExecute.getClass().getSimpleName());
+        return this;
     }
 }

@@ -4,7 +4,7 @@ import caramel.api.utils.FileIO;
 
 import java.io.File;
 
-public final class CleanStage implements Stage {
+public class CleanStage implements Stage {
     private final File output;
 
     public CleanStage(File output) {

@@ -6,6 +6,8 @@ import xyz.destiall.caramel.app.scripts.loader.FileScriptMemoryJavaObject;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public final class MoveStage implements Stage {
     private final File root;
@@ -22,14 +24,15 @@ public final class MoveStage implements Stage {
 
     @Override
     public boolean isReady() {
-        File[] files = root.listFiles(f -> f.getName().endsWith(".class"));
-        return files != null && files.length != 0;
+        List<File> files = FileIO.traverse(root).stream().filter(f -> f.getName().endsWith(".class")).collect(Collectors.toList());
+        Debug.log(root.getPath());
+        return files.size() != 0;
     }
 
     @Override
     public Stage execute() {
-        File[] files = root.listFiles(f -> f.getName().endsWith(".class"));
-        if (files == null || files.length == 0) {
+        List<File> files = FileIO.traverse(root).stream().filter(f -> f.getName().endsWith(".class")).collect(Collectors.toList());
+        if (files.size() == 0) {
             Debug.logError("Nothing to move!");
             return null;
         }
@@ -43,7 +46,7 @@ public final class MoveStage implements Stage {
                 File packageOut = new File(output, pack + File.separator);
                 packageOut.mkdirs();
                 File dst = new File(packageOut, file.getName());
-                FileIO.copy(file, dst, true);
+                FileIO.copy(file, dst, null, true);
                 Debug.log("Moving file " + file.getPath() + " to " + dst.getPath());
                 FileIO.delete(file);
             } catch (Exception e) {
@@ -51,6 +54,6 @@ public final class MoveStage implements Stage {
             }
         }
 
-        return new JarStage(output, outputBuild);
+        return new ExtractStage(output, outputBuild);
     }
 }

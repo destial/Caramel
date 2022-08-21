@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app;
 
-import caramel.api.MouseListener;
+import caramel.api.input.MouseListener;
 import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import imgui.ImGui;

@@ -3,7 +3,7 @@ package xyz.destiall.caramel.app;
 import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.Input;
-import caramel.api.JoystickListener;
+import caramel.api.input.JoystickListener;
 import caramel.api.Time;
 import caramel.api.components.Camera;
 import caramel.api.graphics.Graphics;
@@ -102,10 +102,6 @@ import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -147,6 +143,16 @@ public final class ApplicationImpl extends Application implements Runnable {
     public static ApplicationImpl getRuntime() {
         if (inst == null) inst = new ApplicationImpl();
         ((ApplicationImpl) inst).EDITOR_MODE = false;
+        try {
+            File assets = new File("assets");
+            if (assets.mkdir()) {
+                String path = Application.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+                File jar = new File(path);
+                FileIO.extract(jar, assets, "assets");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return (ApplicationImpl) inst;
     }
 
@@ -211,6 +217,10 @@ public final class ApplicationImpl extends Application implements Runnable {
                 winPosY = object.get("windowPosY").getAsInt();
                 lastScene = object.get("lastScene").getAsString();
                 fullscreen = object.has("fullscreen") ? object.get("fullscreen").getAsBoolean() : false;
+            }
+
+            if (!EDITOR_MODE) {
+                fullscreen = true;
             }
 
             File assets = new File("assets" + File.separator);
@@ -463,6 +473,7 @@ public final class ApplicationImpl extends Application implements Runnable {
             getSceneViewFramebuffer().unbind();
         }
         BatchRenderer.DRAW_CALLS = 0;
+
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().bind();
         if (scene.getGameCameras().isEmpty()) {
             Graphics.get().glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -475,6 +486,7 @@ public final class ApplicationImpl extends Application implements Runnable {
                 scene.render(camera);
             }
         }
+
         scene.render(scene.getUICamera());
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().unbind();
 
@@ -483,7 +495,7 @@ public final class ApplicationImpl extends Application implements Runnable {
             mouseListener.setGameViewportSize(new Vector2f(width, height));
         }
 
-        if (EDITOR_MODE) imGui.render();
+        if (EDITOR_MODE && !fullscreen) imGui.render();
 
         scene.endFrame();
 
