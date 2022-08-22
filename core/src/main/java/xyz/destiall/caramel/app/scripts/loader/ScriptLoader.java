@@ -5,32 +5,24 @@ import caramel.api.debug.Debug;
 import caramel.api.scripts.InternalScript;
 import caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
-import xyz.destiall.caramel.app.scripts.build.CompileStage;
-import xyz.destiall.caramel.app.scripts.build.Stage;
+import xyz.destiall.caramel.app.build.CompileStage;
+import xyz.destiall.caramel.app.build.Stage;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import javax.script.ScriptException;
 import javax.tools.DiagnosticCollector;
 import javax.tools.JavaCompiler;
-import javax.tools.JavaFileManager;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
-import javax.tools.Tool;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class ScriptLoader {
@@ -213,11 +205,17 @@ public final class ScriptLoader {
             throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
         scriptManager.setCompileTask(Application.getApp().getScheduler().runTask(() -> {
+            if (root.exists()) {
+                Debug.log("Cleaning build files...");
+                FileIO.delete(root);
+            }
+            root.mkdir();
             Stage next = new CompileStage(compiler, diagnostics, root, output, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
             while (next != null) {
-                Debug.log("Starting " + next.getClass().getSimpleName());
+                Debug.log("Starting " + next.getName());
                 next = next.execute();
             }
+            Debug.log("Build complete!");
             scriptManager.setCompileTask(null);
         }));
     }

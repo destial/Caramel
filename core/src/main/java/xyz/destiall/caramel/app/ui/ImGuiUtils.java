@@ -1027,7 +1027,7 @@ public final class ImGuiUtils {
                         }
                     } else {
                         File absolute = new File(path);
-                        String relative = FileIO.asRelative(absolute);
+                        String relative = FileIO.relativize(absolute);
                         if (Texture.getTexture(relative) != null) {
                             EditorAction action = new EditorAction(scene) {
                                 @Override
@@ -1406,7 +1406,7 @@ public final class ImGuiUtils {
                 if (ImGuiFileDialog.isOk()) {
                     String path = ImGuiFileDialog.getFilePathName();
                     File absolute = new File(path);
-                    String relative = FileIO.asRelative(absolute);
+                    String relative = FileIO.relativize(absolute);
                     ImGuiFileDialog.close();
                     return relative;
                 }
@@ -1430,7 +1430,7 @@ public final class ImGuiUtils {
         int result = NativeFileDialog.NFD_OpenDialog(f, System.getProperty("user.dir"), pointerBuffer);
         if (result == NFD_OKAY) {
             File file = new File(pointerBuffer.getStringASCII());
-            return FileIO.asRelative(file);
+            return FileIO.relativize(file);
         }
         return null;
     }
@@ -1449,7 +1449,7 @@ public final class ImGuiUtils {
         int result = NativeFileDialog.NFD_SaveDialog(f, System.getProperty("user.dir"), pointerBuffer);
         if (result == NFD_OKAY) {
             File file = new File(pointerBuffer.getStringASCII());
-            return FileIO.asRelative(file);
+            return FileIO.relativize(file);
         }
         return null;
     }

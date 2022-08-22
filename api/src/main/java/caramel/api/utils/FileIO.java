@@ -12,8 +12,10 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 public final class FileIO {
@@ -67,7 +70,7 @@ public final class FileIO {
             "}";
 
     public static final URI ROOT = new File("").toURI();
-    public static final File ROOT_FILE = new File("");
+    public static final File ROOT_FILE = new File(System.getProperty("user.dir"));
     private static final Pattern NAME_PATTERN = Pattern.compile("public\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
     private static final Pattern NAME_FINAL_PATTERN = Pattern.compile("public\\s+final\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");
@@ -236,7 +239,9 @@ public final class FileIO {
             }
 
             if (source.isDirectory()) {
-                copyDirectory(source, destination, filter);
+                File destDir = new File(destination, source.getName() + File.separator);
+                destDir.mkdir();
+                copyDirectory(source, destDir, filter);
             } else {
                 copyFile(source, destination, filter);
             }
@@ -270,7 +275,7 @@ public final class FileIO {
     }
 
     public static boolean delete(File f, Predicate<File> filter) {
-        if (filter == null || filter.test(f)) {
+        if (f.exists() && (filter == null || filter.test(f))) {
             if (f.isDirectory()) {
                 for (File c : Objects.requireNonNull(f.listFiles())) {
                     delete(c, filter);
@@ -282,13 +287,36 @@ public final class FileIO {
         return false;
     }
 
+    public static String readUTFFromZip(File source, String path) throws IOException {
+        ZipFile file = new ZipFile(source);
+        ZipInputStream coreZip = new ZipInputStream(java.nio.file.Files.newInputStream(source.toPath()));
+        ZipEntry zipEntry = coreZip.getNextEntry();
+        StringBuilder contents = new StringBuilder();
+        while (zipEntry != null) {
+            if (zipEntry.getName().equals(path)) {
+                InputStream stream = file.getInputStream(zipEntry);
+                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                Scanner scanner = new Scanner(reader);
+                while (scanner.hasNext()) {
+                    contents.append(scanner.nextLine()).append("\n");
+                }
+                break;
+            }
+            zipEntry = coreZip.getNextEntry();
+        }
+        coreZip.closeEntry();
+        coreZip.close();
+        file.close();
+        return contents.toString();
+    }
+
     public static void extract(File source, File dest, String internalPath) throws IOException {
         ZipInputStream coreZip = new ZipInputStream(java.nio.file.Files.newInputStream(source.toPath()));
         ZipEntry zipEntry = coreZip.getNextEntry();
         byte[] data = new byte[1024];
         while (zipEntry != null) {
             if (internalPath.startsWith(zipEntry.getName()) || zipEntry.getName().startsWith(internalPath)) {
-                File newFile = extractFromZip(dest, zipEntry);
+                File newFile = new File(dest, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
                         Debug.logError("Failed to create directory " + newFile);
@@ -319,20 +347,56 @@ public final class FileIO {
         coreZip.close();
     }
 
-    public static File extractFromZip(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
+    public static String relativize(File file) {
+        return ROOT.relativize(file.toURI()).getPath();
     }
 
-    public static String asRelative(File file) {
-        return ROOT.relativize(file.toURI()).getPath();
+    public static void move(File source, File destination, boolean force) throws IOException {
+        move(source, destination, null, force);
+    }
+
+    public static void move(File source, File destination, Predicate<File> filter, boolean force) throws IOException {
+        if (filter == null || filter.test(source)) {
+            if (!source.exists()) {
+                throw new IllegalArgumentException("Source (" + source.getPath() + ") doesn't exist.");
+            }
+
+            if (!force && destination.exists()) {
+                throw new IllegalArgumentException("Destination (" + destination.getPath() + ") exists.");
+            }
+
+            if (source.isDirectory()) {
+                File destDir = new File(destination, source.getName() + File.separator);
+                destDir.mkdir();
+                moveDirectory(source, destDir, filter);
+            } else {
+                moveFile(source, destination, filter);
+            }
+        }
+    }
+
+    public static void moveDirectory(File source, File destination, Predicate<File> filter) throws IOException {
+        if (filter == null || filter.test(source)) {
+            destination.mkdirs();
+
+            File[] files = source.listFiles();
+            if (files == null) return;
+
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    moveDirectory(file, new File(destination, file.getName()), filter);
+                } else {
+                    moveFile(file, new File(destination, file.getName()), filter);
+                }
+            }
+
+            FileIO.delete(source);
+        }
+    }
+
+    public static void moveFile(File source, File destination, Predicate<File> filter) throws IOException {
+        if (filter == null || filter.test(source)) {
+            Files.move(source, destination);
+        }
     }
 }

@@ -10,6 +10,7 @@ import caramel.api.graphics.Graphics;
 import caramel.api.graphics.opengl.OpenGL30;
 import caramel.api.scripts.ScriptManager;
 import caramel.api.sound.decoder.AudioDecoder;
+import xyz.destiall.caramel.app.editor.EditorSceneLoader;
 import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Transform;
@@ -18,8 +19,6 @@ import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FullscreenEvent;
 import caramel.api.events.WindowFocusEvent;
-import caramel.api.objects.GameObject;
-import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
 import caramel.api.render.BatchRenderer;
@@ -28,7 +27,6 @@ import caramel.api.render.Shader;
 import caramel.api.render.Text;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
-import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.FileIO;
 import imgui.ImGui;
 import org.joml.Vector2f;
@@ -44,8 +42,9 @@ import org.reflections.Reflections;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
 import xyz.destiall.caramel.app.editor.managers.BodyManager;
 import xyz.destiall.caramel.app.editor.managers.MeshManager;
+import xyz.destiall.caramel.app.runtime.RuntimeSceneLoader;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
-import xyz.destiall.caramel.app.scripts.RuntimeScriptManager;
+import xyz.destiall.caramel.app.runtime.RuntimeScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
 import xyz.destiall.caramel.app.utils.Payload;
@@ -53,6 +52,8 @@ import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
+import xyz.destiall.java.gson.JsonArray;
+import xyz.destiall.java.gson.JsonElement;
 import xyz.destiall.java.gson.JsonObject;
 import xyz.destiall.java.timer.Scheduler;
 import xyz.destiall.java.timer.Task;
@@ -127,7 +128,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     private int winPosX;
     private int winPosY;
     private boolean fullscreen;
-    private String lastScene;
+    private List<String> lastScenes;
     private String title;
 
     private boolean focused;
@@ -135,24 +136,13 @@ public final class ApplicationImpl extends Application implements Runnable {
     private long audioContext;
     private long audioDevice;
 
-    private final List<SceneImpl> scenes;
-    private int sceneIndex = -1;
+    private SceneLoader sceneLoader;
 
     public long glfwWindow;
 
     public static ApplicationImpl getRuntime() {
         if (inst == null) inst = new ApplicationImpl();
         ((ApplicationImpl) inst).EDITOR_MODE = false;
-        try {
-            File assets = new File("assets");
-            if (assets.mkdir()) {
-                String path = Application.class.getProtectionDomain().getCodeSource().getLocation().getFile();
-                File jar = new File(path);
-                FileIO.extract(jar, assets, "assets");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         return (ApplicationImpl) inst;
     }
 
@@ -168,22 +158,17 @@ public final class ApplicationImpl extends Application implements Runnable {
         joystickListener = new JoystickListenerImpl();
         eventHandler = new EventHandling();
         scheduler = new Scheduler();
-        scenes = new ArrayList<>();
+        listeners = new ArrayList<>();
+        listeners.add(new AudioManager());
+        listeners.add(new MeshManager());
+        listeners.add(new BodyManager());
         serializer = new GsonBuilder()
                 .registerTypeAdapter(SceneImpl.class, new SceneSerializer())
                 .serializeNulls()
                 .setPrettyPrinting()
                 .setLenient()
                 .create();
-        listeners = new ArrayList<>();
-        listeners.add(new AudioManager());
-        listeners.add(new MeshManager());
-        listeners.add(new BodyManager());
         focused = true;
-
-        DebugImpl.log("Loading Editor");
-        AudioDecoder.load();
-        new Graphics(new OpenGL30());
     }
 
     @Override
@@ -194,50 +179,91 @@ public final class ApplicationImpl extends Application implements Runnable {
         destroy();
     }
 
-    @SuppressWarnings("all")
     private void setup() {
+        sceneLoader = EDITOR_MODE ? new EditorSceneLoader(this) : new RuntimeSceneLoader(this);
         // Load settings and data files
-        try {
-            File settings = new File("settings.json");
-            JsonObject object = new JsonObject();
-            if (settings.createNewFile()) {
-                object.addProperty("width", width = 1920);
-                object.addProperty("height", height = 1080);
-                object.addProperty("windowPosX", winPosX = 25);
-                object.addProperty("windowPosY", winPosY = 25);
-                object.addProperty("fullscreen", fullscreen = false);
-                object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.caramel");
-                FileIO.writeData(settings, serializer.toJson(object));
 
+        try {
+            if (EDITOR_MODE) {
+                File settings = new File("settings.json");
+                JsonObject object = new JsonObject();
+                if (settings.createNewFile()) {
+                    object.addProperty("width", width = 1920);
+                    object.addProperty("height", height = 1080);
+                    object.addProperty("windowPosX", winPosX = 25);
+                    object.addProperty("windowPosY", winPosY = 25);
+                    object.addProperty("fullscreen", fullscreen = false);
+                    lastScenes = new ArrayList<>();
+                    String lastScene = "assets/scenes/Untitled Scene.caramel";
+                    lastScenes.add(lastScene);
+                    JsonArray array = new JsonArray();
+                    array.add(lastScene);
+                    object.add("lastScene", array);
+                    FileIO.writeData(settings, serializer.toJson(object));
+
+                } else {
+                    object = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
+                    width = object.get("width").getAsInt();
+                    height = object.get("height").getAsInt();
+                    winPosX = object.get("windowPosX").getAsInt();
+                    winPosY = object.get("windowPosY").getAsInt();
+                    lastScenes = new ArrayList<>();
+                    JsonElement element = object.get("lastScene");
+                    if (element.isJsonArray()) {
+                        JsonArray array = element.getAsJsonArray();
+                        for (JsonElement loc : array) {
+                            lastScenes.add(loc.getAsString());
+                        }
+                    } else {
+                        // Legacy compatibility
+
+                        String loc = element.getAsString();
+                        lastScenes.add(loc);
+                    }
+                    fullscreen = object.has("fullscreen") && object.get("fullscreen").getAsBoolean();
+                }
+
+                File assets = new File("assets" + File.separator);
+                if (!assets.exists() && assets.mkdir()) {
+                    new File(assets, "models" + File.separator).mkdirs();
+                    new File(assets, "textures" + File.separator).mkdirs();
+                    new File(assets, "shaders" + File.separator).mkdirs();
+                    new File(assets, "scenes" + File.separator).mkdirs();
+                    new File(assets, "sounds" + File.separator).mkdirs();
+                    new File(assets, "fonts" + File.separator).mkdirs();
+                    FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
+                }
+
+                File imgui = new File("imgui.ini");
+                if (!imgui.exists()) {
+                    FileIO.saveResource("imgui.ini", "imgui.ini");
+                }
             } else {
-                object = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
+                fullscreen = true;
+                String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+                File source = new File(path);
+
+                File config = new File("config.json");
+                JsonObject object;
+                if (config.exists()) {
+                    object = serializer.fromJson(FileIO.readData(config), JsonObject.class);
+                } else {
+                    object = serializer.fromJson(FileIO.readUTFFromZip(source, "config.json"), JsonObject.class);
+                }
                 width = object.get("width").getAsInt();
                 height = object.get("height").getAsInt();
                 winPosX = object.get("windowPosX").getAsInt();
                 winPosY = object.get("windowPosY").getAsInt();
-                lastScene = object.get("lastScene").getAsString();
-                fullscreen = object.has("fullscreen") ? object.get("fullscreen").getAsBoolean() : false;
-            }
+                JsonArray array = object.get("scenes").getAsJsonArray();
+                lastScenes = new ArrayList<>();
+                for (JsonElement loc : array) {
+                    lastScenes.add(loc.getAsString());
+                }
 
-            if (!EDITOR_MODE) {
-                fullscreen = true;
-            }
-
-            File assets = new File("assets" + File.separator);
-            if (!assets.exists()) {
-                assets.mkdirs();
-                new File(assets, "models" + File.separator).mkdirs();
-                new File(assets, "textures" + File.separator).mkdirs();
-                new File(assets, "shaders" + File.separator).mkdirs();
-                new File(assets, "scenes" + File.separator).mkdirs();
-                new File(assets, "sounds" + File.separator).mkdirs();
-                new File(assets, "fonts" + File.separator).mkdirs();
-                FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
-            }
-
-            File imgui = new File("imgui.ini");
-            if (!imgui.exists()) {
-                FileIO.saveResource("imgui.ini", "imgui.ini");
+                File assets = new File("assets" + File.separator);
+                if (!assets.exists() && assets.mkdir()) {
+                    FileIO.extract(source, FileIO.ROOT_FILE, "assets");
+                }
             }
 
             File logo16 = new File("logo_16.png");
@@ -255,6 +281,9 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     private void init() {
+        DebugImpl.log("Loading Editor");
+        Graphics.set(new OpenGL30());
+
         // Set GLFW Error callbacks to System console
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -341,6 +370,9 @@ public final class ApplicationImpl extends Application implements Runnable {
         ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
         if (!alCapabilities.OpenAL10) {
             Debug.logError("Audio AL10 library not supported!");
+        } else {
+            // Load audio decoders
+            AudioDecoder.load();
         }
 
         // Enable blending
@@ -373,14 +405,16 @@ public final class ApplicationImpl extends Application implements Runnable {
         scriptManager.reloadAll();
 
         // Load all built-in components
-        Reflections reflections = new Reflections("caramel.api");
-        Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
-        List<Class<? extends Component>> sorted = new ArrayList<>(set);
-        sorted.sort(Comparator.comparing(Class::getName));
-        for (Class<? extends Component> c : sorted) {
-            if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
-            if (c == Transform.class || c == EditorCamera.class || c == UICamera.class) continue;
-            Payload.COMPONENTS.add(c);
+        if (EDITOR_MODE) {
+            Reflections reflections = new Reflections("caramel.api");
+            Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
+            List<Class<? extends Component>> sorted = new ArrayList<>(set);
+            sorted.sort(Comparator.comparing(Class::getName));
+            for (Class<? extends Component> c : sorted) {
+                if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
+                if (c == Transform.class || c == EditorCamera.class || c == UICamera.class) continue;
+                Payload.COMPONENTS.add(c);
+            }
         }
     }
 
@@ -391,8 +425,31 @@ public final class ApplicationImpl extends Application implements Runnable {
         float second = 0;
 
         // Create the scene
-        File file = new File(lastScene);
-        SceneImpl scene = loadScene(file);
+        SceneImpl scene = null;
+        String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+        File source = new File(path);
+        for (String data : lastScenes) {
+            SceneImpl loaded = null;
+            if (EDITOR_MODE) {
+                File file = new File(data);
+                loaded = loadScene(file);
+            } else {
+                try {
+                    String contents = FileIO.readUTFFromZip(source, data);
+                    loaded = sceneLoader.loadScene(contents);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (scene == null && loaded != null) {
+                scene = loaded;
+            }
+        }
+
+        if (scene == null) {
+            scene = sceneLoader.newScene();
+        }
 
         DebugImpl.log("Opening scene " + scene.name);
 
@@ -431,7 +488,7 @@ public final class ApplicationImpl extends Application implements Runnable {
             }
         }
 
-        for (SceneImpl s : scenes) {
+        for (SceneImpl s : sceneLoader.getScenes()) {
             if (s.isPlaying()) {
                 s.stop();
             }
@@ -513,15 +570,21 @@ public final class ApplicationImpl extends Application implements Runnable {
 
     private void destroy() {
         // Save settings
-        File settings = new File("settings.json");
-        JsonObject object = new JsonObject();
-        object.addProperty("width", width);
-        object.addProperty("height", height);
-        object.addProperty("windowPosX", winPosX);
-        object.addProperty("windowPosY", winPosY);
-        object.addProperty("fullscreen", fullscreen);
-        object.addProperty("lastScene", FileIO.asRelative(getCurrentScene().getFile()));
-        FileIO.writeData(settings, serializer.toJson(object));
+        if (EDITOR_MODE) {
+            File settings = new File("settings.json");
+            JsonObject object = new JsonObject();
+            object.addProperty("width", width);
+            object.addProperty("height", height);
+            object.addProperty("windowPosX", winPosX);
+            object.addProperty("windowPosY", winPosY);
+            object.addProperty("fullscreen", fullscreen);
+            JsonArray sceneData = new JsonArray();
+            for (SceneImpl scene : sceneLoader.getScenes()) {
+                sceneData.add(FileIO.relativize(scene.getFile()));
+            }
+            object.add("lastScene", sceneData);
+            FileIO.writeData(settings, serializer.toJson(object));
+        }
 
         // Destroy and clean up any remaining objects
         Texture.invalidateAll();
@@ -530,11 +593,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         BatchRenderer.invalidateAll();
         Shader.invalidateAll();
         SoundSource.invalidateAll();
-        for (SceneImpl scene : scenes) {
-            scene.invalidate();
-        }
-        scenes.clear();
-
+        sceneLoader.destroy();
         scriptManager.destroy();
 
         // Unregister any remaining listeners
@@ -543,7 +602,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         }
 
         // Destroy ImGUI
-        imGui.destroyImGui();
+        imGui.destroy();
 
         // Free ALC context and close device
         alcDestroyContext(audioContext);
@@ -593,89 +652,42 @@ public final class ApplicationImpl extends Application implements Runnable {
         return width;
     }
 
-    @Override
-    public SceneImpl getCurrentScene() {
-        if (scenes.isEmpty()) return null;
-        return scenes.get(sceneIndex);
+    public int getWinPosX() {
+        return winPosX;
     }
 
-    public SceneImpl newScene() {
-        SceneImpl scene = new SceneImpl();
-        GameObject gameObject = new GameObjectImpl(scene);
-        MeshRenderer meshRenderer = new MeshRenderer(gameObject);
-        meshRenderer.setMesh(new QuadMesh(1));
-        meshRenderer.build();
-        gameObject.addComponent(meshRenderer);
-        scene.addGameObject(gameObject);
-        scenes.add(scene);
-        sceneIndex++;
-        return scene;
+    public int getWinPosY() {
+        return winPosY;
+    }
+
+    @Override
+    public SceneImpl getCurrentScene() {
+        return sceneLoader.getCurrentScene();
     }
 
     @Override
     public SceneImpl loadScene(File file) {
-        SceneImpl scene = scenes.stream().filter(s -> s.getFile().equals(file)).findFirst().orElse(null);
-        if (scene != null) {
-            sceneIndex = scenes.indexOf(scene);
-            return scene;
-        }
-        try {
-            if (file.exists()) {
-                scene = serializer.fromJson(FileIO.readData(file), SceneImpl.class);
-            } else {
-                scene = newScene();
-            }
-        } catch (Exception e) {
-            Debug.logError("Unable to load possibly corrupted scene file: " + file.getPath());
-            e.printStackTrace();
-            return getCurrentScene();
-        }
-
-        SceneImpl finalScene = scene;
-        if (!scenes.removeIf(s -> s.name.equals(finalScene.name))) {
-            sceneIndex++;
-        }
-        scenes.add(scene);
-        scene.setFile(file);
-        return scene;
+        return sceneLoader.loadScene(file);
     }
 
     @Override
     public SceneImpl loadScene(int index) {
-        if (index < 0 || index >= scenes.size()) {
-            return getCurrentScene();
-        }
-        sceneIndex = index;
-        return getCurrentScene();
-    }
-
-    public List<SceneImpl> getScenes() {
-        return scenes;
+        return sceneLoader.loadScene(index);
     }
 
     @Override
     public void saveCurrentScene() {
-        SceneImpl scene = getCurrentScene();
-        saveScene(scene, scene.getFile());
+        sceneLoader.saveCurrentScene();
     }
 
     @Override
     public void saveScene(Scene scene, File file) {
-        scene.setFile(file);
-        String savedScene = serializer.toJson(scene);
-        if (FileIO.writeData(file, savedScene)) {
-            ((SceneImpl) scene).setSaved(true);
-            DebugImpl.log("Saved scene " + scene.name);
-        } else {
-            DebugImpl.log("Unable to save scene " + scene.name);
-        }
+        sceneLoader.saveScene(scene, file);
     }
 
     @Override
     public void saveAllScenes() {
-        for (SceneImpl scene : scenes) {
-            saveScene(scene, scene.getFile());
-        }
+        sceneLoader.saveAllScenes();
     }
 
     @Override
@@ -720,5 +732,13 @@ public final class ApplicationImpl extends Application implements Runnable {
     @Override
     public boolean isFullScreen() {
         return fullscreen;
+    }
+
+    public Gson getSerializer() {
+        return serializer;
+    }
+
+    public SceneLoader getSceneLoader() {
+        return sceneLoader;
     }
 }

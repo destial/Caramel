@@ -326,7 +326,6 @@
             "a": 1.0
           },
           "mesh": {
-            "length": 1.0,
             "vertexArray": [
               {
                 "position": {

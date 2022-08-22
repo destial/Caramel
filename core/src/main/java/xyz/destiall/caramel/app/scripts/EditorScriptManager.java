@@ -72,10 +72,6 @@ public final class EditorScriptManager implements ScriptManager, Listener {
     public void build(File output) {
         try {
             File root = new File("temp" + File.separator);
-            if (root.exists()) {
-                FileIO.delete(root);
-            }
-            root.mkdir();
             Debug.log("Building to " + output);
             loader.build(root, output);
         } catch (Exception e) {
@@ -247,7 +243,7 @@ public final class EditorScriptManager implements ScriptManager, Listener {
                 awaitingCompilation.put(file.getName(), file);
             } else {
                 if (script != null) {
-                    for (Scene scene : ApplicationImpl.getApp().getScenes()) {
+                    for (Scene scene : ApplicationImpl.getApp().getSceneLoader().getScenes()) {
                         scene.forEachGameObject(go -> go.removeComponent(script.getCompiledClass()));
                     }
                     loader.removeScript(scriptName);

@@ -28,7 +28,7 @@ public final class MenuBarPanel extends Panel {
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
             if (ImGui.beginMenu("File")) {
                 if (ImGui.menuItem("New Scene")) {
-                    SceneImpl newScene = ApplicationImpl.getApp().newScene();
+                    SceneImpl newScene = ApplicationImpl.getApp().getSceneLoader().newScene();
                     ApplicationImpl.getApp().setTitle(newScene.name);
                 }
 

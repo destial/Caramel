@@ -291,7 +291,7 @@ public final class ImGUILayer {
         glfwMakeContextCurrent(window.glfwWindow);
     }
 
-    public void destroyImGui() {
+    public void destroy() {
         imGuiGl3.dispose();
         ImGui.getIO().getFonts().destroy();
         ImNodes.destroyContext();
