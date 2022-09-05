@@ -19,13 +19,13 @@ public abstract class SceneLoader {
     private int sceneIndex = -1;
     private final Gson serializer;
 
-    public SceneLoader(ApplicationImpl application) {
+    public SceneLoader(final ApplicationImpl application) {
         scenes = new ArrayList<>();
         serializer = application.getSerializer();
     }
 
-    public SceneImpl loadScene(String data) {
-        SceneImpl scene = serializer.fromJson(data, SceneImpl.class);
+    public SceneImpl loadScene(final String data) {
+        final SceneImpl scene = serializer.fromJson(data, SceneImpl.class);
         if (scene == null) return null;
         if (!scenes.removeIf(s -> s.name.equals(scene.name))) {
             sceneIndex++;
@@ -45,7 +45,7 @@ public abstract class SceneLoader {
         return scene;
     }
 
-    public SceneImpl loadScene(int index) {
+    public SceneImpl loadScene(final int index) {
         if (index < 0 || index >= scenes.size()) {
             return getCurrentScene();
         }
@@ -58,13 +58,13 @@ public abstract class SceneLoader {
     }
 
     public void saveCurrentScene() {
-        SceneImpl scene = getCurrentScene();
+        final SceneImpl scene = getCurrentScene();
         saveScene(scene, scene.getFile());
     }
 
-    public void saveScene(Scene scene, File file) {
+    public void saveScene(final Scene scene, final File file) {
         scene.setFile(file);
-        String savedScene = serializer.toJson(scene);
+        final String savedScene = serializer.toJson(scene);
         if (FileIO.writeData(file, savedScene)) {
             ((SceneImpl) scene).setSaved(true);
             DebugImpl.log("Saved scene " + scene.name);
@@ -74,7 +74,7 @@ public abstract class SceneLoader {
     }
 
     public void saveAllScenes() {
-        for (SceneImpl scene : scenes) {
+        for (final SceneImpl scene : scenes) {
             saveScene(scene, scene.getFile());
         }
     }
@@ -85,9 +85,9 @@ public abstract class SceneLoader {
     }
 
     public SceneImpl newScene() {
-        SceneImpl scene = new SceneImpl();
-        GameObject gameObject = new GameObjectImpl(scene);
-        MeshRenderer meshRenderer = new MeshRenderer(gameObject);
+        final SceneImpl scene = new SceneImpl();
+        final GameObject gameObject = new GameObjectImpl(scene);
+        final MeshRenderer meshRenderer = new MeshRenderer(gameObject);
         meshRenderer.setMesh(new QuadMesh(1));
         meshRenderer.build();
         gameObject.addComponent(meshRenderer);
@@ -98,7 +98,7 @@ public abstract class SceneLoader {
     }
 
     public void destroy() {
-        for (SceneImpl scene : scenes) {
+        for (final SceneImpl scene : scenes) {
             scene.invalidate();
         }
         scenes.clear();

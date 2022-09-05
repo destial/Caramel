@@ -24,7 +24,7 @@ public final class CompileStage implements Stage {
     private final File root;
     private final File output;
 
-    public CompileStage(JavaCompiler compiler, DiagnosticCollector<JavaFileObject> diagnostics, File root, File output, Collection<FileScriptMemoryJavaObject> sources) {
+    public CompileStage(final JavaCompiler compiler, final DiagnosticCollector<JavaFileObject> diagnostics, final File root, final File output, final Collection<FileScriptMemoryJavaObject> sources) {
         this.compiler = compiler;
         this.sources = sources;
         this.diagnostics = diagnostics;
@@ -39,8 +39,8 @@ public final class CompileStage implements Stage {
             return new ExtractStage(root, output);
         }
 
-        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
-        JavaFileManager.Location loc = new JavaFileManager.Location() {
+        final StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.ENGLISH, Charset.defaultCharset());
+        final JavaFileManager.Location loc = new JavaFileManager.Location() {
             @Override
             public String getName() {
                 return root.getPath();
@@ -58,9 +58,9 @@ public final class CompileStage implements Stage {
             e.printStackTrace();
             return null;
         }
-        JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, Arrays.asList("-d", "./" + FileIO.relativize(root)), null, sources);
+        final JavaCompiler.CompilationTask task = compiler.getTask(null, fileManager, diagnostics, Arrays.asList("-d", "./" + FileIO.relativize(root)), null, sources);
         if (!task.call()) {
-            String message = "Error while compiling sources: " + diagnostics.getDiagnostics().stream()
+            final String message = "Error while compiling sources: " + diagnostics.getDiagnostics().stream()
                     .map(Object::toString)
                     .collect(Collectors.joining("\n"));
             Debug.logError(message);

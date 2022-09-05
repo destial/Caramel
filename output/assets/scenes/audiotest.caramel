@@ -274,6 +274,29 @@
           "clazz": "caramel.api.physics.components.Box2DCollider",
           "id": 14,
           "enabled": true
+        },
+        {
+          "graph": {
+            "nextNodeId": 3,
+            "nextLinkId": 1,
+            "nodes": [
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.StartGraphNode",
+                "nodeId": 1,
+                "name": "Start "
+              },
+              {
+                "clazz": "xyz.destiall.caramel.app.editor.nodes.UpdateGraphNode",
+                "nodeId": 2,
+                "name": "Update"
+              }
+            ],
+            "links": [],
+            "ini": "[editor]\npanning\u003d0,0\n\n[node.1]\norigin\u003d100,100\n\n[node.2]\norigin\u003d98,236\n"
+          },
+          "clazz": "caramel.api.components.Blueprint",
+          "id": 22,
+          "enabled": true
         }
       ],
       "children": [],

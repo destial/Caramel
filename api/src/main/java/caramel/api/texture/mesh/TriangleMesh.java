@@ -14,15 +14,15 @@ public final class TriangleMesh extends Mesh {
     }
 
     public Mesh copy() {
-        TriangleMesh mesh = new TriangleMesh();
+        final TriangleMesh mesh = new TriangleMesh();
         mesh.name = name;
         mesh.drawArrays = drawArrays;
         mesh.type = type;
         mesh.texture = texture;
         mesh.shader = shader;
         mesh.dirty = dirty;
-        for (Vertex vertex : vertexArray) {
-            Vertex copy = new Vertex();
+        for (final Vertex vertex : vertexArray) {
+            final Vertex copy = new Vertex();
             copy.position.set(vertex.position);
             copy.normal.set(vertex.normal);
             copy.color.set(vertex.color);

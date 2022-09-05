@@ -13,7 +13,7 @@ public final class Light extends Component {
     @InvokeOnEdit("setDirty") public Vector3f color;
     @HideInEditor public boolean dirty = false;
 
-    public Light(GameObject gameObject) {
+    public Light(final GameObject gameObject) {
         super(gameObject);
     }
 

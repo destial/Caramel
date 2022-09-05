@@ -12,7 +12,7 @@ import java.io.File;
 public abstract class Prefab extends GameObject {
     protected final File file;
 
-    public Prefab(File file) {
+    public Prefab(final File file) {
         super(null);
         this.file = file;
     }
@@ -25,30 +25,30 @@ public abstract class Prefab extends GameObject {
         return file;
     }
 
-    public GameObject instantiate(Scene scene, Transform parent) {
-        GameObject clone = this.clone(false);
+    public GameObject instantiate(final Scene scene, final Transform parent) {
+        final GameObject clone = this.clone(false);
         clone.setScene(scene);
         return super.instantiate(clone, parent);
     }
 
-    public GameObject instantiate(Scene scene) {
-        GameObject clone = this.clone(false);
+    public GameObject instantiate(final Scene scene) {
+        final GameObject clone = this.clone(false);
         clone.setScene(scene);
         return super.instantiate(clone);
     }
 
     @Override
-    public GameObject clone(boolean copyId) {
+    public GameObject clone(final boolean copyId) {
         throw new UnsupportedOperationException("You cannot clone a prefab without a scene!");
     }
 
     @Override
-    public GameObject instantiate(GameObject prefab, Transform parent) {
+    public GameObject instantiate(final GameObject prefab, final Transform parent) {
         throw new UnsupportedOperationException("You cannot instantiate a prefab without a scene!");
     }
 
     @Override
-    public GameObject instantiate(GameObject prefab) {
+    public GameObject instantiate(final GameObject prefab) {
         throw new UnsupportedOperationException("You cannot instantiate a prefab without a scene!");
     }
 }

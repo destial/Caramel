@@ -36,7 +36,7 @@ public final class ScenePanel extends Panel {
     private boolean dragging = false;
     private float leftX, rightX, topY, bottomY;
 
-    public ScenePanel(SceneImpl scene) {
+    public ScenePanel(final SceneImpl scene) {
         super(scene);
     }
 
@@ -54,12 +54,12 @@ public final class ScenePanel extends Panel {
             ImGui.text("Delta: " + (Time.deltaTime * 1000) + "ms");
             ImGui.text("Draw Calls: " + BatchRenderer.DRAW_CALLS);
 
-            ImVec2 windowSize = getLargestAspectRatioViewport();
-            ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
+            final ImVec2 windowSize = getLargestAspectRatioViewport();
+            final ImVec2 windowPos = getCenteredPositionForViewport(windowSize);
 
             ImGui.setCursorPos(windowPos.x, windowPos.y);
 
-            ImVec2 bottomLeft = new ImVec2();
+            final ImVec2 bottomLeft = new ImVec2();
             ImGui.getCursorScreenPos(bottomLeft);
             bottomLeft.x -= ImGui.getScrollX();
             bottomLeft.y -= ImGui.getScrollY();
@@ -69,7 +69,7 @@ public final class ScenePanel extends Panel {
             rightX = leftX + windowSize.x;
             topY = bottomY + windowSize.y;
 
-            int texId = window.getSceneViewFramebuffer().getTexture().getTexId();
+            final int texId = window.getSceneViewFramebuffer().getTexture().getTexId();
 
             ImGui.image(texId, windowSize.x, windowSize.y, 0, 1, 1, 0);
             if (ImGui.button("T")) {
@@ -88,7 +88,7 @@ public final class ScenePanel extends Panel {
             window.getMouseListener().setSceneViewportSize(new Vector2f(windowSize.x, windowSize.y));
 
             if (ImGui.isMouseDown(Input.Mouse.LEFT) && ImGui.isWindowHovered() && !dragging) {
-                GameObject clicked = getClicked();
+                final GameObject clicked = getClicked();
                 if (clicked == null) {
                     dragging = true;
                     startMouseCoords.set(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
@@ -96,7 +96,7 @@ public final class ScenePanel extends Panel {
             }
 
             if (ImGui.isMouseClicked(Input.Mouse.LEFT) && ImGui.isWindowFocused() && ImGui.isWindowHovered()) {
-                GameObject clicked = getClicked();
+                final GameObject clicked = getClicked();
                 if (clicked != null) {
                     if (!ImGui.getIO().getKeyCtrl()) {
                         window.getCurrentScene().getSelectedGameObject().clear();
@@ -107,8 +107,8 @@ public final class ScenePanel extends Panel {
             }
 
             if (ImGui.isMouseReleased(Input.Mouse.LEFT) && dragging) {
-                ImVec2 endMouseCoords = new ImVec2(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
-                Set<GameObject> objects = getSelected(startMouseCoords, endMouseCoords);
+                final ImVec2 endMouseCoords = new ImVec2(window.getMouseListener().getOrthoX(), window.getMouseListener().getOrthoY());
+                final Set<GameObject> objects = getSelected(startMouseCoords, endMouseCoords);
                 if (objects != null) {
                     if (!ImGui.getIO().getKeyCtrl()) {
                         window.getCurrentScene().getSelectedGameObject().clear();
@@ -121,8 +121,8 @@ public final class ScenePanel extends Panel {
             if (ImGui.isWindowFocused()) {
                 if (!scene.getSelectedGameObject().isEmpty()) {
                     if (ImGui.isKeyPressed(Input.Key.BACKSPACE) || ImGui.isKeyPressed(Input.Key.DELETE)) {
-                        DeleteGameObjects action = new DeleteGameObjects(scene);
-                        for (GameObject go : scene.getSelectedGameObject()) {
+                        final DeleteGameObjects action = new DeleteGameObjects(scene);
+                        for (final GameObject go : scene.getSelectedGameObject()) {
                             scene.destroy(go);
                             action.deleted.add(go);
                         }
@@ -135,9 +135,9 @@ public final class ScenePanel extends Panel {
                     }
 
                     if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.V) && !Payload.COPIED_GAMEOBJECTS.isEmpty()) {
-                        AddGameObjects action = new AddGameObjects(scene);
-                        for (GameObject copied : Payload.COPIED_GAMEOBJECTS) {
-                            GameObject go = copied.clone(false);
+                        final AddGameObjects action = new AddGameObjects(scene);
+                        for (final GameObject copied : Payload.COPIED_GAMEOBJECTS) {
+                            final GameObject go = copied.clone(false);
                             action.added.add(go);
                             scene.addGameObject(go);
                         }
@@ -145,9 +145,9 @@ public final class ScenePanel extends Panel {
                     }
 
                     if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
-                        AddGameObjects action = new AddGameObjects(scene);
-                        for (GameObject copied : scene.getSelectedGameObject()) {
-                            GameObject go = copied.clone(false);
+                        final AddGameObjects action = new AddGameObjects(scene);
+                        for (final GameObject copied : scene.getSelectedGameObject()) {
+                            final GameObject go = copied.clone(false);
                             scene.addGameObject(go);
                             action.added.add(go);
                         }
@@ -160,7 +160,7 @@ public final class ScenePanel extends Panel {
                 }
             }
 
-            GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
+            final GameObject selected = window.getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
 
             if (selected != null && !scene.isPlaying()) {
                 ImGuizmo.setEnabled(true);
@@ -174,16 +174,16 @@ public final class ScenePanel extends Panel {
                 Matrix4f projection = camera.getProjection();
                 Matrix4f transform = selected.transform.getModel();
 
-                float[] view = new float[16];
+                final float[] view = new float[16];
                 inverseView.get(view);
-                float[] proj = new float[16];
+                final float[] proj = new float[16];
                 projection.get(proj);
-                float[] model = new float[16];
+                final float[] model = new float[16];
                 transform.get(model);
 
-                float[] t = new float[3];
-                float[] r = new float[3];
-                float[] s = new float[3];
+                final float[] t = new float[3];
+                final float[] r = new float[3];
+                final float[] s = new float[3];
 
                 ImGuizmo.manipulate(view, proj, model, operation, Mode.LOCAL);
 
@@ -254,20 +254,20 @@ public final class ScenePanel extends Panel {
     public GameObject getClicked() {
         if (scene.isPlaying()) return null;
 
-        float x = window.getMouseListener().getOrthoX();
-        float y = window.getMouseListener().getOrthoY();
+        final float x = window.getMouseListener().getOrthoX();
+        final float y = window.getMouseListener().getOrthoY();
 
-        for (GameObject gameObject : scene.getGameObjects()) {
-            Vector3f max = new Vector3f(0.5f, 0.5f, 1f);
-            Vector3f min = new Vector3f(-0.5f, -0.5f, 1f);
+        for (final GameObject gameObject : scene.getGameObjects()) {
+            final Vector3f max = new Vector3f(0.5f, 0.5f, 1f);
+            final Vector3f min = new Vector3f(-0.5f, -0.5f, 1f);
 
-            float tx = gameObject.transform.position.x + gameObject.transform.localPosition.x;
-            float ty = gameObject.transform.position.y + gameObject.transform.localPosition.y;
-            float tz = gameObject.transform.position.z + gameObject.transform.localPosition.z;
-            Matrix4f model = gameObject.transform.getModel();
+            final float tx = gameObject.transform.position.x + gameObject.transform.localPosition.x;
+            final float ty = gameObject.transform.position.y + gameObject.transform.localPosition.y;
+            final float tz = gameObject.transform.position.z + gameObject.transform.localPosition.z;
+            final Matrix4f model = gameObject.transform.getModel();
 
-            Vector3f mX = max.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
-            Vector3f mN = min.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
+            final Vector3f mX = max.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
+            final Vector3f mN = min.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
 
             if (x >= mN.x && x <= mX.x && y >= mN.y && y <= mX.y) {
                 return gameObject;
@@ -276,19 +276,19 @@ public final class ScenePanel extends Panel {
         return null;
     }
 
-    public Set<GameObject> getSelected(ImVec2 start, ImVec2 end) {
+    public Set<GameObject> getSelected(final ImVec2 start, final ImVec2 end) {
         if (scene.isPlaying()) return null;
 
-        Set<GameObject> objects = new HashSet<>();
-        float mnX = Math.min(start.x, end.x);
-        float mxX = Math.max(start.x, end.x);
-        float mnY = Math.min(start.y, end.y);
-        float mxY = Math.max(start.y, end.y);
-        for (GameObject gameObject : scene.getGameObjects()) {
-            float minX = gameObject.transform.position.x - gameObject.transform.scale.x * 0.5f;
-            float maxX = gameObject.transform.position.x + gameObject.transform.scale.x * 0.5f;
-            float minY = gameObject.transform.position.y - gameObject.transform.scale.y * 0.5f;
-            float maxY = gameObject.transform.position.y + gameObject.transform.scale.y * 0.5f;
+        final Set<GameObject> objects = new HashSet<>();
+        final float mnX = Math.min(start.x, end.x);
+        final float mxX = Math.max(start.x, end.x);
+        final float mnY = Math.min(start.y, end.y);
+        final float mxY = Math.max(start.y, end.y);
+        for (final GameObject gameObject : scene.getGameObjects()) {
+            final float minX = gameObject.transform.position.x - gameObject.transform.scale.x * 0.5f;
+            final float maxX = gameObject.transform.position.x + gameObject.transform.scale.x * 0.5f;
+            final float minY = gameObject.transform.position.y - gameObject.transform.scale.y * 0.5f;
+            final float maxY = gameObject.transform.position.y + gameObject.transform.scale.y * 0.5f;
 
             if (mnX <= minX && mnY <= minY && mxX >= maxX && mxY >= maxY) {
                 objects.add(gameObject);
@@ -303,17 +303,17 @@ public final class ScenePanel extends Panel {
                window.getMouseListener().getY() >= bottomY && window.getMouseListener().getY() <= topY;
     }
 
-    private ImVec2 getCenteredPositionForViewport(ImVec2 aspectSize) {
+    private ImVec2 getCenteredPositionForViewport(final ImVec2 aspectSize) {
         ImVec2 windowSize = getWindowAvailSize();
 
-        float viewportX = (windowSize.x / 2f) - (aspectSize.x / 2f);
-        float viewportY = (windowSize.y / 2f) - (aspectSize.y / 2f);
+        final float viewportX = (windowSize.x / 2f) - (aspectSize.x / 2f);
+        final float viewportY = (windowSize.y / 2f) - (aspectSize.y / 2f);
 
         return new ImVec2(viewportX + ImGui.getCursorPosX(), viewportY + ImGui.getCursorPosY());
     }
 
     private ImVec2 getWindowAvailSize() {
-        ImVec2 windowSize = new ImVec2();
+        final ImVec2 windowSize = new ImVec2();
         ImGui.getContentRegionAvail(windowSize);
         windowSize.x -= ImGui.getScrollX();
         windowSize.y -= ImGui.getScrollY();
@@ -321,7 +321,7 @@ public final class ScenePanel extends Panel {
     }
 
     private ImVec2 getLargestAspectRatioViewport() {
-        ImVec2 windowSize = getWindowAvailSize();
+        final ImVec2 windowSize = getWindowAvailSize();
         float aspectWidth = windowSize.x;
         float aspectHeight = aspectWidth / getRatio();
         if (aspectHeight > windowSize.y) {

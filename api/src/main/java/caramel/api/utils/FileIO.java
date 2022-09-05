@@ -75,21 +75,21 @@ public final class FileIO {
     private static final Pattern NAME_FINAL_PATTERN = Pattern.compile("public\\s+final\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
     private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");
 
-    public static String getPackage(String script) {
+    public static String getPackage(final String script) {
         String fullPackage = null;
-        Matcher packageMatcher = PACKAGE_PATTERN.matcher(script);
+        final Matcher packageMatcher = PACKAGE_PATTERN.matcher(script);
         if (packageMatcher.find()) {
             fullPackage = packageMatcher.group(1);
         }
         return fullPackage;
     }
 
-    public static String getFullName(File file, String script) {
-        String fullPackage = getPackage(script);
+    public static String getFullName(final File file, final String script) {
+        final String fullPackage = getPackage(script);
 
         Matcher nameMatcher = NAME_PATTERN.matcher(script);
         if (nameMatcher.find()) {
-            String name = nameMatcher.group(1);
+            final String name = nameMatcher.group(1);
             if (fullPackage == null) {
                 return name;
             } else {
@@ -99,7 +99,7 @@ public final class FileIO {
 
         nameMatcher = NAME_FINAL_PATTERN.matcher(script);
         if (nameMatcher.find()) {
-            String name = nameMatcher.group(1);
+            final String name = nameMatcher.group(1);
             if (fullPackage == null) {
                 return name;
             } else {
@@ -110,17 +110,19 @@ public final class FileIO {
         return "scripts." + file.getName().substring(0, file.getName().length() - ".java".length());
     }
 
-    public static InternalScript writeScript(String className) {
-        File scriptFolder = new File("assets/scripts/");
-        if (!scriptFolder.exists()) scriptFolder.mkdir();
-        String contents = BASE.replace("${name}", className);
-        File scriptFile = new File(scriptFolder, className + ".java");
+    public static InternalScript writeScript(final String className) {
+        final File scriptFolder = new File("assets/scripts/");
+        if (!scriptFolder.exists()) {
+            scriptFolder.mkdir();
+        }
+        final String contents = BASE.replace("${name}", className);
+        final File scriptFile = new File(scriptFolder, className + ".java");
         if (scriptFile.exists()) return null;
         try {
-            FileWriter write = new FileWriter(scriptFile);
-            InternalScript internalScript = Application.getApp().getScriptManager().reloadScript(scriptFile, contents);
+            final FileWriter write = new FileWriter(scriptFile);
+            final InternalScript internalScript = Application.getApp().getScriptManager().reloadScript(scriptFile, contents);
 
-            BufferedWriter buffer = new BufferedWriter(write);
+            final BufferedWriter buffer = new BufferedWriter(write);
             buffer.write(contents);
             buffer.flush();
             buffer.close();
@@ -131,8 +133,8 @@ public final class FileIO {
         return null;
     }
 
-    public static boolean writeData(File location, String contents) {
-        try (FileWriter write = new FileWriter(location); BufferedWriter buffer = new BufferedWriter(write)) {
+    public static boolean writeData(final File location, final String contents) {
+        try (final FileWriter write = new FileWriter(location); final BufferedWriter buffer = new BufferedWriter(write)) {
             buffer.write(contents);
             return true;
         } catch (Exception e) {
@@ -142,12 +144,12 @@ public final class FileIO {
         return false;
     }
 
-    public static byte[] loadResource(String path) {
+    public static byte[] loadResource(final String path) {
         try {
-            InputStream stream = FileIO.class.getResourceAsStream("/" + path);
+            final InputStream stream = FileIO.class.getResourceAsStream("/" + path);
             if (stream == null) return null;
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            byte[] b = new byte[8 * 1024];
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            final byte[] b = new byte[8 * 1024];
             int bytesRead;
             while ((bytesRead = stream.read(b)) > 0) {
                 outputStream.write(b, 0, bytesRead);
@@ -159,17 +161,17 @@ public final class FileIO {
         return null;
     }
 
-    public static void saveResource(String path, String targetPath) {
-        Path p = Paths.get(targetPath);
+    public static void saveResource(final String path, final String targetPath) {
+        final Path p = Paths.get(targetPath);
         try {
             if (!java.nio.file.Files.exists(p)) {
-                File f = p.toFile();
+                final File f = p.toFile();
                 f.createNewFile();
-                InputStream stream = FileIO.class.getResourceAsStream("/" + path);
+                final InputStream stream = FileIO.class.getResourceAsStream("/" + path);
                 if (stream == null) return;
                 Debug.console("Writing resource file " + path);
-                OutputStream outputStream = new FileOutputStream(f);
-                byte[] b = new byte[8 * 1024];
+                final OutputStream outputStream = new FileOutputStream(f);
+                final byte[] b = new byte[8 * 1024];
                 int bytesRead;
                 while ((bytesRead = stream.read(b)) > 0) {
                     outputStream.write(b, 0, bytesRead);
@@ -182,9 +184,9 @@ public final class FileIO {
         }
     }
 
-    public static String readData(File file) {
-        try (Scanner scanner = new Scanner(file)) {
-            StringBuilder contents = new StringBuilder();
+    public static String readData(final File file) {
+        try (final Scanner scanner = new Scanner(file)) {
+            final StringBuilder contents = new StringBuilder();
             while (scanner.hasNextLine()) {
                 contents.append(scanner.nextLine()).append("\n");
             }
@@ -195,20 +197,20 @@ public final class FileIO {
         return null;
     }
 
-    public static List<File> traverse(File root) {
-        List<File> list = new ArrayList<>();
+    public static List<File> traverse(final File root) {
+        final List<File> list = new ArrayList<>();
         traverse(root, list);
         return list;
 
     }
 
-    private static void traverse(File root, List<File> files) {
-        File[] list = root.listFiles();
+    private static void traverse(final File root, final List<File> files) {
+        final File[] list = root.listFiles();
         if (list == null || list.length == 0) {
             return;
         }
 
-        for (File f : list) {
+        for (final File f : list) {
             files.add(f);
             if (f.isDirectory()) {
                 traverse(f, files);
@@ -216,19 +218,19 @@ public final class FileIO {
         }
     }
 
-    public static void copy(File source, File destination) throws IOException {
+    public static void copy(final File source, final File destination) throws IOException {
         copy(source, destination, null, false);
     }
 
-    public static void copy(File source, File destination, Predicate<File> filter) throws IOException {
+    public static void copy(final File source, final File destination, final Predicate<File> filter) throws IOException {
         copy(source, destination, filter, false);
     }
 
-    public static void copy(File source, File destination, boolean force) throws IOException {
+    public static void copy(final File source, final File destination, final boolean force) throws IOException {
         copy(source, destination, null, force);
     }
 
-    public static void copy(File source, File destination, Predicate<File> filter, boolean force) throws IOException {
+    public static void copy(final File source, final File destination, final Predicate<File> filter, final boolean force) throws IOException {
         if (filter == null || filter.test(source)) {
             if (!source.exists()) {
                 throw new IllegalArgumentException("Source (" + source.getPath() + ") doesn't exist.");
@@ -239,7 +241,7 @@ public final class FileIO {
             }
 
             if (source.isDirectory()) {
-                File destDir = new File(destination, source.getName() + File.separator);
+                final File destDir = new File(destination, source.getName() + File.separator);
                 destDir.mkdir();
                 copyDirectory(source, destDir, filter);
             } else {
@@ -248,13 +250,13 @@ public final class FileIO {
         }
     }
 
-    public static void copyDirectory(File source, File destination, Predicate<File> filter) throws IOException {
+    public static void copyDirectory(final File source, final File destination, final Predicate<File> filter) throws IOException {
         if (filter == null || filter.test(source)) {
             destination.mkdirs();
 
-            File[] files = source.listFiles();
+            final File[] files = source.listFiles();
 
-            for (File file : files) {
+            for (final File file : files) {
                 if (file.isDirectory()) {
                     copyDirectory(file, new File(destination, file.getName()), filter);
                 } else {
@@ -264,20 +266,20 @@ public final class FileIO {
         }
     }
 
-    public static void copyFile(File source, File destination, Predicate<File> filter) throws IOException {
+    public static void copyFile(final File source, final File destination, final Predicate<File> filter) throws IOException {
         if (filter == null || filter.test(source)) {
             Files.copy(source, destination);
         }
     }
 
-    public static boolean delete(File f) {
+    public static boolean delete(final File f) {
         return delete(f, null);
     }
 
-    public static boolean delete(File f, Predicate<File> filter) {
+    public static boolean delete(final File f, final Predicate<File> filter) {
         if (f.exists() && (filter == null || filter.test(f))) {
             if (f.isDirectory()) {
-                for (File c : Objects.requireNonNull(f.listFiles())) {
+                for (final File c : Objects.requireNonNull(f.listFiles())) {
                     delete(c, filter);
                 }
             }
@@ -287,16 +289,16 @@ public final class FileIO {
         return false;
     }
 
-    public static String readUTFFromZip(File source, String path) throws IOException {
-        ZipFile file = new ZipFile(source);
-        ZipInputStream coreZip = new ZipInputStream(java.nio.file.Files.newInputStream(source.toPath()));
+    public static String readUTFFromZip(final File source, final String path) throws IOException {
+        final ZipFile file = new ZipFile(source);
+        final ZipInputStream coreZip = new ZipInputStream(java.nio.file.Files.newInputStream(source.toPath()));
         ZipEntry zipEntry = coreZip.getNextEntry();
-        StringBuilder contents = new StringBuilder();
+        final StringBuilder contents = new StringBuilder();
         while (zipEntry != null) {
             if (zipEntry.getName().equals(path)) {
-                InputStream stream = file.getInputStream(zipEntry);
-                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
-                Scanner scanner = new Scanner(reader);
+                final InputStream stream = file.getInputStream(zipEntry);
+                final InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8);
+                final Scanner scanner = new Scanner(reader);
                 while (scanner.hasNext()) {
                     contents.append(scanner.nextLine()).append("\n");
                 }
@@ -310,13 +312,13 @@ public final class FileIO {
         return contents.toString();
     }
 
-    public static void extract(File source, File dest, String internalPath) throws IOException {
-        ZipInputStream coreZip = new ZipInputStream(java.nio.file.Files.newInputStream(source.toPath()));
+    public static void extract(final File source, final File dest, final String internalPath) throws IOException {
+        final ZipInputStream coreZip = new ZipInputStream(java.nio.file.Files.newInputStream(source.toPath()));
         ZipEntry zipEntry = coreZip.getNextEntry();
         byte[] data = new byte[1024];
         while (zipEntry != null) {
             if (internalPath.startsWith(zipEntry.getName()) || zipEntry.getName().startsWith(internalPath)) {
-                File newFile = new File(dest, zipEntry.getName());
+                final File newFile = new File(dest, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
                         Debug.logError("Failed to create directory " + newFile);
@@ -324,7 +326,7 @@ public final class FileIO {
                     }
                 } else {
                     // fix for Windows-created archives
-                    File parent = newFile.getParentFile();
+                    final File parent = newFile.getParentFile();
                     if (!parent.isDirectory() && !parent.mkdirs()) {
                         Debug.logError("Failed to create directory " + parent);
                         continue;
@@ -332,7 +334,7 @@ public final class FileIO {
 
                     Debug.log("Extracting " + zipEntry.getName());
                     // write file content
-                    FileOutputStream fos = new FileOutputStream(newFile);
+                    final FileOutputStream fos = new FileOutputStream(newFile);
                     int len;
                     while ((len = coreZip.read(data)) > 0) {
                         fos.write(data, 0, len);
@@ -347,15 +349,15 @@ public final class FileIO {
         coreZip.close();
     }
 
-    public static String relativize(File file) {
+    public static String relativize(final File file) {
         return ROOT.relativize(file.toURI()).getPath();
     }
 
-    public static void move(File source, File destination, boolean force) throws IOException {
+    public static void move(final File source, final File destination, final boolean force) throws IOException {
         move(source, destination, null, force);
     }
 
-    public static void move(File source, File destination, Predicate<File> filter, boolean force) throws IOException {
+    public static void move(final File source, final File destination, final Predicate<File> filter, final boolean force) throws IOException {
         if (filter == null || filter.test(source)) {
             if (!source.exists()) {
                 throw new IllegalArgumentException("Source (" + source.getPath() + ") doesn't exist.");
@@ -366,7 +368,7 @@ public final class FileIO {
             }
 
             if (source.isDirectory()) {
-                File destDir = new File(destination, source.getName() + File.separator);
+                final File destDir = new File(destination, source.getName() + File.separator);
                 destDir.mkdir();
                 moveDirectory(source, destDir, filter);
             } else {
@@ -375,14 +377,14 @@ public final class FileIO {
         }
     }
 
-    public static void moveDirectory(File source, File destination, Predicate<File> filter) throws IOException {
+    public static void moveDirectory(final File source, final File destination, final Predicate<File> filter) throws IOException {
         if (filter == null || filter.test(source)) {
             destination.mkdirs();
 
-            File[] files = source.listFiles();
+            final File[] files = source.listFiles();
             if (files == null) return;
 
-            for (File file : files) {
+            for (final File file : files) {
                 if (file.isDirectory()) {
                     moveDirectory(file, new File(destination, file.getName()), filter);
                 } else {
@@ -394,7 +396,7 @@ public final class FileIO {
         }
     }
 
-    public static void moveFile(File source, File destination, Predicate<File> filter) throws IOException {
+    public static void moveFile(final File source, final File destination, final Predicate<File> filter) throws IOException {
         if (filter == null || filter.test(source)) {
             Files.move(source, destination);
         }

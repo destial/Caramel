@@ -13,7 +13,7 @@ public final class InternalScript {
     private final CharSequence code;
     private final File file;
 
-    public InternalScript(Class<?> compiledClass, File file, CharSequence code) {
+    public InternalScript(final Class<?> compiledClass, final File file, final CharSequence code) {
         this.compiledClass = compiledClass;
         this.code = code;
         this.file = file;
@@ -31,8 +31,8 @@ public final class InternalScript {
         return (Class<? extends Component>) compiledClass;
     }
 
-    public Component getAsComponent(GameObject gameObject) throws InvocationTargetException, InstantiationException, IllegalAccessException {
-        Constructor<? extends Component> constructor = (Constructor<? extends Component>) Reflect.getConstructor(getCompiledClass(), GameObject.class);
+    public Component getAsComponent(final GameObject gameObject) throws InvocationTargetException, InstantiationException, IllegalAccessException {
+        final Constructor<? extends Component> constructor = (Constructor<? extends Component>) Reflect.getConstructor(getCompiledClass(), GameObject.class);
         return constructor.newInstance(gameObject);
     }
 }

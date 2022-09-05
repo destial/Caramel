@@ -6,8 +6,8 @@ import xyz.destiall.caramel.app.SceneLoader;
 
 import java.io.File;
 
-public class RuntimeSceneLoader extends SceneLoader {
-    public RuntimeSceneLoader(ApplicationImpl application) {
+public final class RuntimeSceneLoader extends SceneLoader {
+    public RuntimeSceneLoader(final ApplicationImpl application) {
         super(application);
     }
 

@@ -9,7 +9,7 @@ public final class PackStage implements Stage {
     private final File root;
     private final File output;
 
-    public PackStage(File root, File output) {
+    public PackStage(final File root, final File output) {
         this.root = root;
         this.output = output;
     }
@@ -21,12 +21,12 @@ public final class PackStage implements Stage {
 
     private Stage windows() {
         try {
-            String output = FileIO.relativize(this.output);
+            final String output = FileIO.relativize(this.output);
             String directory = FileIO.relativize(root);
-            String manifestFile = FileIO.relativize(new File(root, "META-INF" + File.separator + "MANIFEST.MF"));
+            final String manifestFile = FileIO.relativize(new File(root, "META-INF" + File.separator + "MANIFEST.MF"));
             directory = directory.substring(0, directory.length() - 1);
             Debug.log("Packaging " + directory + " to " + output + "...");
-            String command = "jar cfm " + output + " " +  manifestFile + " -C " + directory + " .";
+            final String command = "jar cfm " + output + " " +  manifestFile + " -C " + directory + " .";
             Debug.console("Executing \"" + command + "\"");
 
             Runtime.getRuntime().exec(command).waitFor();

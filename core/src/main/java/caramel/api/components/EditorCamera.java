@@ -18,7 +18,7 @@ public final class EditorCamera extends Camera {
     private float mouseX, mouseY;
     public float sensitivity = 0.5f;
 
-    public EditorCamera(GameObject gameObject) {
+    public EditorCamera(final GameObject gameObject) {
         super(gameObject);
         this.isEditor = true;
         perspective = false;
@@ -30,8 +30,8 @@ public final class EditorCamera extends Camera {
     @Override
     public void update() {
         if (Panel.isWindowHovered(ScenePanel.class) && ImGui.isMouseDown(Input.Mouse.RIGHT)) {
-            float mouseX = -Input.getMouseDeltaX() * sensitivity;
-            float mouseY = Input.getMouseDeltaY() * sensitivity;
+            final float mouseX = -Input.getMouseDeltaX() * sensitivity;
+            final float mouseY = Input.getMouseDeltaY() * sensitivity;
 
             if (perspective) {
                 if (ImGui.isKeyDown(Input.Key.W)) {
@@ -41,10 +41,10 @@ public final class EditorCamera extends Camera {
                 }
 
                 if (ImGui.isKeyDown(Input.Key.A)) {
-                    Vector3f left = up.cross(target, new Vector3f());
+                    final Vector3f left = up.cross(target, new Vector3f());
                     transform.position.add(left.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
                 } else if (ImGui.isKeyDown(Input.Key.D)) {
-                    Vector3f right = target.cross(up, new Vector3f());
+                    final Vector3f right = target.cross(up, new Vector3f());
                     transform.position.add(right.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 5.f : 1)));
                 }
 
@@ -55,7 +55,7 @@ public final class EditorCamera extends Camera {
                 }
 
                 target.rotateY(mouseX * Time.deltaTime);
-                Vector3f right = up.cross(target, new Vector3f());
+                final Vector3f right = up.cross(target, new Vector3f());
                 right.y = 0;
                 right.normalize();
                 target.rotateAxis(mouseY * Time.deltaTime, right.x, 0, right.z);
@@ -65,15 +65,15 @@ public final class EditorCamera extends Camera {
                 up.normalize();
 
             } else {
-                float scroll = -Input.getMouseScroll();
+                final float scroll = -Input.getMouseScroll();
                 zoom += (scroll * 0.1f);
                 transform.position.add(up.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseY, new Vector3f()));
-                Vector3f right = target.cross(up, new Vector3f());
+                final Vector3f right = target.cross(up, new Vector3f());
                 transform.position.add(right.mul(Time.deltaTime * (ImGui.isKeyDown(Input.Key.L_CONTROL) ? 9f : 2f) * mouseX));
             }
         }
 
-        GameObject selected = Application.getApp().getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
+        final GameObject selected = Application.getApp().getCurrentScene().getSelectedGameObject().stream().findFirst().orElse(null);
 
         if (ImGui.isKeyPressed(Input.Key.F) && selected != null && (Panel.isWindowFocused(ScenePanel.class) || Panel.isWindowFocused(HierarchyPanel.class))) {
             gameObject.scene.getEditorCamera().transform.position.x = selected.transform.position.x;

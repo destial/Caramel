@@ -14,12 +14,12 @@ public final class RigidBody3D extends RigidBody {
 
     public transient DBody rawBody = null;
 
-    public RigidBody3D(GameObject gameObject) {
+    public RigidBody3D(final GameObject gameObject) {
         super(gameObject);
     }
 
     @Override
-    public void _setPosition(float x, float y, float z) {
+    public void _setPosition(final float x, final float y, final float z) {
 
     }
 
@@ -46,16 +46,16 @@ public final class RigidBody3D extends RigidBody {
                     rawBody.getPosition().get2()
             );
 
-            DMatrix3C rot = rawBody.getRotation();
-            double b1_squared = 0.25 * (1.f + rot.get00() + rot.get11() + rot.get22());
+            final DMatrix3C rot = rawBody.getRotation();
+            final double b1_squared = 0.25 * (1.f + rot.get00() + rot.get11() + rot.get22());
             if (b1_squared >= 0.25) {
-                double b1 = Math.sqrt(b1_squared);
+                final double b1 = Math.sqrt(b1_squared);
 
-                double over_b1_4 = 0.25 / b1;
-                double b2 = (rot.get21() - rot.get12()) * over_b1_4;
-                double b3 = (rot.get02() - rot.get20()) * over_b1_4;
-                double b4 = (rot.get10() - rot.get01()) * over_b1_4;
-                Quaternionf quaternionf = new Quaternionf(b1, b2, b3, b4);
+                final double over_b1_4 = 0.25 / b1;
+                final double b2 = (rot.get21() - rot.get12()) * over_b1_4;
+                final double b3 = (rot.get02() - rot.get20()) * over_b1_4;
+                final double b4 = (rot.get10() - rot.get01()) * over_b1_4;
+                final Quaternionf quaternionf = new Quaternionf(b1, b2, b3, b4);
                 transform.rotation.rotate(quaternionf);
             }
         }

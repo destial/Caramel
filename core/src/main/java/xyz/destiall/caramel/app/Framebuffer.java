@@ -30,7 +30,7 @@ public final class Framebuffer {
     private int width;
     private int height;
 
-    public Framebuffer(int width, int height) {
+    public Framebuffer(final int width, final int height) {
         this.width = width;
         this.height = height;
 
@@ -66,7 +66,7 @@ public final class Framebuffer {
         rboId = 0;
     }
 
-    public void resize(int width, int height) {
+    public void resize(final int width, final int height) {
         this.width = width;
         this.height = height;
         texture.invalidate();

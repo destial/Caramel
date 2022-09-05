@@ -20,17 +20,17 @@ public final class Physics2D implements Physics {
     private World world;
     private final SceneImpl scene;
 
-    public Physics2D(SceneImpl scene) {
+    public Physics2D(final SceneImpl scene) {
         this.scene = scene;
         reset();
     }
 
     @Override
-    public void addGameObject(GameObject gameObject) {
-        RigidBody2D rigidBody = gameObject.getComponent(RigidBody2D.class);
+    public void addGameObject(final GameObject gameObject) {
+        final RigidBody2D rigidBody = gameObject.getComponent(RigidBody2D.class);
         if (rigidBody == null || rigidBody.rawBody != null) return;
 
-        BodyDef bodyDef = new BodyDef();
+        final BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(gameObject.transform.position.x, gameObject.transform.position.y);
         bodyDef.angle = gameObject.transform.rotation.z;
         bodyDef.angularDamping = rigidBody.angularDamping;
@@ -55,7 +55,7 @@ public final class Physics2D implements Physics {
 
         if (gameObject.hasComponent(Box2DCollider.class)) {
             shape = new PolygonShape();
-            Box2DCollider collider = gameObject.getComponent(Box2DCollider.class);
+            final Box2DCollider collider = gameObject.getComponent(Box2DCollider.class);
             ((PolygonShape) shape).setAsBox(collider.useScale ? rigidBody.transform.scale.x * 0.5f : collider.bounds.x() * 0.5f, collider.useScale ? rigidBody.transform.scale.y * 0.5f : collider.bounds.y() * 0.5f);
             Vec2 pos = bodyDef.position;
             float x = pos.x + collider.offset.x;
@@ -64,7 +64,7 @@ public final class Physics2D implements Physics {
 
         } else if (gameObject.hasComponent(Circle2DCollider.class)) {
             shape = new CircleShape();
-            Circle2DCollider collider = gameObject.getComponent(Circle2DCollider.class);
+            final Circle2DCollider collider = gameObject.getComponent(Circle2DCollider.class);
             shape.setRadius(collider.radius);
             Vec2 pos = bodyDef.position;
             float x = pos.x + collider.offset.x;
@@ -79,8 +79,8 @@ public final class Physics2D implements Physics {
     }
 
     @Override
-    public void removeGameObject(GameObject gameObject) {
-        RigidBody2D rigidBody = gameObject.getComponent(RigidBody2D.class);
+    public void removeGameObject(final GameObject gameObject) {
+        final RigidBody2D rigidBody = gameObject.getComponent(RigidBody2D.class);
         if (rigidBody == null || rigidBody.rawBody == null) return;
         world.destroyBody(rigidBody.rawBody);
         rigidBody.rawBody = null;

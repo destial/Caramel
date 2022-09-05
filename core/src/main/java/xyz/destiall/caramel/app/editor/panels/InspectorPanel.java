@@ -43,7 +43,7 @@ public final class InspectorPanel extends Panel {
     private static final TextEditor editor;
     static {
         editor = new TextEditor();
-        TextEditorLanguageDefinition lang = new TextEditorLanguageDefinition();
+        final TextEditorLanguageDefinition lang = new TextEditorLanguageDefinition();
         lang.setAutoIdentation(true);
         lang.setName("java");
         lang.setSingleLineComment("//");
@@ -62,7 +62,7 @@ public final class InspectorPanel extends Panel {
     private Component selectedComponent;
     private ImVec2 popupMousePos;
 
-    public InspectorPanel(SceneImpl scene) {
+    public InspectorPanel(final SceneImpl scene) {
         super(scene);
     }
 
@@ -76,11 +76,11 @@ public final class InspectorPanel extends Panel {
             Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
 
-            GameObject selected = scene.getSelectedGameObject().stream().findFirst().orElse(null);
+            final GameObject selected = scene.getSelectedGameObject().stream().findFirst().orElse(null);
             if (selected != null) {
                 selected.active = ImGuiUtils.drawCheckBox("active", selected.active);
                 ImGuiUtils.inputText("name", ((StringWrapperImpl) selected.name).imString());
-                for (Component component : selected.getComponents()) {
+                for (final Component component : selected.getComponents()) {
                     ImGui.pushStyleColor(ImGuiCol.Header, SECONDARY_COLOR.x, SECONDARY_COLOR.y, SECONDARY_COLOR.z, SECONDARY_COLOR.w);
                     if (selectedComponent == component) {
                         ImGui.pushStyleColor(ImGuiCol.HeaderActive, PRIMARY_COLOR.x, PRIMARY_COLOR.y, PRIMARY_COLOR.z, PRIMARY_COLOR.w);
@@ -88,7 +88,7 @@ public final class InspectorPanel extends Panel {
                     }
                     if (ImGui.collapsingHeader(component.getClass().getSimpleName())) {
                         ImGui.text("id: " + component.id);
-                        for (Field field : component.getClass().getFields()) {
+                        for (final Field field : component.getClass().getFields()) {
                             if (field.isAnnotationPresent(HideInEditor.class) || Modifier.isTransient(field.getModifiers())) {
                                 continue;
                             }
@@ -98,7 +98,7 @@ public final class InspectorPanel extends Panel {
                             }
                         }
                         ImGui.separator();
-                        for (Method method : component.getClass().getMethods()) {
+                        for (final Method method : component.getClass().getMethods()) {
                             if (method.isAnnotationPresent(FunctionButton.class)) {
                                 method.setAccessible(true);
                                 ImGuiUtils.imguiLayer(method, component);
@@ -106,7 +106,7 @@ public final class InspectorPanel extends Panel {
                         }
 
                         if (component instanceof Script) {
-                            InternalScript s = Application.getApp().getScriptManager().getInternalScript(component.getClass());
+                            final InternalScript s = Application.getApp().getScriptManager().getInternalScript(component.getClass());
                             if (s != null && ImGui.button("Open Script")) {
                                 try {
                                     Desktop.getDesktop().open(s.getFile());
@@ -146,7 +146,7 @@ public final class InspectorPanel extends Panel {
                     ImGui.setWindowPos(popupMousePos.x, popupMousePos.y);
                     if (ImGui.selectable("Remove Component")) {
                         selected.removeComponent(selectedComponent.getClass());
-                        DeleteComponents deleteComponents = new DeleteComponents(selected);
+                        final DeleteComponents deleteComponents = new DeleteComponents(selected);
                         deleteComponents.deleted.add(selectedComponent);
                         scene.addUndoAction(deleteComponents);
                         selectedComponent = null;
@@ -161,7 +161,7 @@ public final class InspectorPanel extends Panel {
                 if (addingComponents) {
                     ImGui.beginListBox("##List Component");
                     ImGui.inputText("Search", search);
-                    for (Class<?> c : Payload.COMPONENTS) {
+                    for (final Class<?> c : Payload.COMPONENTS) {
                         if (selected.hasComponent((Class<? extends Component>) c)) continue;
                         if (search.isEmpty() || c.getSimpleName().toLowerCase().contains(search.get().toLowerCase())) {
                             if (ImGui.selectable(c.getSimpleName())) {
@@ -178,12 +178,12 @@ public final class InspectorPanel extends Panel {
                     if (addingScript) {
                         ImGuiUtils.inputText("Script Name:", this.scriptName);
                         if (ImGui.button("Create")) {
-                            InternalScript s = FileIO.writeScript(this.scriptName.get());
+                            final InternalScript s = FileIO.writeScript(this.scriptName.get());
                             if (s == null) {
                                 Debug.logError("Error while creating script file!");
                             } else {
                                 try {
-                                    Component c = s.getAsComponent(selected);
+                                    final Component c = s.getAsComponent(selected);
                                     selected.addComponent(c);
                                     Desktop.getDesktop().open(s.getFile());
                                 } catch (Exception e) {
@@ -205,21 +205,21 @@ public final class InspectorPanel extends Panel {
         ImGui.end();
     }
 
-    private void addComponent(GameObject gameObject, Class<?> componentClass) {
+    private void addComponent(final GameObject gameObject, final Class<?> componentClass) {
         if (Component.class.isAssignableFrom(componentClass)) {
             try {
-                AddComponents addComponents = new AddComponents(gameObject);
+                final AddComponents addComponents = new AddComponents(gameObject);
                 if (componentClass.isAssignableFrom(Box2DCollider.class) && !gameObject.hasComponent(RigidBody2D.class)) {
-                    RigidBody2D rigidBody = new RigidBody2D(gameObject);
+                    final RigidBody2D rigidBody = new RigidBody2D(gameObject);
                     gameObject.addComponent(rigidBody);
                     addComponents.added.add(rigidBody);
                 }
                 if (componentClass.isAssignableFrom(Box3DCollider.class) && !gameObject.hasComponent(RigidBody3D.class)) {
-                    RigidBody3D rigidBody = new RigidBody3D(gameObject);
+                    final RigidBody3D rigidBody = new RigidBody3D(gameObject);
                     gameObject.addComponent(rigidBody);
                     addComponents.added.add(rigidBody);
                 }
-                Component instance = (Component) componentClass.getConstructor(GameObject.class).newInstance(gameObject);
+                final Component instance = (Component) componentClass.getConstructor(GameObject.class).newInstance(gameObject);
                 gameObject.addComponent(instance);
                 addComponents.added.add(instance);
                 scene.addUndoAction(addComponents);

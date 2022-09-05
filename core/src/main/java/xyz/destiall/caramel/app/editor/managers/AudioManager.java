@@ -11,10 +11,10 @@ import java.util.Set;
 public final class AudioManager implements Listener {
 
     @EventHandler
-    private void onStopScene(SceneStopEvent e) {
-        for (GameObject gameObject : e.getScene().getGameObjects()) {
-            Set<AudioPlayer> audioPlayers = gameObject.getComponents(AudioPlayer.class);
-            for (AudioPlayer a : audioPlayers) {
+    private void onStopScene(final SceneStopEvent e) {
+        for (final GameObject gameObject : e.getScene().getGameObjects()) {
+            final Set<AudioPlayer> audioPlayers = gameObject.getComponents(AudioPlayer.class);
+            for (final AudioPlayer a : audioPlayers) {
                 a.invalidate();
             }
         }

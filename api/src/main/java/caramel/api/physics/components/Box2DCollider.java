@@ -20,7 +20,7 @@ public final class Box2DCollider extends Collider {
 
     public transient RigidBody2D rigidBody;
 
-    public Box2DCollider(GameObject gameObject) {
+    public Box2DCollider(final GameObject gameObject) {
         super(gameObject);
     }
 
@@ -32,7 +32,7 @@ public final class Box2DCollider extends Collider {
     @Override
     public void update() {
         if (rigidBody == null || rigidBody.rawBody == null) return;
-        PolygonShape shape = (PolygonShape) rigidBody.rawBody.m_fixtureList.getShape();
+        final PolygonShape shape = (PolygonShape) rigidBody.rawBody.m_fixtureList.getShape();
         if (useScale) {
             shape.setAsBox(transform.scale.x * 0.5f, transform.scale.y * 0.5f);
         } else {
@@ -42,11 +42,11 @@ public final class Box2DCollider extends Collider {
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (collisionRender && camera.isEditor) {
             float x = useScale ? transform.scale.x : bounds.x();
             float y = useScale ? transform.scale.y : bounds.y();
-            Vector3f scale = new Vector3f(x, y, 1);
+            final Vector3f scale = new Vector3f(x, y, 1);
             Debug.drawOutline(transform, scale, debugColor);
         }
     }

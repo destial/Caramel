@@ -29,7 +29,7 @@ public abstract class Component implements Update {
 
     protected Component() {}
 
-    public Component(GameObject gameObject) {
+    public Component(final GameObject gameObject) {
         this.gameObject = gameObject;
         this.transform = gameObject.transform;
         id = gameObject.scene.generateId();
@@ -38,13 +38,13 @@ public abstract class Component implements Update {
     public abstract void start();
     public void lateUpdate() {}
 
-    public void onCollisionEnter(RigidBody2D other) {}
+    public void onCollisionEnter(final RigidBody2D other) {}
 
-    public void onCollisionExit(RigidBody2D other) {}
+    public void onCollisionExit(final RigidBody2D other) {}
 
-    public void onCollisionEnterRaw(ContactPoint2D point2D) {}
+    public void onCollisionEnterRaw(final ContactPoint2D point2D) {}
 
-    public void onCollisionExitRaw(ContactPoint2D point2D) {}
+    public void onCollisionExitRaw(final ContactPoint2D point2D) {}
 
     /**
      * Get a {@link Component} that is linked to this object.
@@ -52,7 +52,7 @@ public abstract class Component implements Update {
      * @param <C> {@link Component}
      * @return The {@link Component} if it exists, null if none.
      */
-    public <C extends Component> C getComponent(Class<C> clazz) {
+    public <C extends Component> C getComponent(final Class<C> clazz) {
         return gameObject.getComponent(clazz);
     }
 
@@ -61,7 +61,7 @@ public abstract class Component implements Update {
      * @param clazz The class of the {@link Component}.
      * @return The {@link Component} if it exists, null if none.
      */
-    public Component getComponent(String clazz) {
+    public Component getComponent(final String clazz) {
         return gameObject.getComponent(clazz);
     }
 
@@ -72,7 +72,7 @@ public abstract class Component implements Update {
      * @param <C> {@link Component}
      * @return The {@link Component} if it exists, null if none.
      */
-    public <C extends Component> C getComponentInParent(Class<C> clazz) {
+    public <C extends Component> C getComponentInParent(final Class<C> clazz) {
         return gameObject.getComponentInParent(clazz);
     }
 
@@ -82,7 +82,7 @@ public abstract class Component implements Update {
      * @param <C> {@link Component}
      * @return The {@link Component} if it exists, null if none.
      */
-    public <C extends Component> C getComponentInChildren(Class<C> clazz) {
+    public <C extends Component> C getComponentInChildren(final Class<C> clazz) {
         return gameObject.getComponentInChildren(clazz);
     }
 
@@ -92,7 +92,7 @@ public abstract class Component implements Update {
      * @param <C> {@link Component}
      * @return true if it successfully removed, else false.
      */
-    public <C extends Component> boolean removeComponent(Class<C> clazz) {
+    public <C extends Component> boolean removeComponent(final Class<C> clazz) {
         return gameObject.removeComponent(clazz);
     }
 
@@ -102,7 +102,7 @@ public abstract class Component implements Update {
      * @param <C> {@link Component}
      * @return true if it exists, else false.
      */
-    public <C extends Component> boolean hasComponent(Class<C> clazz) {
+    public <C extends Component> boolean hasComponent(final Class<C> clazz) {
         return gameObject.hasComponent(clazz);
     }
 
@@ -110,7 +110,7 @@ public abstract class Component implements Update {
      * Destroy a {@link GameObject} from its scene.
      * @param gameObject The {@link GameObject} to destroy.
      */
-    public void destroy(GameObject gameObject) {
+    public void destroy(final GameObject gameObject) {
         gameObject.destroy(gameObject);
     }
 
@@ -119,7 +119,7 @@ public abstract class Component implements Update {
      * @param gameObject The {@link GameObject} to destroy.
      * @param timeout The time to wait in milliseconds.
      */
-    public void destroy(GameObject gameObject, long timeout) {
+    public void destroy(final GameObject gameObject, final long timeout) {
         gameObject.destroy(gameObject, timeout);
     }
 
@@ -127,8 +127,8 @@ public abstract class Component implements Update {
      * Invoke a method in this {@link Component}. This will completely bypass security access by private or protected modifiers.
      * @param methodName The method to invoke.
      */
-    public void sendMessage(String methodName) {
-        Method m = Reflect.getDeclaredMethod(this.getClass(), methodName);
+    public void sendMessage(final String methodName) {
+        final Method m = Reflect.getDeclaredMethod(this.getClass(), methodName);
         m.setAccessible(true);
         Reflect.invokeMethod(this, methodName);
     }
@@ -138,21 +138,21 @@ public abstract class Component implements Update {
      * @param methodName The method to invoke.
      * @param timeout The time to wait in milliseconds.
      */
-    public void sendMessage(String methodName, long timeout) {
+    public void sendMessage(final String methodName, final long timeout) {
         Application.getApp().getScheduler().runTaskLater(() -> sendMessage(methodName), timeout, TimeUnit.MILLISECONDS);
     }
 
-    public Component clone(GameObject gameObject, boolean copyId) {
+    public Component clone(final GameObject gameObject, final boolean copyId) {
         try {
-            Component clone = getClass().getDeclaredConstructor(GameObject.class).newInstance(gameObject);
+            final Component clone = getClass().getDeclaredConstructor(GameObject.class).newInstance(gameObject);
             gameObject.scene.entityIds.decrementAndGet();
-            for (Field field : getClass().getFields()) {
+            for (final Field field : getClass().getFields()) {
                 try {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
-                    boolean prev = field.isAccessible();
+                    final boolean prev = field.isAccessible();
                     field.setAccessible(true);
 
-                    Object value = field.get(this);
+                    final Object value = field.get(this);
                     if (value != null) {
                         if (field.getType().isAssignableFrom(Copyable.class)) {
                             field.set(clone, ((Copyable<?>) value).copy());

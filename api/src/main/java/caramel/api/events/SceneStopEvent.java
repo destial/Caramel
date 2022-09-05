@@ -8,7 +8,7 @@ import xyz.destiall.java.events.Event;
  */
 public final class SceneStopEvent extends Event {
     private final Scene scene;
-    public SceneStopEvent(Scene scene) {
+    public SceneStopEvent(final Scene scene) {
         this.scene = scene;
     }
 

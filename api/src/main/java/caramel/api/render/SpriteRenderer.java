@@ -20,7 +20,7 @@ public final class SpriteRenderer extends Renderer {
 
     private transient float timeElapsed = 0;
 
-    public SpriteRenderer(GameObject gameObject) {
+    public SpriteRenderer(final GameObject gameObject) {
         super(gameObject);
     }
 
@@ -42,7 +42,7 @@ public final class SpriteRenderer extends Renderer {
         spritesheet.setCurrentAnimation(animation);
     }
 
-    public void setAnimation(String animation) {
+    public void setAnimation(final String animation) {
         this.animation = animation;
         if (spritesheet == null) return;
         spritesheet.setCurrentAnimation(animation);
@@ -64,7 +64,7 @@ public final class SpriteRenderer extends Renderer {
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (spritesheet == null) {
             buildAnimation();
         }
@@ -94,8 +94,8 @@ public final class SpriteRenderer extends Renderer {
     }
 
     @Override
-    public SpriteRenderer clone(GameObject gameObject, boolean copyId) {
-        SpriteRenderer clone = (SpriteRenderer) super.clone(gameObject, copyId);
+    public SpriteRenderer clone(final GameObject gameObject, final boolean copyId) {
+        final SpriteRenderer clone = (SpriteRenderer) super.clone(gameObject, copyId);
         clone.spritesheet = spritesheet.copy();
         return clone;
     }

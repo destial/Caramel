@@ -68,7 +68,7 @@ public class Mesh implements Copyable<Mesh> {
         return elementArray;
     }
 
-    public void setDrawArrays(boolean drawArrays) {
+    public void setDrawArrays(final boolean drawArrays) {
         this.drawArrays = drawArrays;
     }
 
@@ -79,15 +79,15 @@ public class Mesh implements Copyable<Mesh> {
 
     @Override
     public Mesh copy() {
-        Mesh mesh = new Mesh();
+        final Mesh mesh = new Mesh();
         mesh.name = name;
         mesh.drawArrays = drawArrays;
         mesh.type = type;
         mesh.texture = texture;
         mesh.shader = shader;
         mesh.dirty = dirty;
-        for (Vertex vertex : vertexArray) {
-            Vertex copy = new Vertex();
+        for (final Vertex vertex : vertexArray) {
+            final Vertex copy = new Vertex();
             copy.position.set(vertex.position);
             copy.normal.set(vertex.normal);
             copy.color.set(vertex.color);
@@ -118,13 +118,13 @@ public class Mesh implements Copyable<Mesh> {
         return this;
     }
 
-    public Mesh pushVertex(Vertex vertex) {
+    public Mesh pushVertex(final Vertex vertex) {
         vertexArray.add(vertex);
         setDirty(true);
         return this;
     }
 
-    public Vertex getVertex(int index) {
+    public Vertex getVertex(final int index) {
         while (index >= vertexArray.size()) {
             pushVertex(0f, 0f, 0f, 1f, 1f, 1f, 1f, 0f, 1f, 1f, 1f, 1f, 0f);
             if (index < vertexArray.size()) break;
@@ -132,12 +132,12 @@ public class Mesh implements Copyable<Mesh> {
         return vertexArray.get(index);
     }
 
-    public int getIndex(int index) {
+    public int getIndex(final int index) {
         return elementArray.get(index);
     }
 
-    public Mesh pushVertex(Vector3f position, Color color, Vector2f texCoords, Vector3f normal, float texSlot) {
-        Vertex vertex = new Vertex();
+    public Mesh pushVertex(final Vector3f position, final Color color, final Vector2f texCoords, final Vector3f normal, final float texSlot) {
+        final Vertex vertex = new Vertex();
         vertex.position.set(position);
         vertex.color.set(color);
         vertex.texCoords.set(texCoords);
@@ -147,9 +147,9 @@ public class Mesh implements Copyable<Mesh> {
         return pushVertex(vertex);
     }
 
-    public Mesh pushVertex(float... floats) {
+    public Mesh pushVertex(final float... floats) {
         if (floats.length != Vertex.SIZE) return this;
-        Vertex vertex = new Vertex();
+        final Vertex vertex = new Vertex();
         vertex.position.x = floats[0];
         vertex.position.y = floats[1];
         vertex.position.z = floats[2];
@@ -171,19 +171,19 @@ public class Mesh implements Copyable<Mesh> {
         return pushVertex(vertex);
     }
 
-    public Mesh pushIndex(int i) {
+    public Mesh pushIndex(final int i) {
         elementArray.add(i);
         setDirty(true);
         return this;
     }
 
-    public Mesh pushIndex(int... indexes) {
-        for (int i : indexes) elementArray.add(i);
+    public Mesh pushIndex(final int... indexes) {
+        for (final int i : indexes) elementArray.add(i);
         setDirty(true);
         return this;
     }
 
-    public void setDirty(boolean dirty) {
+    public void setDirty(final boolean dirty) {
         this.dirty = dirty;
     }
 
@@ -191,9 +191,9 @@ public class Mesh implements Copyable<Mesh> {
         return color;
     }
 
-    public void setColor(Color color) {
+    public void setColor(final Color color) {
         this.color.set(color);
-        for (Vertex vertex : vertexArray) {
+        for (final Vertex vertex : vertexArray) {
             vertex.color.set(color);
         }
         if (texture != null) {
@@ -208,7 +208,7 @@ public class Mesh implements Copyable<Mesh> {
         build(true);
     }
 
-    public void build(boolean with_indices) {
+    public void build(final boolean with_indices) {
         this.withIndices = with_indices;
         if (name == null) {
             name = "Custom";
@@ -234,13 +234,13 @@ public class Mesh implements Copyable<Mesh> {
             Graphics.get().glBufferData(GL_ELEMENT_ARRAY_BUFFER, getIndexBuffer(), GL_DYNAMIC_DRAW);
         }
 
-        int positionSize = 3;
-        int colorSize = 4;
-        int texSize = 2;
-        int normalSize = 3;
-        int texIdSize = 1;
-        int floatSizeBytes = 4;
-        int vertexSizeBytes = (positionSize + colorSize + texSize + normalSize + texIdSize) * floatSizeBytes;
+        final int positionSize = 3;
+        final int colorSize = 4;
+        final int texSize = 2;
+        final int normalSize = 3;
+        final int texIdSize = 1;
+        final int floatSizeBytes = 4;
+        final int vertexSizeBytes = (positionSize + colorSize + texSize + normalSize + texIdSize) * floatSizeBytes;
 
         Graphics.get().glVertexAttribPointer(0, positionSize, GL_FLOAT, false, vertexSizeBytes, 0);
         Graphics.get().glVertexAttribPointer(1, colorSize, GL_FLOAT, false, vertexSizeBytes, positionSize * floatSizeBytes);
@@ -268,7 +268,7 @@ public class Mesh implements Copyable<Mesh> {
     }
 
     public float[] getVertexBuffer() {
-        float[] vertices = new float[vertexArray.size() * Vertex.SIZE];
+        final float[] vertices = new float[vertexArray.size() * Vertex.SIZE];
         int index = 0;
         for (Vertex v : vertexArray) {
             vertices[  index  ] = v.position.x;
@@ -295,14 +295,14 @@ public class Mesh implements Copyable<Mesh> {
     }
 
     public int[] getIndexBuffer() {
-        int[] indices = new int[elementArray.size()];
+        final int[] indices = new int[elementArray.size()];
         for (int i = 0; i < elementArray.size(); i++) {
             indices[i] = elementArray.get(i);
         }
         return indices;
     }
 
-    public void setShader(String shader) {
+    public void setShader(final String shader) {
         this.shader = shader;
     }
 
@@ -310,10 +310,10 @@ public class Mesh implements Copyable<Mesh> {
         return Shader.getShader(shader);
     }
 
-    public void setTexture(String path) {
+    public void setTexture(final String path) {
         this.texture = path;
         if (texture != null) {
-            Texture tex = Texture.getTexture(path);
+            final Texture tex = Texture.getTexture(path);
             if (tex != null) {
                 shader = "default";
             } else {
@@ -333,16 +333,16 @@ public class Mesh implements Copyable<Mesh> {
         return texture != null && !texture.isEmpty() ? Texture.getTexture(texture) : null;
     }
 
-    public void renderBatch(Transform transform, Camera camera) {
+    public void renderBatch(final Transform transform, final Camera camera) {
         shader = "defaultBatch";
-        Shader s = Shader.getShader(shader);
-        Matrix4f mvp = transform.getModel();
+        final Shader s = Shader.getShader(shader);
+        final Matrix4f mvp = transform.getModel();
         dirtyVertexArray.clear();
 
-        Texture t = texture != null ? Texture.getTexture(texture) : null;
+        final Texture t = texture != null ? Texture.getTexture(texture) : null;
         int texId = -1;
         if (t != null) {
-            List<Texture> textures = Texture.getTextures();
+            final List<Texture> textures = Texture.getTextures();
             for (int i = 0; i < textures.size(); i++) {
                 if (t == textures.get(i)) {
                     texId = i;
@@ -351,9 +351,9 @@ public class Mesh implements Copyable<Mesh> {
             }
         }
 
-        Vector4f aPos = new Vector4f();
-        for (Vertex vertex : vertexArray) {
-            Vertex v = new Vertex();
+        final Vector4f aPos = new Vector4f();
+        for (final Vertex vertex : vertexArray) {
+            final Vertex v = new Vertex();
             aPos.set(vertex.position, 1f);
             aPos.mul(mvp);
             v.position.x = aPos.x;
@@ -370,10 +370,10 @@ public class Mesh implements Copyable<Mesh> {
         BatchRenderer.addMesh(s, this);
     }
 
-    public void render(Transform transform, Camera camera) {
+    public void render(final Transform transform, final Camera camera) {
         if (shader.equals("defaultBatch")) {
             if (texture != null) {
-                Texture tex = Texture.getTexture(texture);
+                final Texture tex = Texture.getTexture(texture);
                 if (tex != null) {
                     shader = "default";
                 } else {
@@ -384,10 +384,10 @@ public class Mesh implements Copyable<Mesh> {
             }
         }
 
-        Shader s = Shader.getShader(shader);
+        final Shader s = Shader.getShader(shader);
         s.attach();
         if (texture != null) {
-            Texture tex = Texture.getTexture(texture);
+            final Texture tex = Texture.getTexture(texture);
             Graphics.get().glActiveTexture(GL_TEXTURE0);
             tex.bind();
             s.uploadTexture("texSampler", 0);
@@ -403,7 +403,7 @@ public class Mesh implements Copyable<Mesh> {
             dirty = false;
         }
 
-        Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
+        final Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
         s.uploadMat4f("uMVP", mvp);
 
         Graphics.get().glBindVertexArray(vaoId);
@@ -425,7 +425,7 @@ public class Mesh implements Copyable<Mesh> {
         Graphics.get().glBindVertexArray(0);
 
         if (texture != null) {
-            Texture tex = Texture.getTexture(texture);
+            final Texture tex = Texture.getTexture(texture);
             tex.unbind();
         }
 

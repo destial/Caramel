@@ -5,15 +5,15 @@ import caramel.api.objects.Scene;
 import org.joml.Vector3f;
 
 public final class EditTransformComponent extends EditComponent<Transform> {
-    public Vector3f pos1;
-    public Vector3f rot1;
-    public Vector3f sca1;
+    public final Vector3f pos1;
+    public final Vector3f rot1;
+    public final Vector3f sca1;
 
     public Vector3f pos2;
     public Vector3f rot2;
     public Vector3f sca2;
 
-    public EditTransformComponent(Scene scene, Transform transform) {
+    public EditTransformComponent(final Scene scene, final Transform transform) {
         super(scene, transform);
         pos1 = new Vector3f(transform.position);
         rot1 = new Vector3f(transform.rotation);

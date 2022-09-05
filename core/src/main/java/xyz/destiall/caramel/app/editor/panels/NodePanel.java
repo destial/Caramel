@@ -16,9 +16,9 @@ import xyz.destiall.caramel.app.editor.nodes.DebugGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.FloatGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.Graph;
 import xyz.destiall.caramel.app.editor.nodes.GraphNode;
-import xyz.destiall.caramel.app.editor.nodes.IntGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.IntegerGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.Link;
-import xyz.destiall.caramel.app.editor.nodes.MethodGraphNode;
+import xyz.destiall.caramel.app.editor.nodes.ComponentGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.StartGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.StringGraphNode;
 import xyz.destiall.caramel.app.editor.nodes.UpdateGraphNode;
@@ -33,18 +33,18 @@ public final class NodePanel extends Panel {
     private static final String DELETE_NODE = "node_delete_node";
     private static final String DELETE_LINK = "node_delete_link";
 
-    public NodePanel(SceneImpl scene) {
+    public NodePanel(final SceneImpl scene) {
         super(scene);
     }
 
-    public void setCurrentGraph(Graph graph) {
+    public void setCurrentGraph(final Graph graph) {
         this.currentGraph = graph;
         if (currentGraph.ini != null) {
             ImNodes.loadCurrentEditorStateFromIniString(currentGraph.ini, currentGraph.ini.length());
         }
     }
 
-    public static String text(String label, String text) {
+    public static String text(final String label, final String text) {
         ImGui.pushID(label);
 
         ImGui.columns(2);
@@ -53,7 +53,7 @@ public final class NodePanel extends Panel {
         ImGui.nextColumn();
 
         ImGui.setColumnWidth(1, 75f);
-        ImString outString = new ImString(text, 256);
+        final ImString outString = new ImString(text, 256);
         ImGui.inputText("##" + label, outString);
 
         ImGui.columns(1);
@@ -74,7 +74,7 @@ public final class NodePanel extends Panel {
             Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
 
-            boolean save = ImGui.button("save");
+            final boolean save = ImGui.button("save");
 
             if (ImGui.button("close")) {
                 currentGraph.save(ImNodes.saveCurrentEditorStateToIniString());
@@ -86,14 +86,14 @@ public final class NodePanel extends Panel {
             ImGui.sameLine();
             ImNodes.beginNodeEditor();
 
-            float nodeWidth = 100f;
+            final float nodeWidth = 100f;
 
-            for (GraphNode<?> node : currentGraph.getNodes()) {
+            for (final GraphNode<?> node : currentGraph.getNodes()) {
                 ImNodes.beginNode(node.getId());
 
                 ImNodes.beginNodeTitleBar();
                 ImGui.pushItemWidth(nodeWidth);
-                ImString name = node.getName().imString();
+                final ImString name = node.getName().imString();
                 ImGui.inputText("##rename", name, ImGuiInputTextFlags.EnterReturnsTrue | ImGuiInputTextFlags.NoHorizontalScroll);
                 ImGui.popItemWidth();
                 ImNodes.endNodeTitleBar();
@@ -114,11 +114,11 @@ public final class NodePanel extends Panel {
                         ImNodes.beginInputAttribute(((BooleanGraphNode) node).getInputPinRight(), ImNodesPinShape.CircleFilled);
                         ImGui.text("Second");
 
-                    } else if (node instanceof IntGraphNode) {
+                    } else if (node instanceof IntegerGraphNode) {
                         ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
-                        int[] ints = {((IntGraphNode) node).getValue()};
+                        final int[] ints = {((IntegerGraphNode) node).getValue()};
                         if (ImGui.dragInt(input, ints)) {
-                            ((IntGraphNode) node).setValue(ints[0]);
+                            ((IntegerGraphNode) node).setValue(ints[0]);
                         }
                     } else {
                         ImNodes.beginInputAttribute(node.getInputPinId(), ImNodesPinShape.CircleFilled);
@@ -130,12 +130,12 @@ public final class NodePanel extends Panel {
 
                 if (node instanceof StringGraphNode) {
                     if (node.getValue() != null) {
-                        ImString string = new ImString(((StringGraphNode) node).getValue());
+                        final ImString string = new ImString(((StringGraphNode) node).getValue());
                         ImGui.inputText("string", string);
                         ((StringGraphNode) node).setValue(string.get());
                     }
                 } else if (node instanceof DebugGraphNode) {
-                    ImString string = new ImString(((DebugGraphNode) node).getValue());
+                    final ImString string = new ImString(((DebugGraphNode) node).getValue());
                     ImGui.inputText("debug", string);
                     ((DebugGraphNode) node).setValue(string.get());
                 }
@@ -143,7 +143,7 @@ public final class NodePanel extends Panel {
                 if (!(node instanceof DebugGraphNode)) {
                     if (node instanceof BooleanGraphNode) {
                         ImNodes.beginOutputAttribute(((BooleanGraphNode) node).getOutputPinTrue());
-                        ImVec2 vec2 = new ImVec2();
+                        final ImVec2 vec2 = new ImVec2();
                         ImGui.calcTextSize(vec2, "true");
                         ImGui.indent(nodeWidth - vec2.x);
                         ImGui.text("true");
@@ -155,7 +155,7 @@ public final class NodePanel extends Panel {
                         ImGui.text("false");
                     } else {
                         ImNodes.beginOutputAttribute(node.getOutputPinId());
-                        ImVec2 vec2 = new ImVec2();
+                        final ImVec2 vec2 = new ImVec2();
                         ImGui.calcTextSize(vec2, output);
                         ImGui.indent(nodeWidth - vec2.x);
                         ImGui.text(output);
@@ -166,7 +166,7 @@ public final class NodePanel extends Panel {
                 ImNodes.endNode();
             }
 
-            for (Link link : currentGraph.getLinks()) {
+            for (final Link link : currentGraph.getLinks()) {
                 ImNodes.link(link.getId(), link.getStart(), link.getEnd());
             }
 
@@ -179,9 +179,9 @@ public final class NodePanel extends Panel {
                 currentGraph.link(LINK_A.get(), LINK_B.get());
             }
 
-            int[] nodeIds = new int[currentGraph.getNodes().size()];
+            final int[] nodeIds = new int[currentGraph.getNodes().size()];
             ImNodes.getSelectedNodes(nodeIds);
-            int[] linkIds = new int[currentGraph.getNodes().size()];
+            final int[] linkIds = new int[currentGraph.getNodes().size()];
             ImNodes.getSelectedLinks(linkIds);
 
             if (ImGui.isMouseClicked(Input.Mouse.RIGHT)) {
@@ -201,7 +201,7 @@ public final class NodePanel extends Panel {
             if (ImGui.isPopupOpen(DELETE_NODE)) {
                 final int targetNode = ImGui.getStateStorage().getInt(ImGui.getID(DELETE_NODE));
                 if (ImGui.beginPopup(DELETE_NODE)) {
-                    GraphNode<?> node = currentGraph.getNode(targetNode);
+                    final GraphNode<?> node = currentGraph.getNode(targetNode);
                     if (node != null) {
                         if (ImGui.button("Delete " + node.getName())) {
                             currentGraph.deleteNode(targetNode);
@@ -224,38 +224,13 @@ public final class NodePanel extends Panel {
             }
 
             if (ImGui.beginPopup(CREATE_NODE)) {
-                if (ImGui.button("Create New Int Node")) {
-                    final IntGraphNode node = currentGraph.createIntGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New Float Node")) {
-                    final FloatGraphNode node = currentGraph.createFloatGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New String Node")) {
-                    final StringGraphNode node = currentGraph.createStringGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New Boolean Node")) {
-                    final BooleanGraphNode node = currentGraph.createBooleanGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New Method Node")) {
-                    final MethodGraphNode node = currentGraph.createMethodGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New Start Node")) {
-                    final StartGraphNode node = currentGraph.createStartGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New Update Node")) {
-                    final UpdateGraphNode node = currentGraph.createUpdateGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
-                } else if (ImGui.button("Create New Debug Node")) {
-                    final DebugGraphNode node = currentGraph.createDebugGraphNode();
-                    ImNodes.setNodeScreenSpacePos(node.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
-                    ImGui.closeCurrentPopup();
+                for (final Class<? extends GraphNode<?>> node : Graph.NODES) {
+                    if (ImGui.button("Create new " + Graph.getLabel(node) + " Node")) {
+                        final GraphNode<?> graphNode = currentGraph.createNode(node);
+                        if (graphNode == null) continue;
+                        ImNodes.setNodeScreenSpacePos(graphNode.getId(), ImGui.getMousePosX(), ImGui.getMousePosY());
+                        ImGui.closeCurrentPopup();;
+                    }
                 }
                 ImGui.endPopup();
             }

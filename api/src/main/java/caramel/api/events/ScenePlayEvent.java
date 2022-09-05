@@ -8,7 +8,7 @@ import xyz.destiall.java.events.Event;
  */
 public final class ScenePlayEvent extends Event {
     private final Scene scene;
-    public ScenePlayEvent(Scene scene) {
+    public ScenePlayEvent(final Scene scene) {
         this.scene = scene;
     }
 

@@ -12,17 +12,17 @@ import java.util.Set;
 public final class MeshManager implements Listener {
 
     @EventHandler
-    public void onSceneStop(SceneStopEvent e) {
-        for (GameObject gameObject : e.getScene().getGameObjects()) {
-            Set<MeshRenderer> renderers = gameObject.getComponentsInChildren(MeshRenderer.class);
+    public void onSceneStop(final SceneStopEvent e) {
+        for (final GameObject gameObject : e.getScene().getGameObjects()) {
+            final Set<MeshRenderer> renderers = gameObject.getComponentsInChildren(MeshRenderer.class);
             renderers.addAll(gameObject.getComponents(MeshRenderer.class));
-            for (MeshRenderer renderer: renderers) {
+            for (final MeshRenderer renderer: renderers) {
                 if (renderer.mesh == null) continue;
                 renderer.mesh.invalidate();
             }
-            Set<SpriteRenderer> spriteRenderers = gameObject.getComponentsInChildren(SpriteRenderer.class);
+            final Set<SpriteRenderer> spriteRenderers = gameObject.getComponentsInChildren(SpriteRenderer.class);
             spriteRenderers.addAll(gameObject.getComponents(SpriteRenderer.class));
-            for (SpriteRenderer spriteRenderer : spriteRenderers) {
+            for (final SpriteRenderer spriteRenderer : spriteRenderers) {
                 if (spriteRenderer.spritesheet.mesh == null) continue;
                 spriteRenderer.spritesheet.mesh.invalidate();
             }

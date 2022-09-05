@@ -14,19 +14,19 @@ import org.jbox2d.dynamics.contacts.Contact;
 public final class ContactListener implements org.jbox2d.callbacks.ContactListener {
     private final Scene scene;
 
-    public ContactListener(Scene scene) {
+    public ContactListener(final Scene scene) {
         this.scene = scene;
     }
 
     @Override
-    public void beginContact(Contact contact) {
-        RigidBody2D first = scene.getGameObjects().stream().filter(g -> g.hasComponent(RigidBody2D.class) && g.getComponent(RigidBody2D.class).rawBody == contact.getFixtureA().getBody()).findFirst().get().getComponent(RigidBody2D.class);
-        RigidBody2D second = scene.getGameObjects().stream().filter(g -> g.hasComponent(RigidBody2D.class) && g.getComponent(RigidBody2D.class).rawBody == contact.getFixtureB().getBody()).findFirst().get().getComponent(RigidBody2D.class);
+    public void beginContact(final Contact contact) {
+        final RigidBody2D first = scene.getGameObjects().stream().filter(g -> g.hasComponent(RigidBody2D.class) && g.getComponent(RigidBody2D.class).rawBody == contact.getFixtureA().getBody()).findFirst().get().getComponent(RigidBody2D.class);
+        final RigidBody2D second = scene.getGameObjects().stream().filter(g -> g.hasComponent(RigidBody2D.class) && g.getComponent(RigidBody2D.class).rawBody == contact.getFixtureB().getBody()).findFirst().get().getComponent(RigidBody2D.class);
         if (first.bounce || second.bounce) {
             contact.setRestitution(1.f);
         }
-        ContactPoint2D contactPoint2D = new ContactPoint2D(first, second, contact);
-        for (Component component : first.gameObject.getMutableComponents()) {
+        final ContactPoint2D contactPoint2D = new ContactPoint2D(first, second, contact);
+        for (final Component component : first.gameObject.getMutableComponents()) {
             try {
                 component.onCollisionEnterRaw(contactPoint2D);
                 component.onCollisionEnter(second);
@@ -37,7 +37,7 @@ public final class ContactListener implements org.jbox2d.callbacks.ContactListen
                 Debug.log(e.getCause());
             }
         }
-        for (Component component : second.gameObject.getMutableComponents()) {
+        for (final Component component : second.gameObject.getMutableComponents()) {
             try {
                 component.onCollisionEnterRaw(contactPoint2D);
                 component.onCollisionEnter(first);

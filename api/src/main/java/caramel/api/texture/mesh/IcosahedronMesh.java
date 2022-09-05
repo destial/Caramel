@@ -16,29 +16,29 @@ public final class IcosahedronMesh extends Mesh {
         this(1, 2);
     }
 
-    public IcosahedronMesh(float radius, int subdivisions) {
+    public IcosahedronMesh(final float radius, final int subdivisions) {
         name = "Icosahedron";
         this.subdivisions = subdivisions;
         this.radius = radius;
-        Vertex v1 = new Vertex(-1, t, 0.0f);
-        Vertex v2 = new Vertex(1, t, 0.0f);
-        Vertex v3 = new Vertex(-1, -t, 0.0f);
-        Vertex v4 = new Vertex(1, -t, 0.0f);
+        final Vertex v1 = new Vertex(-1, t, 0.0f);
+        final Vertex v2 = new Vertex(1, t, 0.0f);
+        final Vertex v3 = new Vertex(-1, -t, 0.0f);
+        final Vertex v4 = new Vertex(1, -t, 0.0f);
 
-        Vertex v5 = new Vertex(0.0f, -1, t);
-        Vertex v6 = new Vertex(0.0f, 1, t);
-        Vertex v7 = new Vertex(0.0f, -1, -t);
-        Vertex v8 = new Vertex(0.0f, 1, -t);
+        final Vertex v5 = new Vertex(0.0f, -1, t);
+        final Vertex v6 = new Vertex(0.0f, 1, t);
+        final Vertex v7 = new Vertex(0.0f, -1, -t);
+        final Vertex v8 = new Vertex(0.0f, 1, -t);
 
-        Vertex v9 = new Vertex(t,0.0f,-1);
-        Vertex v10 = new Vertex(t, 0.0f, 1);
-        Vertex v11 = new Vertex(-t, 0.0f, -1);
-        Vertex v12 = new Vertex(-t, 0.0f, 1);
+        final Vertex v9 = new Vertex(t,0.0f,-1);
+        final Vertex v10 = new Vertex(t, 0.0f, 1);
+        final Vertex v11 = new Vertex(-t, 0.0f, -1);
+        final Vertex v12 = new Vertex(-t, 0.0f, 1);
 
-        Vertex v13 = new Vertex(v1);
-        Vertex v14 = v11.getMidVertex(v12);
-        Vertex v15 = new Vertex(v14);
-        Vertex v16 = new Vertex(v3);
+        final Vertex v13 = new Vertex(v1);
+        final Vertex v14 = v11.getMidVertex(v12);
+        final Vertex v15 = new Vertex(v14);
+        final Vertex v16 = new Vertex(v3);
 
         v1.normalize();
         v2.normalize();
@@ -127,7 +127,7 @@ public final class IcosahedronMesh extends Mesh {
 
         vertexArray.addAll(baseVertices);
 
-        for (Triangle tr : baseTriangles) {
+        for (final Triangle tr : baseTriangles) {
             elementArray.add(baseVertices.indexOf(tr.v1));
             elementArray.add(baseVertices.indexOf(tr.v2));
             elementArray.add(baseVertices.indexOf(tr.v3));
@@ -135,10 +135,10 @@ public final class IcosahedronMesh extends Mesh {
     }
 
     public void subdivide() {
-        ArrayList<Triangle> newTriangles = new ArrayList<>();
-        ArrayList<Vertex> newVertices = new ArrayList<>(baseVertices);
+        final ArrayList<Triangle> newTriangles = new ArrayList<>();
+        final ArrayList<Vertex> newVertices = new ArrayList<>(baseVertices);
         for (int i = 0; i < baseTriangles.size(); ) {
-            Triangle aTriangle = baseTriangles.get(i);
+            final Triangle aTriangle = baseTriangles.get(i);
             baseTriangles.remove(aTriangle);
             subdivideTri(aTriangle, newTriangles, newVertices);
         }
@@ -146,12 +146,12 @@ public final class IcosahedronMesh extends Mesh {
         baseVertices = newVertices;
     }
 
-    void subdivideTri(Triangle tri, ArrayList<Triangle> nTriangles, ArrayList<Vertex> nVertices) {
-        Vertex v1 = new Vertex(tri.v1);
+    void subdivideTri(final Triangle tri, final ArrayList<Triangle> nTriangles, final ArrayList<Vertex> nVertices) {
+        final Vertex v1 = new Vertex(tri.v1);
         v1.normalize();
-        Vertex v2 = new Vertex(tri.v2);
+        final Vertex v2 = new Vertex(tri.v2);
         v2.normalize();
-        Vertex v3 = new Vertex(tri.v3);
+        final Vertex v3 = new Vertex(tri.v3);
         v3.normalize();
 
         Vertex v12 = v1.getMidVertex(v2);
@@ -203,37 +203,37 @@ public final class IcosahedronMesh extends Mesh {
         nTriangles.add(new Triangle(v12,v23,v31));
     }
 
-    void setPole(Vertex v1, Vertex v2, Vertex v12) {
+    void setPole(final Vertex v1, final Vertex v2, final Vertex v12) {
         v12.texCoords.x = (v1.texCoords.x + v2.texCoords.x)/2;
     }
 
     public static class Triangle {
         public final Vertex v1,v2,v3;
         public final Vector3f normal;
-        public Triangle(Vertex vert1, Vertex vert2, Vertex vert3) {
+        public Triangle(final Vertex vert1, final Vertex vert2, final Vertex vert3) {
             v1 = vert1;
             v2 = vert2;
             v3 = vert3;
 
-            Vertex v12 = new Vertex(v2);
+            final Vertex v12 = new Vertex(v2);
             v12.position.sub(v1.position);
-            Vertex v23 = new Vertex(v3);
+            final Vertex v23 = new Vertex(v3);
             v23.position.sub(v2.position);
             normal = v12.position.cross(v23.position);
             normal.normalize();
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(final Object o) {
             if (this == o)
                 return true;
             if (o == null)
                 return false;
             if (getClass() != o.getClass()) {
-                Vertex vert = (Vertex) o;
+                final Vertex vert = (Vertex) o;
                 return vert.equals(v1) || vert.equals(v2) || vert.equals(v3);
             } else {
-                Triangle tri = (Triangle) o;
+                final Triangle tri = (Triangle) o;
                 return tri.v1.equals(v1) || tri.v2.equals(v2) || tri.v3.equals(v3);
             }
         }
@@ -241,15 +241,15 @@ public final class IcosahedronMesh extends Mesh {
 
     @Override
     public Mesh copy() {
-        IcosahedronMesh mesh = new IcosahedronMesh(radius, subdivisions);
+        final IcosahedronMesh mesh = new IcosahedronMesh(radius, subdivisions);
         mesh.name = name;
         mesh.drawArrays = drawArrays;
         mesh.type = type;
         mesh.texture = texture;
         mesh.shader = shader;
         mesh.dirty = dirty;
-        for (Vertex vertex : vertexArray) {
-            Vertex copy = new Vertex();
+        for (final Vertex vertex : vertexArray) {
+            final Vertex copy = new Vertex();
             copy.position.set(vertex.position);
             copy.normal.set(vertex.normal);
             copy.color.set(vertex.color);

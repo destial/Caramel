@@ -19,7 +19,7 @@ public final class ExtractStage implements Stage {
     private final File output;
     private static final int BUFFER = 1024;
 
-    public ExtractStage(File root, File output) {
+    public ExtractStage(final File root, final File output) {
         this.root = root;
         this.output = output;
     }
@@ -34,12 +34,12 @@ public final class ExtractStage implements Stage {
             Debug.log("Copying assets...");
             FileIO.copy(new File("assets" + File.separator), root, (f) -> !f.getName().contains("scripts") && !f.getName().toLowerCase().endsWith(".caramel"), true);
 
-            String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-            ZipInputStream coreZip = new ZipInputStream(Files.newInputStream(new File(path).toPath()));
+            final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+            final ZipInputStream coreZip = new ZipInputStream(Files.newInputStream(new File(path).toPath()));
             ZipEntry zipEntry = coreZip.getNextEntry();
             byte[] data = new byte[BUFFER];
             while (zipEntry != null) {
-                File newFile = new File(root, zipEntry.getName());
+                final File newFile = new File(root, zipEntry.getName());
                 if (zipEntry.isDirectory()) {
                     if (!newFile.isDirectory() && !newFile.mkdirs()) {
                         Debug.logError("Failed to create directory " + newFile);
@@ -47,13 +47,13 @@ public final class ExtractStage implements Stage {
                     }
                 } else {
                     // fix for Windows-created archives
-                    File parent = newFile.getParentFile();
+                    final File parent = newFile.getParentFile();
                     if (!parent.isDirectory() && !parent.mkdirs()) {
                         Debug.logError("Failed to create directory " + parent);
                         continue;
                     }
                     // write file content
-                    FileOutputStream fos = new FileOutputStream(newFile);
+                    final FileOutputStream fos = new FileOutputStream(newFile);
                     int len;
                     while ((len = coreZip.read(data)) > 0) {
                         fos.write(data, 0, len);
@@ -68,20 +68,20 @@ public final class ExtractStage implements Stage {
 
             // Re-write main class to runtime class
             Debug.log("Re-writing manifest...");
-            File manifest = new File(root, "META-INF" + File.separator + "MANIFEST.MF");
+            final File manifest = new File(root, "META-INF" + File.separator + "MANIFEST.MF");
             String content = FileIO.readData(manifest);
             content = content.replace("xyz.destiall.caramel.app.Main", "xyz.destiall.caramel.app.MainRuntime");
             FileIO.writeData(manifest, content);
 
-            File pom = new File(root, "META-INF" + File.separator + "maven" + File.separator + "xyz.destiall.gameengine" + File.separator + "build" + File.separator + "pom.xml");
+            final File pom = new File(root, "META-INF" + File.separator + "maven" + File.separator + "xyz.destiall.gameengine" + File.separator + "build" + File.separator + "pom.xml");
             content = FileIO.readData(pom);
             content = content.replace("xyz.destiall.caramel.app.Main", "xyz.destiall.caramel.app.MainRuntime");
             FileIO.writeData(pom, content);
 
             // Copy scenes
             Debug.log("Copying scenes...");
-            JsonArray sceneData = new JsonArray();
-            for (SceneImpl scene : ApplicationImpl.getApp().getSceneLoader().getScenes()) {
+            final JsonArray sceneData = new JsonArray();
+            for (final SceneImpl scene : ApplicationImpl.getApp().getSceneLoader().getScenes()) {
                 ApplicationImpl.getApp().getSceneLoader().saveScene(scene, scene.getFile());
                 FileIO.copy(scene.getFile(), new File(root, scene.getFile().getName()), true);
                 sceneData.add(scene.getFile().getName());
@@ -89,8 +89,8 @@ public final class ExtractStage implements Stage {
 
             // Writing build config
             Debug.log("Writing build configuration...");
-            File config = new File(root, "config.json");
-            JsonObject object = new JsonObject();
+            final File config = new File(root, "config.json");
+            final JsonObject object = new JsonObject();
             object.addProperty("width", ApplicationImpl.getApp().getWidth());
             object.addProperty("height", ApplicationImpl.getApp().getHeight());
             object.addProperty("windowPosX", ApplicationImpl.getApp().getWinPosX());

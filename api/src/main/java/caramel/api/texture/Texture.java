@@ -31,13 +31,13 @@ public final class Texture {
     private transient int texId;
     private String path;
 
-    public Texture(int width, int height) {
+    public Texture(final int width, final int height) {
         this.width = width;
         this.height = height;
         loaded = true;
     }
 
-    public Texture(int width, int height, ByteBuffer buffer) {
+    public Texture(final int width, final int height, final ByteBuffer buffer) {
         this.width = width;
         this.height = height;
         this.buffer = buffer;
@@ -51,7 +51,7 @@ public final class Texture {
         }
     }
 
-    private Texture(String path) {
+    private Texture(final String path) {
         this.path = path;
     }
 
@@ -84,16 +84,16 @@ public final class Texture {
     public boolean buildTexture() {
         if (texId != 0 && !loaded) return false;
 
-        File file = new File(path);
+        final File file = new File(path);
         if (!file.exists()) {
             Debug.logError("Texture file does not exist: " + file.getPath());
             return false;
         }
 
-        IntBuffer width = BufferUtils.createIntBuffer(1);
-        IntBuffer height = BufferUtils.createIntBuffer(1);
-        IntBuffer channels = BufferUtils.createIntBuffer(1);
-        ByteBuffer image = stbi_load(getPath(), width, height, channels, 0);
+        final IntBuffer width = BufferUtils.createIntBuffer(1);
+        final IntBuffer height = BufferUtils.createIntBuffer(1);
+        final IntBuffer channels = BufferUtils.createIntBuffer(1);
+        final ByteBuffer image = stbi_load(getPath(), width, height, channels, 0);
 
         if (image == null) {
             Debug.logError("Unable to load texture: " + getPath());
@@ -154,13 +154,13 @@ public final class Texture {
         return path;
     }
 
-    public void setPath(String path) {
+    public void setPath(final String path) {
         this.path = path;
     }
 
     private static final List<Texture> TEXTURES = new ArrayList<>();
 
-    public static Texture getTexture(String path) {
+    public static Texture getTexture(final String path) {
         Texture texture = TEXTURES.stream().filter(t -> t.getPath().equals(path)).findFirst().orElse(null);
         if (texture == null) {
             texture = new Texture(path);
@@ -178,7 +178,7 @@ public final class Texture {
     }
 
     public static void invalidateAll() {
-        for (Texture t : TEXTURES) {
+        for (final Texture t : TEXTURES) {
             if (t.isLoaded()) {
                 Graphics.get().glDeleteTextures(t.texId);
                 t.texId = 0;

@@ -9,7 +9,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.zip.ZipEntry;
 
 public final class RuntimeScriptManager implements ScriptManager {
     private final File scriptsRootFolder;
@@ -36,10 +35,10 @@ public final class RuntimeScriptManager implements ScriptManager {
     }
 
     @Override
-    public void loadScripts(File folder) {
+    public void loadScripts(final File folder) {
         try {
-            URL url = folder.toURI().toURL();
-            URL[] urls = new URL[]{url};
+            final URL url = folder.toURI().toURL();
+            final URL[] urls = new URL[]{url};
             scriptLoader = new URLClassLoader(urls, getClass().getClassLoader());
         } catch (Exception e) {
             e.printStackTrace();
@@ -48,11 +47,11 @@ public final class RuntimeScriptManager implements ScriptManager {
 
     @Override
     public InternalScript getScript(String name) {
-        Map.Entry<Class<?>, InternalScript> entry = scripts.entrySet().stream().filter(en -> en.getKey().getSimpleName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        final Map.Entry<Class<?>, InternalScript> entry = scripts.entrySet().stream().filter(en -> en.getKey().getSimpleName().equalsIgnoreCase(name)).findFirst().orElse(null);
         if (entry == null) {
             try {
-                Class<?> cls = scriptLoader.loadClass(name);
-                InternalScript internalScript = new InternalScript(cls, null, null);
+                final Class<?> cls = scriptLoader.loadClass(name);
+                final InternalScript internalScript = new InternalScript(cls, null, null);
                 scripts.put(cls, internalScript);
                 return internalScript;
             } catch (ClassNotFoundException e) {
@@ -63,30 +62,17 @@ public final class RuntimeScriptManager implements ScriptManager {
     }
 
     @Override
-    public InternalScript getInternalScript(Class<?> clazz) {
+    public InternalScript getInternalScript(final Class<?> clazz) {
         return scripts.get(clazz);
     }
 
     @Override
-    public InternalScript reloadScript(File file) {
+    public InternalScript reloadScript(final File file) {
         return null;
     }
 
     @Override
-    public InternalScript reloadScript(File file, String contents) {
+    public InternalScript reloadScript(final File file, final String contents) {
         return null;
-    }
-
-    private File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
-        File destFile = new File(destinationDir, zipEntry.getName());
-
-        String destDirPath = destinationDir.getCanonicalPath();
-        String destFilePath = destFile.getCanonicalPath();
-
-        if (!destFilePath.startsWith(destDirPath + File.separator)) {
-            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
-        }
-
-        return destFile;
     }
 }

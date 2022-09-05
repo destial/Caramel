@@ -58,8 +58,8 @@ public final class DebugDraw implements Update, Render {
         Graphics.get().glLineWidth(5.f);
     }
 
-    public void addLine(Vector3f from, Vector3f to, Vector3f color) {
-        DebugLine line = new DebugLine(from, to, color, 1);
+    public void addLine(final Vector3f from, final Vector3f to, final Vector3f color) {
+        final DebugLine line = new DebugLine(from, to, color, 1);
         lines.add(line);
     }
 
@@ -78,13 +78,13 @@ public final class DebugDraw implements Update, Render {
         }
 
         if (lines.isEmpty()) return;
-        int size = lines.size() * 2 * 6;
+        final int size = lines.size() * 2 * 6;
         vertexArray = new float[size];
 
         int index = 0;
-        for (DebugLine line : lines) {
+        for (final DebugLine line : lines) {
             for (int i = 0; i < 2; i++) {
-                Vector3f pos = i == 0 ? line.from : line.to;
+                final Vector3f pos = i == 0 ? line.from : line.to;
                 vertexArray[  index  ] = pos.x;
                 vertexArray[index + 1] = pos.y;
                 vertexArray[index + 2] = pos.z;
@@ -98,7 +98,7 @@ public final class DebugDraw implements Update, Render {
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (lines.isEmpty()) return;
 
         Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vboID);
@@ -110,7 +110,7 @@ public final class DebugDraw implements Update, Render {
         }
 
         shader.attach();
-        Matrix4f vp = camera.getProjection().mul(camera.getView());
+        final Matrix4f vp = camera.getProjection().mul(camera.getView());
         shader.uploadMat4f("uVP", vp);
 
         Graphics.get().glBindVertexArray(vaoID);

@@ -8,35 +8,35 @@ public final class Color implements Copyable<Color> {
 
     public Color() {}
 
-    public Color(Color color) {
+    public Color(final Color color) {
         this.r = color.r;
         this.g = color.g;
         this.b = color.b;
         this.a = color.a;
     }
 
-    public Color(float r, float g, float b, float a) {
+    public Color(final float r, final float g, final float b, final float a) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
     }
 
-    public void set(float r, float g, float b, float a) {
+    public void set(final float r, final float g, final float b, final float a) {
         this.r = r;
         this.g = g;
         this.b = b;
         this.a = a;
     }
 
-    public void set(Color color) {
+    public void set(final Color color) {
         this.r = color.r;
         this.g = color.g;
         this.b = color.b;
         this.a = color.a;
     }
 
-    public static void lerp(Color target, Color from, float delta) {
+    public static void lerp(final Color target, final Color from, final float delta) {
         from.r = Math.fma(target.r - from.r, delta, from.r);
         from.g = Math.fma(target.g - from.g, delta, from.g);
         from.b = Math.fma(target.b - from.b, delta, from.b);

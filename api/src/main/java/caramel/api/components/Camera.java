@@ -28,7 +28,7 @@ public class Camera extends Component {
     @ShowInEditor public boolean perspective = false;
     public float zoom = 1f;
 
-    public Camera(GameObject gameObject) {
+    public Camera(final GameObject gameObject) {
         super(gameObject);
         projection = new Matrix4f();
         view = new Matrix4f();

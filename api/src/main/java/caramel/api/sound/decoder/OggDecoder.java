@@ -11,17 +11,17 @@ import static org.lwjgl.system.MemoryStack.stackPop;
 import static org.lwjgl.system.MemoryStack.stackPush;
 
 public final class OggDecoder extends AudioDecoder {
-    public OggDecoder(String extension) {
+    public OggDecoder(final String extension) {
         super(extension);
     }
 
     @Override
-    public SoundFormat decode(String path) {
+    public SoundFormat decode(final String path) {
         stackPush();
-        IntBuffer channels = stackMallocInt(1);
+        final IntBuffer channels = stackMallocInt(1);
         stackPush();
-        IntBuffer sampleRate = stackMallocInt(1);
-        ShortBuffer rawAudio = stb_vorbis_decode_filename(path, channels, sampleRate);
+        final IntBuffer sampleRate = stackMallocInt(1);
+        final ShortBuffer rawAudio = stb_vorbis_decode_filename(path, channels, sampleRate);
 
         if (rawAudio == null) {
             logError(path);
@@ -30,8 +30,8 @@ public final class OggDecoder extends AudioDecoder {
             return null;
         }
 
-        int c = channels.get();
-        int rate = sampleRate.get();
+        final int c = channels.get();
+        final int rate = sampleRate.get();
 
         stackPop();
         stackPop();

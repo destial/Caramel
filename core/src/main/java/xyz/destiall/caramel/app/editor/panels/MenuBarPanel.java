@@ -4,9 +4,6 @@ import caramel.api.debug.DebugImpl;
 import caramel.api.objects.SceneImpl;
 import caramel.api.render.Shader;
 import imgui.ImGui;
-import imgui.extension.imguifiledialog.ImGuiFileDialog;
-import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
-import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
 import imgui.flag.ImGuiWindowFlags;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
@@ -17,7 +14,7 @@ import java.util.Map;
 
 public final class MenuBarPanel extends Panel {
     private boolean shaderTools = false;
-    public MenuBarPanel(SceneImpl scene) {
+    public MenuBarPanel(final SceneImpl scene) {
         super(scene);
     }
 
@@ -28,33 +25,24 @@ public final class MenuBarPanel extends Panel {
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
             if (ImGui.beginMenu("File")) {
                 if (ImGui.menuItem("New Scene")) {
-                    SceneImpl newScene = ApplicationImpl.getApp().getSceneLoader().newScene();
+                    final SceneImpl newScene = ApplicationImpl.getApp().getSceneLoader().newScene();
                     ApplicationImpl.getApp().setTitle(newScene.name);
                 }
 
                 if (ImGui.menuItem("Open Scene")) {
-                    if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
-                        ImGuiFileDialog.openModal("open-scene", "Open Scene", ".caramel", ".", new ImGuiFileDialogPaneFun() {
-                            @Override
-                            public void paneFun(String filter, long userDatas, boolean canContinue) {
-                            }
-                        }, 250, 1, 42, ImGuiFileDialogFlags.None);
-                    } else {
-                        String path = ImGuiUtils.openFileJava("Open Scene", ".caramel");
-                        if (path != null) {
-                            File file = new File(path);
-                            if (!file.exists()) {
-                                DebugImpl.logError(file.getPath() + " does not exist!");
-                            } else {
-                                if (path.endsWith(".caramel")) {
-                                    if (scene.isPlaying()) scene.stop();
-                                    SceneImpl s = ApplicationImpl.getApp().loadScene(file);
-                                    ApplicationImpl.getApp().setTitle(s.name);
-                                }
+                    final String path = ImGuiUtils.openFileJava("Open Scene", ".caramel");
+                    if (path != null) {
+                        final File file = new File(path);
+                        if (!file.exists()) {
+                            DebugImpl.logError(file.getPath() + " does not exist!");
+                        } else {
+                            if (path.endsWith(".caramel")) {
+                                if (scene.isPlaying()) scene.stop();
+                                final SceneImpl s = ApplicationImpl.getApp().loadScene(file);
+                                ApplicationImpl.getApp().setTitle(s.name);
                             }
                         }
                     }
-
                 }
 
                 if (ImGui.menuItem("Save", "Ctrl + S", false, !scene.isSaved())) {
@@ -63,26 +51,18 @@ public final class MenuBarPanel extends Panel {
                 }
 
                 if (ImGui.menuItem("Save As", "Ctrl + Shift + S")) {
-                    if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
-                        ImGuiFileDialog.openModal("save-scene", "Save Scene As", ".caramel", ".", new ImGuiFileDialogPaneFun() {
-                            @Override
-                            public void paneFun(String filter, long userDatas, boolean canContinue) {
-                            }
-                        }, 250, 1, 42, ImGuiFileDialogFlags.None);
-
-                    } else {
-                        String path = ImGuiUtils.saveFileJava("Save Scene", ".caramel");
-                        if (path != null) {
-                            if (!path.toLowerCase().endsWith(".caramel")) {
-                                path += ".caramel";
-                            }
-                            File file = new File(path);
-                            String fileName = file.getName();
-                            scene.name = fileName.substring(0, file.getName().length() - ".caramel".length());
-                            ApplicationImpl.getApp().saveScene(scene, file);
-                            ApplicationImpl.getApp().setTitle(scene.name);
+                    String path = ImGuiUtils.saveFileJava("Save Scene", ".caramel");
+                    if (path != null) {
+                        if (!path.toLowerCase().endsWith(".caramel")) {
+                            path += ".caramel";
                         }
+                        final File file = new File(path);
+                        final String fileName = file.getName();
+                        scene.name = fileName.substring(0, file.getName().length() - ".caramel".length());
+                        ApplicationImpl.getApp().saveScene(scene, file);
+                        ApplicationImpl.getApp().setTitle(scene.name);
                     }
+
                 }
 
                 ImGui.endMenu();
@@ -107,7 +87,7 @@ public final class MenuBarPanel extends Panel {
             }
 
             if (shaderTools && ImGui.begin("Shader Tools", ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoSavedSettings)) {
-                for (Map.Entry<String, Shader> entry : Shader.getShaders().entrySet()) {
+                for (final Map.Entry<String, Shader> entry : Shader.getShaders().entrySet()) {
                     if (ImGui.button("Recompile")) {
                         entry.getValue().recompile();
                     }
@@ -121,38 +101,13 @@ public final class MenuBarPanel extends Panel {
                 ImGui.end();
             }
 
-            if (ImGuiUtils.USE_IMGUI_FILE_CHOOSER) {
-                if (ImGuiFileDialog.display("save-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
-                    if (ImGuiFileDialog.isOk()) {
-                        File file = new File(ImGuiFileDialog.getFilePathName());
-
-                        String fileName = ImGuiFileDialog.getCurrentFileName();
-                        scene.name = fileName.substring(0, file.getName().length() - ImGuiFileDialog.getCurrentFilter().length());
-                        ApplicationImpl.getApp().saveScene(scene, file);
-                        ApplicationImpl.getApp().setTitle(scene.name);
-                    }
-                    ImGuiFileDialog.close();
-
-                } else if (ImGuiFileDialog.display("open-scene", ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
-                    File file = new File(ImGuiFileDialog.getFilePathName());
-                    if (!file.exists()) {
-                        DebugImpl.logError(file.getPath() + " does not exist!");
-                    } else {
-                        if (scene.isPlaying()) scene.stop();
-                        SceneImpl s = ApplicationImpl.getApp().loadScene(file);
-                        ApplicationImpl.getApp().setTitle(s.name);
-                    }
-                    ImGuiFileDialog.close();
-                }
-            }
-
             if (ImGui.button("Build")) {
                 String path = ImGuiUtils.saveFileJava("Build", ".jar");
                 if (path != null) {
                     if (!path.toLowerCase().endsWith(".jar")) {
                         path += ".jar";
                     }
-                    File out = new File(path);
+                    final File out = new File(path);
                     ((EditorScriptManager) ApplicationImpl.getApp().getScriptManager()).build(out);
                 }
             }

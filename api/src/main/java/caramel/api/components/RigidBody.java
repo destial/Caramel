@@ -22,11 +22,11 @@ public abstract class RigidBody extends Component {
     @InvokeOnEdit("updateBody") public RigidBodyType bodyType = RigidBodyType.DYNAMIC;
 
 
-    public RigidBody(GameObject gameObject) {
+    public RigidBody(final GameObject gameObject) {
         super(gameObject);
     }
 
-    public abstract void _setPosition(float x, float y, float z);
+    public abstract void _setPosition(final float x, final float y, final float z);
 
     protected abstract void updateBody();
 }

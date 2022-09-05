@@ -10,6 +10,7 @@ import caramel.api.graphics.Graphics;
 import caramel.api.graphics.opengl.OpenGL30;
 import caramel.api.scripts.ScriptManager;
 import caramel.api.sound.decoder.AudioDecoder;
+import caramel.api.utils.SystemIO;
 import xyz.destiall.caramel.app.editor.EditorSceneLoader;
 import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
@@ -58,6 +59,7 @@ import xyz.destiall.java.gson.JsonObject;
 import xyz.destiall.java.timer.Scheduler;
 import xyz.destiall.java.timer.Task;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -109,7 +111,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 public final class ApplicationImpl extends Application implements Runnable {
     public boolean EDITOR_MODE = true;
-    private boolean running = false;
+    private boolean running = true;
 
     private final MouseListenerImpl mouseListener;
     private final KeyListenerImpl keyListener;
@@ -174,8 +176,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     @Override
     public void run() {
         setup();
-        init();
-        loop();
+        if (init()) loop();
         destroy();
     }
 
@@ -185,7 +186,7 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         try {
             if (EDITOR_MODE) {
-                File settings = new File("settings.json");
+                final File settings = new File("settings.json");
                 JsonObject object = new JsonObject();
                 if (settings.createNewFile()) {
                     object.addProperty("width", width = 1920);
@@ -208,7 +209,7 @@ public final class ApplicationImpl extends Application implements Runnable {
                     winPosX = object.get("windowPosX").getAsInt();
                     winPosY = object.get("windowPosY").getAsInt();
                     lastScenes = new ArrayList<>();
-                    JsonElement element = object.get("lastScene");
+                    final JsonElement element = object.get("lastScene");
                     if (element.isJsonArray()) {
                         JsonArray array = element.getAsJsonArray();
                         for (JsonElement loc : array) {
@@ -216,14 +217,13 @@ public final class ApplicationImpl extends Application implements Runnable {
                         }
                     } else {
                         // Legacy compatibility
-
-                        String loc = element.getAsString();
+                        final String loc = element.getAsString();
                         lastScenes.add(loc);
                     }
                     fullscreen = object.has("fullscreen") && object.get("fullscreen").getAsBoolean();
                 }
 
-                File assets = new File("assets" + File.separator);
+                final File assets = new File("assets" + File.separator);
                 if (!assets.exists() && assets.mkdir()) {
                     new File(assets, "models" + File.separator).mkdirs();
                     new File(assets, "textures" + File.separator).mkdirs();
@@ -234,16 +234,16 @@ public final class ApplicationImpl extends Application implements Runnable {
                     FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
                 }
 
-                File imgui = new File("imgui.ini");
+                final File imgui = new File("imgui.ini");
                 if (!imgui.exists()) {
                     FileIO.saveResource("imgui.ini", "imgui.ini");
                 }
             } else {
                 fullscreen = true;
-                String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-                File source = new File(path);
+                final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+                final File source = new File(path);
 
-                File config = new File("config.json");
+                final File config = new File("config.json");
                 JsonObject object;
                 if (config.exists()) {
                     object = serializer.fromJson(FileIO.readData(config), JsonObject.class);
@@ -254,24 +254,24 @@ public final class ApplicationImpl extends Application implements Runnable {
                 height = object.get("height").getAsInt();
                 winPosX = object.get("windowPosX").getAsInt();
                 winPosY = object.get("windowPosY").getAsInt();
-                JsonArray array = object.get("scenes").getAsJsonArray();
+                final JsonArray array = object.get("scenes").getAsJsonArray();
                 lastScenes = new ArrayList<>();
                 for (JsonElement loc : array) {
                     lastScenes.add(loc.getAsString());
                 }
 
-                File assets = new File("assets" + File.separator);
+                final File assets = new File("assets" + File.separator);
                 if (!assets.exists() && assets.mkdir()) {
                     FileIO.extract(source, FileIO.ROOT_FILE, "assets");
                 }
             }
 
-            File logo16 = new File("logo_16.png");
+            final File logo16 = new File("logo_16.png");
             if (!logo16.exists()) {
                 FileIO.saveResource("logo_16.png", "logo_16.png");
             }
 
-            File logo32 = new File("logo_32.png");
+            final File logo32 = new File("logo_32.png");
             if (!logo32.exists()) {
                 FileIO.saveResource("logo_32.png", "logo_32.png");
             }
@@ -280,7 +280,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         }
     }
 
-    private void init() {
+    private boolean init() {
         DebugImpl.log("Loading Editor");
         Graphics.set(new OpenGL30());
 
@@ -300,18 +300,18 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         // Create window icons
         try {
-            ByteBuffer[] list = new ByteBuffer[2];
-            IntBuffer width16 = BufferUtils.createIntBuffer(1);
-            IntBuffer height16 = BufferUtils.createIntBuffer(1);
-            IntBuffer channels16 = BufferUtils.createIntBuffer(1);
+            final ByteBuffer[] list = new ByteBuffer[2];
+            final IntBuffer width16 = BufferUtils.createIntBuffer(1);
+            final IntBuffer height16 = BufferUtils.createIntBuffer(1);
+            final IntBuffer channels16 = BufferUtils.createIntBuffer(1);
             list[0] = stbi_load("logo_16.png", width16, height16, channels16, 0);
 
-            IntBuffer width32 = BufferUtils.createIntBuffer(1);
-            IntBuffer height32 = BufferUtils.createIntBuffer(1);
-            IntBuffer channels32 = BufferUtils.createIntBuffer(1);
+            final IntBuffer width32 = BufferUtils.createIntBuffer(1);
+            final IntBuffer height32 = BufferUtils.createIntBuffer(1);
+            final IntBuffer channels32 = BufferUtils.createIntBuffer(1);
             list[1] = stbi_load("logo_32.png", width32, height32, channels32, 0);
 
-            GLFWImage.Buffer icons = GLFWImage.malloc(2);
+            final GLFWImage.Buffer icons = GLFWImage.malloc(2);
             if (list[0] != null && list[1] != null) {
                 icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
                 icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
@@ -356,9 +356,9 @@ public final class ApplicationImpl extends Application implements Runnable {
         });
 
         // Create audio handler
-        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+        final String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
         audioDevice = alcOpenDevice(defaultDeviceName);
-        int[] attributes = {0};
+        final int[] attributes = {0};
         audioContext = alcCreateContext(audioDevice, attributes);
         alcMakeContextCurrent(audioContext);
 
@@ -366,8 +366,8 @@ public final class ApplicationImpl extends Application implements Runnable {
         GL.createCapabilities();
 
         // Create OpenAL capabilities
-        ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
-        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+        final ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+        final ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
         if (!alCapabilities.OpenAL10) {
             Debug.logError("Audio AL10 library not supported!");
         } else {
@@ -379,17 +379,10 @@ public final class ApplicationImpl extends Application implements Runnable {
         Graphics.get().glEnable(GL_BLEND);
         Graphics.get().glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Setup script manager
-        if (EDITOR_MODE) {
-            scriptManager = new EditorScriptManager();
-            listeners.add((EditorScriptManager) scriptManager);
-        } else {
-            scriptManager = new RuntimeScriptManager();
-        }
-
-        // Register event listeners
-        for (Listener listener : listeners) {
-            eventHandler.registerListener(listener);
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // Create and setup ImGUI
@@ -401,21 +394,41 @@ public final class ApplicationImpl extends Application implements Runnable {
         framebuffer[0] = new Framebuffer(this.width, this.height);
         framebuffer[1] = new Framebuffer(this.width, this.height);
 
-        // Load all the scripts
-        scriptManager.reloadAll();
+        // Setup script manager
+        if (EDITOR_MODE) {
+            scriptManager = new EditorScriptManager();
+            if (!((EditorScriptManager)scriptManager).canLoad()) {
+                SystemIO.showPopupMessage("Error", "You are not running a JDK version! Currently running JRE " + SystemIO.getJavaVersion() + ". Exiting...", "Exit");
+                return false;
+            } else {
+                listeners.add((EditorScriptManager) scriptManager);
+            }
+        } else {
+            scriptManager = new RuntimeScriptManager();
+        }
 
         // Load all built-in components
         if (EDITOR_MODE) {
-            Reflections reflections = new Reflections("caramel.api");
-            Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
-            List<Class<? extends Component>> sorted = new ArrayList<>(set);
+            final Reflections reflections = new Reflections("caramel.api");
+            final Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
+            final List<Class<? extends Component>> sorted = new ArrayList<>(set);
             sorted.sort(Comparator.comparing(Class::getName));
-            for (Class<? extends Component> c : sorted) {
+            for (final Class<? extends Component> c : sorted) {
                 if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
                 if (c == Transform.class || c == EditorCamera.class || c == UICamera.class) continue;
                 Payload.COMPONENTS.add(c);
             }
         }
+
+        // Register event listeners
+        for (final Listener listener : listeners) {
+            eventHandler.registerListener(listener);
+        }
+
+        // Load all the scripts
+        scriptManager.reloadAll();
+
+        return true;
     }
 
     private void loop() {
@@ -426,9 +439,9 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         // Create the scene
         SceneImpl scene = null;
-        String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
-        File source = new File(path);
-        for (String data : lastScenes) {
+        final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+        final File source = new File(path);
+        for (final String data : lastScenes) {
             SceneImpl loaded = null;
             if (EDITOR_MODE) {
                 File file = new File(data);
@@ -453,16 +466,14 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         DebugImpl.log("Opening scene " + scene.name);
 
-        running = true;
-
         if (!EDITOR_MODE) {
             scene.play();
         }
 
         setTitle(scene.name);
 
-        Task task = scheduler.runTaskInterval(System::gc, 10000, 10000);
-
+        final Task task = scheduler.runTaskInterval(System::gc, 10000, 10000);
+        float delta = 0;
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
             if (Time.isSecond) {
@@ -472,7 +483,7 @@ public final class ApplicationImpl extends Application implements Runnable {
             if (process()) break;
 
             endTime = (float) glfwGetTime();
-            float delta = endTime - startTime;
+            delta = endTime - startTime;
             if (delta <= 0) continue;
 
             Time.deltaTime = delta;
@@ -488,7 +499,7 @@ public final class ApplicationImpl extends Application implements Runnable {
             }
         }
 
-        for (SceneImpl s : sceneLoader.getScenes()) {
+        for (final SceneImpl s : sceneLoader.getScenes()) {
             if (s.isPlaying()) {
                 s.stop();
             }
@@ -500,7 +511,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     private boolean process() {
-        SceneImpl scene = getCurrentScene();
+        final SceneImpl scene = getCurrentScene();
         if (scene == null) return true;
 
         glfwPollEvents();
@@ -538,7 +549,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         } else {
             Graphics.get().glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
             Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            for (Camera camera : scene.getGameCameras()) {
+            for (final Camera camera : scene.getGameCameras()) {
                 if (!camera.gameObject.active) continue;
                 scene.render(camera);
             }
@@ -571,8 +582,8 @@ public final class ApplicationImpl extends Application implements Runnable {
     private void destroy() {
         // Save settings
         if (EDITOR_MODE) {
-            File settings = new File("settings.json");
-            JsonObject object = new JsonObject();
+            final File settings = new File("settings.json");
+            final JsonObject object = new JsonObject();
             object.addProperty("width", width);
             object.addProperty("height", height);
             object.addProperty("windowPosX", winPosX);
@@ -597,7 +608,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         scriptManager.destroy();
 
         // Unregister any remaining listeners
-        for (Listener listener : listeners) {
+        for (final Listener listener : listeners) {
             eventHandler.unregisterListener(listener);
         }
 

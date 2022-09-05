@@ -67,7 +67,7 @@ public final class ImGUILayer {
     public static final Vector4f PRIMARY_COLOR = new Vector4f(255 / 255f, 137 / 256f, 2 / 256f, 1.f);
     public static final Vector4f TERTIARY_COLOR = new Vector4f(102 / 255f, 54 / 256f, 0 / 256f, 0.5f);
 
-    public ImGUILayer(ApplicationImpl window) {
+    public ImGUILayer(final ApplicationImpl window) {
         this.window = window;
         this.glfwWindow = window.glfwWindow;
     }
@@ -181,7 +181,7 @@ public final class ImGUILayer {
     public void update() {
         startFrame(Time.deltaTime);
 
-        boolean recompiling = window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling();
+        final boolean recompiling = window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling();
         if (!window.isFullScreen()) {
             setupDockspace();
             if (recompiling) {
@@ -200,8 +200,8 @@ public final class ImGUILayer {
                     ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize |
                     ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove |
                     ImGuiWindowFlags.NoMouseInputs)) {
-                float width = ImGui.getWindowWidth();
-                float height = ImGui.getWindowWidth();
+                final float width = ImGui.getWindowWidth();
+                final float height = ImGui.getWindowWidth();
                 ImGui.setWindowPos((
                         ApplicationImpl.getApp().getWidth() / 2f) - (width / 2f),
                         (ApplicationImpl.getApp().getHeight() / 2f) - height / 2f);
@@ -214,10 +214,10 @@ public final class ImGUILayer {
     }
 
     private void startFrame(final float deltaTime) {
-        float[] winWidth = { ApplicationImpl.getApp().getWidth() };
-        float[] winHeight = { ApplicationImpl.getApp().getHeight() };
-        double[] mousePosX = { 0 };
-        double[] mousePosY = { 0 };
+        final float[] winWidth = { ApplicationImpl.getApp().getWidth() };
+        final float[] winHeight = { ApplicationImpl.getApp().getHeight() };
+        final double[] mousePosX = { 0 };
+        final double[] mousePosY = { 0 };
         glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
 
         final ImGuiIO io = ImGui.getIO();
@@ -265,7 +265,7 @@ public final class ImGUILayer {
     }
 
     private void setupDockspace() {
-        int windowFlags =
+        final int windowFlags =
                 ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBringToFrontOnFocus |

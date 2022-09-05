@@ -45,6 +45,10 @@ public final class ScriptLoader {
         this.scriptManager = scriptManager;
     }
 
+    public boolean canLoad() {
+        return compiler != null;
+    }
+
     public InternalScript get(String name) {
         Map.Entry<String, ScriptClassLoader> entry = loaders.entrySet().stream().filter(en -> en.getKey().endsWith(name)).findFirst().orElse(null);
         if (entry == null) return null;

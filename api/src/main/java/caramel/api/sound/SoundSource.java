@@ -19,20 +19,20 @@ public final class SoundSource {
     private transient final Set<Sound> sounds;
     transient int bufferId = -1;
 
-    private SoundSource(String path) {
+    private SoundSource(final String path) {
         this.path = path;
         sounds = ConcurrentHashMap.newKeySet();
     }
 
     public boolean build() {
         if (bufferId != -1) return true;
-        String fileFormat = path.substring(path.lastIndexOf(".")).toLowerCase();
-        AudioDecoder decoder = AudioDecoder.getDecoder(fileFormat);
+        final String fileFormat = path.substring(path.lastIndexOf(".")).toLowerCase();
+        final AudioDecoder decoder = AudioDecoder.getDecoder(fileFormat);
         if (decoder == null) {
             Debug.logError("Unsupported audio file type: " + fileFormat);
             return false;
         }
-        SoundFormat format = decoder.decode(path);
+        final SoundFormat format = decoder.decode(path);
         if (format == null) {
             Debug.logError("Unable to read audio file: " + path);
             return false;
@@ -58,13 +58,13 @@ public final class SoundSource {
                 return null;
             }
         }
-        Sound sound = new Sound(this);
+        final Sound sound = new Sound(this);
         sounds.add(sound);
         return sound;
     }
 
     public void invalidate() {
-        for (Sound sound : sounds) {
+        for (final Sound sound : sounds) {
             sound.invalidate();
         }
         sounds.clear();
@@ -77,8 +77,8 @@ public final class SoundSource {
     private final static Map<String, SoundSource> SOURCES = new ConcurrentHashMap<>();
 
     public static void invalidateAll() {
-        for (SoundSource source : SOURCES.values()) {
-            for (Sound sound : source.sounds) {
+        for (final SoundSource source : SOURCES.values()) {
+            for (final Sound sound : source.sounds) {
                 sound.invalidate();
             }
             source.sounds.clear();
@@ -88,7 +88,7 @@ public final class SoundSource {
         SOURCES.clear();
     }
 
-    public static SoundSource getSource(String path) {
+    public static SoundSource getSource(final String path) {
         SoundSource source = SOURCES.get(path);
         if (source == null) {
             source = new SoundSource(path);
@@ -98,7 +98,7 @@ public final class SoundSource {
         return source;
     }
 
-    public void invalidate(Sound sound) {
+    public void invalidate(final Sound sound) {
         if (sounds.remove(sound)) {
             sound.invalidate();
         }

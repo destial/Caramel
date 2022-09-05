@@ -1,10 +1,10 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
-import caramel.api.components.VisualScript;
+import caramel.api.components.Blueprint;
 
 public class StringGraphNode extends GraphNode<String> {
     public String value = "string";
-    public StringGraphNode(int nodeId) {
+    public StringGraphNode(final int nodeId) {
         super(nodeId);
     }
 
@@ -14,12 +14,12 @@ public class StringGraphNode extends GraphNode<String> {
     }
 
     @Override
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 
     @Override
-    public boolean execute(VisualScript script, Graph graph) {
+    public boolean execute(final Blueprint script, final Graph graph) {
         return false;
     }
 }

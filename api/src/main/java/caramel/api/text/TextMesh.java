@@ -33,7 +33,7 @@ public final class TextMesh {
     private int size = 0;
     private TextFont font;
 
-    public void setFont(TextFont font) {
+    public void setFont(final TextFont font) {
         this.font = font;
     }
 
@@ -46,14 +46,14 @@ public final class TextMesh {
         Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vbo);
         Graphics.get().glBufferData(GL_ARRAY_BUFFER, Float.BYTES * VERTEX_SIZE * BATCH_SIZE, GL_DYNAMIC_DRAW);
 
-        int elementSize = BATCH_SIZE * 3;
-        int[] elementBuffer = new int[elementSize];
-        int[] indices = {
+        final int elementSize = BATCH_SIZE * 3;
+        final int[] elementBuffer = new int[elementSize];
+        final int[] indices = {
                 0, 1, 3,
                 1, 2, 3
         };
 
-        for (int i=0; i < elementSize; i++) {
+        for (int i = 0; i < elementSize; i++) {
             elementBuffer[i] = indices[(i % 6)] + ((i / 6) * 4);
         }
 
@@ -61,7 +61,7 @@ public final class TextMesh {
         Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         Graphics.get().glBufferData(GL_ELEMENT_ARRAY_BUFFER, elementBuffer, GL_STATIC_DRAW);
 
-        int stride = VERTEX_SIZE * Float.BYTES;
+        final int stride = VERTEX_SIZE * Float.BYTES;
         Graphics.get().glVertexAttribPointer(0, 2, GL_FLOAT, false, stride, 0);
         Graphics.get().glEnableVertexAttribArray(0);
 
@@ -82,7 +82,7 @@ public final class TextMesh {
         }
     }
 
-    public void render(Transform transform, Camera camera) {
+    public void render(final Transform transform, final Camera camera) {
         shader.attach();
         Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, vbo);
         Graphics.get().glBufferSubData(GL_ARRAY_BUFFER, 0, vertices);
@@ -91,7 +91,7 @@ public final class TextMesh {
         Graphics.get().glBindTexture(GL_TEXTURE_2D, font.texture.getTexId());
         shader.uploadTexture("texSampler", 0);
 
-        Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
+        final Matrix4f mvp = camera.getProjection().mul(camera.getView()).mul(transform.getModel());
         shader.uploadMat4f("uMVP", mvp);
 
         Graphics.get().glBindVertexArray(vao);
@@ -116,11 +116,11 @@ public final class TextMesh {
         shader.detach();
     }
 
-    public void setColor(Color color) {
+    public void setColor(final Color color) {
         this.color = color;
     }
 
-    public boolean addCharacter(float x, float y, CharInfo charInfo) {
+    public boolean addCharacter(final float x, final float y, final CharInfo charInfo) {
         // If we have no more room in the current batch, flush it and start with a fresh batch
         if (size >= BATCH_SIZE - 4) {
             return false;
@@ -136,13 +136,13 @@ public final class TextMesh {
             b = color.b;
         }
 
-        float x1 = x + charInfo.width;
-        float y1 = y + charInfo.height;
+        final float x1 = x + charInfo.width;
+        final float y1 = y + charInfo.height;
 
-        float ux0 = charInfo.textureCoordinates[0].x;
-        float uy0 = charInfo.textureCoordinates[0].y;
-        float ux1 = charInfo.textureCoordinates[1].x;
-        float uy1 = charInfo.textureCoordinates[1].y;
+        final float ux0 = charInfo.textureCoordinates[0].x;
+        final float uy0 = charInfo.textureCoordinates[0].y;
+        final float ux1 = charInfo.textureCoordinates[1].x;
+        final float uy1 = charInfo.textureCoordinates[1].y;
 
         int index = size * VERTEX_SIZE;
         vertices[index] = x1;      vertices[index + 1] = y;
@@ -168,12 +168,12 @@ public final class TextMesh {
         return true;
     }
 
-    public void addText(String text) {
+    public void addText(final String text) {
         float length = 0;
         float height = 0;
-        for (int i=0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            CharInfo charInfo = font.getCharacter(c);
+        for (int i = 0; i < text.length(); i++) {
+            final char c = text.charAt(i);
+            final CharInfo charInfo = font.getCharacter(c);
             if (charInfo.width == 0) {
                 Debug.console("Unknown character " + c);
                 continue;
@@ -185,13 +185,13 @@ public final class TextMesh {
         float x = -length / 2;
         float y = -height / 4;
         for (int i = 0; i < text.length(); i++) {
-            char c = text.charAt(i);
-            CharInfo charInfo = font.getCharacter(c);
+            final char c = text.charAt(i);
+            final CharInfo charInfo = font.getCharacter(c);
             if (charInfo.width == 0) {
                 Debug.console("Unknown character " + c);
                 continue;
             }
-            float xPos = x;
+            final float xPos = x;
             addCharacter(xPos, y, charInfo);
             x += charInfo.width;
 

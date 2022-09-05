@@ -12,7 +12,7 @@ import java.util.Objects;
 public final class FileEvent extends Event {
     private final File file;
     private final Type type;
-    public FileEvent(File file, Type type) {
+    public FileEvent(final File file, final Type type) {
         super(false);
         this.file = file;
         this.type = type;
@@ -27,7 +27,7 @@ public final class FileEvent extends Event {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         FileEvent event = (FileEvent) o;

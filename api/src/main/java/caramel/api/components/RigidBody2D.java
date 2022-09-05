@@ -24,12 +24,12 @@ public final class RigidBody2D extends RigidBody {
 
     public transient Fixture fixture;
 
-    public RigidBody2D(GameObject gameObject) {
+    public RigidBody2D(final GameObject gameObject) {
         super(gameObject);
     }
 
     @Override
-    public void _setPosition(float x, float y, float z) {
+    public void _setPosition(final float x, final float y, final float z) {
         if (rawBody == null) return;
         rawBody.setTransform(new Vec2(x, y), rawBody.getAngle());
         // transform.setPosition(x, y, z);
@@ -56,7 +56,7 @@ public final class RigidBody2D extends RigidBody {
                 rawBody.setType(BodyType.DYNAMIC);
                 break;
         }
-        MassData massData = new MassData();
+        final MassData massData = new MassData();
         fixture.getMassData(massData);
         massData.mass = mass;
         rawBody.setMassData(massData);
@@ -68,35 +68,35 @@ public final class RigidBody2D extends RigidBody {
         circle2DCollider = getComponent(Circle2DCollider.class);
     }
 
-    public void setVelocity(float x, float y) {
+    public void setVelocity(final float x, final float y) {
         this.velocity.set(x, y);
         if (rawBody == null) return;
         rawBody.setLinearVelocity(velocity.getJbox2d());
     }
 
-    public void setVelocity(Vector2 vel) {
+    public void setVelocity(final Vector2 vel) {
         this.velocity.set(vel.x(), vel.y());
         if (rawBody == null) return;
         rawBody.setLinearVelocity(velocity.getJbox2d());
     }
 
-    public void addVelocity(float x, float y) {
+    public void addVelocity(final float x, final float y) {
         if (rawBody == null) return;
         Vec2 vel = rawBody.getLinearVelocity();
         rawBody.setLinearVelocity(vel.addLocal(x, y));
     }
 
-    public void addForce(float x, float y) {
+    public void addForce(final float x, final float y) {
         if (rawBody == null) return;
         rawBody.applyForceToCenter(new Vec2(x, y));
     }
 
-    public void addForce(Vector2 force) {
+    public void addForce(final Vector2 force) {
         if (rawBody == null) return;
         rawBody.applyForceToCenter(force.getJbox2d());
     }
 
-    public void setForce(Vector2 force) {
+    public void setForce(final Vector2 force) {
         if (rawBody == null) return;
         rawBody.m_force.set(force.x(), force.y());
     }
@@ -115,15 +115,15 @@ public final class RigidBody2D extends RigidBody {
 
     public boolean isOnGround() {
         if (rawBody == null) return false;
-        Vec2 raycastStart = new Vec2(transform.position.x, transform.position.y);
+        final Vec2 raycastStart = new Vec2(transform.position.x, transform.position.y);
         if (box2DCollider != null) {
             raycastStart.y -= box2DCollider.useScale ? transform.scale.y * 0.5f : box2DCollider.bounds.y() * 0.5f;
         } else if (circle2DCollider != null) {
             raycastStart.y -= circle2DCollider.radius;
         }
-        Vec2 raycastEnd = new Vec2(raycastStart);
+        final Vec2 raycastEnd = new Vec2(raycastStart);
         raycastEnd.y -= 0.1f;
-        RaycastInfo2D raycastInfo = new RaycastInfo2D(gameObject);
+        final RaycastInfo2D raycastInfo = new RaycastInfo2D(gameObject);
         rawBody.m_world.raycast(raycastInfo, raycastStart, raycastEnd);
         return raycastInfo.hit;
     }

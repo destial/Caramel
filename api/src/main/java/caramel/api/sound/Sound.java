@@ -30,7 +30,7 @@ public final class Sound implements Copyable<Sound> {
     private boolean loop = false;
     private float volume = 0f;
 
-    Sound(SoundSource source) {
+    Sound(final SoundSource source) {
         this.source = source;
 
         sourceId = alGenSources();
@@ -40,7 +40,7 @@ public final class Sound implements Copyable<Sound> {
         setVolume(0.1f);
     }
 
-    public void setVolume(float volume) {
+    public void setVolume(final float volume) {
         this.volume = volume;
         alSourcef(sourceId, AL_GAIN, volume);
     }
@@ -53,12 +53,12 @@ public final class Sound implements Copyable<Sound> {
         return loop;
     }
 
-    public void setLoop(boolean loop) {
+    public void setLoop(final boolean loop) {
         this.loop = loop;
         alSourcei(sourceId, AL_LOOPING, loop ? 1 : 0);
     }
 
-    public void setPosition(int pos) {
+    public void setPosition(final int pos) {
         alSourcei(sourceId, AL_POSITION, pos);
     }
 
@@ -78,7 +78,7 @@ public final class Sound implements Copyable<Sound> {
         play(false);
     }
 
-    public void play(boolean cont) {
+    public void play(final boolean cont) {
         if (!cont) setPosition(0);
         alSourcef(sourceId, AL_GAIN, volume);
         alSourcePlay(sourceId);
@@ -111,11 +111,11 @@ public final class Sound implements Copyable<Sound> {
         alDeleteSources(sourceId);
     }
 
-    public void setLocation(@Nullable Transform transform) {
+    public void setLocation(@Nullable final Transform transform) {
         alSource3f(sourceId, AL_POSITION, transform == null ? 0f : transform.position.x, transform == null ? 0f : transform.position.y, transform == null ? 0f : transform.position.z);
     }
 
-    public void setListener(@Nullable AudioListener listener) {
+    public void setListener(@Nullable final AudioListener listener) {
         float x = listener == null ? 0f : listener.transform.position.x + listener.offset.x;
         float y = listener == null ? 0f : listener.transform.position.y + listener.offset.y;
         float z = listener == null ? 0f : listener.transform.position.z + listener.offset.z;

@@ -9,7 +9,7 @@ import org.jbox2d.dynamics.contacts.Contact;
 public final class ContactPoint2D {
     private final Contact contact;
     private final RigidBody2D a, b;
-    public ContactPoint2D(RigidBody2D a, RigidBody2D b, Contact contact) {
+    public ContactPoint2D(final RigidBody2D a, final RigidBody2D b, final Contact contact) {
         this.a = a;
         this.b = b;
         this.contact = contact;

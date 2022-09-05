@@ -7,7 +7,7 @@ import java.io.File;
 public class CleanStage implements Stage {
     private final File output;
 
-    public CleanStage(File output) {
+    public CleanStage(final File output) {
         this.output = output;
     }
 

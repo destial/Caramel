@@ -31,7 +31,7 @@ public final class FileWatcher implements Runnable {
     private Task watchTask;
     private WatchService watcher;
 
-    public FileWatcher(File folder) {
+    public FileWatcher(final File folder) {
         this.folder = folder;
         scheduler = new Scheduler();
         try {
@@ -52,7 +52,7 @@ public final class FileWatcher implements Runnable {
         scheduler.cancelAll();
     }
 
-    private void register(Path dir) throws IOException {
+    private void register(final Path dir) throws IOException {
         if (keyMap.containsValue(dir)) {
             keyMap.entrySet().removeIf(en -> {
                 if (en.getValue().equals(dir)) {
@@ -62,11 +62,11 @@ public final class FileWatcher implements Runnable {
                 return false;
             });
         }
-        WatchKey key = dir.register(watcher,  StandardWatchEventKinds.ENTRY_CREATE,  StandardWatchEventKinds.ENTRY_DELETE,  StandardWatchEventKinds.ENTRY_MODIFY);
+        final WatchKey key = dir.register(watcher,  StandardWatchEventKinds.ENTRY_CREATE,  StandardWatchEventKinds.ENTRY_DELETE,  StandardWatchEventKinds.ENTRY_MODIFY);
         keyMap.put(key, dir);
     }
 
-    private void registerAll(Path path) throws IOException {
+    private void registerAll(final Path path) throws IOException {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
             @Override
             public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
@@ -83,28 +83,28 @@ public final class FileWatcher implements Runnable {
     @Override
     public void run() {
         try {
-            Path path = Paths.get(folder.getAbsolutePath());
+            final Path path = Paths.get(folder.getAbsolutePath());
             registerAll(path);
             for (;;) {
-                Set<String> polled = new HashSet<>();
+                final Set<String> polled = new HashSet<>();
                 WatchKey watchKey;
                 try {
                      watchKey = watcher.take();
                 } catch (InterruptedException e) {
                     return;
                 }
-                Path eventDir = keyMap.get(watchKey);
+                final Path eventDir = keyMap.get(watchKey);
                 if (eventDir == null || !eventDir.toFile().exists()) return;
-                for (WatchEvent<?> event : watchKey.pollEvents()) {
-                    WatchEvent.Kind<?> kind = event.kind();
-                    Path eventPath = (Path) event.context();
-                    File toFile = eventPath.toFile();
+                for (final WatchEvent<?> event : watchKey.pollEvents()) {
+                    final WatchEvent.Kind<?> kind = event.kind();
+                    final Path eventPath = (Path) event.context();
+                    final File toFile = eventPath.toFile();
                     FileEvent fileEvent;
                     if (polled.add(toFile.getPath())) {
                         if (kind == StandardWatchEventKinds.ENTRY_CREATE) {
                             fileEvent = new FileEvent(toFile, FileEvent.Type.CREATE);
                             try {
-                                Path child = eventDir.resolve(eventPath);
+                                final Path child = eventDir.resolve(eventPath);
                                 if (Files.isDirectory(child, LinkOption.NOFOLLOW_LINKS)) {
                                     registerAll(child);
                                 }

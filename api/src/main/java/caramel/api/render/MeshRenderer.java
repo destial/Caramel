@@ -15,13 +15,13 @@ public final class MeshRenderer extends Renderer {
     private static final Set<Mesh> meshes = new HashSet<>();
 
     public static void invalidateAll() {
-        for (Mesh mesh : meshes) {
+        for (final Mesh mesh : meshes) {
             mesh.invalidate();
         }
         meshes.clear();
     }
 
-    public static void addMesh(Mesh mesh) {
+    public static void addMesh(final Mesh mesh) {
         meshes.add(mesh);
     }
 
@@ -29,12 +29,12 @@ public final class MeshRenderer extends Renderer {
     @ShowInEditor public final Color color = new Color(1f, 1f, 1f, 1f);
     public Mesh mesh;
 
-    public MeshRenderer(GameObject gameObject) {
+    public MeshRenderer(final GameObject gameObject) {
         super(gameObject);
         mesh = new QuadMesh();
     }
 
-    public MeshRenderer(GameObject gameObject, Mesh mesh) {
+    public MeshRenderer(final GameObject gameObject, final Mesh mesh) {
         super(gameObject);
         this.mesh = mesh;
         mesh.build();
@@ -52,13 +52,13 @@ public final class MeshRenderer extends Renderer {
         mesh.setColor(color);
     }
 
-    public void setMesh(Mesh mesh) {
+    public void setMesh(final Mesh mesh) {
         this.mesh = mesh;
         setColor();
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (mesh != null) {
             if (BatchRenderer.USE_BATCH) {
                 mesh.renderBatch(transform, camera);
@@ -72,8 +72,8 @@ public final class MeshRenderer extends Renderer {
     public void start() {}
 
     @Override
-    public MeshRenderer clone(GameObject gameObject, boolean copyId) {
-        MeshRenderer clone = (MeshRenderer) super.clone(gameObject, copyId);
+    public MeshRenderer clone(final GameObject gameObject, final boolean copyId) {
+        final MeshRenderer clone = (MeshRenderer) super.clone(gameObject, copyId);
         clone.mesh = mesh.copy();
         return clone;
     }

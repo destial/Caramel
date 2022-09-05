@@ -21,7 +21,7 @@ public abstract class Application {
 
     public abstract Scheduler getScheduler();
 
-    public abstract void setTitle(String title);
+    public abstract void setTitle(final String title);
 
     public abstract int getHeight();
 
@@ -29,19 +29,19 @@ public abstract class Application {
 
     public abstract Scene getCurrentScene();
 
-    public abstract Scene loadScene(File file);
+    public abstract Scene loadScene(final File file);
 
-    public abstract Scene loadScene(int index);
+    public abstract Scene loadScene(final int index);
 
     public abstract void saveCurrentScene();
 
-    public abstract void saveScene(Scene scene, File file);
+    public abstract void saveScene(final Scene scene, final File file);
 
     public abstract void saveAllScenes();
 
     public abstract boolean isRunning();
 
-    public abstract void setRunning(boolean run);
+    public abstract void setRunning(final boolean run);
 
     public abstract ScriptManager getScriptManager();
 

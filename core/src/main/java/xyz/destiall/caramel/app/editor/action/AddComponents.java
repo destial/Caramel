@@ -8,9 +8,9 @@ import java.util.List;
 
 public final class AddComponents extends EditorAction {
     private final GameObject gameObject;
-    public List<Component> added;
+    public final List<Component> added;
 
-    public AddComponents(GameObject gameObject) {
+    public AddComponents(final GameObject gameObject) {
         super(gameObject.scene);
         this.gameObject = gameObject;
         this.added = new ArrayList<>();
@@ -19,7 +19,7 @@ public final class AddComponents extends EditorAction {
     @Override
     public void undo() {
         if (action == PreviousAction.UNDO) return;
-        for (Component a : added) {
+        for (final Component a : added) {
             gameObject.removeComponent(a.getClass());
         }
         action = PreviousAction.UNDO;
@@ -28,7 +28,7 @@ public final class AddComponents extends EditorAction {
     @Override
     public void redo() {
         if (action == PreviousAction.REDO) return;
-        for (Component a : added) {
+        for (final Component a : added) {
             gameObject.addComponent(a);
         }
         action = PreviousAction.REDO;

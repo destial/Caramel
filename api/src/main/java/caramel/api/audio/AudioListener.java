@@ -9,7 +9,7 @@ import org.joml.Vector3f;
  */
 public final class AudioListener extends Component {
     public final Vector3f offset = new Vector3f(0, 0, 0);
-    public AudioListener(GameObject gameObject) {
+    public AudioListener(final GameObject gameObject) {
         super(gameObject);
     }
 

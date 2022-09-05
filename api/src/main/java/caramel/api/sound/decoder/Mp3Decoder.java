@@ -29,7 +29,7 @@ public final class Mp3Decoder extends AudioDecoder {
     static public final int UNSUPPORTED_LAYER = DECODER_ERROR + 1;
     static public final int ILLEGAL_SUBBAND_ALLOCATION = DECODER_ERROR + 2;
 
-    public Mp3Decoder(String extension) {
+    public Mp3Decoder(final String extension) {
         super(extension);
     }
 
@@ -44,18 +44,18 @@ public final class Mp3Decoder extends AudioDecoder {
 
         private boolean initialized;
 
-        public void decodeFrame(Header header, Bitstream stream) throws DecoderException {
+        public void decodeFrame(final Header header, final Bitstream stream) throws DecoderException {
             if (!initialized) initialize(header);
             int layer = header.layer();
-            FrameDecoder decoder = retrieveDecoder(header, stream, layer);
+            final FrameDecoder decoder = retrieveDecoder(header, stream, layer);
             decoder.decodeFrame();
         }
 
-        public void setOutputBuffer(OutputBuffer out) {
+        public void setOutputBuffer(final OutputBuffer out) {
             output = out;
         }
 
-        private FrameDecoder retrieveDecoder(Header header, Bitstream stream, int layer) throws DecoderException {
+        private FrameDecoder retrieveDecoder(final Header header, final Bitstream stream, final int layer) throws DecoderException {
             FrameDecoder decoder = null;
 
             switch (layer) {
@@ -86,11 +86,11 @@ public final class Mp3Decoder extends AudioDecoder {
             return decoder;
         }
 
-        private void initialize(Header header) {
-            float scalefactor = 32700.0f;
-            int mode = header.mode();
+        private void initialize(final Header header) {
+            final float scalefactor = 32700.0f;
+            final int mode = header.mode();
             header.layer();
-            int channels = mode == Header.SINGLE_CHANNEL ? 1 : 2;
+            final int channels = mode == Header.SINGLE_CHANNEL ? 1 : 2;
             if (output == null) throw new RuntimeException("Output buffer was not set.");
 
             filter1 = new SynthesisFilter(0, scalefactor, null);
@@ -101,19 +101,19 @@ public final class Mp3Decoder extends AudioDecoder {
     }
 
     @Override
-    public SoundFormat decode(String path) {
-        try (InputStream file = Files.newInputStream(new File(path).toPath())) {
-            Bitstream bitstream = new Bitstream(file);
+    public SoundFormat decode(final String path) {
+        try (final InputStream file = Files.newInputStream(new File(path).toPath())) {
+            final Bitstream bitstream = new Bitstream(file);
             Header header = bitstream.readFrame();
             if (header == null) {
                 Debug.logError("Empty mp3 file: " + path);
                 return null;
             }
-            int channels = header.mode()  == Header.SINGLE_CHANNEL ? 1 : 2;
-            int rate = header.getSampleRate();
-            OutputBuffer outputBuffer = new OutputBuffer(channels, false);
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream(4096);
-            Decode decoder = new Decode();
+            final int channels = header.mode()  == Header.SINGLE_CHANNEL ? 1 : 2;
+            final int rate = header.getSampleRate();
+            final OutputBuffer outputBuffer = new OutputBuffer(channels, false);
+            final ByteArrayOutputStream buffer = new ByteArrayOutputStream(4096);
+            final Decode decoder = new Decode();
             decoder.setOutputBuffer(outputBuffer);
             while (true) {
                 header = bitstream.readFrame();
@@ -128,8 +128,8 @@ public final class Mp3Decoder extends AudioDecoder {
             }
             bitstream.close();
 
-            int bytes = buffer.size() - (buffer.size() % (channels > 1 ? 4 : 2));
-            ByteBuffer output = MemoryUtil.memAlloc(bytes);
+            final int bytes = buffer.size() - (buffer.size() % (channels > 1 ? 4 : 2));
+            final ByteBuffer output = MemoryUtil.memAlloc(bytes);
             output.order(ByteOrder.nativeOrder());
             output.put(buffer.toByteArray(), 0, bytes);
             output.flip();

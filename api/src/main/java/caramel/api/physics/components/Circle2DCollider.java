@@ -17,7 +17,7 @@ public final class Circle2DCollider extends Collider {
 
     public transient RigidBody2D rigidBody;
 
-    public Circle2DCollider(GameObject gameObject) {
+    public Circle2DCollider(final GameObject gameObject) {
         super(gameObject);
     }
 
@@ -29,7 +29,7 @@ public final class Circle2DCollider extends Collider {
     @Override
     public void update() {
         if (rigidBody == null || rigidBody.rawBody == null) return;
-        CircleShape shape = (CircleShape) rigidBody.rawBody.m_fixtureList.getShape();
+        final CircleShape shape = (CircleShape) rigidBody.rawBody.m_fixtureList.getShape();
         shape.setRadius(radius);
         rigidBody.rawBody.m_mass = rigidBody.mass;
     }

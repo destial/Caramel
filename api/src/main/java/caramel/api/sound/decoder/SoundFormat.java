@@ -9,7 +9,7 @@ public final class SoundFormat {
     private final int frequency;
     private Buffer buffer;
 
-    public SoundFormat(int channels, int frequency, Buffer buffer) {
+    public SoundFormat(final int channels, final int frequency, final Buffer buffer) {
         this.channels = channels;
         this.frequency = frequency;
         this.buffer = buffer;

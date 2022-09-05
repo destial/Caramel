@@ -20,7 +20,7 @@ public final class Physics3D implements Physics {
     private DWorld world;
     private final SceneImpl scene;
 
-    public Physics3D(SceneImpl scene) {
+    public Physics3D(final SceneImpl scene) {
         this.scene = scene;
         world = OdeHelper.createWorld();
         world.setGravity(gravity);
@@ -28,16 +28,16 @@ public final class Physics3D implements Physics {
 
     // @SuppressWarnings("all")
     @Override
-    public void addGameObject(GameObject gameObject) {
-        RigidBody3D rigidBody = gameObject.getComponent(RigidBody3D.class);
+    public void addGameObject(final GameObject gameObject) {
+        final RigidBody3D rigidBody = gameObject.getComponent(RigidBody3D.class);
         if (rigidBody == null || rigidBody.rawBody != null) return;
 
-        DBody bodyDef = OdeHelper.createBody(world);
-        DMass mass = OdeHelper.createMass();
+        final DBody bodyDef = OdeHelper.createBody(world);
+        final DMass mass = OdeHelper.createMass();
         mass.setMass(rigidBody.mass);
         bodyDef.setPosition(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z);
-        Quaternionf rot = gameObject.transform.rotation.rotationTo(gameObject.transform.rotation, new Quaternionf());
-        DQuaternion quat = new DQuaternion();
+        final Quaternionf rot = gameObject.transform.rotation.rotationTo(gameObject.transform.rotation, new Quaternionf());
+        final DQuaternion quat = new DQuaternion();
         quat.set(rot.x, rot.y, rot.z, rot.w);
         bodyDef.setQuaternion(quat);
         bodyDef.setAngularDamping(rigidBody.angularDamping);
@@ -58,8 +58,8 @@ public final class Physics3D implements Physics {
         }
 
         if (gameObject.hasComponent(Box3DCollider.class)) {
-            Box3DCollider collider = gameObject.getComponent(Box3DCollider.class);
-            DBox box = OdeHelper.createBox(collider.bounds.x * 0.5f, collider.bounds.y * 0.5f, collider.bounds.z * 0.5f);
+            final Box3DCollider collider = gameObject.getComponent(Box3DCollider.class);
+            final DBox box = OdeHelper.createBox(collider.bounds.x * 0.5f, collider.bounds.y * 0.5f, collider.bounds.z * 0.5f);
             box.setBody(bodyDef);
             mass.setBox(rigidBody.mass / (collider.bounds.x * collider.bounds.y * collider.bounds.z), collider.bounds.x * 0.5f, collider.bounds.y * 0.5f, collider.bounds.z * 0.5f);
         }
@@ -70,7 +70,7 @@ public final class Physics3D implements Physics {
 
     @Override
     public void removeGameObject(GameObject gameObject) {
-        RigidBody3D rigidBody = gameObject.getComponent(RigidBody3D.class);
+        final RigidBody3D rigidBody = gameObject.getComponent(RigidBody3D.class);
         if (rigidBody == null || rigidBody.rawBody == null) return;
         rigidBody.rawBody.destroy();
         rigidBody.rawBody = null;

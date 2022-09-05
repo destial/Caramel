@@ -12,15 +12,15 @@ public final class ConsolePanel extends Panel {
     private static final int LOG_LIMIT = 50;
     public static final ArrayList<Pair<String, Level>> LOGS = new ArrayList<>();
 
-    public ConsolePanel(SceneImpl scene) {
+    public ConsolePanel(final SceneImpl scene) {
         super(scene);
     }
 
-    public static void addLog(String log) {
-        String[] split = log.split("\n");
-        for (String s : split) {
+    public static void addLog(final String log) {
+        final String[] split = log.split("\n");
+        for (final String s : split) {
             if (LOGS.size() > 0) {
-                Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
+                final Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
                 if (previous != null && previous.getKey().equals(s) && previous.getValue() == Level.INFO) {
                     LOGS.remove(LOGS.size() - 1);
                 }
@@ -32,11 +32,11 @@ public final class ConsolePanel extends Panel {
         }
     }
 
-    public static void addWarning(String log) {
-        String[] split = log.split("\n");
-        for (String s : split) {
+    public static void addWarning(final String log) {
+        final String[] split = log.split("\n");
+        for (final String s : split) {
             if (LOGS.size() > 0) {
-                Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
+                final Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
                 if (previous != null && previous.getKey().equals(s) && previous.getValue() == Level.INFO) {
                     LOGS.remove(previous);
                 }
@@ -48,11 +48,11 @@ public final class ConsolePanel extends Panel {
         }
     }
 
-    public static void addError(String log) {
-        String[] split = log.split("\n");
-        for (String s : split) {
+    public static void addError(final String log) {
+        final String[] split = log.split("\n");
+        for (final String s : split) {
             if (LOGS.size() > 0) {
-                Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
+                final Pair<String, Level> previous = LOGS.get(LOGS.size() - 1);
                 if (previous != null && previous.getKey().equals(s) && previous.getValue() == Level.INFO) {
                     LOGS.remove(previous);
                 }
@@ -77,7 +77,7 @@ public final class ConsolePanel extends Panel {
         ImGui.end();
     }
 
-    private int getColor(Level level) {
+    private int getColor(final Level level) {
         if (level.equals(Level.INFO)) {
             return Color.WHITE.getRGB();
         } else if (level.equals(Level.WARNING)) {

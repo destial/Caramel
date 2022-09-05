@@ -19,7 +19,7 @@ public final class Transform extends Component {
     @HideInEditor public final Vector3f forward;
     @HideInEditor public final Vector3f up;
 
-    public Transform(GameObject gameObject) {
+    public Transform(final GameObject gameObject) {
         super(gameObject);
         gameObject.transform = this;
         transform = this;
@@ -35,7 +35,7 @@ public final class Transform extends Component {
     }
 
     public void setPosition(float x, float y, float z) {
-        Vector3f pos = gameObject.parent != null ? localPosition : position;
+        final Vector3f pos = gameObject.parent != null ? localPosition : position;
         pos.set(x, y, z);
         RigidBody rb = getComponent(RigidBody.class);
         if (rb != null) {
@@ -44,7 +44,7 @@ public final class Transform extends Component {
     }
 
     public Matrix4f getModel() {
-        Vector3f pos = new Vector3f(position).add(localPosition);
+        final Vector3f pos = new Vector3f(position).add(localPosition);
         model
             .identity()
             .translate(pos)

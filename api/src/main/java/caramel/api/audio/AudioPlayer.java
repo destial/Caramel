@@ -24,7 +24,7 @@ public final class AudioPlayer extends Component {
     @ShowInEditor public boolean playOnStart = true;
     @ShowInEditor public boolean updatePosition = true;
 
-    public AudioPlayer(GameObject gameObject) {
+    public AudioPlayer(final GameObject gameObject) {
         super(gameObject);
     }
 
@@ -99,7 +99,7 @@ public final class AudioPlayer extends Component {
     }
 
     @Override
-    public AudioPlayer clone(GameObject gameObject, boolean copyId) {
+    public AudioPlayer clone(final GameObject gameObject, final boolean copyId) {
         stop();
         return (AudioPlayer) super.clone(gameObject, copyId);
     }

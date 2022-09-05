@@ -17,7 +17,7 @@ public final class KeyListenerImpl implements KeyListener {
         Arrays.fill(keysReleased, true);
     }
 
-    public void keyCallback(long window, int key, int scan, int action, int mods) {
+    public void keyCallback(final long window, final int key, final int scan, final int action, final int mods) {
         if (action == GLFW_PRESS) {
             keys[key] = true;
             if (keysReleased[key]) {
@@ -29,16 +29,16 @@ public final class KeyListenerImpl implements KeyListener {
         }
     }
 
-    public boolean isKeyDown(int key) {
+    public boolean isKeyDown(final int key) {
         return keys[key];
     }
 
-    public boolean isKeyPressedThisFrame(int key) {
+    public boolean isKeyPressedThisFrame(final int key) {
         return keysPressedThisFrame[key];
     }
 
     public List<Integer> getKeysPressed() {
-        List<Integer> keysPressed = new ArrayList<>(keys.length);
+        final List<Integer> keysPressed = new ArrayList<>(keys.length);
         for (int i = 0; i < keys.length; i++) {
             if (keys[i]) keysPressed.add(i);
         }
@@ -46,7 +46,7 @@ public final class KeyListenerImpl implements KeyListener {
     }
 
     public List<Integer> getKeysPressedThisFrame() {
-        List<Integer> keysPressed = new ArrayList<>(keysPressedThisFrame.length);
+        final List<Integer> keysPressed = new ArrayList<>(keysPressedThisFrame.length);
         for (int i = 0; i < keysPressedThisFrame.length; i++) {
             if (keysPressedThisFrame[i]) keysPressed.add(i);
         }

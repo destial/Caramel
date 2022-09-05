@@ -79,19 +79,19 @@ public final class SceneImpl extends Scene {
             panels.put(NodePanel.class, new NodePanel(this));
         }
 
-        GameObjectImpl go = new GameObjectImpl(this);
+        final GameObjectImpl go = new GameObjectImpl(this);
         go.addComponent(new EditorCamera(go));
         editorCamera = go.getComponent(EditorCamera.class);
         physics = new HashMap<>();
         physics.put(Physics.Mode._2D, new Physics2D(this));
         physics.put(Physics.Mode._3D, new Physics3D(this));
 
-        GameObject ui = new GameObjectImpl(this);
+        final GameObject ui = new GameObjectImpl(this);
         uiCamera = new UICamera(ui);
         ui.addComponent(uiCamera);
     }
 
-    public <P extends Panel> P getEditorPanel(Class<P> clazz) {
+    public <P extends Panel> P getEditorPanel(final Class<P> clazz) {
         return clazz.cast(panels.get(clazz));
     }
 
@@ -104,13 +104,13 @@ public final class SceneImpl extends Scene {
                     return s;
                 });
 
-        for (GameObject go : gameObjects) go.update();
-        for (Physics world : physics.values()) {
+        for (final GameObject go : gameObjects) go.update();
+        for (final Physics world : physics.values()) {
             world.update();
         }
-        for (GameObject go : gameObjects) go.lateUpdate();
+        for (final GameObject go : gameObjects) go.lateUpdate();
 
-        for (GameObject go : gameObjects) {
+        for (final GameObject go : gameObjects) {
             go.editorUpdate();
             if (go.getComponentInChildren(Camera.class) != null) {
                 gameCameras.add(go.getComponentInChildren(Camera.class));
@@ -120,7 +120,7 @@ public final class SceneImpl extends Scene {
 
     public void undoLastAction() {
         if (actions.size() == 0) return;
-        EditorAction action = actions.get(actions.size() - 1);
+        final EditorAction action = actions.get(actions.size() - 1);
         action.undo();
         actions.remove(action);
         redoActions.add(action);
@@ -128,19 +128,19 @@ public final class SceneImpl extends Scene {
 
     public void redoLastAction() {
         if (redoActions.size() == 0) return;
-        EditorAction action = redoActions.get(redoActions.size() - 1);
+        final EditorAction action = redoActions.get(redoActions.size() - 1);
         action.redo();
         redoActions.remove(action);
         actions.add(action);
     }
 
-    public void addUndoAction(EditorAction action) {
+    public void addUndoAction(final EditorAction action) {
         actions.add(action);
         redoActions.clear();
         saved = false;
     }
 
-    public void setSaved(boolean saved) {
+    public void setSaved(final boolean saved) {
         this.saved = saved;
     }
 
@@ -149,17 +149,17 @@ public final class SceneImpl extends Scene {
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         Graphics.get().glEnable(GL_DEPTH_TEST);
         if (playing) {
-            for (GameObject go : gameObjects) go.render(camera);
+            for (final GameObject go : gameObjects) go.render(camera);
 
             if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
         } else {
             if (ImGui.isKeyDown(Input.Key.G)) Graphics.get().glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
             else Graphics.get().glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-            for (GameObject go : gameObjects) go.render(camera);
+            for (final GameObject go : gameObjects) go.render(camera);
 
             if (BatchRenderer.USE_BATCH) BatchRenderer.render(camera);
 
@@ -181,9 +181,9 @@ public final class SceneImpl extends Scene {
     }
 
     public void endFrame() {
-        for (Pair<GameObject, GameObject> entry : toAdd) {
-            GameObject parent = entry.getKey();
-            GameObject child = entry.getValue();
+        for (final Pair<GameObject, GameObject> entry : toAdd) {
+            final GameObject parent = entry.getKey();
+            final GameObject child = entry.getValue();
             if (child.parent != null) {
                 child.parent.gameObject.children.remove(child);
             } else {
@@ -201,7 +201,7 @@ public final class SceneImpl extends Scene {
             }
 
             if (playing) {
-                for (Physics world : physics.values()) {
+                for (final Physics world : physics.values()) {
                     world.addGameObject(child);
                 }
             }
@@ -215,16 +215,16 @@ public final class SceneImpl extends Scene {
         editorCamera.gameObject.update();
 
         if (playing) {
-            for (GameObject go : gameObjects) {
+            for (final GameObject go : gameObjects) {
                 go.update();
                 if (go.getComponentInChildren(Camera.class) != null) {
                     gameCameras.add(go.getComponentInChildren(Camera.class));
                 }
             }
-            for (Physics world : physics.values()) {
+            for (final Physics world : physics.values()) {
                 world.update();
             }
-            for (GameObject go : gameObjects) go.lateUpdate();
+            for (final GameObject go : gameObjects) go.lateUpdate();
 
         } else {
             if (ImGui.getIO().getKeyCtrl() && ImGui.isKeyPressed(Input.Key.Z)) {
@@ -236,7 +236,7 @@ public final class SceneImpl extends Scene {
             }
         }
 
-        for (GameObject go : gameObjects) {
+        for (final GameObject go : gameObjects) {
             go.editorUpdate();
             if (go.getComponentInChildren(Camera.class) != null) {
                 gameCameras.add(go.getComponentInChildren(Camera.class));
@@ -245,7 +245,7 @@ public final class SceneImpl extends Scene {
 
         editorCamera.gameObject.lateUpdate();
 
-        for (GameObject selected : selectedGameObject) {
+        for (final GameObject selected : selectedGameObject) {
             DebugImpl.drawOutline(selected.transform, selectionColor);
         }
 
@@ -261,31 +261,31 @@ public final class SceneImpl extends Scene {
 
         gameObjects.clear();
         selectedGameObject.clear();
-        for (GameObject go : defaultGameObjects) {
-            GameObject clone = go.clone(true);
+        for (final GameObject go : defaultGameObjects) {
+            final GameObject clone = go.clone(true);
             gameObjects.add(clone);
             if (selectedDefaultGameObject.contains(go)) {
                 selectedGameObject.add(clone);
             }
-            for (Physics world : physics.values()) {
+            for (final Physics world : physics.values()) {
                 world.addGameObject(clone);
             }
         }
 
-        for (GameObject clone : gameObjects) {
-            for (Component component : clone.getMutableComponents()) {
+        for (final GameObject clone : gameObjects) {
+            for (final Component component : clone.getMutableComponents()) {
                 if (component instanceof Script) {
                     try {
-                        for (Field field : component.getClass().getDeclaredFields()) {
+                        for (final Field field : component.getClass().getDeclaredFields()) {
                             if (Modifier.isTransient(field.getModifiers()) || !Component.class.isAssignableFrom(field.getType())) continue;
                             field.setAccessible(true);
-                            Component value = (Component) field.get(component);
+                            final Component value = (Component) field.get(component);
                             if (value != null) {
-                                for (GameObject def : defaultGameObjects) {
+                                for (final GameObject def : defaultGameObjects) {
                                     boolean b = false;
-                                    for (Component c : def.getMutableComponents()) {
+                                    for (final Component c : def.getMutableComponents()) {
                                         if (value == c) {
-                                            Component clonedComponent = gameObjects.stream().filter(g -> g.id == def.id).findFirst().get().getComponent((Class<? extends Component>) field.getType());
+                                            final Component clonedComponent = gameObjects.stream().filter(g -> g.id == def.id).findFirst().get().getComponent((Class<? extends Component>) field.getType());
                                             field.set(component, clonedComponent);
                                             b = true;
                                             break;
@@ -320,19 +320,19 @@ public final class SceneImpl extends Scene {
         defaultGameObjects.clear();
         selectedDefaultGameObject.clear();
 
-        for (Physics p : physics.values()) {
+        for (final Physics p : physics.values()) {
             p.reset();
         }
         gameCameras.clear();
     }
 
     public void __imguiLayer() {
-        for (Panel panel : panels.values()) {
+        for (final Panel panel : panels.values()) {
             panel.__imguiLayer();
         }
     }
 
-    public void setEditorCamera(EditorCamera camera) {
+    public void setEditorCamera(final EditorCamera camera) {
         editorCamera = camera;
     }
 
@@ -340,7 +340,7 @@ public final class SceneImpl extends Scene {
         return editorCamera;
     }
 
-    public void destroy(GameObject gameObject) {
+    public void destroy(final GameObject gameObject) {
         if (gameObject.parent != null) {
             gameObject.parent.gameObject.children.remove(gameObject);
         } else {
@@ -355,13 +355,13 @@ public final class SceneImpl extends Scene {
         }
         selectedGameObject.remove(gameObject);
         selectedDefaultGameObject.remove(gameObject);
-        for (Physics world : physics.values()) {
+        for (final Physics world : physics.values()) {
             world.removeGameObject(gameObject);
         }
     }
 
     public void invalidate() {
-        for (Physics physics : physics.values()) {
+        for (final Physics physics : physics.values()) {
             physics.invalidate();
         }
         physics.clear();

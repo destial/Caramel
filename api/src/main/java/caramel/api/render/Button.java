@@ -36,7 +36,7 @@ public final class Button extends Renderer {
 
     public float colorChangeTime = 1f;
 
-    public Button(GameObject gameObject) {
+    public Button(final GameObject gameObject) {
         super(gameObject);
         onClick = new ArrayList<>();
         onHover = new ArrayList<>();
@@ -64,13 +64,13 @@ public final class Button extends Renderer {
         mesh.setColor(currentColor);
     }
 
-    public void setMesh(Mesh mesh) {
+    public void setMesh(final Mesh mesh) {
         this.mesh = mesh;
         setColor();
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (mesh == null) {
             mesh = new QuadMesh(1);
             setColor();
@@ -103,7 +103,7 @@ public final class Button extends Renderer {
             if (clicked) {
                 clicked = false;
             } else {
-                for (Runnable runnable : onHover) {
+                for (final Runnable runnable : onHover) {
                     runnable.run();
                 }
             }
@@ -116,7 +116,7 @@ public final class Button extends Renderer {
             if (clicked) {
                 clicked = false;
             } else {
-                for (Runnable runnable : onExit) {
+                for (final Runnable runnable : onExit) {
                     runnable.run();
                 }
             }
@@ -126,27 +126,27 @@ public final class Button extends Renderer {
             targetColor.set(clickColor);
             setColor();
             clicked = true;
-            for (Runnable runnable : onClick) {
+            for (final Runnable runnable : onClick) {
                 runnable.run();
             }
         }
     }
 
-    public boolean isHovered(Camera camera) {
+    public boolean isHovered(final Camera camera) {
         float x = Input.getMouseWorldX(camera);
         float y = Input.getMouseWorldY(camera);
 
-        Vector3f max = new Vector3f(0.5f, 0.5f, 1f);
-        Vector3f min = new Vector3f(-0.5f, -0.5f, 1f);
+        final Vector3f max = new Vector3f(0.5f, 0.5f, 1f);
+        final Vector3f min = new Vector3f(-0.5f, -0.5f, 1f);
 
-        float tx = transform.position.x + transform.localPosition.x;
-        float ty = transform.position.y + transform.localPosition.y;
-        float tz = transform.position.z + transform.localPosition.z;
+        final float tx = transform.position.x + transform.localPosition.x;
+        final float ty = transform.position.y + transform.localPosition.y;
+        final float tz = transform.position.z + transform.localPosition.z;
 
-        Matrix4f model = transform.getModel();
+        final Matrix4f model = transform.getModel();
 
-        Vector3f mX = max.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
-        Vector3f mN = min.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
+        final Vector3f mX = max.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
+        final Vector3f mN = min.mul(model.get3x3(new Matrix3d())).add(tx, ty, tz);
 
         return x >= mN.x && x <= mX.x && y >= mN.y && y <= mX.y;
     }
@@ -155,8 +155,8 @@ public final class Button extends Renderer {
     public void start() {}
 
     @Override
-    public Button clone(GameObject gameObject, boolean copyId) {
-        Button clone = (Button) super.clone(gameObject, copyId);
+    public Button clone(final GameObject gameObject, final boolean copyId) {
+        final Button clone = (Button) super.clone(gameObject, copyId);
         clone.currentColor = new Color(currentColor);
         clone.targetColor = new Color(targetColor);
         clone.hoverColor = new Color(hoverColor);

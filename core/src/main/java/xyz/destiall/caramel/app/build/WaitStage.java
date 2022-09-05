@@ -7,12 +7,12 @@ public final class WaitStage implements Stage {
     private final int limit;
     private int counter = -1;
 
-    public WaitStage(Stage stageToExecute, int limit) {
+    public WaitStage(final Stage stageToExecute, final int limit) {
         this.stageToExecute = stageToExecute;
         this.limit = limit;
     }
 
-    public WaitStage(Stage stageToExecute) {
+    public WaitStage(final Stage stageToExecute) {
         this(stageToExecute, 10);
     }
 

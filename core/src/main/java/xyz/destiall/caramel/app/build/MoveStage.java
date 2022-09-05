@@ -16,7 +16,7 @@ public final class MoveStage implements Stage {
     private final File outputBuild;
     private final Collection<FileScriptMemoryJavaObject> sources;
 
-    public MoveStage(File output, File outputBuild, Collection<FileScriptMemoryJavaObject> sources) {
+    public MoveStage(final File output, final File outputBuild, final Collection<FileScriptMemoryJavaObject> sources) {
         this.output = output;
         this.outputBuild = outputBuild;
         this.sources = sources;
@@ -25,20 +25,20 @@ public final class MoveStage implements Stage {
 
     @Override
     public Stage execute() {
-        File[] files = root.listFiles(f -> f.getName().endsWith(".class"));
+        final File[] files = root.listFiles(f -> f.getName().endsWith(".class"));
         if (files == null || files.length == 0) {
             Debug.logError("Nothing to move! Skipping to ExtractStage...");
             return new ExtractStage(output, outputBuild);
         }
 
-        for (File file : files) {
+        for (final File file : files) {
             try {
-                File sourceFile = sources.stream().filter(s -> s.getName().endsWith(file.getName().replace(".class", ""))).findFirst().orElse(null).getOrigin();
+                final File sourceFile = sources.stream().filter(s -> s.getName().endsWith(file.getName().replace(".class", ""))).findFirst().orElse(null).getOrigin();
                 String read = FileIO.readData(sourceFile);
                 String pack = FileIO.getPackage(read).replace(".", File.separator);
-                File packageOut = new File(output, pack + File.separator);
+                final File packageOut = new File(output, pack + File.separator);
                 packageOut.mkdirs();
-                File dst = new File(packageOut, file.getName());
+                final File dst = new File(packageOut, file.getName());
                 FileIO.copy(file, dst, null, true);
                 FileIO.delete(file);
             } catch (Exception e) {

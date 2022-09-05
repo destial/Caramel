@@ -12,7 +12,7 @@ public abstract class Collider extends Component implements Render {
     public Vector3f offset = new Vector3f(0);
     public boolean collisionRender = false;
 
-    public Collider(GameObject gameObject) {
+    public Collider(final GameObject gameObject) {
         super(gameObject);
     }
 }

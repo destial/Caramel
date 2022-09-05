@@ -18,7 +18,7 @@ public final class RaycastInfo2D implements RayCastCallback {
     public boolean hit;
     public GameObject hitObject;
 
-    public RaycastInfo2D(GameObject obj) {
+    public RaycastInfo2D(final GameObject obj) {
         fixture = null;
         point = new Vector2f();
         normal = new Vector2f();
@@ -29,7 +29,7 @@ public final class RaycastInfo2D implements RayCastCallback {
     }
 
     @Override
-    public float reportFixture(Fixture fixture, Vec2 point, Vec2 normal, float fraction) {
+    public float reportFixture(final Fixture fixture, final Vec2 point, final Vec2 normal, final float fraction) {
         if (fixture.m_userData == requestingObject) {
             return 1;
         }

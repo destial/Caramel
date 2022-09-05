@@ -3,7 +3,7 @@ package caramel.api.graphics;
 public final class Graphics {
     private Graphics() {}
 
-    public static void set(GL30 api) {
+    public static void set(final GL30 api) {
         if (Graphics.api != null) return;
         Graphics.api = api;
     }

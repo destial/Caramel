@@ -5,7 +5,7 @@ import caramel.api.render.Renderer;
 import org.joml.Matrix4f;
 
 public final class UICamera extends Camera {
-    public UICamera(GameObject gameObject) {
+    public UICamera(final GameObject gameObject) {
         super(gameObject);
         this.isEditor = false;
         state = Renderer.State.UI;

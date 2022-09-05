@@ -39,7 +39,7 @@ public final class Shader {
     public void loadSource() {
         if (compiled) return;
         String source = null;
-        String path = "assets/shaders/" + this.path;
+        final String path = "assets/shaders/" + this.path;
         FileIO.saveResource(this.path, path);
         try {
             source = new String(Files.readAllBytes(Paths.get(path)));
@@ -47,7 +47,7 @@ public final class Shader {
             e.printStackTrace();
             Debug.logError("Error could not open file for shader : '" + path +"'");
         }
-        String[] splitString = source.split("(#type)( )+([a-zA-Z]+)");
+        final String[] splitString = source.split("(#type)( )+([a-zA-Z]+)");
         if (splitString.length < 2) {
             Debug.logError("Error shader '" + path + "' is not a valid shader");
         }
@@ -97,7 +97,7 @@ public final class Shader {
 
         success = Graphics.get().glGetShaderi(fragmentShader, GL_COMPILE_STATUS);
         if (success == GL_FALSE) {
-            int len = Graphics.get().glGetShaderi(fragmentShader, GL_INFO_LOG_LENGTH);
+            final int len = Graphics.get().glGetShaderi(fragmentShader, GL_INFO_LOG_LENGTH);
             Debug.logError("Fragment compilation failed. Shader path: " + path);
             System.err.println(Graphics.get().glGetShaderInfoLog(fragmentShader, len));
             return false;
@@ -110,7 +110,7 @@ public final class Shader {
 
         success = Graphics.get().glGetProgrami(shaderProgram, GL_LINK_STATUS);
         if (success == GL_FALSE) {
-            int len = Graphics.get().glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);
+            final int len = Graphics.get().glGetProgrami(shaderProgram, GL_INFO_LOG_LENGTH);
             Debug.logError("Shader linking failed. Shader path: " + path);
             System.err.println(Graphics.get().glGetProgramInfoLog(shaderProgram, len));
             return false;
@@ -147,29 +147,29 @@ public final class Shader {
     }
 
     public void uploadMat4f(String name, Matrix4f matrix) {
-        int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
-        FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
+        final int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
+        final FloatBuffer matBuffer = BufferUtils.createFloatBuffer(16);
         matrix.get(matBuffer);
         Graphics.get().glUniformMatrix4fv(loc, false, matBuffer);
     }
 
     public void uploadVec3f(String name, Vector3f vector) {
-        int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
+        final int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
         Graphics.get().glUniform3f(loc, vector.x, vector.y, vector.z);
     }
 
     public void uploadFloat(String name, float f) {
-        int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
+        final int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
         Graphics.get().glUniform1f(loc, f);
     }
 
     public void uploadTexture(String name, int id) {
-        int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
+        final int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
         Graphics.get().glUniform1i(loc, id);
     }
 
     public void uploadIntArray(String name, int[] array) {
-        int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
+        final int loc = Graphics.get().glGetUniformLocation(shaderProgram, name);
         Graphics.get().glUniform1iv(loc, array);
     }
 
@@ -180,7 +180,7 @@ public final class Shader {
     private static final Map<String, Shader> SHADERS = new HashMap<>();
 
     public static void invalidateAll() {
-        for (Shader shader : SHADERS.values()) {
+        for (final Shader shader : SHADERS.values()) {
             Graphics.get().glDeleteShader(shader.shaderProgram);
             Graphics.get().glDeleteShader(shader.vertexShader);
             Graphics.get().glDeleteShader(shader.fragmentShader);
