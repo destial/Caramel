@@ -7,7 +7,7 @@ import caramel.api.objects.GameObject;
 public abstract class Renderer extends Component implements Render {
     public State renderState = State.WORLD;
 
-    public Renderer(GameObject gameObject) {
+    public Renderer(final GameObject gameObject) {
         super(gameObject);
     }
 

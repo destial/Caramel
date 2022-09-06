@@ -6,7 +6,7 @@ import org.joml.Vector2f;
 public final class Sprite implements Copyable<Sprite> {
     private final Vector2f[] texCoords;
 
-    public Sprite(Vector2f[] coords) {
+    public Sprite(final Vector2f[] coords) {
         this.texCoords = coords;
     }
 

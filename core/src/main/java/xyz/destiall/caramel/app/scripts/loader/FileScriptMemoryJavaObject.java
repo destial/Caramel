@@ -8,7 +8,7 @@ public final class FileScriptMemoryJavaObject extends AbstractScriptJavaObject {
     private final String code;
     private final String className;
 
-    FileScriptMemoryJavaObject(File origin, String className, JavaFileObject.Kind kind, String code) {
+    FileScriptMemoryJavaObject(final File origin, final String className, final JavaFileObject.Kind kind, final String code) {
         super(className, kind);
         this.className = className;
         this.origin = origin;
@@ -25,7 +25,7 @@ public final class FileScriptMemoryJavaObject extends AbstractScriptJavaObject {
     }
 
     @Override
-    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+    public CharSequence getCharContent(final boolean ignoreEncodingErrors) {
         return code;
     }
 

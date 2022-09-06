@@ -3,36 +3,36 @@ package xyz.destiall.caramel.app;
 import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.Input;
-import caramel.api.JoystickListener;
+import caramel.api.input.JoystickListener;
 import caramel.api.Time;
-import caramel.api.audio.AudioListener;
+import caramel.api.components.Camera;
+import caramel.api.graphics.Graphics;
+import caramel.api.graphics.opengl.OpenGL30;
+import caramel.api.scripts.ScriptManager;
+import caramel.api.sound.decoder.AudioDecoder;
+import caramel.api.utils.SystemIO;
+import org.lwjgl.glfw.*;
+import xyz.destiall.caramel.app.editor.EditorSceneLoader;
+import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
-import caramel.api.components.Light;
-import caramel.api.components.RigidBody3D;
 import caramel.api.components.Transform;
 import caramel.api.components.UICamera;
 import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.FullscreenEvent;
 import caramel.api.events.WindowFocusEvent;
-import caramel.api.objects.GameObject;
-import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.Scene;
 import caramel.api.objects.SceneImpl;
-import caramel.api.physics.components.Box3DCollider;
 import caramel.api.render.BatchRenderer;
 import caramel.api.render.MeshRenderer;
 import caramel.api.render.Shader;
 import caramel.api.render.Text;
 import caramel.api.sound.SoundSource;
 import caramel.api.texture.Texture;
-import caramel.api.texture.mesh.QuadMesh;
 import caramel.api.utils.FileIO;
 import imgui.ImGui;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
@@ -40,18 +40,26 @@ import org.lwjgl.openal.ALCapabilities;
 import org.lwjgl.opengl.GL;
 import org.reflections.Reflections;
 import xyz.destiall.caramel.app.editor.debug.DebugDraw;
+import xyz.destiall.caramel.app.editor.managers.BodyManager;
+import xyz.destiall.caramel.app.editor.managers.MeshManager;
+import xyz.destiall.caramel.app.runtime.RuntimeSceneLoader;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
+import xyz.destiall.caramel.app.runtime.RuntimeScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
+import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.events.Listener;
 import xyz.destiall.java.gson.Gson;
 import xyz.destiall.java.gson.GsonBuilder;
+import xyz.destiall.java.gson.JsonArray;
+import xyz.destiall.java.gson.JsonElement;
 import xyz.destiall.java.gson.JsonObject;
 import xyz.destiall.java.timer.Scheduler;
 import xyz.destiall.java.timer.Task;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
@@ -62,6 +70,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import static caramel.api.graphics.GL20.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -92,22 +101,13 @@ import static org.lwjgl.openal.ALC10.alcDestroyContext;
 import static org.lwjgl.openal.ALC10.alcGetString;
 import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
 import static org.lwjgl.openal.ALC10.alcOpenDevice;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClear;
-import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public final class ApplicationImpl extends Application {
+public final class ApplicationImpl extends Application implements Runnable {
     public boolean EDITOR_MODE = true;
-    private boolean running = false;
+    private boolean running = true;
 
     private final MouseListenerImpl mouseListener;
     private final KeyListenerImpl keyListener;
@@ -119,25 +119,30 @@ public final class ApplicationImpl extends Application {
 
     private ImGUILayer imGui;
     private Framebuffer[] framebuffer;
-    private EditorScriptManager scriptManager;
+    private ScriptManager scriptManager;
 
     private int width;
     private int height;
     private int winPosX;
     private int winPosY;
     private boolean fullscreen;
-    private String lastScene;
+    private List<String> lastScenes;
     private String title;
-
     private boolean focused;
 
     private long audioContext;
     private long audioDevice;
 
-    private final List<SceneImpl> scenes;
-    private int sceneIndex = -1;
+    private SceneLoader sceneLoader;
+    private JsonObject settings;
 
     public long glfwWindow;
+
+    public static ApplicationImpl getRuntime() {
+        if (inst == null) inst = new ApplicationImpl();
+        ((ApplicationImpl) inst).EDITOR_MODE = false;
+        return (ApplicationImpl) inst;
+    }
 
     public static ApplicationImpl getApp() {
         if (inst == null) inst = new ApplicationImpl();
@@ -151,76 +156,113 @@ public final class ApplicationImpl extends Application {
         joystickListener = new JoystickListenerImpl();
         eventHandler = new EventHandling();
         scheduler = new Scheduler();
-        scenes = new ArrayList<>();
+        listeners = new ArrayList<>();
+        listeners.add(new AudioManager());
+        listeners.add(new MeshManager());
+        listeners.add(new BodyManager());
         serializer = new GsonBuilder()
                 .registerTypeAdapter(SceneImpl.class, new SceneSerializer())
                 .serializeNulls()
                 .setPrettyPrinting()
                 .setLenient()
                 .create();
-        listeners = new ArrayList<>();
-        listeners.add(new AudioListener());
         focused = true;
-
-        DebugImpl.log("Loading Editor");
     }
 
     @Override
     public void run() {
         setup();
-        init();
-        loop();
+        if (init()) loop();
         destroy();
     }
 
-    @SuppressWarnings("all")
     private void setup() {
         // Load settings and data files
+        sceneLoader = EDITOR_MODE ? new EditorSceneLoader(this) : new RuntimeSceneLoader(this);
+
         try {
-            File settings = new File("settings.json");
-            JsonObject object = new JsonObject();
-            if (settings.createNewFile()) {
-                object.addProperty("width", width = 1920);
-                object.addProperty("height", height = 1080);
-                object.addProperty("windowPosX", winPosX = 25);
-                object.addProperty("windowPosY", winPosY = 25);
-                object.addProperty("fullscreen", fullscreen = false);
-                object.addProperty("lastScene", lastScene = "assets/scenes/Untitled Scene.caramel");
-                FileIO.writeData(settings, serializer.toJson(object));
+            if (EDITOR_MODE) {
+                final File settings = new File("settings.json");
+                this.settings = new JsonObject();
+                if (settings.createNewFile()) {
+                    this.settings.addProperty("width", width = 1920);
+                    this.settings.addProperty("height", height = 1080);
+                    this.settings.addProperty("windowPosX", winPosX = 25);
+                    this.settings.addProperty("windowPosY", winPosY = 25);
+                    this.settings.addProperty("fullscreen", fullscreen = false);
+                    lastScenes = new ArrayList<>();
+                    String lastScene = "assets/scenes/Untitled Scene.caramel";
+                    lastScenes.add(lastScene);
+                    JsonArray array = new JsonArray();
+                    array.add(lastScene);
+                    this.settings.add("lastScene", array);
+                    this.settings.addProperty("imgui", ImGuiUtils.DEFAULT_SETTINGS);
+                    FileIO.writeData(settings, serializer.toJson(this.settings));
 
+                } else {
+                    this.settings = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
+                    width = this.settings.get("width").getAsInt();
+                    height = this.settings.get("height").getAsInt();
+                    winPosX = this.settings.get("windowPosX").getAsInt();
+                    winPosY = this.settings.get("windowPosY").getAsInt();
+                    lastScenes = new ArrayList<>();
+                    final JsonElement element = this.settings.get("lastScene");
+                    if (element.isJsonArray()) {
+                        JsonArray array = element.getAsJsonArray();
+                        for (JsonElement loc : array) {
+                            lastScenes.add(loc.getAsString());
+                        }
+                    } else {
+                        // Legacy compatibility
+                        final String loc = element.getAsString();
+                        lastScenes.add(loc);
+                    }
+                    fullscreen = this.settings.has("fullscreen") && this.settings.get("fullscreen").getAsBoolean();
+                }
+
+                final File assets = new File("assets" + File.separator);
+                if (!assets.exists() && assets.mkdir()) {
+                    new File(assets, "models" + File.separator).mkdirs();
+                    new File(assets, "textures" + File.separator).mkdirs();
+                    new File(assets, "shaders" + File.separator).mkdirs();
+                    new File(assets, "scenes" + File.separator).mkdirs();
+                    new File(assets, "sounds" + File.separator).mkdirs();
+                    new File(assets, "fonts" + File.separator).mkdirs();
+                    FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
+                }
             } else {
-                object = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
-                width = object.get("width").getAsInt();
-                height = object.get("height").getAsInt();
-                winPosX = object.get("windowPosX").getAsInt();
-                winPosY = object.get("windowPosY").getAsInt();
-                lastScene = object.get("lastScene").getAsString();
-                fullscreen = object.has("fullscreen") ? object.get("fullscreen").getAsBoolean() : false;
+                fullscreen = true;
+                final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+                final File source = new File(path);
+
+                final File config = new File("config.json");
+                if (config.exists()) {
+                    this.settings = serializer.fromJson(FileIO.readData(config), JsonObject.class);
+                } else {
+                    this.settings = serializer.fromJson(FileIO.readUTFFromZip(source, "config.json"), JsonObject.class);
+                }
+                width = this.settings.get("width").getAsInt();
+                height = this.settings.get("height").getAsInt();
+                winPosX = this.settings.get("windowPosX").getAsInt();
+                winPosY = this.settings.get("windowPosY").getAsInt();
+                final JsonArray array = this.settings.get("scenes").getAsJsonArray();
+                lastScenes = new ArrayList<>();
+                for (JsonElement loc : array) {
+                    lastScenes.add(loc.getAsString());
+                }
+
+                final File assets = new File("assets" + File.separator);
+                if (!assets.exists() && assets.mkdir()) {
+                    FileIO.extract(source, FileIO.ROOT_FILE, "assets");
+                }
             }
 
-            File assets = new File("assets" + File.separator);
-            if (!assets.exists()) {
-                assets.mkdirs();
-                new File(assets, "models" + File.separator).mkdirs();
-                new File(assets, "textures" + File.separator).mkdirs();
-                new File(assets, "shaders" + File.separator).mkdirs();
-                new File(assets, "scenes" + File.separator).mkdirs();
-                new File(assets, "sounds" + File.separator).mkdirs();
-                new File(assets, "fonts" + File.separator).mkdirs();
-                FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
-            }
-
-            File imgui = new File("imgui.ini");
-            if (!imgui.exists()) {
-                FileIO.saveResource("imgui.ini", "imgui.ini");
-            }
-
-            File logo16 = new File("logo_16.png");
+            final File logo16 = new File("logo_16.png");
             if (!logo16.exists()) {
                 FileIO.saveResource("logo_16.png", "logo_16.png");
             }
 
-            File logo32 = new File("logo_32.png");
+            final File logo32 = new File("logo_32.png");
             if (!logo32.exists()) {
                 FileIO.saveResource("logo_32.png", "logo_32.png");
             }
@@ -229,7 +271,10 @@ public final class ApplicationImpl extends Application {
         }
     }
 
-    private void init() {
+    private boolean init() {
+        DebugImpl.log("Loading Editor");
+        Graphics.set(new OpenGL30());
+
         // Set GLFW Error callbacks to System console
         GLFWErrorCallback.createPrint(System.err).set();
 
@@ -246,18 +291,18 @@ public final class ApplicationImpl extends Application {
 
         // Create window icons
         try {
-            ByteBuffer[] list = new ByteBuffer[2];
-            IntBuffer width16 = BufferUtils.createIntBuffer(1);
-            IntBuffer height16 = BufferUtils.createIntBuffer(1);
-            IntBuffer channels16 = BufferUtils.createIntBuffer(1);
+            final ByteBuffer[] list = new ByteBuffer[2];
+            final IntBuffer width16 = BufferUtils.createIntBuffer(1);
+            final IntBuffer height16 = BufferUtils.createIntBuffer(1);
+            final IntBuffer channels16 = BufferUtils.createIntBuffer(1);
             list[0] = stbi_load("logo_16.png", width16, height16, channels16, 0);
 
-            IntBuffer width32 = BufferUtils.createIntBuffer(1);
-            IntBuffer height32 = BufferUtils.createIntBuffer(1);
-            IntBuffer channels32 = BufferUtils.createIntBuffer(1);
+            final IntBuffer width32 = BufferUtils.createIntBuffer(1);
+            final IntBuffer height32 = BufferUtils.createIntBuffer(1);
+            final IntBuffer channels32 = BufferUtils.createIntBuffer(1);
             list[1] = stbi_load("logo_32.png", width32, height32, channels32, 0);
 
-            GLFWImage.Buffer icons = GLFWImage.malloc(2);
+            final GLFWImage.Buffer icons = GLFWImage.malloc(2);
             if (list[0] != null && list[1] != null) {
                 icons.position(0).width(width16.get(0)).height(height16.get(0)).pixels(list[0]);
                 icons.position(1).width(width32.get(0)).height(height32.get(0)).pixels(list[1]);
@@ -285,26 +330,32 @@ public final class ApplicationImpl extends Application {
 
         // Set resize callbacks.
         // Input callbacks are set in ImGUI.
-        glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
+        try (GLFWWindowSizeCallback ignored = glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
-        });
+        })) {
+            Debug.log("Setting window size callbacks");
+        } catch (Exception ignored) {}
 
         // Set position callbacks.
-        glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
+        try (GLFWWindowPosCallback ignored = glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
             this.winPosX = x;
             this.winPosY = y;
-        });
+        })) {
+            Debug.log("Setting window position callbacks");
+        } catch (Exception ignored) {}
 
-        glfwSetWindowFocusCallback(glfwWindow, (window, focused) -> {
+        try (GLFWWindowFocusCallback ignored = glfwSetWindowFocusCallback(glfwWindow, (window, focused) -> {
             this.focused = focused;
             eventHandler.call(new WindowFocusEvent(focused));
-        });
+        })) {
+            Debug.log("Setting window focus callbacks");
+        } catch (Exception ignored) {}
 
         // Create audio handler
-        String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
+        final String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
         audioDevice = alcOpenDevice(defaultDeviceName);
-        int[] attributes = {0};
+        final int[] attributes = {0};
         audioContext = alcCreateContext(audioDevice, attributes);
         alcMakeContextCurrent(audioContext);
 
@@ -312,23 +363,24 @@ public final class ApplicationImpl extends Application {
         GL.createCapabilities();
 
         // Create OpenAL capabilities
-        ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
-        ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
+        final ALCCapabilities alcCapabilities = ALC.createCapabilities(audioDevice);
+        final ALCapabilities alCapabilities = AL.createCapabilities(alcCapabilities);
         if (!alCapabilities.OpenAL10) {
             Debug.logError("Audio AL10 library not supported!");
+        } else {
+            // Load audio decoders
+            AudioDecoder.load();
         }
 
         // Enable blending
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        Graphics.get().glEnable(GL_BLEND);
+        Graphics.get().glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        // Setup script manager
-        scriptManager = new EditorScriptManager();
-
-        // Register event listeners
-        listeners.add(scriptManager);
-        for (Listener listener : listeners) {
-            eventHandler.registerListener(listener);
+        // Set Java UI scheme
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         // Create and setup ImGUI
@@ -340,19 +392,41 @@ public final class ApplicationImpl extends Application {
         framebuffer[0] = new Framebuffer(this.width, this.height);
         framebuffer[1] = new Framebuffer(this.width, this.height);
 
+        // Setup script manager
+        if (EDITOR_MODE) {
+            scriptManager = new EditorScriptManager();
+            if (!((EditorScriptManager)scriptManager).canLoad()) {
+                SystemIO.showPopupMessage("Error", "You are not running a JDK version! Currently running JRE " + SystemIO.getJavaVersion() + ". Exiting...", "Exit");
+                return false;
+            } else {
+                listeners.add((EditorScriptManager) scriptManager);
+            }
+        } else {
+            scriptManager = new RuntimeScriptManager();
+        }
+
+        // Load all built-in components
+        if (EDITOR_MODE) {
+            final Reflections reflections = new Reflections("caramel.api");
+            final Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
+            final List<Class<? extends Component>> sorted = new ArrayList<>(set);
+            sorted.sort(Comparator.comparing(Class::getName));
+            for (final Class<? extends Component> c : sorted) {
+                if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
+                if (c == Transform.class || c == EditorCamera.class || c == UICamera.class) continue;
+                Payload.COMPONENTS.add(c);
+            }
+        }
+
+        // Register event listeners
+        for (final Listener listener : listeners) {
+            eventHandler.registerListener(listener);
+        }
+
         // Load all the scripts
         scriptManager.reloadAll();
 
-        // Load all built-in components
-        Reflections reflections = new Reflections("caramel.api");
-        Set<Class<? extends Component>> set = reflections.getSubTypesOf(Component.class);
-        List<Class<? extends Component>> sorted = new ArrayList<>(set);
-        sorted.sort(Comparator.comparing(Class::getName));
-        for (Class<? extends Component> c : sorted) {
-            if (Modifier.isAbstract(c.getModifiers()) || Modifier.isInterface(c.getModifiers())) continue;
-            if (c == Transform.class || c == EditorCamera.class || c == UICamera.class || c == RigidBody3D.class || c == Light.class || c == Box3DCollider.class) continue;
-            Payload.COMPONENTS.add(c);
-        }
+        return true;
     }
 
     private void loop() {
@@ -362,12 +436,33 @@ public final class ApplicationImpl extends Application {
         float second = 0;
 
         // Create the scene
-        File file = new File(lastScene);
-        SceneImpl scene = loadScene(file);
+        SceneImpl scene = null;
+        final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+        final File source = new File(path);
+        for (final String data : lastScenes) {
+            SceneImpl loaded = null;
+            if (EDITOR_MODE) {
+                final File file = new File(data);
+                loaded = loadScene(file);
+            } else {
+                try {
+                    final String contents = FileIO.readUTFFromZip(source, data);
+                    loaded = sceneLoader.loadScene(contents);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (scene == null && loaded != null) {
+                scene = loaded;
+            }
+        }
+
+        if (scene == null) {
+            scene = sceneLoader.newScene();
+        }
 
         DebugImpl.log("Opening scene " + scene.name);
-
-        running = true;
 
         if (!EDITOR_MODE) {
             scene.play();
@@ -375,8 +470,8 @@ public final class ApplicationImpl extends Application {
 
         setTitle(scene.name);
 
-        Task task = scheduler.runTaskInterval(System::gc, 10000, 10000);
-
+        final Task task = scheduler.runTaskInterval(System::gc, 10000, 10000);
+        float delta = 0;
         // Main loop
         while (!glfwWindowShouldClose(glfwWindow) && running) {
             if (Time.isSecond) {
@@ -386,7 +481,7 @@ public final class ApplicationImpl extends Application {
             if (process()) break;
 
             endTime = (float) glfwGetTime();
-            float delta = endTime - startTime;
+            delta = endTime - startTime;
             if (delta <= 0) continue;
 
             Time.deltaTime = delta;
@@ -402,7 +497,7 @@ public final class ApplicationImpl extends Application {
             }
         }
 
-        for (SceneImpl s : scenes) {
+        for (final SceneImpl s : sceneLoader.getScenes()) {
             if (s.isPlaying()) {
                 s.stop();
             }
@@ -413,8 +508,12 @@ public final class ApplicationImpl extends Application {
         running = false;
     }
 
+    public JsonObject getSettings() {
+        return settings;
+    }
+
     private boolean process() {
-        SceneImpl scene = getCurrentScene();
+        final SceneImpl scene = getCurrentScene();
         if (scene == null) return true;
 
         glfwPollEvents();
@@ -437,22 +536,27 @@ public final class ApplicationImpl extends Application {
 
         if (EDITOR_MODE && !fullscreen) {
             getSceneViewFramebuffer().bind();
-            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            Graphics.get().glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+            Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             scene.render(scene.getEditorCamera());
             DebugDraw.INSTANCE.render(scene.getEditorCamera());
             getSceneViewFramebuffer().unbind();
         }
         BatchRenderer.DRAW_CALLS = 0;
+
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().bind();
-        if (scene.getGameCamera() == null || !scene.getGameCamera().gameObject.active) {
-            glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        if (scene.getGameCameras().isEmpty()) {
+            Graphics.get().glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+            Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         } else {
-            glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            scene.render(scene.getGameCamera());
+            Graphics.get().glClearColor(0.4f, 0.4f, 0.4f, 0.5f);
+            Graphics.get().glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            for (final Camera camera : scene.getGameCameras()) {
+                if (!camera.gameObject.active) continue;
+                scene.render(camera);
+            }
         }
+
         scene.render(scene.getUICamera());
         if (EDITOR_MODE && !fullscreen) getGameViewFramebuffer().unbind();
 
@@ -461,7 +565,7 @@ public final class ApplicationImpl extends Application {
             mouseListener.setGameViewportSize(new Vector2f(width, height));
         }
 
-        if (EDITOR_MODE) imGui.render();
+        if (EDITOR_MODE && !fullscreen) imGui.render();
 
         scene.endFrame();
 
@@ -479,15 +583,20 @@ public final class ApplicationImpl extends Application {
 
     private void destroy() {
         // Save settings
-        File settings = new File("settings.json");
-        JsonObject object = new JsonObject();
-        object.addProperty("width", width);
-        object.addProperty("height", height);
-        object.addProperty("windowPosX", winPosX);
-        object.addProperty("windowPosY", winPosY);
-        object.addProperty("fullscreen", fullscreen);
-        object.addProperty("lastScene", new File("").toURI().relativize(getCurrentScene().getFile().toURI()).getPath());
-        FileIO.writeData(settings, serializer.toJson(object));
+        final File settings = new File("settings.json");
+        this.settings = new JsonObject();
+        if (EDITOR_MODE) {
+            this.settings.addProperty("width", width);
+            this.settings.addProperty("height", height);
+            this.settings.addProperty("windowPosX", winPosX);
+            this.settings.addProperty("windowPosY", winPosY);
+            this.settings.addProperty("fullscreen", fullscreen);
+            final JsonArray sceneData = new JsonArray();
+            for (final SceneImpl scene : sceneLoader.getScenes()) {
+                sceneData.add(FileIO.relativize(scene.getFile()));
+            }
+            this.settings.add("lastScene", sceneData);
+        }
 
         // Destroy and clean up any remaining objects
         Texture.invalidateAll();
@@ -496,20 +605,20 @@ public final class ApplicationImpl extends Application {
         BatchRenderer.invalidateAll();
         Shader.invalidateAll();
         SoundSource.invalidateAll();
-        for (SceneImpl scene : scenes) {
-            scene.invalidate();
-        }
-        scenes.clear();
-
+        sceneLoader.destroy();
         scriptManager.destroy();
 
         // Unregister any remaining listeners
-        for (Listener listener : listeners) {
+        for (final Listener listener : listeners) {
             eventHandler.unregisterListener(listener);
         }
 
-        // Destroy ImGUI
-        imGui.destroyImGui();
+        // Destroy && saved ImGUI
+        final String save = imGui.destroy();
+        if (EDITOR_MODE) {
+            this.settings.addProperty("imgui", save);
+            FileIO.writeData(settings, serializer.toJson(this.settings));
+        }
 
         // Free ALC context and close device
         alcDestroyContext(audioContext);
@@ -517,7 +626,11 @@ public final class ApplicationImpl extends Application {
 
         // Free GLFW callbacks and destroy the window (if not yet destroyed)
         glfwFreeCallbacks(glfwWindow);
-        glfwSetErrorCallback(null).free();
+        try (GLFWErrorCallback errorCallback = glfwSetErrorCallback(null)) {
+            if (errorCallback != null) {
+                errorCallback.free();
+            }
+        } catch (Exception ignored) {}
         glfwDestroyWindow(glfwWindow);
 
         // Terminate the window
@@ -544,7 +657,7 @@ public final class ApplicationImpl extends Application {
     }
 
     @Override
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
         glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
     }
@@ -559,89 +672,42 @@ public final class ApplicationImpl extends Application {
         return width;
     }
 
+    public int getWinPosX() {
+        return winPosX;
+    }
+
+    public int getWinPosY() {
+        return winPosY;
+    }
+
     @Override
     public SceneImpl getCurrentScene() {
-        if (scenes.isEmpty()) return null;
-        return scenes.get(sceneIndex);
-    }
-
-    public SceneImpl newScene() {
-        SceneImpl scene = new SceneImpl();
-        GameObject gameObject = new GameObjectImpl(scene);
-        MeshRenderer meshRenderer = new MeshRenderer(gameObject);
-        meshRenderer.setMesh(new QuadMesh(1));
-        meshRenderer.build();
-        gameObject.addComponent(meshRenderer);
-        scene.addGameObject(gameObject);
-        scenes.add(scene);
-        sceneIndex++;
-        return scene;
+        return sceneLoader.getCurrentScene();
     }
 
     @Override
-    public SceneImpl loadScene(File file) {
-        SceneImpl scene = scenes.stream().filter(s -> s.getFile().equals(file)).findFirst().orElse(null);
-        if (scene != null) {
-            sceneIndex = scenes.indexOf(scene);
-            return scene;
-        }
-        try {
-            if (file.exists()) {
-                scene = serializer.fromJson(FileIO.readData(file), SceneImpl.class);
-            } else {
-                scene = newScene();
-            }
-        } catch (Exception e) {
-            Debug.logError("Unable to load possibly corrupted scene file: " + file.getPath());
-            e.printStackTrace();
-            return getCurrentScene();
-        }
-
-        SceneImpl finalScene = scene;
-        if (!scenes.removeIf(s -> s.name.equals(finalScene.name))) {
-            sceneIndex++;
-        }
-        scenes.add(scene);
-        scene.setFile(file);
-        return scene;
+    public SceneImpl loadScene(final File file) {
+        return sceneLoader.loadScene(file);
     }
 
     @Override
-    public SceneImpl loadScene(int index) {
-        if (index < 0 || index >= scenes.size()) {
-            return getCurrentScene();
-        }
-        sceneIndex = index;
-        return getCurrentScene();
-    }
-
-    public List<SceneImpl> getScenes() {
-        return scenes;
+    public SceneImpl loadScene(final int index) {
+        return sceneLoader.loadScene(index);
     }
 
     @Override
     public void saveCurrentScene() {
-        SceneImpl scene = getCurrentScene();
-        saveScene(scene, scene.getFile());
+        sceneLoader.saveCurrentScene();
     }
 
     @Override
-    public void saveScene(Scene scene, File file) {
-        scene.setFile(file);
-        String savedScene = serializer.toJson(scene);
-        if (FileIO.writeData(file, savedScene)) {
-            ((SceneImpl) scene).setSaved(true);
-            DebugImpl.log("Saved scene " + scene.name);
-        } else {
-            DebugImpl.log("Unable to save scene " + scene.name);
-        }
+    public void saveScene(final Scene scene, final File file) {
+        sceneLoader.saveScene(scene, file);
     }
 
     @Override
     public void saveAllScenes() {
-        for (SceneImpl scene : scenes) {
-            saveScene(scene, scene.getFile());
-        }
+        sceneLoader.saveAllScenes();
     }
 
     @Override
@@ -650,7 +716,7 @@ public final class ApplicationImpl extends Application {
     }
 
     @Override
-    public void setRunning(boolean run) {
+    public void setRunning(final boolean run) {
         this.running = run;
     }
 
@@ -670,7 +736,7 @@ public final class ApplicationImpl extends Application {
     }
 
     @Override
-    public EditorScriptManager getScriptManager() {
+    public ScriptManager getScriptManager() {
         return scriptManager;
     }
 
@@ -686,5 +752,13 @@ public final class ApplicationImpl extends Application {
     @Override
     public boolean isFullScreen() {
         return fullscreen;
+    }
+
+    public Gson getSerializer() {
+        return serializer;
+    }
+
+    public SceneLoader getSceneLoader() {
+        return sceneLoader;
     }
 }

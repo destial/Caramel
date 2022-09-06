@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
-import caramel.api.components.VisualScript;
+import caramel.api.components.Blueprint;
 
 public class StartGraphNode extends GraphNode<Runnable> {
     private Runnable startFunction;
@@ -15,12 +15,12 @@ public class StartGraphNode extends GraphNode<Runnable> {
     }
 
     @Override
-    public void setValue(Runnable value) {
+    public void setValue(final Runnable value) {
         startFunction = value;
     }
 
     @Override
-    public boolean execute(VisualScript script, Graph graph) {
+    public boolean execute(final Blueprint script, final Graph graph) {
 
         return false;
     }

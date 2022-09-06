@@ -9,7 +9,7 @@ public final class Animation {
 
     private final Sprite[] sprites;
 
-    public Animation(Sprite[] sprites) {
+    public Animation(final Sprite[] sprites) {
         this.sprites = sprites;
     }
 

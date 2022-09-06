@@ -2,7 +2,9 @@ package caramel.api.components;
 
 import caramel.api.Application;
 import caramel.api.Component;
+import caramel.api.Time;
 import caramel.api.interfaces.HideInEditor;
+import caramel.api.interfaces.ShowInEditor;
 import caramel.api.objects.GameObject;
 import caramel.api.render.Renderer;
 import org.joml.Matrix4f;
@@ -23,9 +25,10 @@ public class Camera extends Component {
     @HideInEditor public float fov = 60f;
     @HideInEditor public float near = 0.01f;
     @HideInEditor public float far = 1000f;
+    @ShowInEditor public boolean perspective = false;
     public float zoom = 1f;
 
-    public Camera(GameObject gameObject) {
+    public Camera(final GameObject gameObject) {
         super(gameObject);
         projection = new Matrix4f();
         view = new Matrix4f();
@@ -46,12 +49,16 @@ public class Camera extends Component {
     public void editorUpdate() {}
 
     public Matrix4f getProjection() {
-        float ratio = getRatio();
-        projection.identity();
-        if (zoom <= 0) {
-            zoom = 1f;
+        if (perspective) {
+            projection.identity().perspective((float) Math.toRadians(fov), 16 / 9f, near, far);
+        } else {
+            float ratio = getRatio();
+            projection.identity();
+            if (zoom <= 0) {
+                zoom = 1f;
+            }
+            projection.ortho(-4.5f * ratio * zoom, 4.5f * ratio * zoom, -2.5f * ratio * zoom, 2.5f * ratio * zoom, near, far, true);
         }
-        projection.ortho(-4.5f * ratio * zoom, 4.5f * ratio * zoom, -2.5f * ratio * zoom, 2.5f * ratio * zoom, near, far, true);
         return new Matrix4f(projection);
     }
 

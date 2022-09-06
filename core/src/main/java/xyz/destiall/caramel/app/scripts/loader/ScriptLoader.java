@@ -1,9 +1,12 @@
 package xyz.destiall.caramel.app.scripts.loader;
 
+import caramel.api.Application;
 import caramel.api.debug.Debug;
 import caramel.api.scripts.InternalScript;
 import caramel.api.utils.FileIO;
 import xyz.destiall.caramel.app.scripts.EditorScriptManager;
+import xyz.destiall.caramel.app.build.CompileStage;
+import xyz.destiall.caramel.app.build.Stage;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import javax.script.ScriptException;
@@ -13,7 +16,6 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -21,8 +23,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public final class ScriptLoader {
@@ -43,6 +43,10 @@ public final class ScriptLoader {
         StandardJavaFileManager standardFileManager = compiler.getStandardFileManager(diagnostics, null, null);
         scriptMemoryManager = new ScriptMemoryManager(standardFileManager, getClass().getClassLoader());
         this.scriptManager = scriptManager;
+    }
+
+    public boolean canLoad() {
+        return compiler != null;
     }
 
     public InternalScript get(String name) {
@@ -99,10 +103,10 @@ public final class ScriptLoader {
 
     public InternalScript compile(File file, String code) throws ScriptException, MalformedURLException {
         if (compiler == null) {
-            throw new ScriptException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+            throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
 
-        String fullClassName = getFullName(file, code);
+        String fullClassName = FileIO.getFullName(file, code);
         Debug.console("Building " + fullClassName);
 
         FileScriptMemoryJavaObject scriptSource = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
@@ -139,7 +143,8 @@ public final class ScriptLoader {
             scriptManager.loadComponents(previous.script, loader.script);
             try {
                 previous.close();
-            } catch (IOException e) {
+                previous.clearAssertionStatus();
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -149,49 +154,15 @@ public final class ScriptLoader {
         return loader.script;
     }
 
-    private static final Pattern NAME_PATTERN = Pattern.compile("public\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
-    private static final Pattern NAME_FINAL_PATTERN = Pattern.compile("public\\s+final\\s+class\\s+([A-Za-z][A-Za-z0-9_$]*)");
-    private static final Pattern PACKAGE_PATTERN = Pattern.compile("package\\s+([A-Za-z][A-Za-z0-9_$.]*)");
-
-    private String getFullName(File file, String script) {
-        String fullPackage = null;
-        Matcher packageMatcher = PACKAGE_PATTERN.matcher(script);
-        if (packageMatcher.find()) {
-            fullPackage = packageMatcher.group(1);
-        }
-
-        Matcher nameMatcher = NAME_PATTERN.matcher(script);
-        if (nameMatcher.find()) {
-            String name = nameMatcher.group(1);
-            if (fullPackage == null) {
-                return name;
-            } else {
-                return fullPackage + "." + name;
-            }
-        }
-
-        nameMatcher = NAME_FINAL_PATTERN.matcher(script);
-        if (nameMatcher.find()) {
-            String name = nameMatcher.group(1);
-            if (fullPackage == null) {
-                return name;
-            } else {
-                return fullPackage + "." + name;
-            }
-        }
-
-        return "scripts." + file.getName().substring(0, file.getName().length() - ".java".length());
-    }
-
     public void compileAll(List<File> files) throws ScriptException {
         if (compiler == null) {
-            throw new ScriptException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+            throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
         }
         List<FileScriptMemoryJavaObject> sources = new ArrayList<>(files.size());
         for (File file : files) {
             if (!file.exists()) continue;
             String code = FileIO.readData(file);
-            String fullClassName = getFullName(file, code);
+            String fullClassName = FileIO.getFullName(file, code);
             FileScriptMemoryJavaObject object = scriptMemoryManager.createSourceFileObject(file, fullClassName, code);
             sources.add(object);
         }
@@ -221,7 +192,8 @@ public final class ScriptLoader {
                 scriptManager.loadComponents(previous.script, loader.script);
                 try {
                     previous.close();
-                } catch (IOException e) {
+                    previous.clearAssertionStatus();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -230,5 +202,25 @@ public final class ScriptLoader {
             setClass(source.getName(), loader.script.getCompiledClass());
             Payload.COMPONENTS.add(loader.script.getCompiledClass());
         }
+    }
+
+    public void build(File root, File output) throws ScriptException {
+        if (compiler == null) {
+            throw new NullPointerException("You are not running on a compatible version of the Java Development Kit! You cannot use scripts!");
+        }
+        scriptManager.setCompileTask(Application.getApp().getScheduler().runTask(() -> {
+            if (root.exists()) {
+                Debug.log("Cleaning build files...");
+                FileIO.delete(root);
+            }
+            root.mkdir();
+            Stage next = new CompileStage(compiler, diagnostics, root, output, loaders.values().stream().map(ScriptClassLoader::getSource).collect(Collectors.toList()));
+            while (next != null) {
+                Debug.log("Starting " + next.getName());
+                next = next.execute();
+            }
+            Debug.log("Build complete!");
+            scriptManager.setCompileTask(null);
+        }));
     }
 }

@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
-import caramel.api.components.VisualScript;
+import caramel.api.components.Blueprint;
 import caramel.api.objects.StringWrapperImpl;
 
 public abstract class GraphNode<T> {
@@ -33,11 +33,11 @@ public abstract class GraphNode<T> {
     }
 
     public abstract T getValue();
-    public abstract void setValue(T value);
+    public abstract void setValue(final T value);
 
-    public void setName(String s) {
+    public void setName(final String s) {
         this.name.set(s);
     }
 
-    public abstract boolean execute(VisualScript script, Graph graph);
+    public abstract boolean execute(final Blueprint script, final Graph graph);
 }

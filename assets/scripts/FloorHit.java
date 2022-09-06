@@ -34,8 +34,7 @@ public class FloorHit extends Script {
     public void onCollisionEnter(RigidBody2D other) {
         if (other.gameObject.name.equals("Floor")) {
             animation.score = 0;
-            animation.button.getComponent(Text.class).text = "Hit " + animation.score;
-            int test = 3;
         }
+        getComponent(AudioPlayer.class).play();
     }
 }

@@ -16,7 +16,7 @@ public final class Vertex implements Copyable<Vertex> {
     public float texSlot;
     public float height;
 
-    public Vertex(float x, float y, float z) {
+    public Vertex(final float x, final float y, final float z) {
         position = new Vector3f(x, y, z);
         texCoords = new Vector2f();
         color = new Color();
@@ -24,7 +24,7 @@ public final class Vertex implements Copyable<Vertex> {
         texSlot = -1;
     }
 
-    public Vertex(Vertex vertex) {
+    public Vertex(final Vertex vertex) {
         position = new Vector3f(vertex.position);
         texCoords = new Vector2f(vertex.texCoords);
         color = new Color(vertex.color);
@@ -40,7 +40,7 @@ public final class Vertex implements Copyable<Vertex> {
         texSlot = -1;
     }
 
-    public Vertex getMidVertex(Vertex v) {
+    public Vertex getMidVertex(final Vertex v) {
         return new Vertex((position.x + v.position.x)/2f,(position.y + v.position.y)/2f,(position.z + v.position.z)/2f);
     }
 
@@ -53,11 +53,11 @@ public final class Vertex implements Copyable<Vertex> {
         texCoords.x = (float)(0.5 - Math.asin(position.y)/Math.PI);
     }
 
-    public void setHeight(float h) {
+    public void setHeight(final float h) {
         height = h;
     }
 
-    public void adjustHeight(float h) {
+    public void adjustHeight(final float h) {
         double min = (1/3f) + 1;
         height = (height/5 + 1)/2*h ;
         position.x *= height;

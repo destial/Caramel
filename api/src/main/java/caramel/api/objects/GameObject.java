@@ -4,6 +4,7 @@ import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
 import caramel.api.interfaces.Render;
 import caramel.api.interfaces.StringWrapper;
 import caramel.api.interfaces.Update;
@@ -43,7 +44,7 @@ public abstract class GameObject implements Update, Render {
         tags = new ArrayList<>();
     }
 
-    public GameObject(Scene parentScene) {
+    public GameObject(final Scene parentScene) {
         this.scene = parentScene;
         components = ConcurrentHashMap.newKeySet(3);
         children = new LinkedList<>();
@@ -55,51 +56,71 @@ public abstract class GameObject implements Update, Render {
     @Override
     public void update() {
         if (!active) return;
-        for (GameObject child : children) {
+        for (final GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
             child.update();
         }
 
-        for (Component component : components) {
+        for (final Component component : components) {
             if (!component.enabled) continue;
             if (!component.alreadyEnabled) {
                 try {
                     component.start();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Debug.log(e.getMessage());
                 }
                 component.alreadyEnabled = true;
             }
-            component.update();
+            try {
+                component.update();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
     }
 
     @Override
     public void lateUpdate() {
-        for (Component component : components) {
+        for (final Component component : components) {
             if (!component.enabled || component instanceof MeshRenderer) continue;
-            component.lateUpdate();
+            try {
+                component.lateUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
 
-        Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
-        for (Renderer render : renderers) {
-            render.lateUpdate();
+        final Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
+        for (final Renderer render : renderers) {
+            try {
+                render.lateUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
     }
 
     @Override
     public void editorUpdate() {
         if (!active) return;
-        for (GameObject child : children) {
+        for (final GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
-            child.editorUpdate();
+            try {
+                child.editorUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
 
-        Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
-        for (Renderer render : renderers) {
-            render.lateUpdate();
+        final Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
+        for (final Renderer render : renderers) {
+            try {
+                render.lateUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
     }
 
@@ -108,7 +129,7 @@ public abstract class GameObject implements Update, Render {
      * It will remove itself from its previous {@link Scene}.
      * @param parentScene The {@link Scene} to set it to, not null.
      */
-    public void setScene(Scene parentScene) {
+    public void setScene(final Scene parentScene) {
         if (parentScene != null) {
             destroy(this);
             scene = parentScene;
@@ -122,8 +143,8 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return The {@link Component} if it exists, null if none.
      */
-    public <C extends Component> C getComponent(Class<C> clazz) {
-        Component component = components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
+    public <C extends Component> C getComponent(final Class<C> clazz) {
+        final Component component = components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).findFirst().orElse(null);
         return clazz.cast(component);
     }
 
@@ -132,7 +153,7 @@ public abstract class GameObject implements Update, Render {
      * @param clazz The class of the {@link Component}.
      * @return The {@link Component} if it exists, null if none.
      */
-    public Component getComponent(String clazz) {
+    public Component getComponent(final String clazz) {
         return components.stream().filter(c -> c.getClass().getSimpleName().equals(clazz)).findFirst().orElse(null);
     }
 
@@ -142,7 +163,7 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return The set of {@link Component}. It cannot be null.
      */
-    public <C extends Component> Set<C> getComponents(Class<C> clazz) {
+    public <C extends Component> Set<C> getComponents(final Class<C> clazz) {
         return (Set<C>) components.stream().filter(c -> clazz.isAssignableFrom(c.getClass())).collect(Collectors.toSet());
     }
 
@@ -153,9 +174,9 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return The {@link Component} if it exists, null if none.
      */
-    public <C extends Component> C getComponentInParent(Class<C> clazz) {
+    public <C extends Component> C getComponentInParent(final Class<C> clazz) {
         if (parent == null) return null;
-        Component component = parent.gameObject.getComponent(clazz);
+        final Component component = parent.gameObject.getComponent(clazz);
         if (component != null) return clazz.cast(component);
         return parent.gameObject.getComponentInParent(clazz);
     }
@@ -166,10 +187,10 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return The {@link Component} if it exists, null if none.
      */
-    public <C extends Component> C getComponentInChildren(Class<C> clazz) {
+    public <C extends Component> C getComponentInChildren(final Class<C> clazz) {
         Component component = getComponent(clazz);
         if (component != null) return clazz.cast(component);
-        for (GameObject child : children) {
+        for (final GameObject child : children) {
             component = child.getComponentInChildren(clazz);
             if (component != null) return clazz.cast(component);
         }
@@ -182,16 +203,16 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return The set of {@link Component}. It cannot be null.
      */
-    public <C extends Component> Set<C> getComponentsInChildren(Class<C> clazz) {
-        Set<C> set = new HashSet<>();
-        C component = getComponent(clazz);
+    public <C extends Component> Set<C> getComponentsInChildren(final Class<C> clazz) {
+        final Set<C> set = new HashSet<>();
+        final C component = getComponent(clazz);
         if (component != null) set.add(component);
         getComponentsInChildren(clazz, set);
         return set;
     }
 
-    private <C extends Component> void getComponentsInChildren(Class<C> clazz, Set<C> set) {
-        for (GameObject child : children) {
+    private <C extends Component> void getComponentsInChildren(final Class<C> clazz, final Set<C> set) {
+        for (final GameObject child : children) {
             if (child.hasComponent(clazz)) {
                 set.add(child.getComponent(clazz));
             }
@@ -204,7 +225,7 @@ public abstract class GameObject implements Update, Render {
      * @param tag The tag to check
      * @return true if it exists, else false.
      */
-    public boolean hasTag(String tag) {
+    public boolean hasTag(final String tag) {
         return tags.contains(tag);
     }
 
@@ -213,7 +234,7 @@ public abstract class GameObject implements Update, Render {
      * @param component The {@link Component} to add.
      * @return true if a component of the same type doesn't exist, else false.
      */
-    public boolean addComponent(Component component) {
+    public boolean addComponent(final Component component) {
         if (hasComponent(component.getClass())) return false;
         components.add(component);
         return true;
@@ -225,14 +246,14 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return true if it successfully removed, else false.
      */
-    public <C extends Component> boolean removeComponent(Class<C> clazz) {
-        Component component = getComponent(clazz);
+    public <C extends Component> boolean removeComponent(final Class<C> clazz) {
+        final Component component = getComponent(clazz);
         if (component == null) return false;
         if (component instanceof Transform) return false;
         components.remove(component);
         if (scene != null) {
-            if (component instanceof Camera && scene.getGameCamera() == component) {
-                scene.setGameCamera(null);
+            if (component instanceof Camera) {
+                scene.removeGameCamera((Camera) component);
             }
         }
         return true;
@@ -243,14 +264,14 @@ public abstract class GameObject implements Update, Render {
      * @param clazz The class of the {@link Component}.
      * @return true if it successfully removed, else false.
      */
-    public boolean removeComponent(String clazz) {
-        Component component = getComponent(clazz);
+    public boolean removeComponent(final String clazz) {
+        final Component component = getComponent(clazz);
         if (component == null) return false;
         if (component instanceof Transform) return false;
         components.remove(component);
         if (scene != null) {
-            if (component instanceof Camera && scene.getGameCamera() == component) {
-                scene.setGameCamera(null);
+            if (component instanceof Camera) {
+                scene.removeGameCamera((Camera) component);
             }
         }
         return true;
@@ -282,7 +303,7 @@ public abstract class GameObject implements Update, Render {
      * @param <C> {@link Component}
      * @return true if it exists, else false.
      */
-    public <C extends Component> boolean hasComponent(Class<C> clazz) {
+    public <C extends Component> boolean hasComponent(final Class<C> clazz) {
         return components.stream().anyMatch(c -> clazz.isAssignableFrom(c.getClass()));
     }
 
@@ -291,7 +312,7 @@ public abstract class GameObject implements Update, Render {
      * @param name The name of the {@link GameObject} to find.
      * @return The matching {@link GameObject}, null if none found.
      */
-    public GameObject findGameObject(String name) {
+    public GameObject findGameObject(final String name) {
         if (scene != null) {
             return scene.findGameObject(name);
         }
@@ -302,7 +323,7 @@ public abstract class GameObject implements Update, Render {
      * Destroy a {@link GameObject} from its scene.
      * @param gameObject The {@link GameObject} to destroy.
      */
-    public void destroy(GameObject gameObject) {
+    public void destroy(final GameObject gameObject) {
         if (scene != null) {
             scene.destroy(gameObject);
         }
@@ -313,23 +334,23 @@ public abstract class GameObject implements Update, Render {
      * @param gameObject The {@link GameObject} to destroy.
      * @param timeout The time to wait in milliseconds.
      */
-    public void destroy(GameObject gameObject, long timeout) {
+    public void destroy(final GameObject gameObject, final long timeout) {
         Application.getApp().getScheduler().runTaskLater(() -> destroy(gameObject), timeout, TimeUnit.MILLISECONDS);
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (!active) return;
-        for (Component component : components) {
+        for (final Component component : components) {
             if (component instanceof Render) {
-                Render render = ((Render) component);
+                final Render render = ((Render) component);
                 if (render instanceof Renderer) {
                     if (((Renderer) render).getRenderState() != camera.getState()) continue;
                 }
                 render.render(camera);
             }
         }
-        for (GameObject ch : children) {
+        for (final GameObject ch : children) {
             ch.render(camera);
         }
     }
@@ -339,7 +360,7 @@ public abstract class GameObject implements Update, Render {
      * @param copyId Whether to copy its ID or generate a new unique ID.
      * @return The duplicated {@link GameObject}.
      */
-    public abstract GameObject clone(boolean copyId);
+    public abstract GameObject clone(final boolean copyId);
 
     /**
      * Instantiate a new {@link GameObject} in this scene from its {@link Prefab}.
@@ -347,8 +368,8 @@ public abstract class GameObject implements Update, Render {
      * @param parent The parent {@link Transform} to add it to.
      * @return The newly instantiated {@link GameObject}.
      */
-    public GameObject instantiate(GameObject prefab, Transform parent) {
-        GameObject clone = prefab.clone(false);
+    public GameObject instantiate(final GameObject prefab, final Transform parent) {
+        final GameObject clone = prefab.clone(false);
         if (parent != null) {
             scene.addGameObject(clone, parent.gameObject);
         }
@@ -369,7 +390,7 @@ public abstract class GameObject implements Update, Render {
      * @param prefab The {@link Prefab} to instantiate from.
      * @return The newly instantiated {@link GameObject}.
      */
-    public GameObject instantiate(GameObject prefab) {
+    public GameObject instantiate(final GameObject prefab) {
         return instantiate(prefab, null);
     }
 }

@@ -4,11 +4,11 @@ import java.io.File;
 
 public final class PrefabImpl extends Prefab {
 
-    public PrefabImpl(File file) {
+    public PrefabImpl(final File file) {
         super(file);
     }
 
-    public PrefabImpl(File file, GameObject gameObject) {
+    public PrefabImpl(final File file, final GameObject gameObject) {
         super(file);
         this.name.set(gameObject.name.get());
         this.active = gameObject.active;

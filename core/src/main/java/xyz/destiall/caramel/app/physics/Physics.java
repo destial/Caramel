@@ -4,8 +4,8 @@ import caramel.api.interfaces.Update;
 import caramel.api.objects.GameObject;
 
 public interface Physics extends Update {
-    void addGameObject(GameObject gameObject);
-    void removeGameObject(GameObject gameObject);
+    void addGameObject(final GameObject gameObject);
+    void removeGameObject(final GameObject gameObject);
     void reset();
     void invalidate();
 

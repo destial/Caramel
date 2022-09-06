@@ -8,7 +8,7 @@ public final class UnknownFieldComponent {
     private final Field field;
     private final Component owningComponent;
 
-    public UnknownFieldComponent(Field field, Component owningComponent) {
+    public UnknownFieldComponent(final Field field, final Component owningComponent) {
         this.field = field;
         this.owningComponent = owningComponent;
     }

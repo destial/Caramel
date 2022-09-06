@@ -8,6 +8,8 @@ import caramel.api.interfaces.Update;
 import caramel.api.utils.Pair;
 
 import java.io.File;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,7 +26,7 @@ public abstract class Scene implements Update, Render {
     protected List<GameObject> defaultGameObjects;
     protected List<Pair<GameObject, GameObject>> toAdd;
     protected Set<Light> lights;
-    protected Camera gameCamera;
+    protected Set<Camera> gameCameras;
     protected File file;
     protected boolean playing = false;
 
@@ -35,6 +37,7 @@ public abstract class Scene implements Update, Render {
     public Scene() {
         selectedGameObject = ConcurrentHashMap.newKeySet();
         selectedDefaultGameObject = ConcurrentHashMap.newKeySet();
+        gameCameras = ConcurrentHashMap.newKeySet();
     }
 
     /**
@@ -65,7 +68,7 @@ public abstract class Scene implements Update, Render {
      * Destroy a {@link GameObject} that is present in this {@link Scene}.
      * @param gameObject The {@link GameObject} to destroy.
      */
-    public abstract void destroy(GameObject gameObject);
+    public abstract void destroy(final GameObject gameObject);
 
     /**
      * Get the file which this {@link Scene} was loaded from.
@@ -79,7 +82,7 @@ public abstract class Scene implements Update, Render {
      * Set the file to which this {@link Scene} will be saved to.
      * @param file The scene save file.
      */
-    public void setFile(File file) {
+    public void setFile(final File file) {
         this.file = file;
     }
 
@@ -99,19 +102,35 @@ public abstract class Scene implements Update, Render {
     }
 
     /**
-     * Set the main game {@link Camera} to render the {@link Scene} to.
+     * Add a game {@link Camera} to render the {@link Scene} to.
      * @param camera The game {@link Camera}.
      */
-    public void setGameCamera(Camera camera) {
-        this.gameCamera = camera;
+    public void addGameCamera(final Camera camera) {
+        gameCameras.add(camera);
     }
 
     /**
-     * Get the main game {@link Camera} that the {@link Scene} is rendering to.
-     * @return The game {@link Camera}.
+     * Remove a game {@link Camera} from the {@link Scene} to.
+     * @param camera The game {@link Camera}.
+     */
+    public void removeGameCamera(final Camera camera) {
+        gameCameras.remove(camera);
+    }
+
+    /**
+     * Get the game {@link Camera}s that the {@link Scene} is rendering to.
+     * @return The game {@link Camera}s.
+     */
+    public Collection<Camera> getGameCameras() {
+        return gameCameras;
+    }
+
+    /**
+     * Get the first game {@link Camera}s that the {@link Scene} is rendering to.
+     * @return The game {@link Camera}s.
      */
     public Camera getGameCamera() {
-        return gameCamera;
+        return gameCameras.stream().findFirst().orElse(null);
     }
 
     /**
@@ -125,14 +144,14 @@ public abstract class Scene implements Update, Render {
      * @param name The name of the {@link GameObject} to find.
      * @return The matching {@link GameObject}, null if none found.
      */
-    public GameObject findGameObject(String name) {
+    public GameObject findGameObject(final String name) {
         return findGameObject(gameObjects, name);
     }
 
-    private GameObject findGameObject(List<GameObject> children, String name) {
-        for (GameObject child : children) {
+    private GameObject findGameObject(final List<GameObject> children, final String name) {
+        for (final GameObject child : children) {
             if (child.name.equals(name)) return child;
-            GameObject o = findGameObject(child.children, name);
+            final GameObject o = findGameObject(child.children, name);
             if (o != null) return o;
         }
         return null;
@@ -150,7 +169,7 @@ public abstract class Scene implements Update, Render {
      * Add a {@link GameObject} to this {@link Scene}.
      * @param gameObject The {@link GameObject} to add.
      */
-    public void addGameObject(GameObject gameObject) {
+    public void addGameObject(final GameObject gameObject) {
         toAdd.add(new Pair<>(null, gameObject));
     }
 
@@ -159,7 +178,7 @@ public abstract class Scene implements Update, Render {
      * @param gameObject The {@link GameObject} to add.
      * @param parent The parent {@link GameObject}.
      */
-    public void addGameObject(GameObject gameObject, GameObject parent) {
+    public void addGameObject(final GameObject gameObject, final GameObject parent) {
         toAdd.add(new Pair<>(parent, gameObject));
     }
 
@@ -167,12 +186,12 @@ public abstract class Scene implements Update, Render {
      * Loop through every {@link GameObject}, including children, in this {@link Scene}.
      * @param func The function to run for every {@link GameObject}.
      */
-    public void forEachGameObject(Consumer<GameObject> func) {
+    public void forEachGameObject(final Consumer<GameObject> func) {
         forEachGameObject(gameObjects, func);
     }
 
-    private void forEachGameObject(List<GameObject> objects, Consumer<GameObject> func) {
-        for (GameObject gameObject : objects) {
+    private void forEachGameObject(final List<GameObject> objects, final Consumer<GameObject> func) {
+        for (final GameObject gameObject : objects) {
             if (gameObject.children.size() > 0) forEachGameObject(gameObject.children, func);
             func.accept(gameObject);
         }
@@ -183,11 +202,11 @@ public abstract class Scene implements Update, Render {
      * @param id The ID to check.
      * @return true if already existing, else false.
      */
-    public boolean entityIdExists(int id) {
+    public boolean entityIdExists(final int id) {
         return entityIdExists(getGameObjects(), id);
     }
 
-    private boolean entityIdExists(List<GameObject> list, int id) {
+    private boolean entityIdExists(final List<GameObject> list, final int id) {
         return list.stream().anyMatch(g -> g.id == id || g.getMutableComponents().stream().anyMatch(c -> c.id == id) || entityIdExists(g.children, id));
     }
 }

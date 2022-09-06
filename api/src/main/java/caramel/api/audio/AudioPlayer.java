@@ -1,6 +1,7 @@
 package caramel.api.audio;
 
 import caramel.api.Component;
+import caramel.api.interfaces.FileExtensions;
 import caramel.api.interfaces.FunctionButton;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.interfaces.ShowInEditor;
@@ -11,17 +12,19 @@ import caramel.api.sound.SoundSource;
 import java.io.File;
 
 /**
- * This {@link Component} is used to play audio files. Only accepts .ogg files.
+ * This {@link Component} is used to play audio files.
  */
 public final class AudioPlayer extends Component {
     private transient SoundSource source;
     private transient Sound sound;
-    @ShowInEditor @InvokeOnEdit("rebuild") public File file;
-    @ShowInEditor @InvokeOnEdit("rebuild") public boolean loop = false;
+    @ShowInEditor public AudioListener listener;
+    @ShowInEditor @FileExtensions({".ogg", ".mp3"}) @InvokeOnEdit("rebuild") public File file;
+    @ShowInEditor @InvokeOnEdit("setLoop") public boolean loop = false;
     @ShowInEditor @InvokeOnEdit("setVolume") public float volume = 0.1f;
     @ShowInEditor public boolean playOnStart = true;
+    @ShowInEditor public boolean updatePosition = true;
 
-    public AudioPlayer(GameObject gameObject) {
+    public AudioPlayer(final GameObject gameObject) {
         super(gameObject);
     }
 
@@ -30,6 +33,17 @@ public final class AudioPlayer extends Component {
         rebuild();
         if (playOnStart) {
             play();
+        }
+    }
+
+    @Override
+    public void lateUpdate() {
+        if (updatePosition && sound != null && listener != null) {
+            sound.setLocation(transform);
+            sound.setListener(listener);
+        } else if (sound != null) {
+            sound.setLocation(null);
+            sound.setListener(null);
         }
     }
 
@@ -65,22 +79,34 @@ public final class AudioPlayer extends Component {
         }
     }
 
+    public void setLoop() {
+        if (sound != null) {
+            sound.setLoop(loop);
+        }
+    }
+
     public void rebuild() {
         stop();
-        if (source != null) {
-            source.invalidate();
-        }
         if (file == null) return;
+        if (source != null) {
+            source.invalidate(sound);
+        }
         source = SoundSource.getSource(file.getPath());
         if (source.build()) {
-            sound = source.createSound(loop);
+            sound = source.createSound();
             setVolume();
         }
     }
 
     @Override
-    public AudioPlayer clone(GameObject gameObject, boolean copyId) {
+    public AudioPlayer clone(final GameObject gameObject, final boolean copyId) {
         stop();
         return (AudioPlayer) super.clone(gameObject, copyId);
+    }
+
+    public void invalidate() {
+        if (sound != null) {
+            sound.invalidate();
+        }
     }
 }

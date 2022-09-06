@@ -8,7 +8,7 @@ import xyz.destiall.java.events.Event;
 public final class WindowFocusEvent extends Event {
     private final boolean on;
 
-    public WindowFocusEvent(boolean on) {
+    public WindowFocusEvent(final boolean on) {
         this.on = on;
     }
 

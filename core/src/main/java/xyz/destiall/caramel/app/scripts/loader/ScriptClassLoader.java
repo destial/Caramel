@@ -24,12 +24,12 @@ public final class ScriptClassLoader extends URLClassLoader {
     private final FileScriptMemoryJavaObject source;
     private final String fullClassName;
 
-    ScriptClassLoader(ScriptLoader loader, Map<String, ClassScriptMemoryJavaObject> mapNameToBytes, ClassLoader parent, File file, String fullClassName, FileScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
+    ScriptClassLoader(final ScriptLoader loader, final Map<String, ClassScriptMemoryJavaObject> mapNameToBytes, final ClassLoader parent, final File file, final String fullClassName, final FileScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
         super(new URL[] {file.toURI().toURL()}, parent);
         this.mapClassBytes = mapNameToBytes;
         try {
-            URL url = new URL(MEMORY_CLASS_URL);
-            CodeSource codeSource = new CodeSource(url, (Certificate[]) null);
+            final URL url = new URL(MEMORY_CLASS_URL);
+            final CodeSource codeSource = new CodeSource(url, (Certificate[]) null);
             protectionDomain = new ProtectionDomain(codeSource, null, this, new Principal[0]);
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
@@ -39,7 +39,7 @@ public final class ScriptClassLoader extends URLClassLoader {
         this.source = source;
         this.fullClassName = fullClassName;
         try {
-            Class<?> clazz = loadClass(fullClassName);
+            final Class<?> clazz = loadClass(fullClassName);
             this.script = new InternalScript(clazz, file, this.source.getCharContent(false));
         } catch (Exception e) {
             throw new ScriptException(e);
@@ -59,7 +59,7 @@ public final class ScriptClassLoader extends URLClassLoader {
     }
 
     @Override
-    protected Class<?> findClass(String name) throws ClassNotFoundException {
+    protected Class<?> findClass(final String name) throws ClassNotFoundException {
         Class<?> result = loader.getClassByName(name);
         if (result == null) {
             result = super.findClass(name);
@@ -71,16 +71,16 @@ public final class ScriptClassLoader extends URLClassLoader {
     }
 
     @Override
-    public Class<?> loadClass(String name) throws ClassNotFoundException {
-        Class<?> find = loader.getClass(name);
+    public Class<?> loadClass(final String name) throws ClassNotFoundException {
+        final Class<?> find = loader.getClass(name);
         if (find != null) {
             return find;
         }
-        ClassScriptMemoryJavaObject object = mapClassBytes.get(name);
+        final ClassScriptMemoryJavaObject object = mapClassBytes.get(name);
         if (object == null) {
             return super.loadClass(name);
         }
-        byte[] bytes = object.getBytes();
+        final byte[] bytes = object.getBytes();
         return defineClass(name, bytes, 0, bytes.length, protectionDomain);
     }
 }

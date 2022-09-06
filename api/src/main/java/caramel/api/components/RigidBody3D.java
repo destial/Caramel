@@ -2,7 +2,8 @@ package caramel.api.components;
 
 import caramel.api.math.Vector3;
 import caramel.api.objects.GameObject;
-import caramel.api.physics.components.Box3DCollider;
+import org.joml.Quaternionf;
+import org.ode4j.math.DMatrix3C;
 import org.ode4j.ode.DBody;
 
 /**
@@ -11,15 +12,14 @@ import org.ode4j.ode.DBody;
 public final class RigidBody3D extends RigidBody {
     public final Vector3 velocity = new Vector3();
 
-    public DBody rawBody = null;
-    public Box3DCollider collider;
+    public transient DBody rawBody = null;
 
-    public RigidBody3D(GameObject gameObject) {
+    public RigidBody3D(final GameObject gameObject) {
         super(gameObject);
     }
 
     @Override
-    public void _setPosition(float x, float y, float z) {
+    public void _setPosition(final float x, final float y, final float z) {
 
     }
 
@@ -30,11 +30,10 @@ public final class RigidBody3D extends RigidBody {
 
     @Override
     public void start() {
-        collider = getComponent(Box3DCollider.class);
     }
 
     @Override
-    public void update() {
+    public void lateUpdate() {
         if (rawBody != null) {
             velocity.set(
                     rawBody.getLinearVel().get0(),
@@ -46,11 +45,19 @@ public final class RigidBody3D extends RigidBody {
                     rawBody.getPosition().get1(),
                     rawBody.getPosition().get2()
             );
-            transform.rotation.set(
-                    (float) rawBody.getRotation().get00(),
-                    (float) rawBody.getRotation().get01(),
-                    (float) rawBody.getRotation().get02()
-            );
+
+            final DMatrix3C rot = rawBody.getRotation();
+            final double b1_squared = 0.25 * (1.f + rot.get00() + rot.get11() + rot.get22());
+            if (b1_squared >= 0.25) {
+                final double b1 = Math.sqrt(b1_squared);
+
+                final double over_b1_4 = 0.25 / b1;
+                final double b2 = (rot.get21() - rot.get12()) * over_b1_4;
+                final double b3 = (rot.get02() - rot.get20()) * over_b1_4;
+                final double b4 = (rot.get10() - rot.get01()) * over_b1_4;
+                final Quaternionf quaternionf = new Quaternionf(b1, b2, b3, b4);
+                transform.rotation.rotate(quaternionf);
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 package xyz.destiall.caramel.app;
 
 import caramel.api.debug.DebugImpl;
+import caramel.api.graphics.Graphics;
 import caramel.api.texture.Texture;
 
 import static org.lwjgl.opengl.GL11.glViewport;
@@ -29,7 +30,7 @@ public final class Framebuffer {
     private int width;
     private int height;
 
-    public Framebuffer(int width, int height) {
+    public Framebuffer(final int width, final int height) {
         this.width = width;
         this.height = height;
 
@@ -37,20 +38,20 @@ public final class Framebuffer {
     }
 
     public void generate() {
-        fboId = glGenFramebuffers();
+        fboId = Graphics.get().glGenFramebuffers();
         bind();
-        glViewport(0, 0, width, height);
+        Graphics.get().glViewport(0, 0, width, height);
         texture = new Texture(width, height);
         texture.buildEmpty();
 
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.getTexId(), 0);
+        Graphics.get().glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture.getTexId(), 0);
 
-        rboId = glGenRenderbuffers();
-        glBindRenderbuffer(GL_RENDERBUFFER, rboId);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, width, height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
+        rboId = Graphics.get().glGenRenderbuffers();
+        Graphics.get().glBindRenderbuffer(GL_RENDERBUFFER, rboId);
+        Graphics.get().glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, width, height);
+        Graphics.get().glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboId);
 
-        if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        if (Graphics.get().glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
             DebugImpl.logError("Framebuffer incomplete!");
             return;
         }
@@ -59,13 +60,13 @@ public final class Framebuffer {
     }
 
     public void invalidate() {
-        glDeleteFramebuffers(fboId);
-        glDeleteRenderbuffers(rboId);
+        Graphics.get().glDeleteFramebuffers(fboId);
+        Graphics.get().glDeleteRenderbuffers(rboId);
         fboId = 0;
         rboId = 0;
     }
 
-    public void resize(int width, int height) {
+    public void resize(final int width, final int height) {
         this.width = width;
         this.height = height;
         texture.invalidate();
@@ -75,11 +76,11 @@ public final class Framebuffer {
     }
 
     public void bind() {
-        glBindFramebuffer(GL_FRAMEBUFFER, fboId);
+        Graphics.get().glBindFramebuffer(GL_FRAMEBUFFER, fboId);
     }
 
     public void unbind() {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        Graphics.get().glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
     public int getHeight() {

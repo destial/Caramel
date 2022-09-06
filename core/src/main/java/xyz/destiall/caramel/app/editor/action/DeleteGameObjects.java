@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class DeleteGameObjects extends EditorAction {
-    public List<GameObject> deleted;
+    public final List<GameObject> deleted;
 
-    public DeleteGameObjects(Scene scene) {
+    public DeleteGameObjects(final Scene scene) {
         super(scene);
         this.deleted = new ArrayList<>();
     }
@@ -17,7 +17,7 @@ public final class DeleteGameObjects extends EditorAction {
     @Override
     public void undo() {
         if (action == PreviousAction.UNDO) return;
-        for (GameObject d : deleted) {
+        for (final GameObject d : deleted) {
             scene.addGameObject(d);
         }
         action = PreviousAction.UNDO;
@@ -26,7 +26,7 @@ public final class DeleteGameObjects extends EditorAction {
     @Override
     public void redo() {
         if (action == PreviousAction.REDO) return;
-        for (GameObject d : deleted) {
+        for (final GameObject d : deleted) {
             scene.destroy(d);
         }
         action = PreviousAction.REDO;

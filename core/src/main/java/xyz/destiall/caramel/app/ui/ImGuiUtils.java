@@ -1,20 +1,19 @@
 package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Component;
+import caramel.api.interfaces.FileExtensions;
 import caramel.api.interfaces.InvokeOnEdit;
 import caramel.api.math.Vector2;
 import caramel.api.math.Vector3;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.SceneImpl;
 import caramel.api.render.Animation;
-import caramel.api.texture.Mesh;
 import caramel.api.texture.Spritesheet;
 import caramel.api.texture.Texture;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.utils.Color;
+import caramel.api.utils.FileIO;
 import imgui.ImGui;
-import imgui.extension.imguifiledialog.ImGuiFileDialog;
-import imgui.extension.imguifiledialog.callback.ImGuiFileDialogPaneFun;
-import imgui.extension.imguifiledialog.flag.ImGuiFileDialogFlags;
 import imgui.flag.ImGuiCol;
 import imgui.flag.ImGuiStyleVar;
 import imgui.type.ImBoolean;
@@ -32,18 +31,14 @@ import xyz.destiall.java.reflection.Reflect;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.lwjgl.util.nfd.NativeFileDialog.NFD_OKAY;
 
 public final class ImGuiUtils {
+    public static final String DEFAULT_SETTINGS = "[Window][Debug##Default]\nPos\u003d60,60\nSize\u003d400,400\nCollapsed\u003d0\n\n[Window][Hierarchy]\nPos\u003d8,27\nSize\u003d152,908\nCollapsed\u003d0\nDockId\u003d0x00000002,0\n\n[Window][Dear ImGui Demo]\nPos\u003d950,382\nSize\u003d322,330\nCollapsed\u003d0\nDockId\u003d0x00000006,0\n\n[Window][Dockspace]\nPos\u003d0,0\nSize\u003d1560,943\nCollapsed\u003d0\n\n[Window][Game]\nPos\u003d616,27\nSize\u003d505,526\nCollapsed\u003d0\nDockId\u003d0x0000000A,0\n\n[Window][Inspector]\nPos\u003d1123,27\nSize\u003d429,908\nCollapsed\u003d0\nDockId\u003d0x00000005,0\n\n[Window][Console]\nPos\u003d162,555\nSize\u003d959,380\nCollapsed\u003d0\nDockId\u003d0x00000007,0\n\n[Window][ImGuizmo Demo]\nPos\u003d697,274\nSize\u003d184,141\nCollapsed\u003d0\n\n[Window][Scene]\nPos\u003d162,27\nSize\u003d452,526\nCollapsed\u003d0\nDockId\u003d0x00000009,0\n\n[Window][Edit GameObject]\nPos\u003d76,614\nSize\u003d135,65\nCollapsed\u003d0\n\n[Window][Choose File##browse-key]\nPos\u003d102,100\nSize\u003d800,400\nCollapsed\u003d0\n\n[Window][Save Scene As##save-scene-as]\nPos\u003d453,137\nSize\u003d373,446\nCollapsed\u003d0\n\n[Window][Save Scene As##save-scene]\nPos\u003d210,94\nSize\u003d800,600\nCollapsed\u003d0\n\n[Window][Open Scene##open-scene]\nPos\u003d332,117\nSize\u003d800,600\nCollapsed\u003d0\n\n[Window][NodeEditor]\nPos\u003d342,76\nSize\u003d1048,674\nCollapsed\u003d0\n\n[Table][0xCBC8BC0F,4]\nRefScale\u003d13\nColumn 0  Sort\u003d0v\n\n[Table][0x7886A9AE,4]\nRefScale\u003d13\nColumn 0  Sort\u003d0v\n\n[Table][0xA96AB942,4]\nRefScale\u003d13\nColumn 0  Sort\u003d0v\n\n[Table][0x6E981252,4]\nRefScale\u003d13\nColumn 0  Sort\u003d0v\n\n[Docking][Data]\nDockSpace         ID\u003d0x33675C32 Window\u003d0x5B816B74 Pos\u003d8,27 Size\u003d1544,908 Split\u003dX\n  DockNode        ID\u003d0x00000001 Parent\u003d0x33675C32 SizeRef\u003d1473,685 Split\u003dX\n    DockNode      ID\u003d0x00000002 Parent\u003d0x00000001 SizeRef\u003d152,685 Selected\u003d0x788BAA0D\n    DockNode      ID\u003d0x00000003 Parent\u003d0x00000001 SizeRef\u003d959,685 Split\u003dY Selected\u003d0x83199EB2\n      DockNode    ID\u003d0x00000004 Parent\u003d0x00000003 SizeRef\u003d863,526 Split\u003dX Selected\u003d0x18B8C0DE\n        DockNode  ID\u003d0x00000009 Parent\u003d0x00000004 SizeRef\u003d452,621 CentralNode\u003d1 Selected\u003d0x18B8C0DE\n        DockNode  ID\u003d0x0000000A Parent\u003d0x00000004 SizeRef\u003d505,621 Selected\u003d0x83199EB2\n      DockNode    ID\u003d0x00000007 Parent\u003d0x00000003 SizeRef\u003d863,380 Selected\u003d0xF9BEF62A\n  DockNode        ID\u003d0x00000008 Parent\u003d0x33675C32 SizeRef\u003d429,685 Split\u003dY Selected\u003d0xE927CF2F\n    DockNode      ID\u003d0x00000005 Parent\u003d0x00000008 SizeRef\u003d215,353 Selected\u003d0xF02CD328\n    DockNode      ID\u003d0x00000006 Parent\u003d0x00000008 SizeRef\u003d215,330 Selected\u003d0xE927CF2F\n\n";
     private static final float width = 110f;
-    public static final boolean USE_IMGUI_FILE_CHOOSER = false;
 
     public static boolean drawVec2Control(String label, Vector2f values) {
         return drawVec2Control(label, values, 0.0f, width);
@@ -53,7 +48,7 @@ public final class ImGuiUtils {
         return drawVec2Control(label, values, resetValue, width);
     }
 
-    public static boolean drawVec2Control(String label, Vector2f values, float resetValue, float columnWidth) {
+    public static boolean drawVec2Control(final String label, final Vector2f values, final float resetValue, final float columnWidth) {
         ImGui.pushID(label);
 
         ImGui.columns(2);
@@ -63,9 +58,9 @@ public final class ImGuiUtils {
 
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
 
-        float lineHeight = ImGui.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
-        Vector2f buttonSize = new Vector2f(lineHeight + 3.0f, lineHeight);
-        float widthEach = (ImGui.calcItemWidth() - buttonSize.x * 2.0f) / 2.0f;
+        final float lineHeight = ImGui.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
+        final Vector2f buttonSize = new Vector2f(lineHeight + 3.0f, lineHeight);
+        final float widthEach = (ImGui.calcItemWidth() - buttonSize.x * 2.0f) / 2.0f;
 
         ImGui.pushItemWidth(widthEach);
         ImGui.pushStyleColor(ImGuiCol.Button, 0.8f, 0.1f, 0.15f, 1.0f);
@@ -80,7 +75,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesX = {values.x};
+        final float[] vecValuesX = {values.x};
         if (ImGui.dragFloat("##x", vecValuesX, 0.1f)) {
             edited = true;
         }
@@ -98,7 +93,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesY = {values.y};
+        final float[] vecValuesY = {values.y};
         if (ImGui.dragFloat("##y", vecValuesY, 0.1f)) {
             edited = true;
         }
@@ -135,9 +130,9 @@ public final class ImGuiUtils {
 
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
 
-        float lineHeight = ImGui.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
-        Vector2f buttonSize = new Vector2f(lineHeight + 3.0f, lineHeight);
-        float widthEach = (ImGui.calcItemWidth() - buttonSize.x * 3.0f) / 3.0f;
+        final float lineHeight = ImGui.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
+        final Vector2f buttonSize = new Vector2f(lineHeight + 3.0f, lineHeight);
+        final float widthEach = (ImGui.calcItemWidth() - buttonSize.x * 3.0f) / 3.0f;
 
         ImGui.pushItemWidth(widthEach);
         ImGui.pushStyleColor(ImGuiCol.Button, 0.8f, 0.1f, 0.15f, 1.0f);
@@ -152,7 +147,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesX = {values.x};
+        final float[] vecValuesX = {values.x};
         if (ImGui.dragFloat("##X", vecValuesX, 0.1f)) {
             edited = true;
         }
@@ -170,7 +165,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesY = {values.y};
+        final float[] vecValuesY = {values.y};
         if (ImGui.dragFloat("##Y", vecValuesY, 0.1f)) {
             edited = true;
         }
@@ -189,7 +184,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesZ = {values.z};
+        final float[] vecValuesZ = {values.z};
         if (ImGui.dragFloat("##Z", vecValuesZ, 0.1f)) {
             edited = true;
         }
@@ -214,7 +209,7 @@ public final class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        float[] valArr = {value};
+        final float[] valArr = {value};
         ImGui.dragFloat("##dragFloat", valArr, 0.1f);
 
         ImGui.columns(1);
@@ -231,7 +226,7 @@ public final class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        int[] valArr = {value};
+        final int[] valArr = {value};
         ImGui.dragInt("##dragInt", valArr, 0.1f);
 
         ImGui.columns(1);
@@ -249,7 +244,7 @@ public final class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        float[] imColor = {color.r, color.g, color.b, color.a};
+        final float[] imColor = {color.r, color.g, color.b, color.a};
         if (ImGui.colorEdit4("##colorPicker", imColor)) {
             color.set(imColor[0], imColor[1], imColor[2], imColor[3]);
             res = true;
@@ -268,7 +263,7 @@ public final class ImGuiUtils {
         ImGui.setColumnWidth(0, width);
         ImGui.text(label);
         ImGui.nextColumn();
-        String id = clazz.getSimpleName() + "-" + parent.id;
+        final String id = clazz.getSimpleName() + "-" + parent.id;
 
         if (ImGui.button("find")) {
             ImGui.openPopup(id);
@@ -278,16 +273,16 @@ public final class ImGuiUtils {
         if (ImGui.isPopupOpen(id)) {
             if (ImGui.beginPopup(id)) {
                 if (ImGui.beginListBox("##List Component")) {
-                    Set<Component> objects = new HashSet<>();
+                    final Set<Component> objects = new HashSet<>();
                     for (GameObject root : parent.scene.getGameObjects()) {
-                        Set<? extends Component> components = root.getComponents(clazz);
-                        Set<? extends Component> children = root.getComponentsInChildren(clazz);
+                        final Set<? extends Component> components = root.getComponents(clazz);
+                        final Set<? extends Component> children = root.getComponentsInChildren(clazz);
                         objects.addAll(components);
                         objects.addAll(children);
                     }
 
                     for (Component component : objects) {
-                        String name = component.getClass().getSimpleName() + " (" + component.gameObject.name + ")";
+                        final String name = component.getClass().getSimpleName() + " (" + component.gameObject.name + ")";
                         if (ImGui.selectable(name)) {
                             find = component;
                             ImGui.closeCurrentPopup();
@@ -305,7 +300,7 @@ public final class ImGuiUtils {
 
         if (previous != null) {
             ImGui.sameLine();
-            String name = previous.getClass().getSimpleName() + " (" + previous.gameObject.name + ")";
+            final String name = previous.getClass().getSimpleName() + " (" + previous.gameObject.name + ")";
             ImGui.text(name);
         }
 
@@ -322,7 +317,7 @@ public final class ImGuiUtils {
         ImGui.setColumnWidth(0, width);
         ImGui.text(label);
         ImGui.nextColumn();
-        String id = "mesh_load";
+        final String id = "mesh_load";
 
         if (ImGui.button("load")) {
             ImGui.openPopup(id);
@@ -333,7 +328,7 @@ public final class ImGuiUtils {
             if (ImGui.beginPopup(id)) {
                 if (ImGui.beginListBox("##list mesh")) {
                     for (Class<? extends Mesh> clazz : Mesh.MESHES) {
-                        String name = clazz.getSimpleName().replace("Mesh", "");
+                        final String name = clazz.getSimpleName().replace("Mesh", "");
                         if (ImGui.selectable(name)) {
                             find = (Mesh) Reflect.newInstance(clazz);
                             ImGui.closeCurrentPopup();
@@ -351,7 +346,7 @@ public final class ImGuiUtils {
 
         if (previous != null) {
             ImGui.sameLine();
-            String name = previous.name;
+            final String name = previous.name;
             ImGui.text(name);
         }
 
@@ -389,7 +384,7 @@ public final class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        ImString outString = new ImString(text, 256);
+        final ImString outString = new ImString(text, 256);
         if (ImGui.inputText("##" + label, outString)) {
             ImGui.columns(1);
             ImGui.popID();
@@ -417,9 +412,9 @@ public final class ImGuiUtils {
 
         ImGui.pushStyleVar(ImGuiStyleVar.ItemSpacing, 0, 0);
 
-        float lineHeight = ImGui.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
-        Vector2f buttonSize = new Vector2f(lineHeight + 3.0f, lineHeight);
-        float widthEach = (ImGui.calcItemWidth() - buttonSize.x * 3.0f) / 3.0f;
+        final float lineHeight = ImGui.getFontSize() + ImGui.getStyle().getFramePaddingY() * 2.0f;
+        final Vector2f buttonSize = new Vector2f(lineHeight + 3.0f, lineHeight);
+        final float widthEach = (ImGui.calcItemWidth() - buttonSize.x * 3.0f) / 3.0f;
 
         ImGui.pushItemWidth(widthEach);
         ImGui.pushStyleColor(ImGuiCol.Button, 0.8f, 0.1f, 0.15f, 1.0f);
@@ -435,7 +430,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesX = {values.x};
+        final float[] vecValuesX = {values.x};
         if (ImGui.dragFloat("##X", vecValuesX, 0.1f)) {
             edited = true;
         }
@@ -453,7 +448,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesY = {values.y};
+        final float[] vecValuesY = {values.y};
         if (ImGui.dragFloat("##Y", vecValuesY, 0.1f)) {
             edited = true;
         }
@@ -472,7 +467,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesZ = {values.z};
+        final float[] vecValuesZ = {values.z};
         if (ImGui.dragFloat("##Z", vecValuesZ, 0.1f)) {
             edited = true;
         }
@@ -491,7 +486,7 @@ public final class ImGuiUtils {
         ImGui.popStyleColor(3);
 
         ImGui.sameLine();
-        float[] vecValuesW = {values.w};
+        final float[] vecValuesW = {values.w};
         if (ImGui.dragFloat("##W", vecValuesW, 0.1f)) {
             edited = true;
         }
@@ -517,7 +512,7 @@ public final class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        ImBoolean imBoolean = new ImBoolean(value);
+        final ImBoolean imBoolean = new ImBoolean(value);
         ImGui.checkbox("##checkbox", imBoolean);
         ImGui.columns(1);
         ImGui.popID();
@@ -533,7 +528,7 @@ public final class ImGuiUtils {
         ImGui.text(label);
         ImGui.nextColumn();
 
-        ImInt imInt = new ImInt(id);
+        final ImInt imInt = new ImInt(id);
         if (ImGui.collapsingHeader(items[id])) {
             ImGui.listBox("##listselectablebox", imInt, items);
         }
@@ -569,18 +564,18 @@ public final class ImGuiUtils {
 
     public static void imguiLayer(Field field, Component component) {
         try {
-            Class<?> type = field.getType();
-            Object value = field.get(component);
-            String name = field.getName();
-            SceneImpl scene = (SceneImpl) component.gameObject.scene;
+            final Class<?> type = field.getType();
+            final Object value = field.get(component);
+            final String name = field.getName();
+            final SceneImpl scene = (SceneImpl) component.gameObject.scene;
 
-            String[] invokeMethods = field.isAnnotationPresent(InvokeOnEdit.class) ? field.getAnnotation(InvokeOnEdit.class).value() : null;
+            final String[] invokeMethods = field.isAnnotationPresent(InvokeOnEdit.class) ? field.getAnnotation(InvokeOnEdit.class).value() : null;
 
             if (type == boolean.class) {
-                boolean previous = (boolean) value;
-                boolean now = drawCheckBox(name, previous);
+                final boolean previous = (boolean) value;
+                final boolean now = drawCheckBox(name, previous);
                 if (previous != now) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {
                             try {
@@ -619,10 +614,10 @@ public final class ImGuiUtils {
                 field.setBoolean(component, now);
 
             } else if (type == int.class) {
-                int previous = (int) value;
-                int now = dragInt(name, previous);
+                final int previous = (int) value;
+                final int now = dragInt(name, previous);
                 if (previous != now) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {
                             try {
@@ -661,10 +656,10 @@ public final class ImGuiUtils {
                 field.setInt(component, now);
 
             } else if (type == float.class) {
-                float previous = (float) value;
-                float now = dragFloat(name, previous);
+                final float previous = (float) value;
+                final float now = dragFloat(name, previous);
                 if (previous != now) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {
                             try {
@@ -703,10 +698,10 @@ public final class ImGuiUtils {
                 field.setFloat(component, now);
 
             } else if (type == String.class) {
-                String previous = (String) value;
+                final String previous = (String) value;
                 String now = inputText(name, previous);
                 if (previous != null && previous.equals(now)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {
                             try {
@@ -745,9 +740,9 @@ public final class ImGuiUtils {
                 field.set(component, now);
 
             } else if (type == Vector3f.class) {
-                Vector3f previous = new Vector3f((Vector3f) value);
+                final Vector3f previous = new Vector3f((Vector3f) value);
                 if (drawVec3Control(name, (Vector3f) value, 1f)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         final Vector3f redo = new Vector3f();
                         @Override
                         public void undo() {
@@ -779,9 +774,9 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Vector3.class) {
-                Vector3 previous = new Vector3((Vector3) value);
+                final Vector3 previous = new Vector3((Vector3) value);
                 if (drawVec3Control(name, ((Vector3) value).getJoml(), 1f)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         final Vector3 redo = new Vector3();
                         @Override
                         public void undo() {
@@ -813,9 +808,9 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Vector2f.class) {
-                Vector2f previous = new Vector2f((Vector2f) value);
+                final Vector2f previous = new Vector2f((Vector2f) value);
                 if (drawVec2Control(name, (Vector2f) value, 1f)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         final Vector2f redo = new Vector2f();
                         @Override
                         public void undo() {
@@ -847,9 +842,9 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Vector2.class) {
-                Vector2 previous = new Vector2((Vector2) value);
+                final Vector2 previous = new Vector2((Vector2) value);
                 if (drawVec2Control(name, ((Vector2) value).getJoml(), 1f)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         final Vector2 redo = new Vector2();
                         @Override
                         public void undo() {
@@ -881,9 +876,9 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Color.class) {
-                Color previous = new Color((Color) value);
+                final Color previous = new Color((Color) value);
                 if (ImGuiUtils.colorPicker4(name, (Color) value)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         final Color redo = new Color();
                         @Override
                         public void undo() {
@@ -915,9 +910,9 @@ public final class ImGuiUtils {
                }
 
             } else if (type == Quaternionf.class) {
-                Quaternionf previous = new Quaternionf((Quaternionf) value);
+                final Quaternionf previous = new Quaternionf((Quaternionf) value);
                 if (drawQuatControl(name, (Quaternionf) value, 0.f)) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         final Quaternionf redo = new Quaternionf();
                         @Override
                         public void undo() {
@@ -951,12 +946,12 @@ public final class ImGuiUtils {
             } else if (type == Mesh.class) {
                 Mesh mesh = (Mesh) value;
                 ImGui.text("shader: " + mesh.getShader().getPath());
-                Mesh newMesh = findMesh(name, mesh);
+                final Mesh newMesh = findMesh(name, mesh);
                 if (newMesh != null) {
                     newMesh.setTexture(mesh.getTexture() != null ? mesh.getTexturePath() : null);
                     newMesh.build();
-                    Mesh finalMesh = mesh;
-                    EditorAction action = new EditorAction(scene) {
+                    final Mesh finalMesh = mesh;
+                    final EditorAction action = new EditorAction(scene) {
                         private final Mesh redo = finalMesh;
                         @Override
                         public void undo() {
@@ -986,18 +981,18 @@ public final class ImGuiUtils {
                     mesh = newMesh;
                 }
 
-                String path = findFile("texture", "Load Texture", ".png,.jpeg,.jpg");
+                final String path = findFile("texture", "Load Texture", ".png,.jpeg,.jpg");
 
                 if (mesh.getTexture() != null) {
                     ImGui.sameLine();
                     ImGui.text(mesh.getTexturePath());
                 }
 
-                Mesh finalMesh = mesh;
+                final Mesh finalMesh = mesh;
                 if (path != null) {
-                    String previous = mesh.getTexture() != null ? mesh.getTexturePath() : null;
+                    final String previous = mesh.getTexture() != null ? mesh.getTexturePath() : null;
                     if (path.isEmpty()) {
-                        EditorAction action = new EditorAction(scene) {
+                        final EditorAction action = new EditorAction(scene) {
                             @Override
                             public void undo() {
                                 try {
@@ -1024,10 +1019,10 @@ public final class ImGuiUtils {
                             }
                         }
                     } else {
-                        File absolute = new File(path);
-                        String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
+                        final File absolute = new File(path);
+                        final String relative = FileIO.relativize(absolute);
                         if (Texture.getTexture(relative) != null) {
-                            EditorAction action = new EditorAction(scene) {
+                            final EditorAction action = new EditorAction(scene) {
                                 @Override
                                 public void undo() {
                                     try {
@@ -1058,20 +1053,20 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Spritesheet.class) {
-                Spritesheet sheet = (Spritesheet) value;
+                final Spritesheet sheet = (Spritesheet) value;
                 if (sheet != null) {
-                    Map<String, Animation> map = sheet.getAnimations();
+                    final Map<String, Animation> map = sheet.getAnimations();
                     if (map != null) {
                         List<String> animation = map.values().stream().map(Animation::toString).sorted(Comparator.naturalOrder()).collect(Collectors.toList());
                         drawList(name, animation);
                     }
 
-                    Mesh newMesh = findMesh("mesh", sheet.mesh);
+                    final Mesh newMesh = findMesh("mesh", sheet.mesh);
                     if (newMesh != null) {
                         newMesh.setTexture(sheet.mesh.getTexture() != null ? sheet.mesh.getTexturePath() : null);
                         newMesh.build();
-                        Mesh finalMesh = sheet.mesh;
-                        EditorAction action = new EditorAction(scene) {
+                        final Mesh finalMesh = sheet.mesh;
+                        final EditorAction action = new EditorAction(scene) {
                             @Override
                             public void undo() {
                                 sheet.mesh = newMesh;
@@ -1093,8 +1088,8 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == Texture.class) {
-                Texture previous = (Texture) value;
-                String path = findFile(name, "Load Texture", ".png,.jpeg,.jpg");
+                final Texture previous = (Texture) value;
+                final String path = findFile(name, "Load Texture", ".png,.jpeg,.jpg");
 
                 if (previous != null) {
                     ImGui.sameLine();
@@ -1103,7 +1098,7 @@ public final class ImGuiUtils {
 
                 if (path != null) {
                     if (path.isEmpty()) {
-                        EditorAction action = new EditorAction(scene) {
+                        final EditorAction action = new EditorAction(scene) {
                             @Override
                             public void undo() {
                                 try {
@@ -1140,9 +1135,9 @@ public final class ImGuiUtils {
                             }
                         }
                     } else {
-                        Texture texture = Texture.getTexture(path);
+                        final Texture texture = Texture.getTexture(path);
                         if (texture.buildTexture()) {
-                            EditorAction action = new EditorAction(scene) {
+                            final EditorAction action = new EditorAction(scene) {
                                 @Override
                                 public void undo() {
                                     try {
@@ -1183,17 +1178,27 @@ public final class ImGuiUtils {
                 }
 
             } else if (type == File.class) {
-                File previous = (File) value;
-                String path = findFile(name, ".*");
-
+                final File previous = (File) value;
+                final StringBuilder filter = new StringBuilder(".*");
+                if (field.isAnnotationPresent(FileExtensions.class)) {
+                    String[] values = field.getAnnotation(FileExtensions.class).value();
+                    filter.delete(0, filter.length());
+                    for (int i = 0; i < values.length; i++) {
+                        String v = values[i];
+                        filter.append(v);
+                        if (i < values.length - 1) {
+                            filter.append(",");
+                        }
+                    }
+                }
+                final String path = findFile(name, filter.toString());
                 if (previous != null) {
                     ImGui.sameLine();
                     ImGui.text(previous.getPath());
                 }
-
                 if (path != null) {
                     if (path.isEmpty()) {
-                        EditorAction action = new EditorAction(scene) {
+                        final EditorAction action = new EditorAction(scene) {
                             @Override
                             public void undo() {
                                 try {
@@ -1230,8 +1235,8 @@ public final class ImGuiUtils {
                             }
                         }
                     } else {
-                        File now = new File(path);
-                        EditorAction action = new EditorAction(scene) {
+                        final File now = new File(path);
+                        final EditorAction action = new EditorAction(scene) {
                             @Override
                             public void undo() {
                                 try {
@@ -1271,10 +1276,10 @@ public final class ImGuiUtils {
                 }
 
             } else if (Component.class.isAssignableFrom(type)) {
-                Component previous = (Component) value;
-                Component find = findComponent(name, component.gameObject, previous, (Class<? extends Component>) type);
+                final Component previous = (Component) value;
+                final Component find = findComponent(name, component.gameObject, previous, (Class<? extends Component>) type);
                 if (find != null && find != previous) {
-                    EditorAction action = new EditorAction(scene) {
+                    final EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {
                             try {
@@ -1313,8 +1318,8 @@ public final class ImGuiUtils {
                 }
 
             } else if (type.isEnum()) {
-                Enum<?>[] values = (Enum<?>[]) type.getMethod("values").invoke(null);
-                String[] items = new String[values.length];
+                final Enum<?>[] values = (Enum<?>[]) type.getMethod("values").invoke(null);
+                final String[] items = new String[values.length];
                 int previousItem = 0;
                 for (int i = 0; i < values.length; i++) {
                     items[i] = values[i].name();
@@ -1322,10 +1327,10 @@ public final class ImGuiUtils {
                         previousItem = i;
                     }
                 }
-                int currentItem = drawListSelectableBox(name, previousItem, items);
+                final int currentItem = drawListSelectableBox(name, previousItem, items);
                 if (currentItem != previousItem) {
-                    int finalPreviousItem = previousItem;
-                    EditorAction action = new EditorAction(scene) {
+                    final int finalPreviousItem = previousItem;
+                    final EditorAction action = new EditorAction(scene) {
                         @Override
                         public void undo() {
                             try {
@@ -1371,71 +1376,48 @@ public final class ImGuiUtils {
         }
         ImGui.sameLine();
         if (ImGui.button(button)) {
-            if (USE_IMGUI_FILE_CHOOSER) {
-                ImGuiFileDialog.openModal(label, button, filter, ".", new ImGuiFileDialogPaneFun() {
-                    @Override
-                    public void paneFun(String filter, long userDatas, boolean canContinue) {}
-                }, 250, 1, 42, ImGuiFileDialogFlags.None);
-
-            } else {
-                ImGui.columns(1);
-                ImGui.popID();
-
-                return openFileJava(button, filter);
-            }
+            ImGui.columns(1);
+            ImGui.popID();
+            return openFileJava(button, filter);
         }
         ImGui.columns(1);
         ImGui.popID();
-
-        if (USE_IMGUI_FILE_CHOOSER) {
-            if (ImGuiFileDialog.display(label, ImGuiFileDialogFlags.None, 800, 600, 800, 600)) {
-                if (ImGuiFileDialog.isOk()) {
-                    String path = ImGuiFileDialog.getFilePathName();
-                    File absolute = new File(path);
-                    String relative = new File("").toURI().relativize(absolute.toURI()).getPath();
-                    ImGuiFileDialog.close();
-                    return relative;
-                }
-                ImGuiFileDialog.close();
-            }
-        }
 
         return null;
     }
 
     public static String openFileJava(String title, String filter) {
-        NFDPathSet pointer = NFDPathSet.callocStack();
-        PointerBuffer pointerBuffer = PointerBuffer.create(pointer.address(), pointer.sizeof());
-        String[] extensions = filter.split(",");
-        String[] wrap = new String[extensions.length];
+        final NFDPathSet pointer = NFDPathSet.callocStack();
+        final PointerBuffer pointerBuffer = PointerBuffer.create(pointer.address(), pointer.sizeof());
+        final String[] extensions = filter.split(",");
+        final String[] wrap = new String[extensions.length];
         int i = 0;
         for (String e : extensions) {
             wrap[i++] = e.substring(1);
         }
-        String f = String.join(",", wrap);
-        int result = NativeFileDialog.NFD_OpenDialog(f, System.getProperty("user.dir"), pointerBuffer);
+        final String f = String.join(",", wrap);
+        final int result = NativeFileDialog.NFD_OpenDialog(f, System.getProperty("user.dir"), pointerBuffer);
         if (result == NFD_OKAY) {
-            File file = new File(pointerBuffer.getStringASCII());
-            return new File("").toURI().relativize(file.toURI()).getPath();
+            final File file = new File(pointerBuffer.getStringASCII());
+            return FileIO.relativize(file);
         }
         return null;
     }
 
     public static String saveFileJava(String title, String filter) {
-        NFDPathSet pointer = NFDPathSet.calloc();
-        PointerBuffer pointerBuffer = PointerBuffer.create(pointer.address(), pointer.sizeof());
-        String[] extensions = filter.split(",");
-        String[] wrap = new String[extensions.length];
+        final NFDPathSet pointer = NFDPathSet.calloc();
+        final PointerBuffer pointerBuffer = PointerBuffer.create(pointer.address(), pointer.sizeof());
+        final String[] extensions = filter.split(",");
+        final String[] wrap = new String[extensions.length];
         int i = 0;
         for (String e : extensions) {
             wrap[i++] = e.substring(1);
         }
-        String f = String.join(",", wrap);
-
-        int result = NativeFileDialog.NFD_SaveDialog(f, System.getProperty("user.dir"), pointerBuffer);
+        final String f = String.join(",", wrap);
+        final int result = NativeFileDialog.NFD_SaveDialog(f, System.getProperty("user.dir"), pointerBuffer);
         if (result == NFD_OKAY) {
-            File file = new File(pointerBuffer.getStringASCII());
-            return new File("").toURI().relativize(file.toURI()).getPath();
+            final File file = new File(pointerBuffer.getStringASCII());
+            return FileIO.relativize(file);
         }
         return null;
     }
@@ -1446,7 +1428,7 @@ public final class ImGuiUtils {
 
     public static void imguiLayer(Method method, Component component) {
         try {
-            String name = method.getName();
+            final String name = method.getName();
             if (ImGui.button(name)) {
                 method.invoke(component);
             }

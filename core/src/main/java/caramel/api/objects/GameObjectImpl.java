@@ -11,12 +11,12 @@ public final class GameObjectImpl extends GameObject implements Update, Render {
         name = new StringWrapperImpl();
     }
 
-    public GameObjectImpl(Scene parentScene) {
+    public GameObjectImpl(final Scene parentScene) {
         super(parentScene);
         name = new StringWrapperImpl("GameObject");
     }
 
-    public GameObjectImpl clone(boolean copyId) {
+    public GameObjectImpl clone(final boolean copyId) {
         GameObjectImpl clone;
         if (copyId) {
             clone = new GameObjectImpl();
@@ -35,12 +35,12 @@ public final class GameObjectImpl extends GameObject implements Update, Render {
         clone.transform.forward.set(transform.forward);
         clone.transform.enabled = transform.enabled;
         clone.active = active;
-        for (Component c : components) {
+        for (final Component c : components) {
             if (c instanceof Transform) continue;
             Component cl = c.clone(clone, copyId);
             clone.addComponent(cl);
         }
-        for (GameObject c : children) {
+        for (final GameObject c : children) {
             GameObject ch = c.clone(copyId);
             ch.parent = clone.transform;
             clone.children.add(ch);
@@ -48,15 +48,15 @@ public final class GameObjectImpl extends GameObject implements Update, Render {
         return clone;
     }
 
-    public GameObjectImpl instantiate(GameObjectImpl prefab, Transform parent) {
-        GameObjectImpl clone = prefab.clone(false);
+    public GameObjectImpl instantiate(final GameObjectImpl prefab, final Transform parent) {
+        final GameObjectImpl clone = prefab.clone(false);
         if (parent != null) {
             scene.addGameObject(clone, parent.gameObject);
         }
         return clone;
     }
 
-    public GameObjectImpl instantiate(GameObjectImpl prefab) {
+    public GameObjectImpl instantiate(final GameObjectImpl prefab) {
         return instantiate(prefab, null);
     }
 }

@@ -1,8 +1,9 @@
 package caramel.api.render;
 
 import caramel.api.components.Camera;
+import caramel.api.graphics.Graphics;
 import caramel.api.math.Vertex;
-import caramel.api.texture.Mesh;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.Texture;
 import org.joml.Matrix4f;
 
@@ -11,18 +12,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
-import static org.lwjgl.opengl.GL13.glActiveTexture;
-import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
-import static org.lwjgl.opengl.GL15.glBindBuffer;
-import static org.lwjgl.opengl.GL15.glBufferSubData;
-import static org.lwjgl.opengl.GL20.glDisableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
+import static caramel.api.graphics.GL20.GL_ARRAY_BUFFER;
+import static caramel.api.graphics.GL20.GL_ELEMENT_ARRAY_BUFFER;
+import static caramel.api.graphics.GL20.GL_TEXTURE0;
+import static caramel.api.graphics.GL20.GL_TRIANGLES;
+import static caramel.api.graphics.GL20.GL_UNSIGNED_INT;
 
 public final class BatchRenderer extends Mesh {
     public static final int MAX_TEXTURES = 8;
@@ -59,11 +53,11 @@ public final class BatchRenderer extends Mesh {
         elementArray.clear();
     }
 
-    public static void addMesh(Shader shader, Mesh mesh) {
+    public static void addMesh(final Shader shader, final Mesh mesh) {
         if (shaderMapping == null) {
             shaderMapping = new HashMap<>();
-            List<BatchRenderer> rendererList = new ArrayList<>();
-            BatchRenderer batchRenderer = new BatchRenderer();
+            final List<BatchRenderer> rendererList = new ArrayList<>();
+            final BatchRenderer batchRenderer = new BatchRenderer();
             batchRenderer.build();
             rendererList.add(batchRenderer);
             shaderMapping.put(shader, rendererList);
@@ -71,18 +65,18 @@ public final class BatchRenderer extends Mesh {
         List<BatchRenderer> rendererList = shaderMapping.get(shader);
         if (rendererList == null || rendererList.isEmpty()) {
             if (rendererList == null) rendererList = new ArrayList<>();
-            BatchRenderer batchRenderer = new BatchRenderer();
+            final BatchRenderer batchRenderer = new BatchRenderer();
             batchRenderer.build();
             rendererList.add(batchRenderer);
             shaderMapping.put(shader, rendererList);
         }
 
         BatchRenderer renderer = rendererList.get(rendererList.size() - 1);
-        List<Vertex> dirty = mesh.getDirtyVertexArray();
+        final List<Vertex> dirty = mesh.getDirtyVertexArray();
         if (dirty.isEmpty()) return;
 
         // Generate new batch if out of textures or out of vertex buffers
-        Vertex lastVertex = dirty.get(dirty.size() - 1);
+        final Vertex lastVertex = dirty.get(dirty.size() - 1);
         if (lastVertex.texSlot >= MAX_TEXTURES) {
             renderer = new BatchRenderer();
             renderer.build();
@@ -102,7 +96,7 @@ public final class BatchRenderer extends Mesh {
 
         // Add mesh vertices and index buffers to batch
         renderer.vertexArray.addAll(dirty);
-        int indices = renderer.elementArray.stream().reduce((a, b) -> a > b ? a : b).orElse(-1);
+        final int indices = renderer.elementArray.stream().reduce((a, b) -> a > b ? a : b).orElse(-1);
         for (int element : mesh.getElementArray()) {
             renderer.elementArray.add(indices + element + 1);
         }
@@ -112,8 +106,8 @@ public final class BatchRenderer extends Mesh {
 
     public static void invalidateAll() {
         if (shaderMapping == null) return;
-        for (Map.Entry<Shader, List<BatchRenderer>> entry : shaderMapping.entrySet()) {
-            for (BatchRenderer renderer : entry.getValue()) {
+        for (final Map.Entry<Shader, List<BatchRenderer>> entry : shaderMapping.entrySet()) {
+            for (final BatchRenderer renderer : entry.getValue()) {
                 renderer.invalidate();
             }
             entry.getValue().clear();
@@ -123,22 +117,22 @@ public final class BatchRenderer extends Mesh {
 
     public static void render(Camera camera) {
         if (shaderMapping == null) return;
-        int[] texSlots = new int[MAX_TEXTURES];
+        final int[] texSlots = new int[MAX_TEXTURES];
         for (int t = 0; t < MAX_TEXTURES; t++) {
             texSlots[t] = t;
         }
 
-        Matrix4f uVP = camera.getProjection().mul(camera.getView());
+        final Matrix4f uVP = camera.getProjection().mul(camera.getView());
 
-        for (Map.Entry<Shader, List<BatchRenderer>> entry : shaderMapping.entrySet()) {
-            Shader shader = entry.getKey();
-            List<BatchRenderer> rendererList = entry.getValue();
+        for (final Map.Entry<Shader, List<BatchRenderer>> entry : shaderMapping.entrySet()) {
+            final Shader shader = entry.getKey();
+            final List<BatchRenderer> rendererList = entry.getValue();
             shader.attach();
             shader.uploadIntArray("texSampler", texSlots);
             shader.uploadMat4f("uVP", uVP);
 
             for (int index = 0; index < rendererList.size(); index++) {
-                BatchRenderer renderer = rendererList.get(index);
+                final BatchRenderer renderer = rendererList.get(index);
                 if (!renderer.dirty) {
                     renderer.invalidate();
                     rendererList.remove(renderer);
@@ -146,39 +140,39 @@ public final class BatchRenderer extends Mesh {
                     continue;
                 }
 
-                List<Texture> textures = Texture.getTextures();
-                int offset = index * MAX_TEXTURES;
+                final List<Texture> textures = Texture.getTextures();
+                final int offset = index * MAX_TEXTURES;
                 for (int i = offset; i < textures.size() && i + offset < MAX_TEXTURES; i++) {
-                    glActiveTexture(GL_TEXTURE0 + i - offset);
+                    Graphics.get().glActiveTexture(GL_TEXTURE0 + i - offset);
                     textures.get(i).bind();
                 }
 
-                glBindBuffer(GL_ARRAY_BUFFER, renderer.vboId);
-                glBufferSubData(GL_ARRAY_BUFFER, 0, renderer.getVertexBuffer());
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, renderer.vboId);
+                Graphics.get().glBufferSubData(GL_ARRAY_BUFFER, 0, renderer.getVertexBuffer());
+                Graphics.get().glBindBuffer(GL_ARRAY_BUFFER, 0);
                 if (renderer.withIndices) {
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.eboId);
-                    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, renderer.getIndexBuffer());
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                    Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer.eboId);
+                    Graphics.get().glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, renderer.getIndexBuffer());
+                    Graphics.get().glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
                 }
 
-                glBindVertexArray(renderer.vaoId);
-                glEnableVertexAttribArray(0);
-                glEnableVertexAttribArray(1);
-                glEnableVertexAttribArray(2);
-                glEnableVertexAttribArray(3);
-                glEnableVertexAttribArray(4);
+                Graphics.get().glBindVertexArray(renderer.vaoId);
+                Graphics.get().glEnableVertexAttribArray(0);
+                Graphics.get().glEnableVertexAttribArray(1);
+                Graphics.get().glEnableVertexAttribArray(2);
+                Graphics.get().glEnableVertexAttribArray(3);
+                Graphics.get().glEnableVertexAttribArray(4);
 
-                glDrawElements(GL_TRIANGLES, renderer.elementArray.size(), GL_UNSIGNED_INT, 0);
+                Graphics.get().glDrawElements(GL_TRIANGLES, renderer.elementArray.size(), GL_UNSIGNED_INT, 0);
                 DRAW_CALLS++;
 
-                glDisableVertexAttribArray(0);
-                glDisableVertexAttribArray(1);
-                glDisableVertexAttribArray(2);
-                glDisableVertexAttribArray(3);
-                glDisableVertexAttribArray(4);
+                Graphics.get().glDisableVertexAttribArray(0);
+                Graphics.get().glDisableVertexAttribArray(1);
+                Graphics.get().glDisableVertexAttribArray(2);
+                Graphics.get().glDisableVertexAttribArray(3);
+                Graphics.get().glDisableVertexAttribArray(4);
 
-                glBindVertexArray(0);
+                Graphics.get().glBindVertexArray(0);
 
                 for (int i = offset; i < textures.size() && i + offset < MAX_TEXTURES; i++) {
                     textures.get(i).unbind();

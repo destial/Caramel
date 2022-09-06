@@ -24,7 +24,7 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
     private final Map<String, ClassScriptMemoryJavaObject> mapNameToClasses = new ConcurrentHashMap<>();
     private final ClassLoader parentClassLoader;
 
-    public ScriptMemoryManager(JavaFileManager fileManager, ClassLoader parentClassLoader) {
+    public ScriptMemoryManager(final JavaFileManager fileManager, final ClassLoader parentClassLoader) {
         super(fileManager);
 
         this.parentClassLoader = parentClassLoader;
@@ -34,24 +34,23 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
         return mapNameToClasses.values();
     }
 
-    public FileScriptMemoryJavaObject createSourceFileObject(File origin, String name, String code) {
+    public FileScriptMemoryJavaObject createSourceFileObject(final File origin, final String name, final String code) {
         return new FileScriptMemoryJavaObject(origin, name, JavaFileObject.Kind.SOURCE, code);
     }
 
-    public ScriptClassLoader getClassLoader(ScriptLoader loader, File file, String fullClassName, FileScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
+    public ScriptClassLoader getClassLoader(final ScriptLoader loader, final File file, final String fullClassName, final FileScriptMemoryJavaObject source) throws ScriptException, MalformedURLException {
         return new ScriptClassLoader(loader, mapNameToClasses, parentClassLoader, file, fullClassName, source);
     }
 
     @Override
     public Iterable<JavaFileObject> list(
-            JavaFileManager.Location location,
-            String packageName,
-            Set<JavaFileObject.Kind> kinds,
-            boolean recurse) throws IOException {
-        Iterable<JavaFileObject> list = super.list(location, packageName, kinds, recurse);
-
+            final JavaFileManager.Location location,
+            final String packageName,
+            final Set<JavaFileObject.Kind> kinds,
+            final boolean recurse) throws IOException {
+        final Iterable<JavaFileObject> list = super.list(location, packageName, kinds, recurse);
         if (location == CLASS_OUTPUT) {
-            Collection<? extends JavaFileObject> generatedClasses = memoryClasses();
+            final Collection<? extends JavaFileObject> generatedClasses = memoryClasses();
             return () -> new CompositeIterator<>(
                     list.iterator(),
                     generatedClasses.iterator());
@@ -61,7 +60,7 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
     }
 
     @Override
-    public String inferBinaryName(JavaFileManager.Location location, JavaFileObject file) {
+    public String inferBinaryName(final JavaFileManager.Location location, final JavaFileObject file) {
         if (file instanceof ClassScriptMemoryJavaObject) {
             return file.getName();
         } else {
@@ -70,9 +69,9 @@ public final class ScriptMemoryManager extends ForwardingJavaFileManager<JavaFil
     }
 
     @Override
-    public JavaFileObject getJavaFileForOutput(JavaFileManager.Location location, String className, JavaFileObject.Kind kind, FileObject sibling) throws IOException {
+    public JavaFileObject getJavaFileForOutput(final JavaFileManager.Location location, final String className, final JavaFileObject.Kind kind, final FileObject sibling) throws IOException {
         if (kind == JavaFileObject.Kind.CLASS) {
-            ClassScriptMemoryJavaObject file = new ClassScriptMemoryJavaObject(className);
+            final ClassScriptMemoryJavaObject file = new ClassScriptMemoryJavaObject(className);
             mapNameToClasses.put(className, file);
             Debug.console("Mapping class " + className);
             return file;

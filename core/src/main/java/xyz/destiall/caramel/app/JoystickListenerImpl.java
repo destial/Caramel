@@ -1,7 +1,7 @@
 package xyz.destiall.caramel.app;
 
 import caramel.api.Input;
-import caramel.api.JoystickListener;
+import caramel.api.input.JoystickListener;
 import org.lwjgl.glfw.GLFWGamepadState;
 
 import java.nio.ByteBuffer;
@@ -38,11 +38,11 @@ public final class JoystickListenerImpl implements JoystickListener {
         for (int i = Input.Joystick.PAD1; i <= Input.Joystick.PAD16; i++) {
             if (isConnected(i)) {
                 glfwGetGamepadState(i, gamepads.get(i));
-                ByteBuffer buttons = gamepads.get(i).buttons();
-                List<Integer> buttonsPressed = buttonPressed.get(i);
+                final ByteBuffer buttons = gamepads.get(i).buttons();
+                final List<Integer> buttonsPressed = buttonPressed.get(i);
 
                 for (int b = 0; b < buttons.limit(); b++) {
-                    byte state = buttons.get(b);
+                    final byte state = buttons.get(b);
                     if (state == GLFW_PRESS) {
                         if (buttonsPressed.contains(b)) {
                             buttonsPressed.remove((Integer) b);
@@ -58,7 +58,7 @@ public final class JoystickListenerImpl implements JoystickListener {
     }
 
     @Override
-    public void joystickCallback(int jid, int event) {
+    public void joystickCallback(final int jid, final int event) {
         if (event == GLFW_CONNECTED) {
             connectedJoystick = jid;
         } else if (event == GLFW_DISCONNECTED) {
@@ -67,43 +67,43 @@ public final class JoystickListenerImpl implements JoystickListener {
     }
 
     @Override
-    public float getAxis(int joystickId, int code) {
+    public float getAxis(final int joystickId, final int code) {
         return isConnected(joystickId) ? gamepads.get(joystickId).axes(code) : 0f;
     }
 
     @Override
-    public float getRightTrigger(int joystickId) {
+    public float getRightTrigger(final int joystickId) {
         return isConnected(joystickId) ? getAxis(joystickId, Input.Joystick.Axis.RIGHT_TRIGGER) : 0f;
     }
 
     @Override
-    public float getLeftTrigger(int joystickId) {
+    public float getLeftTrigger(final int joystickId) {
         return isConnected(joystickId) ? getAxis(joystickId, Input.Joystick.Axis.LEFT_TRIGGER) : 0f;
     }
 
     @Override
-    public boolean isButtonPressed(int joystickId, int code) {
+    public boolean isButtonPressed(final int joystickId, final int code) {
         return isConnected(joystickId) && buttonPressed.get(joystickId).contains(code);
     }
 
     @Override
-    public boolean isButtonDown(int joystickId, int code) {
+    public boolean isButtonDown(final int joystickId, final int code) {
         return isConnected(joystickId) && gamepads.get(joystickId).buttons(code) == GLFW_PRESS;
     }
 
     @Override
-    public boolean isButtonReleased(int joystickId, int code) {
+    public boolean isButtonReleased(final int joystickId, final int code) {
         return isConnected(joystickId) && gamepads.get(joystickId).buttons(code) == GLFW_RELEASE;
     }
 
     @Override
-    public boolean isConnected(int joystick) {
+    public boolean isConnected(final int joystick) {
         return glfwJoystickPresent(joystick) && glfwJoystickIsGamepad(joystick);
     }
 
     @Override
     public List<Integer> getConnectedJoysticks() {
-        List<Integer> list = new ArrayList<>();
+        final List<Integer> list = new ArrayList<>();
         for (int i = Input.Joystick.PAD1; i <= Input.Joystick.PAD16; i++) {
             if (isConnected(i)) {
                 list.add(i);

@@ -32,11 +32,6 @@
                 <filtering>true</filtering>
                 <directory>${basedir}/../core/src/main/resources/</directory>
             </resource>
-            <resource>
-                <targetPath>.</targetPath>
-                <filtering>true</filtering>
-                <directory>${basedir}/../dist/</directory>
-            </resource>
         </resources>
         <plugins>
             <plugin>
@@ -74,6 +69,54 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <outputFile>../output/Caramel.jar</outputFile>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>l4j-clui</id>
+                        <phase>package</phase>
+                        <goals><goal>launch4j</goal></goals>
+                        <configuration>
+                            <dontWrapJar>true</dontWrapJar>
+                            <headerType>gui</headerType>
+                            <outfile>../output/Caramel.exe</outfile>
+                            <jar>../output/Caramel.jar</jar>
+                            <icon>../icon.ico</icon>
+                            <chdir>.</chdir>
+                            <priority>normal</priority>
+                            <stayAlive>false</stayAlive>
+                            <restartOnCrash>false</restartOnCrash>
+                            <classPath>
+                                <mainClass>xyz.destiall.caramel.app.Main</mainClass>
+                                <addDependencies>true</addDependencies>
+                            </classPath>
+                            <jre>
+                                <path>../output/jdk</path>
+                                <bundledJre64Bit>true</bundledJre64Bit>
+                                <bundledJreAsFallback>true</bundledJreAsFallback>
+                                <minVersion>1.8</minVersion>
+                                <maxVersion>17.0.2</maxVersion>
+                                <jdkPreference>jdkOnly</jdkPreference>
+                                <runtimeBits>64/32</runtimeBits>
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0.R-1</txtFileVersion>
+                                <fileDescription>A Java-based Game Engine</fileDescription>
+                                <copyright>destiall</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.R-1</txtProductVersion>
+                                <productName>Caramel</productName>
+                                <companyName>destiall</companyName>
+                                <internalName>Caramel-Engine</internalName>
+                                <originalFilename>Caramel.exe</originalFilename>
+                                <language>ENGLISH_US</language>
+                            </versionInfo>
                         </configuration>
                     </execution>
                 </executions>

@@ -17,33 +17,33 @@ public final class Vector2 implements Copyable<Vector2> {
         this(0);
     }
 
-    public Vector2(Vector2f vect) {
+    public Vector2(final Vector2f vect) {
         this(vect.x, vect.y);
     }
 
-    public Vector2(Vec2 vect) {
+    public Vector2(final Vec2 vect) {
         this(vect.x, vect.y);
     }
 
-    public Vector2(ImVec2 vect) {
+    public Vector2(final ImVec2 vect) {
         this(vect.x, vect.y);
     }
 
-    public Vector2(float i) {
+    public Vector2(final float i) {
         this(i, i);
     }
 
-    public Vector2(float x, float y) {
+    public Vector2(final float x, final float y) {
         joml = new Vector2f(x, y);
         jbox2d = new Vec2(x, y);
         imgui = new ImVec2(x, y);
     }
 
-    public Vector2(Vector2 value) {
+    public Vector2(final Vector2 value) {
         this(value == null ? 0f : value.x(), value == null ? 0f : value.y());
     }
 
-    public void set(float x, float y) {
+    public void set(final float x, final float y) {
         joml.set(x, y);
         jbox2d.set(x, y);
         imgui.set(x, y);
@@ -53,7 +53,7 @@ public final class Vector2 implements Copyable<Vector2> {
         return joml.x();
     }
 
-    public float distanceSquared(Vector2 other) {
+    public float distanceSquared(final Vector2 other) {
         return joml.distanceSquared(other.joml);
     }
 
@@ -74,7 +74,7 @@ public final class Vector2 implements Copyable<Vector2> {
         return jbox2d;
     }
 
-    public static Vector2 lerp(Vector2 vector, Vector2 target, float dt) {
+    public static Vector2 lerp(final Vector2 vector, final Vector2 target, final float dt) {
         vector.joml.lerp(target.joml, dt);
         return vector;
     }
@@ -84,7 +84,7 @@ public final class Vector2 implements Copyable<Vector2> {
         return joml.toString();
     }
 
-    public void set(Vector2 value) {
+    public void set(final Vector2 value) {
         set(value.x(), value.y());
     }
 

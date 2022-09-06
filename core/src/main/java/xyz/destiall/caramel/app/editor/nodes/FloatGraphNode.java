@@ -1,10 +1,10 @@
 package xyz.destiall.caramel.app.editor.nodes;
 
-import caramel.api.components.VisualScript;
+import caramel.api.components.Blueprint;
 
 public class FloatGraphNode extends GraphNode<Float> {
     public float value;
-    public FloatGraphNode(int nodeId) {
+    public FloatGraphNode(final int nodeId) {
         super(nodeId);
     }
 
@@ -14,12 +14,12 @@ public class FloatGraphNode extends GraphNode<Float> {
     }
 
     @Override
-    public void setValue(Float value) {
+    public void setValue(final Float value) {
         this.value = value;
     }
 
     @Override
-    public boolean execute(VisualScript script, Graph graph) {
+    public boolean execute(final Blueprint script, final Graph graph) {
         return false;
     }
 }

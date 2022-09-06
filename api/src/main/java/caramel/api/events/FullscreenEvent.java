@@ -8,7 +8,7 @@ import xyz.destiall.java.events.Event;
 public final class FullscreenEvent extends Event {
     private final boolean on;
 
-    public FullscreenEvent(boolean on) {
+    public FullscreenEvent(final boolean on) {
         this.on = on;
     }
 

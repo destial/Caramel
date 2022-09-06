@@ -16,35 +16,35 @@ public final class TextFont {
 
     public Texture texture;
 
-    public TextFont(String filepath, int fontSize) {
+    public TextFont(final String filepath, final int fontSize) {
         this.filepath = filepath;
         this.fontSize = fontSize;
         this.characterMap = new HashMap<>();
     }
 
-    public CharInfo getCharacter(int codepoint) {
+    public CharInfo getCharacter(final int codepoint) {
         return characterMap.getOrDefault(codepoint, new CharInfo(0, 0, 0, 0));
     }
 
     public Texture generateTexture() {
         this.characterMap.clear();
-        Font font = new Font(filepath, Font.PLAIN, fontSize);
+        final Font font = new Font(filepath, Font.PLAIN, fontSize);
 
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
         g2d.setFont(font);
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        FontMetrics fontMetrics = g2d.getFontMetrics();
+        final FontMetrics fontMetrics = g2d.getFontMetrics();
 
-        int estimatedWidth = (int)Math.sqrt(font.getNumGlyphs()) * font.getSize() + 1;
+        final int estimatedWidth = (int)Math.sqrt(font.getNumGlyphs()) * font.getSize() + 1;
         int width = 0;
         int height = fontMetrics.getHeight();
         int x = 0;
         int y = (int)(fontMetrics.getHeight() * 1.4f);
 
-        for (int i=0; i < font.getNumGlyphs(); i++) {
+        for (int i = 0; i < font.getNumGlyphs(); i++) {
             if (font.canDisplay(i)) {
-                CharInfo charInfo = new CharInfo(x, y, fontMetrics.charWidth(i), fontMetrics.getHeight());
+                final CharInfo charInfo = new CharInfo(x, y, fontMetrics.charWidth(i), fontMetrics.getHeight());
                 characterMap.put(i, charInfo);
                 width = Math.max(x + fontMetrics.charWidth(i), width);
 
@@ -64,9 +64,9 @@ public final class TextFont {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setFont(font);
         g2d.setColor(Color.WHITE);
-        for (int i=0; i < font.getNumGlyphs(); i++) {
+        for (int i = 0; i < font.getNumGlyphs(); i++) {
             if (font.canDisplay(i)) {
-                CharInfo info = characterMap.get(i);
+                final CharInfo info = characterMap.get(i);
                 info.calculateTextureCoordinates(width, height);
                 g2d.drawString("" + (char)i, info.sourceX, info.sourceY);
             }
@@ -84,15 +84,15 @@ public final class TextFont {
         }
     }
 
-    private Texture uploadTexture(BufferedImage image) {
-        int[] pixels = new int[image.getHeight() * image.getWidth()];
+    private Texture uploadTexture(final BufferedImage image) {
+        final int[] pixels = new int[image.getHeight() * image.getWidth()];
         image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
 
-        ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4);
-        for (int y=0; y < image.getHeight(); y++) {
+        final ByteBuffer buffer = BufferUtils.createByteBuffer(image.getWidth() * image.getHeight() * 4);
+        for (int y = 0; y < image.getHeight(); y++) {
             for (int x=0; x < image.getWidth(); x++) {
-                int pixel = pixels[y * image.getWidth() + x];
-                byte alphaComponent = (byte)((pixel >> 24) & 0xFF);
+                final int pixel = pixels[y * image.getWidth() + x];
+                final byte alphaComponent = (byte)((pixel >> 24) & 0xFF);
                 buffer.put(alphaComponent);
                 buffer.put(alphaComponent);
                 buffer.put(alphaComponent);
@@ -101,7 +101,7 @@ public final class TextFont {
         }
         buffer.flip();
 
-        Texture texture = new Texture(image.getWidth(), image.getHeight(), buffer);
+        final Texture texture = new Texture(image.getWidth(), image.getHeight(), buffer);
         texture.setPath(filepath);
         Texture.getTextures().add(texture);
         return texture;

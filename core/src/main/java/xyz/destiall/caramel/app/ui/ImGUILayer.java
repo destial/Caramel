@@ -2,7 +2,6 @@ package xyz.destiall.caramel.app.ui;
 
 import caramel.api.Input;
 import caramel.api.Time;
-import caramel.api.events.WindowFocusEvent;
 import imgui.ImGui;
 import imgui.ImGuiIO;
 import imgui.callback.ImStrConsumer;
@@ -22,6 +21,7 @@ import org.joml.Vector4f;
 import xyz.destiall.caramel.app.ApplicationImpl;
 import xyz.destiall.caramel.app.editor.debug.DebugLine;
 import xyz.destiall.caramel.app.editor.panels.Panel;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -56,7 +56,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetJoystickCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetMouseButtonCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetScrollCallback;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowFocusCallback;
 
 public final class ImGUILayer {
     private final ApplicationImpl window;
@@ -68,7 +67,7 @@ public final class ImGUILayer {
     public static final Vector4f PRIMARY_COLOR = new Vector4f(255 / 255f, 137 / 256f, 2 / 256f, 1.f);
     public static final Vector4f TERTIARY_COLOR = new Vector4f(102 / 255f, 54 / 256f, 0 / 256f, 0.5f);
 
-    public ImGUILayer(ApplicationImpl window) {
+    public ImGUILayer(final ApplicationImpl window) {
         this.window = window;
         this.glfwWindow = window.glfwWindow;
     }
@@ -77,16 +76,23 @@ public final class ImGUILayer {
     public void initImGui() {
         ImGui.createContext();
         ImNodes.createContext();
-
         final ImGuiIO io = ImGui.getIO();
 
-        io.setIniFilename("imgui.ini");
+        if (window.getSettings().has("imgui")) {
+            io.setIniFilename(null);
+            ImGui.loadIniSettingsFromMemory(window.getSettings().get("imgui").getAsString());
+        } else {
+            // Legacy compatibility
+            io.setIniFilename("imgui.ini");
+        }
+        io.setWantSaveIniSettings(false);
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
         io.addBackendFlags(ImGuiBackendFlags.HasMouseCursors);
         io.setBackendPlatformName("imgui_java_impl_glfw");
 
         io.setKeyMap(ImGuiKey.Backspace, Input.Key.BACKSPACE);
+        io.setKeyMap(ImGuiKey.Space, Input.Key.SPACE);
         io.setKeyMap(ImGuiKey.Enter, Input.Key.ENTER);
         io.setKeyMap(ImGuiKey.Delete, Input.Key.DELETE);
         io.setKeyMap(ImGuiKey.DownArrow, Input.Key.DOWN);
@@ -100,13 +106,13 @@ public final class ImGUILayer {
         io.setKeyMap(ImGuiKey.Home, Input.Key.HOME);
         io.setKeyMap(ImGuiKey.Tab, Input.Key.TAB);
         io.setKeyMap(ImGuiKey.Escape, Input.Key.ESCAPE);
+        io.setKeyMap(ImGuiKey.KeyPadEnter, Input.Key.ENTER);
         io.setKeyMap(ImGuiKey.A, Input.Key.A);
         io.setKeyMap(ImGuiKey.C, Input.Key.C);
         io.setKeyMap(ImGuiKey.V, Input.Key.V);
         io.setKeyMap(ImGuiKey.Y, Input.Key.Y);
         io.setKeyMap(ImGuiKey.X, Input.Key.X);
         io.setKeyMap(ImGuiKey.Z, Input.Key.Z);
-        io.setKeyMap(ImGuiKey.KeyPadEnter, Input.Key.ENTER);
 
         glfwSetKeyCallback(glfwWindow, (w, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
@@ -182,9 +188,9 @@ public final class ImGUILayer {
     public void update() {
         startFrame(Time.deltaTime);
 
+        final boolean recompiling = window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling();
         if (!window.isFullScreen()) {
             setupDockspace();
-            boolean recompiling = window.getScriptManager().isRecompiling();
             if (recompiling) {
                 ImGui.pushAllowKeyboardFocus(false);
             }
@@ -196,13 +202,13 @@ public final class ImGUILayer {
             }
         }
 
-        if (window.getScriptManager().isRecompiling()) {
+        if (recompiling) {
             if (ImGui.begin("##recompile",
                     ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize |
                     ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoMove |
                     ImGuiWindowFlags.NoMouseInputs)) {
-                float width = ImGui.getWindowWidth();
-                float height = ImGui.getWindowWidth();
+                final float width = ImGui.getWindowWidth();
+                final float height = ImGui.getWindowWidth();
                 ImGui.setWindowPos((
                         ApplicationImpl.getApp().getWidth() / 2f) - (width / 2f),
                         (ApplicationImpl.getApp().getHeight() / 2f) - height / 2f);
@@ -215,10 +221,10 @@ public final class ImGUILayer {
     }
 
     private void startFrame(final float deltaTime) {
-        float[] winWidth = { ApplicationImpl.getApp().getWidth() };
-        float[] winHeight = { ApplicationImpl.getApp().getHeight() };
-        double[] mousePosX = { 0 };
-        double[] mousePosY = { 0 };
+        final float[] winWidth = { ApplicationImpl.getApp().getWidth() };
+        final float[] winHeight = { ApplicationImpl.getApp().getHeight() };
+        final double[] mousePosX = { 0 };
+        final double[] mousePosY = { 0 };
         glfwGetCursorPos(glfwWindow, mousePosX, mousePosY);
 
         final ImGuiIO io = ImGui.getIO();
@@ -266,7 +272,7 @@ public final class ImGUILayer {
     }
 
     private void setupDockspace() {
-        int windowFlags =
+        final int windowFlags =
                 ImGuiWindowFlags.MenuBar | ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoMove |
                 ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoBringToFrontOnFocus |
@@ -292,10 +298,12 @@ public final class ImGUILayer {
         glfwMakeContextCurrent(window.glfwWindow);
     }
 
-    public void destroyImGui() {
+    public String destroy() {
+        final String save = ImGui.saveIniSettingsToMemory();
         imGuiGl3.dispose();
         ImGui.getIO().getFonts().destroy();
         ImNodes.destroyContext();
         ImGui.destroyContext();
+        return save;
     }
 }

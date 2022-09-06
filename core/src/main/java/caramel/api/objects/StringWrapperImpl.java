@@ -8,7 +8,7 @@ import java.util.Objects;
 public final class StringWrapperImpl implements StringWrapper {
     private final ImString imString;
 
-    public StringWrapperImpl(String s) {
+    public StringWrapperImpl(final String s) {
         imString = new ImString(s);
     }
 
@@ -36,7 +36,7 @@ public final class StringWrapperImpl implements StringWrapper {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o instanceof String) return Objects.equals(get(), o);
         if (o instanceof ImString) return Objects.equals(imString, o);

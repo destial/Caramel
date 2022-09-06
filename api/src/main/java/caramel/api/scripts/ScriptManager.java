@@ -3,11 +3,11 @@ package caramel.api.scripts;
 import java.io.File;
 
 public interface ScriptManager {
-    InternalScript reloadScript(File file);
-    InternalScript reloadScript(File file, String contents);
+    InternalScript reloadScript(final File file);
+    InternalScript reloadScript(final File file, final String contents);
     void reloadAll();
     void destroy();
-    void loadScripts(File folder);
-    InternalScript getInternalScript(Class<?> clazz);
-    InternalScript getScript(String name);
+    void loadScripts(final File folder);
+    InternalScript getInternalScript(final Class<?> clazz);
+    InternalScript getScript(final String name);
 }

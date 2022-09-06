@@ -5,7 +5,7 @@ import caramel.api.objects.Scene;
 public abstract class EditorAction {
     protected final Scene scene;
     public PreviousAction action;
-    public EditorAction(Scene scene) {
+    public EditorAction(final Scene scene) {
         this.scene = scene;
         action = PreviousAction.REDO;
     }

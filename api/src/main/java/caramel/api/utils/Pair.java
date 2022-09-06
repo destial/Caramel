@@ -2,7 +2,7 @@ package caramel.api.utils;
 
 import java.util.Map;
 
-public class Pair<K,V> implements Map.Entry<K, V> {
+public final class Pair<K,V> implements Map.Entry<K, V> {
     private K key;
     private V value;
     public Pair(K key, V value) {
@@ -25,7 +25,7 @@ public class Pair<K,V> implements Map.Entry<K, V> {
     }
 
     @Override
-    public V setValue(V value) {
+    public V setValue(final V value) {
         V previous = this.value;
         this.value = value;
         return previous;

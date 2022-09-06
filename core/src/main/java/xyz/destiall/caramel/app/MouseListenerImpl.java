@@ -1,6 +1,6 @@
 package xyz.destiall.caramel.app;
 
-import caramel.api.MouseListener;
+import caramel.api.input.MouseListener;
 import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import imgui.ImGui;
@@ -44,7 +44,7 @@ public final class MouseListenerImpl implements MouseListener {
         Arrays.fill(mouseButtonReleased, true);
     }
 
-    public void mousePosCallback(long window, double xPos, double yPos) {
+    public void mousePosCallback(final long window, final double xPos, final double yPos) {
         this.xPos = xPos;
         this.yPos = yPos;
         if (firstFrame) {
@@ -56,7 +56,7 @@ public final class MouseListenerImpl implements MouseListener {
         isDragging = mouseButtonPressed[GLFW_MOUSE_BUTTON_1];
     }
 
-    public void mouseButtonCallback(long window, int button, int action, int mods) {
+    public void mouseButtonCallback(final long window, final int button, final int action, final int mods) {
         if (action == GLFW_PRESS) {
             mouseButtonPressed[button] = true;
             if (mouseButtonReleased[button]) {
@@ -71,7 +71,7 @@ public final class MouseListenerImpl implements MouseListener {
     }
 
 
-    public void mouseScrollCallback(long window, double xOffset, double yOffset) {
+    public void mouseScrollCallback(final long window, final double xOffset, final double yOffset) {
         scrollX = xOffset;
         scrollY = yOffset;
     }
@@ -120,10 +120,9 @@ public final class MouseListenerImpl implements MouseListener {
     public float getOrthoX() {
         float currentX = ImGui.getMousePosX() - sceneViewportPos.x;
         currentX = (currentX / sceneViewportSize.x) * 2.0f - 1.0f;
-        Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
-
-        EditorCamera camera = ApplicationImpl.getApp().getCurrentScene().getEditorCamera();
-        Matrix4f viewProjection = new Matrix4f();
+        final Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
+        final EditorCamera camera = ApplicationImpl.getApp().getCurrentScene().getEditorCamera();
+        final Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);
         currentX = tmp.x;
@@ -135,10 +134,9 @@ public final class MouseListenerImpl implements MouseListener {
     public float getOrthoY() {
         float currentY = ImGui.getMousePosY() - sceneViewportPos.y;
         currentY = -((currentY / sceneViewportSize.y) * 2.0f - 1.0f);
-        Vector4f tmp = new Vector4f(0, currentY, 0, 1);
-
-        EditorCamera camera = ApplicationImpl.getApp().getCurrentScene().getEditorCamera();
-        Matrix4f viewProjection = new Matrix4f();
+        final Vector4f tmp = new Vector4f(0, currentY, 0, 1);
+        final EditorCamera camera = ApplicationImpl.getApp().getCurrentScene().getEditorCamera();
+        final Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);
         currentY = tmp.y;
@@ -148,21 +146,21 @@ public final class MouseListenerImpl implements MouseListener {
 
     @Override
     public float getScreenX() {
-        return getScreenX(ApplicationImpl.getApp().getCurrentScene().getGameCamera());
+        return getScreenX(ApplicationImpl.getApp().getCurrentScene().getGameCameras().stream().findFirst().orElse(null));
     }
 
     @Override
     public float getScreenY() {
-        return getScreenY(ApplicationImpl.getApp().getCurrentScene().getGameCamera());
+        return getScreenY(ApplicationImpl.getApp().getCurrentScene().getGameCameras().stream().findFirst().orElse(null));
     }
 
     @Override
-    public float getScreenX(Camera camera) {
+    public float getScreenX(final Camera camera) {
+        if (camera == null) return 0;
         float currentX = ImGui.getMousePosX() - gameViewportPos.x;
         currentX = (currentX / gameViewportSize.x) * 2.0f - 1.0f;
-        Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
-
-        Matrix4f viewProjection = new Matrix4f();
+        final Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
+        final Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);
         currentX = tmp.x;
@@ -171,12 +169,12 @@ public final class MouseListenerImpl implements MouseListener {
     }
 
     @Override
-    public float getScreenY(Camera camera) {
+    public float getScreenY(final Camera camera) {
+        if (camera == null) return 0;
         float currentY = ImGui.getMousePosY() - gameViewportPos.y;
         currentY = -((currentY / gameViewportSize.y) * 2.0f - 1.0f);
-        Vector4f tmp = new Vector4f(0, currentY, 0, 1);
-
-        Matrix4f viewProjection = new Matrix4f();
+        final Vector4f tmp = new Vector4f(0, currentY, 0, 1);
+        final Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
         tmp.mul(viewProjection);
         currentY = tmp.y;
@@ -185,33 +183,33 @@ public final class MouseListenerImpl implements MouseListener {
     }
 
     @Override
-    public boolean isButtonDown(int button) {
+    public boolean isButtonDown(final int button) {
         return mouseButtonPressed[button];
     }
 
     @Override
-    public boolean isButtonPressedThisFrame(int button) {
+    public boolean isButtonPressedThisFrame(final int button) {
         return mouseButtonPressedThisFrame[button];
     }
 
     @Override
-    public boolean isButtonReleasedThisFrame(int button) {
+    public boolean isButtonReleasedThisFrame(final int button) {
         return mouseButtonReleased[button];
     }
 
-    public void setSceneViewport(Vector2f vector2f) {
+    public void setSceneViewport(final Vector2f vector2f) {
         sceneViewportPos.set(vector2f);
     }
 
-    public void setSceneViewportSize(Vector2f vector2f) {
+    public void setSceneViewportSize(final Vector2f vector2f) {
         sceneViewportSize.set(vector2f);
     }
 
-    public void setGameViewportPos(Vector2f vector2f) {
+    public void setGameViewportPos(final Vector2f vector2f) {
         gameViewportPos.set(vector2f);
     }
 
-    public void setGameViewportSize(Vector2f vector2f) {
+    public void setGameViewportSize(final Vector2f vector2f) {
         gameViewportSize.set(vector2f);
     }
 }

@@ -3,18 +3,21 @@ package xyz.destiall.caramel.app.editor.panels;
 import caramel.api.Application;
 import caramel.api.Input;
 import caramel.api.components.RigidBody2D;
+import caramel.api.components.RigidBody3D;
 import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
 import caramel.api.objects.GameObject;
 import caramel.api.objects.GameObjectImpl;
 import caramel.api.objects.SceneImpl;
 import caramel.api.objects.StringWrapperImpl;
 import caramel.api.physics.components.Box2DCollider;
+import caramel.api.physics.components.Box3DCollider;
 import caramel.api.physics.components.Circle2DCollider;
 import caramel.api.render.Button;
 import caramel.api.render.MeshRenderer;
-import caramel.api.render.Renderer;
 import caramel.api.render.Text;
-import caramel.api.texture.Mesh;
+import caramel.api.texture.mesh.CubeMesh;
+import caramel.api.texture.mesh.Mesh;
 import caramel.api.texture.mesh.CircleMesh;
 import caramel.api.texture.mesh.IcosahedronMesh;
 import caramel.api.texture.mesh.QuadMesh;
@@ -27,6 +30,8 @@ import imgui.flag.ImGuiWindowFlags;
 import imgui.type.ImString;
 import xyz.destiall.caramel.app.editor.action.AddGameObjects;
 import xyz.destiall.caramel.app.editor.action.DeleteGameObjects;
+import xyz.destiall.caramel.app.editor.action.EditorAction;
+import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.utils.Payload;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -40,22 +45,22 @@ public final class HierarchyPanel extends Panel {
     private GameObject editingGo;
     private GameObject hoveredGameObject;
 
-    public HierarchyPanel(SceneImpl scene) {
+    public HierarchyPanel(final SceneImpl scene) {
         super(scene);
     }
 
     @Override
     public void __imguiLayer() {
         int flags = ImGuiWindowFlags.NoCollapse;
-        if (window.getScriptManager().isRecompiling()) {
+        if (window.getScriptManager() instanceof EditorScriptManager && ((EditorScriptManager) window.getScriptManager()).isRecompiling()) {
             flags |= ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoMouseInputs;
         }
         if (ImGui.begin("Hierarchy", flags)) {
             Panel.setPanelFocused(getClass(), ImGui.isWindowFocused());
             Panel.setPanelHovered(getClass(), ImGui.isWindowHovered());
-            AtomicInteger index = new AtomicInteger(0);
+            final AtomicInteger index = new AtomicInteger(0);
             hoveredGameObject = null;
-            for (GameObject gameObject : scene.getGameObjects()) {
+            for (final GameObject gameObject : scene.getGameObjects()) {
                 if (treeNode(gameObject, index)) ImGui.treePop();
             }
 
@@ -78,8 +83,8 @@ public final class HierarchyPanel extends Panel {
             if (ImGui.isWindowFocused()) {
                 if (!scene.getSelectedGameObject().isEmpty()) {
                     if (ImGui.isKeyPressed(Input.Key.BACKSPACE) || ImGui.isKeyPressed(Input.Key.DELETE)) {
-                        DeleteGameObjects action = new DeleteGameObjects(scene);
-                        for (GameObject go : scene.getSelectedGameObject()) {
+                        final DeleteGameObjects action = new DeleteGameObjects(scene);
+                        for (final GameObject go : scene.getSelectedGameObject()) {
                             scene.destroy(go);
                             action.deleted.add(go);
                         }
@@ -92,8 +97,8 @@ public final class HierarchyPanel extends Panel {
                     }
 
                     if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.V) && !Payload.COPIED_GAMEOBJECTS.isEmpty()) {
-                        AddGameObjects action = new AddGameObjects(scene);
-                        for (GameObject copied : Payload.COPIED_GAMEOBJECTS) {
+                        final AddGameObjects action = new AddGameObjects(scene);
+                        for (final GameObject copied : Payload.COPIED_GAMEOBJECTS) {
                             GameObject go = copied.clone(false);
                             action.added.add(go);
                             scene.addGameObject(go);
@@ -102,9 +107,9 @@ public final class HierarchyPanel extends Panel {
                     }
 
                     if ((ImGui.getIO().getKeyCtrl()) && ImGui.isKeyPressed(Input.Key.D) && !scene.getSelectedGameObject().isEmpty()) {
-                        AddGameObjects action = new AddGameObjects(scene);
-                        for (GameObject copied : scene.getSelectedGameObject()) {
-                            GameObject go = copied.clone(false);
+                        final AddGameObjects action = new AddGameObjects(scene);
+                        for (final GameObject copied : scene.getSelectedGameObject()) {
+                            final GameObject go = copied.clone(false);
                             scene.addGameObject(go);
                             action.added.add(go);
                         }
@@ -126,7 +131,7 @@ public final class HierarchyPanel extends Panel {
                     editingGameObject = false;
 
                 } else if (ImGui.selectable("Delete")) {
-                    DeleteGameObjects deleteGameObjects = new DeleteGameObjects(scene);
+                    final DeleteGameObjects deleteGameObjects = new DeleteGameObjects(scene);
                     scene.destroy(editingGo);
                     deleteGameObjects.deleted.add(editingGo);
                     scene.addUndoAction(deleteGameObjects);
@@ -151,9 +156,9 @@ public final class HierarchyPanel extends Panel {
                 }
 
                 if (ImGui.menuItem("Paste", "CTRL + V", false, !Payload.COPIED_GAMEOBJECTS.isEmpty())) {
-                    AddGameObjects action = new AddGameObjects(scene);
-                    for (GameObject copied : Payload.COPIED_GAMEOBJECTS) {
-                        GameObject go = copied.clone(false);
+                    final AddGameObjects action = new AddGameObjects(scene);
+                    for (final GameObject copied : Payload.COPIED_GAMEOBJECTS) {
+                        final GameObject go = copied.clone(false);
                         action.added.add(go);
                         scene.addGameObject(go);
                     }
@@ -164,124 +169,118 @@ public final class HierarchyPanel extends Panel {
                 ImGui.separator();
 
                 if (ImGui.selectable("New Empty GameObject")) {
-                    GameObject go = new GameObjectImpl(scene);
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    final GameObject go = new GameObjectImpl(scene);
                     scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(go);
                     scene.addUndoAction(addGameObjects);
                     addingGameObjectHierarchy = false;
                 }
 
                 if (ImGui.selectable("New 2D Quad")) {
-                    GameObject go = new GameObjectImpl(scene);
+                    final GameObject go = new GameObjectImpl(scene);
                     go.name.set("Quad");
-                    MeshRenderer renderer = new MeshRenderer(go);
-                    renderer.mesh = new QuadMesh();
-                    renderer.mesh.build();
-                    RigidBody2D rigidBody = new RigidBody2D(go);
-                    Box2DCollider boxCollider = new Box2DCollider(go);
 
-                    go.addComponent(renderer);
-                    go.addComponent(rigidBody);
-                    go.addComponent(boxCollider);
-
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    go.addComponent(new MeshRenderer(go, new QuadMesh()));
+                    go.addComponent(new RigidBody2D(go));
+                    go.addComponent(new Box2DCollider(go));
                     scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(go);
                     scene.addUndoAction(addGameObjects);
                     addingGameObjectHierarchy = false;
                 }
 
                 if (ImGui.selectable("New 2D Circle")) {
-                    GameObject go = new GameObjectImpl(scene);
+                    final GameObject go = new GameObjectImpl(scene);
                     go.name.set("Circle");
-                    MeshRenderer renderer = new MeshRenderer(go);
-                    renderer.mesh = new CircleMesh(0.5f, 36);
-                    renderer.mesh.build();
-                    RigidBody2D rigidBody = new RigidBody2D(go);
-                    Circle2DCollider CircleCollider = new Circle2DCollider(go);
 
-                    go.addComponent(renderer);
-                    go.addComponent(rigidBody);
-                    go.addComponent(CircleCollider);
-
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    go.addComponent(new MeshRenderer(go, new CircleMesh(0.5f, 36)));
+                    go.addComponent(new RigidBody2D(go));
+                    go.addComponent(new Circle2DCollider(go));
                     scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(go);
                     scene.addUndoAction(addGameObjects);
                     addingGameObjectHierarchy = false;
                 }
 
                 if (ImGui.selectable("New 2D Triangle")) {
-                    GameObject go = new GameObjectImpl(scene);
-                    go.name.set("Circle");
-                    MeshRenderer renderer = new MeshRenderer(go);
-                    Mesh mesh = new TriangleMesh();
-                    renderer.setMesh(mesh);
-                    mesh.build();
-                    RigidBody2D rigidBody = new RigidBody2D(go);
-                    Circle2DCollider CircleCollider = new Circle2DCollider(go);
+                    final GameObject go = new GameObjectImpl(scene);
+                    go.name.set("Triangle");
 
-                    go.addComponent(renderer);
-                    go.addComponent(rigidBody);
-                    go.addComponent(CircleCollider);
-
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    go.addComponent(new MeshRenderer(go, new TriangleMesh()));
+                    go.addComponent(new RigidBody2D(go));
+                    go.addComponent(new Circle2DCollider(go));
                     scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    addGameObjects.added.add(go);
+                    scene.addUndoAction(addGameObjects);
+                    addingGameObjectHierarchy = false;
+                }
+
+                if (ImGui.selectable("New 3D Cube")) {
+                    final GameObject go = new GameObjectImpl(scene);
+                    go.name.set("Cube");
+
+                    go.addComponent(new MeshRenderer(go, new CubeMesh()));
+                    go.addComponent(new RigidBody3D(go));
+                    go.addComponent(new Box3DCollider(go));
+                    scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(go);
                     scene.addUndoAction(addGameObjects);
                     addingGameObjectHierarchy = false;
                 }
 
                 if (ImGui.selectable("New 3D Sphere")) {
-                    GameObject go = new GameObjectImpl(scene);
+                    final GameObject go = new GameObjectImpl(scene);
                     go.name.set("Sphere");
-                    MeshRenderer renderer = new MeshRenderer(go);
-                    Mesh mesh = new IcosahedronMesh(1, 2);
-                    renderer.setMesh(mesh);
-                    mesh.build();
 
-                    go.addComponent(renderer);
-
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    go.addComponent(new MeshRenderer(go, new IcosahedronMesh()));
+                    go.addComponent(new RigidBody3D(go));
                     scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(go);
                     scene.addUndoAction(addGameObjects);
                     addingGameObjectHierarchy = false;
                 }
 
                 if (ImGui.selectable("New UI Text")) {
-                    GameObject go = new GameObjectImpl(scene);
+                    final GameObject go = new GameObjectImpl(scene);
                     go.name.set("Text");
-                    Text renderer = new Text(go);
                     go.transform.scale.x = 0.025f;
                     go.transform.scale.y = 0.025f;
-                    go.addComponent(renderer);
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
+                    go.addComponent(new Text(go));
                     scene.addGameObject(go);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(go);
                     scene.addUndoAction(addGameObjects);
                     addingGameObjectHierarchy = false;
                 }
 
                 if (ImGui.selectable("New UI Button")) {
-                    GameObject button = new GameObjectImpl(scene);
+                    final GameObject button = new GameObjectImpl(scene);
                     button.name.set("Button");
-                    Button b = new Button(button);
-                    button.addComponent(b);
+                    button.addComponent(new Button(button));
                     button.transform.scale.x = 2.7f;
 
-                    GameObject text = new GameObjectImpl(scene);
+                    final GameObject text = new GameObjectImpl(scene);
                     text.name.set("Text");
-                    Text renderer = new Text(text);
                     text.transform.scale.x = 0.025f;
                     text.transform.scale.y = 0.025f;
-                    text.addComponent(renderer);
-
+                    text.addComponent(new Text(text));
                     button.children.add(text);
-
-                    AddGameObjects addGameObjects = new AddGameObjects(scene);
                     scene.addGameObject(button);
+
+                    final AddGameObjects addGameObjects = new AddGameObjects(scene);
                     addGameObjects.added.add(button);
                     addGameObjects.added.add(text);
                     scene.addUndoAction(addGameObjects);
@@ -293,8 +292,8 @@ public final class HierarchyPanel extends Panel {
         ImGui.end();
     }
 
-    private boolean treeNode(GameObject gameObject, AtomicInteger index) {
-        ImString gameObjectName = ((StringWrapperImpl) gameObject.name).imString();
+    private boolean treeNode(final GameObject gameObject, final AtomicInteger index) {
+        final ImString gameObjectName = ((StringWrapperImpl) gameObject.name).imString();
 
         if (!gameObject.active) {
             ImGui.pushStyleColor(ImGuiCol.Text, 0.5f, 0.5f, 0.5f, 1.0f);
@@ -304,7 +303,7 @@ public final class HierarchyPanel extends Panel {
             ImGui.pushStyleColor(ImGuiCol.Text, TERTIARY_COLOR.x, TERTIARY_COLOR.y, TERTIARY_COLOR.z, 1.f);
         }
 
-        boolean treeNode = ImGui.treeNodeEx(index.incrementAndGet(), ImGuiTreeNodeFlags.OpenOnArrow | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.FramePadding, gameObjectName.get());
+        final boolean treeNode = ImGui.treeNodeEx(index.incrementAndGet(), ImGuiTreeNodeFlags.DefaultOpen | ImGuiTreeNodeFlags.SpanAvailWidth | ImGuiTreeNodeFlags.FramePadding, gameObjectName.get());
         if (scene.getSelectedGameObject().contains(gameObject)) {
             ImGui.popStyleColor();
         }
@@ -336,30 +335,29 @@ public final class HierarchyPanel extends Panel {
         }
 
         if (ImGui.beginDragDropSource()) {
-            ImGui.setDragDropPayload(Payload.DRAG_DROP_GAMEOBJECT_HIERARCHY, gameObject);
+            if (ImGui.getDragDropPayload(Payload.DRAG_DROP_GAMEOBJECT_HIERARCHY) == null) {
+                ImGui.setDragDropPayload(Payload.DRAG_DROP_GAMEOBJECT_HIERARCHY, gameObject);
+            }
             ImGui.text(gameObject.name.get());
             ImGui.endDragDropSource();
         }
 
-        if (ImGui.beginDragDropTarget()) {
-            GameObject payload = ImGui.acceptDragDropPayload(Payload.DRAG_DROP_GAMEOBJECT_HIERARCHY, GameObject.class);
-            if (payload != null && payload != gameObject) {
-                Transform parent = payload.parent;
-                boolean canAdd = true;
-                while (parent != null && canAdd) {
-                    if (parent == gameObject.transform) {
-                        canAdd = false;
-                    }
-                    parent = parent.transform;
-
+        if (ImGui.beginDragDropTarget() && !ImGui.isMouseDown(Input.Mouse.LEFT)) {
+            final GameObject payload = ImGui.getDragDropPayload(Payload.DRAG_DROP_GAMEOBJECT_HIERARCHY);
+            if (payload != null) {
+                ImGui.setDragDropPayload(Payload.DRAG_DROP_GAMEOBJECT_HIERARCHY, null);
+                final Transform parent = payload.parent;
+                if (parent != null) {
+                    parent.gameObject.children.remove(payload);
                 }
-                if (canAdd) scene.addGameObject(gameObject, payload);
+
+                scene.addGameObject(payload, gameObject);
             }
             ImGui.endDragDropTarget();
         }
 
         if (treeNode) {
-            for (GameObject c : gameObject.children) {
+            for (final GameObject c : gameObject.children) {
                 if (treeNode(c, index)) ImGui.treePop();
             }
         }

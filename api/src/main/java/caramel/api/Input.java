@@ -9,31 +9,31 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public interface Input {
 
-    static boolean isMouseDown(int mouse) {
+    static boolean isMouseDown(final int mouse) {
         return Application.getApp().getMouseListener().isButtonDown(mouse);
     }
 
-    static boolean isMousePressed(int mouse) {
+    static boolean isMousePressed(final int mouse) {
         return Application.getApp().getMouseListener().isButtonPressedThisFrame(mouse);
     }
 
-    static boolean isMouseReleased(int mouse) {
+    static boolean isMouseReleased(final int mouse) {
         return Application.getApp().getMouseListener().isButtonReleasedThisFrame(mouse);
     }
 
-    static boolean isControlPressedAnd(int key) {
+    static boolean isControlPressedAnd(final int key) {
         return Input.isKeyDown(Key.CONTROL) && Input.isKeyPressed(key);
     }
 
-    static boolean isAltPressedAnd(int key) {
+    static boolean isAltPressedAnd(final int key) {
         return Input.isKeyDown(Key.ALT) && Input.isKeyPressed(key);
     }
 
-    static boolean isCtrlAltPressedAnd(int key) {
+    static boolean isCtrlAltPressedAnd(final int key) {
         return Input.isKeyDown(Key.CONTROL) && Input.isKeyDown(Key.ALT) && Input.isKeyPressed(key);
     }
 
-    static boolean isKeyDown(int key) {
+    static boolean isKeyDown(final int key) {
         if (key == Key.ALT) {
             return Input.isKeyDown(Key.L_ALT) || Input.isKeyDown(Key.R_ALT);
         }
@@ -43,7 +43,7 @@ public interface Input {
         return Application.getApp().getKeyListener().isKeyDown(key);
     }
 
-    static boolean isKeyPressed(int key) {
+    static boolean isKeyPressed(final int key) {
         if (key == Key.ALT) {
             return Input.isKeyPressed(Key.L_ALT) || Input.isKeyPressed(Key.R_ALT);
         }
@@ -85,11 +85,11 @@ public interface Input {
         return Application.getApp().getMouseListener().getScreenX();
     }
 
-    static float getMouseWorldX(Camera camera) {
+    static float getMouseWorldX(final Camera camera) {
         return Application.getApp().getMouseListener().getScreenX(camera);
     }
 
-    static float getMouseWorldY(Camera camera) {
+    static float getMouseWorldY(final Camera camera) {
         return Application.getApp().getMouseListener().getScreenY(camera);
     }
 
@@ -97,19 +97,19 @@ public interface Input {
         return Application.getApp().getMouseListener().getScreenY();
     }
 
-    static float getJoystickAxis(int code) {
+    static float getJoystickAxis(final int code) {
         return Application.getApp().getJoystickListener().getAxis(Joystick.PAD1, code);
     }
 
-    static boolean isJoystickDown(int code) {
+    static boolean isJoystickDown(final int code) {
         return Application.getApp().getJoystickListener().isButtonDown(Joystick.PAD1, code);
     }
 
-    static boolean isJoystickReleased(int code) {
+    static boolean isJoystickReleased(final int code) {
         return Application.getApp().getJoystickListener().isButtonReleased(Joystick.PAD1, code);
     }
 
-    static boolean isJoystickPressed(int code) {
+    static boolean isJoystickPressed(final int code) {
         return Application.getApp().getJoystickListener().isButtonPressed(Joystick.PAD1, code);
     }
 
@@ -131,8 +131,8 @@ public interface Input {
         int B7 = GLFW_MOUSE_BUTTON_7;
         int B8 = GLFW_MOUSE_BUTTON_8;
 
-        static String getButtonName(int code) {
-            for (Field field : Mouse.class.getFields()) {
+        static String getButtonName(final int code) {
+            for (final Field field : Mouse.class.getFields()) {
                 try {
                     if ((int) field.get(null) == code) {
                         return field.getName();
@@ -202,8 +202,8 @@ public interface Input {
             int LAST = GLFW_GAMEPAD_BUTTON_LAST;
         }
 
-        static String getPadName(int code) {
-            for (Field field : Joystick.class.getFields()) {
+        static String getPadName(final int code) {
+            for (final Field field : Joystick.class.getFields()) {
                 try {
                     if ((int) field.get(null) == code) {
                         return field.getName();
@@ -339,8 +339,8 @@ public interface Input {
         int MENU = GLFW_KEY_MENU;
         int UNKNOWN = GLFW_KEY_UNKNOWN;
 
-        static String getKeyName(int code) {
-            for (Field field : Key.class.getFields()) {
+        static String getKeyName(final int code) {
+            for (final Field field : Key.class.getFields()) {
                 try {
                     if ((int) field.get(null) == code) {
                         return field.getName();

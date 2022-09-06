@@ -7,7 +7,7 @@ public final class CompositeIterator<T> implements Iterator<T> {
     private final Iterator<? extends T>[] iterators;
     private int iteratorIndex = 0;
 
-    public CompositeIterator(Iterator<? extends T>... iterators) {
+    public CompositeIterator(final Iterator<? extends T>... iterators) {
         this.iterators = iterators;
     }
 

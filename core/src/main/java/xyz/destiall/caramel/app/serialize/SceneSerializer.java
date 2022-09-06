@@ -66,7 +66,7 @@ public final class SceneSerializer implements JsonSerializer<SceneImpl>, JsonDes
             scene.getGameObjects().add(gameObject);
 
             if (gameObject.hasComponent(Camera.class)) {
-                scene.setGameCamera(gameObject.getComponent(Camera.class));
+                scene.addGameCamera(gameObject.getComponent(Camera.class));
             }
         }
 

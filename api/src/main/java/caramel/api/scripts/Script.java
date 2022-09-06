@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public abstract class Script extends Component {
-    public Script(GameObject gameObject) {
+    public Script(final GameObject gameObject) {
         super(gameObject);
     }
 
@@ -21,7 +21,7 @@ public abstract class Script extends Component {
      * @param name The name of the {@link GameObject} to find.
      * @return The matching {@link GameObject}, null if none found.
      */
-    public GameObject findGameObject(String name) {
+    public GameObject findGameObject(final String name) {
         return gameObject.scene.findGameObject(name);
     }
 
@@ -30,19 +30,19 @@ public abstract class Script extends Component {
      * @param clazz The {@link Component} class.
      * @return A list of matching {@link GameObject}s. Never null, can be empty.
      */
-    public <C extends Component> List<C> findWithComponent(Class<C> clazz) {
+    public <C extends Component> List<C> findWithComponent(final Class<C> clazz) {
         return gameObject.scene.getGameObjects().stream().filter(g -> g.hasComponent(clazz)).map(g -> g.getComponent(clazz)).collect(Collectors.toList());
     }
 
     @Override
-    public Component clone(GameObject gameObject, boolean copyId) {
-        InternalScript internal = Application.getApp().getScriptManager().getScript(getClass().getName());
+    public Component clone(final GameObject gameObject, final boolean copyId) {
+        final InternalScript internal = Application.getApp().getScriptManager().getScript(getClass().getName());
         try {
-            Component clone = internal.getAsComponent(gameObject);
-            for (Field field : getClass().getFields()) {
+            final Component clone = internal.getAsComponent(gameObject);
+            for (final Field field : getClass().getFields()) {
                 try {
                     if (Modifier.isTransient(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) continue;
-                    boolean prev = field.isAccessible();
+                    final boolean prev = field.isAccessible();
                     field.setAccessible(true);
 
                     field.set(clone, field.get(this));

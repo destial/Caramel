@@ -35,7 +35,7 @@ public final class Text extends Renderer {
     @InvokeOnEdit("updateFontSize")
     public int fontSize = 24;
 
-    public Text(GameObject gameObject) {
+    public Text(final GameObject gameObject) {
         super(gameObject);
         renderState = State.UI;
     }
@@ -64,7 +64,7 @@ public final class Text extends Renderer {
     }
 
     @Override
-    public void render(Camera camera) {
+    public void render(final Camera camera) {
         if (mesh == null) {
             mesh = new TextMesh();
             setColor();
