@@ -264,7 +264,7 @@ final class huffcodetab {
     /**
      * Big Constructor : Computes all Huffman Tables.
      */
-    private huffcodetab (String S, int XLEN, int YLEN, int LINBITS, int LINMAX, int REF, int[] TABLE, int[] HLEN, int[][] VAL,
+    private huffcodetab(String S, int XLEN, int YLEN, int LINBITS, int LINMAX, int REF, int[] TABLE, int[] HLEN, int[][] VAL,
                          int TREELEN) {
         tablename0 = S.charAt(0);
         tablename1 = S.charAt(1);
@@ -279,7 +279,7 @@ final class huffcodetab {
     /**
      * Do the huffman-decoding. note! for counta,countb -the 4 bit value is returned in y, discard x.
      */
-    public static int huffman_decoder (huffcodetab h, int[] x, int[] y, int[] v, int[] w, BitReserve br) {
+    public static int huffman_decoder(huffcodetab h, int[] x, int[] y, int[] v, int[] w, BitReserve br) {
         // array of all huffcodtable headers
         // 0..31 Huffman code table 0..31
         // 32,33 count1-tables

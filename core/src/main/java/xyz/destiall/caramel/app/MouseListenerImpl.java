@@ -121,7 +121,6 @@ public final class MouseListenerImpl implements MouseListener {
         float currentX = ImGui.getMousePosX() - sceneViewportPos.x;
         currentX = (currentX / sceneViewportSize.x) * 2.0f - 1.0f;
         final Vector4f tmp = new Vector4f(currentX, 0, 0, 1);
-
         final EditorCamera camera = ApplicationImpl.getApp().getCurrentScene().getEditorCamera();
         final Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);
@@ -135,8 +134,7 @@ public final class MouseListenerImpl implements MouseListener {
     public float getOrthoY() {
         float currentY = ImGui.getMousePosY() - sceneViewportPos.y;
         currentY = -((currentY / sceneViewportSize.y) * 2.0f - 1.0f);
-        Vector4f tmp = new Vector4f(0, currentY, 0, 1);
-
+        final Vector4f tmp = new Vector4f(0, currentY, 0, 1);
         final EditorCamera camera = ApplicationImpl.getApp().getCurrentScene().getEditorCamera();
         final Matrix4f viewProjection = new Matrix4f();
         camera.getInverseView().mul(camera.getInverseProjection(), viewProjection);

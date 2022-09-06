@@ -28,7 +28,7 @@ public final class TextFont {
 
     public Texture generateTexture() {
         this.characterMap.clear();
-        Font font = new Font(filepath, Font.PLAIN, fontSize);
+        final Font font = new Font(filepath, Font.PLAIN, fontSize);
 
         BufferedImage img = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = img.createGraphics();
@@ -44,7 +44,7 @@ public final class TextFont {
 
         for (int i = 0; i < font.getNumGlyphs(); i++) {
             if (font.canDisplay(i)) {
-                CharInfo charInfo = new CharInfo(x, y, fontMetrics.charWidth(i), fontMetrics.getHeight());
+                final CharInfo charInfo = new CharInfo(x, y, fontMetrics.charWidth(i), fontMetrics.getHeight());
                 characterMap.put(i, charInfo);
                 width = Math.max(x + fontMetrics.charWidth(i), width);
 

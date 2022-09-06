@@ -69,37 +69,33 @@ public final class Bitstream {
 
     private boolean firstframe;
 
-    public Bitstream (InputStream in) {
+    public Bitstream(InputStream in) {
         if (in == null) throw new NullPointerException("in");
         in = new BufferedInputStream(in);
         loadID3v2(in);
         firstframe = true;
-        // source = new PushbackInputStream(in, 1024);
         source = new PushbackInputStream(in, BUFFER_INT_SIZE * 4);
 
         closeFrame();
-        // current_frame_number = -1;
-        // last_frame_number = -1;
     }
 
-    public int header_pos () {
+    public int header_pos() {
         return header_pos;
     }
 
-    private void loadID3v2 (InputStream in) {
+    private void loadID3v2(final InputStream in) {
         int size = -1;
         try {
             // Read ID3v2 header (10 bytes).
             in.mark(10);
             size = readID3v2Header(in);
             header_pos = size;
-        } catch (IOException ignored) {
-        } finally {
+        } catch (IOException ignored) {}
+        finally {
             try {
                 // Unread ID3v2 header (10 bytes).
                 in.reset();
-            } catch (IOException ignored) {
-            }
+            } catch (IOException ignored) {}
         }
         // Load ID3v2 tags.
         try {
@@ -112,8 +108,8 @@ public final class Bitstream {
         }
     }
 
-    private int readID3v2Header (InputStream in) throws IOException {
-        byte[] id3header = new byte[4];
+    private int readID3v2Header(final InputStream in) throws IOException {
+        final byte[] id3header = new byte[4];
         int size = -10;
         in.read(id3header, 0, 3);
         // Look for ID3v2
@@ -133,10 +129,10 @@ public final class Bitstream {
         }
     }
 
-    private void parseID3v2Frames (byte[] bframes) {
+    private void parseID3v2Frames(final byte[] bframes) {
         if (bframes == null) return;
         if (!"ID3".equals(new String(bframes, 0, 3))) return;
-        int v2version = (int)(bframes[3] & 0xFF);
+        final int v2version = (int)(bframes[3] & 0xFF);
         if (v2version < 2 || v2version > 4) {
             return;
         }
@@ -147,15 +143,15 @@ public final class Bitstream {
             for (int i = 10; i < bframes.length && bframes[i] > 0; i += size) {
                 if (v2version == 3 || v2version == 4) {
                     // ID3v2.3 & ID3v2.4
-                    String code = new String(bframes, i, 4);
-                    size = (int)(bframes[i + 4] << 24 & 0xFF000000 | bframes[i + 5] << 16 & 0x00FF0000 | bframes[i + 6] << 8
-                            & 0x0000FF00 | bframes[i + 7] & 0x000000FF);
+                    final String code = new String(bframes, i, 4);
+                    size = bframes[i + 4] << 24 & 0xFF000000 | bframes[i + 5] << 16 & 0x00FF0000 | bframes[i + 6] << 8
+                            & 0x0000FF00 | bframes[i + 7] & 0x000000FF;
                     i += 10;
                     if (code.equals("TXXX")) {
                         value = parseText(bframes, i, size, 1);
-                        String[] values = value.split("\0");
+                        final String[] values = value.split("\0");
                         if (values.length == 2) {
-                            String name = values[0];
+                            final String name = values[0];
                             value = values[1];
                             if (name.equals("replaygain_track_peak")) {
                                 replayGainPeak = Float.parseFloat(value);
@@ -173,9 +169,9 @@ public final class Bitstream {
                     i += 6;
                     if (scode.equals("TXXX")) {
                         value = parseText(bframes, i, size, 1);
-                        String[] values = value.split("\0");
+                        final String[] values = value.split("\0");
                         if (values.length == 2) {
-                            String name = values[0];
+                            final String name = values[0];
                             value = values[1];
                             if (name.equals("replaygain_track_peak")) {
                                 replayGainPeak = Float.parseFloat(value);
@@ -193,11 +189,10 @@ public final class Bitstream {
                 // If scale * peak > 1 then reduce scale (preamp) to prevent clipping.
                 replayGainScale = Math.min(1 / replayGainPeak, replayGainScale);
             }
-        } catch (RuntimeException ignored) {
-        }
+        } catch (RuntimeException ignored) {}
     }
 
-    private String parseText (byte[] bframes, int offset, int size, int skip) {
+    private String parseText(final byte[] bframes, final int offset, final int size, final int skip) {
         String value = null;
         try {
             String[] ENC_TYPES = {"ISO-8859-1", "UTF16", "UTF-16BE", "UTF-8"};
@@ -207,11 +202,11 @@ public final class Bitstream {
         return value;
     }
 
-    public Float getReplayGainScale () {
+    public Float getReplayGainScale() {
         return replayGainScale;
     }
 
-    public void close () throws BitstreamException {
+    public void close() throws BitstreamException {
         try {
             source.close();
         } catch (IOException ex) {
@@ -219,7 +214,7 @@ public final class Bitstream {
         }
     }
 
-    public Header readFrame () throws BitstreamException {
+    public Header readFrame() throws BitstreamException {
         Header result = null;
         try {
             result = readNextFrame();
@@ -245,17 +240,17 @@ public final class Bitstream {
         return result;
     }
 
-    private Header readNextFrame () throws BitstreamException {
+    private Header readNextFrame() throws BitstreamException {
         if (framesize == -1) nextFrame();
         return header;
     }
 
-    private void nextFrame () throws BitstreamException {
+    private void nextFrame() throws BitstreamException {
         // entire frame is read by the header class.
         header.read_header(this, crc);
     }
 
-    public void unreadFrame () throws BitstreamException {
+    public void unreadFrame() throws BitstreamException {
         if (wordpointer == -1 && bitindex == -1 && framesize > 0) try {
             source.unread(frame_bytes, 0, framesize);
         } catch (IOException ex) {
@@ -269,9 +264,9 @@ public final class Bitstream {
         bitindex = -1;
     }
 
-    public boolean isSyncCurrentPosition (int syncmode) throws BitstreamException {
-        int read = readBytes(syncbuf, 0, 4);
-        int headerstring = syncbuf[0] << 24 & 0xFF000000 | syncbuf[1] << 16 & 0x00FF0000 | syncbuf[2] << 8 & 0x0000FF00
+    public boolean isSyncCurrentPosition(final int syncmode) throws BitstreamException {
+        final int read = readBytes(syncbuf, 0, 4);
+        final int headerstring = syncbuf[0] << 24 & 0xFF000000 | syncbuf[1] << 16 & 0x00FF0000 | syncbuf[2] << 8 & 0x0000FF00
                 | syncbuf[3] & 0x000000FF;
 
         try {
@@ -292,50 +287,42 @@ public final class Bitstream {
         return sync;
     }
 
-    public int readBits (int n) {
+    public int readBits(final int n) {
         return get_bits(n);
     }
 
-    public int readCheckedBits (int n) {
+    public int readCheckedBits(final int n) {
         // REVIEW: implement CRC check.
         return get_bits(n);
     }
 
-    BitstreamException newBitstreamException(int errorcode) {
+    BitstreamException newBitstreamException(final int errorcode) {
         return new BitstreamException(errorcode, null);
     }
 
-    private BitstreamException newBitstreamException(int errorcode, Throwable throwable) {
+    private BitstreamException newBitstreamException(final int errorcode, final Throwable throwable) {
         return new BitstreamException(errorcode, throwable);
     }
 
-    int syncHeader (byte syncmode) throws BitstreamException {
+    int syncHeader (final byte syncmode) throws BitstreamException {
         boolean sync;
         int headerstring;
         // read additional 2 bytes
-        int bytesRead = readBytes(syncbuf, 0, 3);
-
+        final int bytesRead = readBytes(syncbuf, 0, 3);
         if (bytesRead != 3) throw newBitstreamException(STREAM_EOF, null);
-
         headerstring = syncbuf[0] << 16 & 0x00FF0000 | syncbuf[1] << 8 & 0x0000FF00 | syncbuf[2] & 0x000000FF;
-
         do {
             headerstring <<= 8;
-
             if (readBytes(syncbuf, 3, 1) != 1) throw newBitstreamException(STREAM_EOF, null);
-
             headerstring |= syncbuf[3] & 0x000000FF;
-
             sync = isSyncMark(headerstring, syncmode, syncword);
         } while (!sync);
-
         // current_frame_number++;
         // if (last_frame_number < current_frame_number) last_frame_number = current_frame_number;
-
         return headerstring;
     }
 
-    public boolean isSyncMark(int headerstring, int syncmode, int word) {
+    public boolean isSyncMark(final int headerstring, final int syncmode, final int word) {
         boolean sync;
 
         if (syncmode == INITIAL_SYNC) // sync = ((headerstring & 0xFFF00000) == 0xFFF00000);
@@ -353,7 +340,7 @@ public final class Bitstream {
         return sync;
     }
 
-    int read_frame_data(int bytesize) throws BitstreamException {
+    int read_frame_data(final int bytesize) throws BitstreamException {
         int numread = 0;
         numread = readFully(frame_bytes, 0, bytesize);
         framesize = bytesize;
@@ -365,8 +352,8 @@ public final class Bitstream {
     void parse_frame() throws BitstreamException {
         // Convert Bytes read to int
         int b = 0;
-        byte[] byteread = frame_bytes;
-        int bytesize = framesize;
+        final byte[] byteread = frame_bytes;
+        final int bytesize = framesize;
 
         for (int k = 0; k < bytesize; k = k + 4) {
             byte b0 = 0;
@@ -383,9 +370,9 @@ public final class Bitstream {
         bitindex = 0;
     }
 
-    public int get_bits(int number_of_bits) {
+    public int get_bits(final int number_of_bits) {
         int returnvalue = 0;
-        int sum = bitindex + number_of_bits;
+        final int sum = bitindex + number_of_bits;
         if (wordpointer < 0) wordpointer = 0;
 
         if (sum <= 32) {
@@ -398,9 +385,9 @@ public final class Bitstream {
             return returnvalue;
         }
 
-        int Right = framebuffer[wordpointer] & 0x0000FFFF;
+        final int Right = framebuffer[wordpointer] & 0x0000FFFF;
         wordpointer++;
-        int Left = framebuffer[wordpointer] & 0xFFFF0000;
+        final int Left = framebuffer[wordpointer] & 0xFFFF0000;
         returnvalue = Right << 16 & 0xFFFF0000 | Left >>> 16 & 0x0000FFFF;
 
         returnvalue >>>= 48 - sum; // returnvalue >>= 16 - (number_of_bits - (32 - bitindex))
@@ -409,12 +396,12 @@ public final class Bitstream {
         return returnvalue;
     }
 
-    void set_syncword(int syncword0) {
+    void set_syncword(final int syncword0) {
         syncword = syncword0 & 0xFFFFFF3F;
         single_ch_mode = (syncword0 & 0x000000C0) == 0x000000C0;
     }
 
-    private int readFully(byte[] b, int offs, int len) throws BitstreamException {
+    private int readFully(final byte[] b, int offs, int len) throws BitstreamException {
         int nRead = 0;
         try {
             while (len > 0) {
@@ -435,7 +422,7 @@ public final class Bitstream {
         return nRead;
     }
 
-    private int readBytes(byte[] b, int offs, int len) throws BitstreamException {
+    private int readBytes(final byte[] b, int offs, int len) throws BitstreamException {
         int totalBytesRead = 0;
         try {
             while (len > 0) {

@@ -76,16 +76,23 @@ public final class ImGUILayer {
     public void initImGui() {
         ImGui.createContext();
         ImNodes.createContext();
-
         final ImGuiIO io = ImGui.getIO();
 
-        io.setIniFilename("imgui.ini");
+        if (window.getSettings().has("imgui")) {
+            io.setIniFilename(null);
+            ImGui.loadIniSettingsFromMemory(window.getSettings().get("imgui").getAsString());
+        } else {
+            // Legacy compatibility
+            io.setIniFilename("imgui.ini");
+        }
+        io.setWantSaveIniSettings(false);
         io.addConfigFlags(ImGuiConfigFlags.DockingEnable);
         io.addConfigFlags(ImGuiConfigFlags.ViewportsEnable);
         io.addBackendFlags(ImGuiBackendFlags.HasMouseCursors);
         io.setBackendPlatformName("imgui_java_impl_glfw");
 
         io.setKeyMap(ImGuiKey.Backspace, Input.Key.BACKSPACE);
+        io.setKeyMap(ImGuiKey.Space, Input.Key.SPACE);
         io.setKeyMap(ImGuiKey.Enter, Input.Key.ENTER);
         io.setKeyMap(ImGuiKey.Delete, Input.Key.DELETE);
         io.setKeyMap(ImGuiKey.DownArrow, Input.Key.DOWN);
@@ -99,13 +106,13 @@ public final class ImGUILayer {
         io.setKeyMap(ImGuiKey.Home, Input.Key.HOME);
         io.setKeyMap(ImGuiKey.Tab, Input.Key.TAB);
         io.setKeyMap(ImGuiKey.Escape, Input.Key.ESCAPE);
+        io.setKeyMap(ImGuiKey.KeyPadEnter, Input.Key.ENTER);
         io.setKeyMap(ImGuiKey.A, Input.Key.A);
         io.setKeyMap(ImGuiKey.C, Input.Key.C);
         io.setKeyMap(ImGuiKey.V, Input.Key.V);
         io.setKeyMap(ImGuiKey.Y, Input.Key.Y);
         io.setKeyMap(ImGuiKey.X, Input.Key.X);
         io.setKeyMap(ImGuiKey.Z, Input.Key.Z);
-        io.setKeyMap(ImGuiKey.KeyPadEnter, Input.Key.ENTER);
 
         glfwSetKeyCallback(glfwWindow, (w, key, scancode, action, mods) -> {
             if (action == GLFW_PRESS) {
@@ -291,10 +298,12 @@ public final class ImGUILayer {
         glfwMakeContextCurrent(window.glfwWindow);
     }
 
-    public void destroy() {
+    public String destroy() {
+        final String save = ImGui.saveIniSettingsToMemory();
         imGuiGl3.dispose();
         ImGui.getIO().getFonts().destroy();
         ImNodes.destroyContext();
         ImGui.destroyContext();
+        return save;
     }
 }

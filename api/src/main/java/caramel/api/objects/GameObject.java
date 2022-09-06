@@ -4,6 +4,7 @@ import caramel.api.Application;
 import caramel.api.Component;
 import caramel.api.components.Camera;
 import caramel.api.components.Transform;
+import caramel.api.debug.Debug;
 import caramel.api.interfaces.Render;
 import caramel.api.interfaces.StringWrapper;
 import caramel.api.interfaces.Update;
@@ -67,11 +68,15 @@ public abstract class GameObject implements Update, Render {
                 try {
                     component.start();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Debug.log(e.getMessage());
                 }
                 component.alreadyEnabled = true;
             }
-            component.update();
+            try {
+                component.update();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
     }
 
@@ -79,12 +84,20 @@ public abstract class GameObject implements Update, Render {
     public void lateUpdate() {
         for (final Component component : components) {
             if (!component.enabled || component instanceof MeshRenderer) continue;
-            component.lateUpdate();
+            try {
+                component.lateUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
 
         final Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
         for (final Renderer render : renderers) {
-            render.lateUpdate();
+            try {
+                render.lateUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
     }
 
@@ -94,12 +107,20 @@ public abstract class GameObject implements Update, Render {
         for (final GameObject child : children) {
             child.transform.position.set(transform.position);
             child.transform.rotation.set(transform.rotation);
-            child.editorUpdate();
+            try {
+                child.editorUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
 
         final Set<Renderer> renderers = getComponentsInChildren(Renderer.class);
         for (final Renderer render : renderers) {
-            render.lateUpdate();
+            try {
+                render.lateUpdate();
+            } catch (Exception e) {
+                Debug.log(e.getMessage());
+            }
         }
     }
 

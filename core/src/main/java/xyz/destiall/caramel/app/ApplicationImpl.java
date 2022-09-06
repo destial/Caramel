@@ -11,6 +11,7 @@ import caramel.api.graphics.opengl.OpenGL30;
 import caramel.api.scripts.ScriptManager;
 import caramel.api.sound.decoder.AudioDecoder;
 import caramel.api.utils.SystemIO;
+import org.lwjgl.glfw.*;
 import xyz.destiall.caramel.app.editor.EditorSceneLoader;
 import xyz.destiall.caramel.app.editor.managers.AudioManager;
 import caramel.api.components.EditorCamera;
@@ -32,8 +33,6 @@ import caramel.api.utils.FileIO;
 import imgui.ImGui;
 import org.joml.Vector2f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.GLFWErrorCallback;
-import org.lwjgl.glfw.GLFWImage;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALCCapabilities;
@@ -48,6 +47,7 @@ import xyz.destiall.caramel.app.scripts.EditorScriptManager;
 import xyz.destiall.caramel.app.runtime.RuntimeScriptManager;
 import xyz.destiall.caramel.app.serialize.SceneSerializer;
 import xyz.destiall.caramel.app.ui.ImGUILayer;
+import xyz.destiall.caramel.app.ui.ImGuiUtils;
 import xyz.destiall.caramel.app.utils.Payload;
 import xyz.destiall.java.events.EventHandling;
 import xyz.destiall.java.events.Listener;
@@ -70,6 +70,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import static caramel.api.graphics.GL20.*;
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.GLFW_FALSE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -100,11 +101,6 @@ import static org.lwjgl.openal.ALC10.alcDestroyContext;
 import static org.lwjgl.openal.ALC10.alcGetString;
 import static org.lwjgl.openal.ALC10.alcMakeContextCurrent;
 import static org.lwjgl.openal.ALC10.alcOpenDevice;
-import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
-import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.stb.STBImage.stbi_image_free;
 import static org.lwjgl.stb.STBImage.stbi_load;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -132,13 +128,13 @@ public final class ApplicationImpl extends Application implements Runnable {
     private boolean fullscreen;
     private List<String> lastScenes;
     private String title;
-
     private boolean focused;
 
     private long audioContext;
     private long audioDevice;
 
     private SceneLoader sceneLoader;
+    private JsonObject settings;
 
     public long glfwWindow;
 
@@ -181,35 +177,36 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     private void setup() {
-        sceneLoader = EDITOR_MODE ? new EditorSceneLoader(this) : new RuntimeSceneLoader(this);
         // Load settings and data files
+        sceneLoader = EDITOR_MODE ? new EditorSceneLoader(this) : new RuntimeSceneLoader(this);
 
         try {
             if (EDITOR_MODE) {
                 final File settings = new File("settings.json");
-                JsonObject object = new JsonObject();
+                this.settings = new JsonObject();
                 if (settings.createNewFile()) {
-                    object.addProperty("width", width = 1920);
-                    object.addProperty("height", height = 1080);
-                    object.addProperty("windowPosX", winPosX = 25);
-                    object.addProperty("windowPosY", winPosY = 25);
-                    object.addProperty("fullscreen", fullscreen = false);
+                    this.settings.addProperty("width", width = 1920);
+                    this.settings.addProperty("height", height = 1080);
+                    this.settings.addProperty("windowPosX", winPosX = 25);
+                    this.settings.addProperty("windowPosY", winPosY = 25);
+                    this.settings.addProperty("fullscreen", fullscreen = false);
                     lastScenes = new ArrayList<>();
                     String lastScene = "assets/scenes/Untitled Scene.caramel";
                     lastScenes.add(lastScene);
                     JsonArray array = new JsonArray();
                     array.add(lastScene);
-                    object.add("lastScene", array);
-                    FileIO.writeData(settings, serializer.toJson(object));
+                    this.settings.add("lastScene", array);
+                    this.settings.addProperty("imgui", ImGuiUtils.DEFAULT_SETTINGS);
+                    FileIO.writeData(settings, serializer.toJson(this.settings));
 
                 } else {
-                    object = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
-                    width = object.get("width").getAsInt();
-                    height = object.get("height").getAsInt();
-                    winPosX = object.get("windowPosX").getAsInt();
-                    winPosY = object.get("windowPosY").getAsInt();
+                    this.settings = serializer.fromJson(FileIO.readData(settings), JsonObject.class);
+                    width = this.settings.get("width").getAsInt();
+                    height = this.settings.get("height").getAsInt();
+                    winPosX = this.settings.get("windowPosX").getAsInt();
+                    winPosY = this.settings.get("windowPosY").getAsInt();
                     lastScenes = new ArrayList<>();
-                    final JsonElement element = object.get("lastScene");
+                    final JsonElement element = this.settings.get("lastScene");
                     if (element.isJsonArray()) {
                         JsonArray array = element.getAsJsonArray();
                         for (JsonElement loc : array) {
@@ -220,7 +217,7 @@ public final class ApplicationImpl extends Application implements Runnable {
                         final String loc = element.getAsString();
                         lastScenes.add(loc);
                     }
-                    fullscreen = object.has("fullscreen") && object.get("fullscreen").getAsBoolean();
+                    fullscreen = this.settings.has("fullscreen") && this.settings.get("fullscreen").getAsBoolean();
                 }
 
                 final File assets = new File("assets" + File.separator);
@@ -233,28 +230,22 @@ public final class ApplicationImpl extends Application implements Runnable {
                     new File(assets, "fonts" + File.separator).mkdirs();
                     FileIO.saveResource("arial.TTF", "assets/fonts/arial.TTF");
                 }
-
-                final File imgui = new File("imgui.ini");
-                if (!imgui.exists()) {
-                    FileIO.saveResource("imgui.ini", "imgui.ini");
-                }
             } else {
                 fullscreen = true;
                 final String path = getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
                 final File source = new File(path);
 
                 final File config = new File("config.json");
-                JsonObject object;
                 if (config.exists()) {
-                    object = serializer.fromJson(FileIO.readData(config), JsonObject.class);
+                    this.settings = serializer.fromJson(FileIO.readData(config), JsonObject.class);
                 } else {
-                    object = serializer.fromJson(FileIO.readUTFFromZip(source, "config.json"), JsonObject.class);
+                    this.settings = serializer.fromJson(FileIO.readUTFFromZip(source, "config.json"), JsonObject.class);
                 }
-                width = object.get("width").getAsInt();
-                height = object.get("height").getAsInt();
-                winPosX = object.get("windowPosX").getAsInt();
-                winPosY = object.get("windowPosY").getAsInt();
-                final JsonArray array = object.get("scenes").getAsJsonArray();
+                width = this.settings.get("width").getAsInt();
+                height = this.settings.get("height").getAsInt();
+                winPosX = this.settings.get("windowPosX").getAsInt();
+                winPosY = this.settings.get("windowPosY").getAsInt();
+                final JsonArray array = this.settings.get("scenes").getAsJsonArray();
                 lastScenes = new ArrayList<>();
                 for (JsonElement loc : array) {
                     lastScenes.add(loc.getAsString());
@@ -339,21 +330,27 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         // Set resize callbacks.
         // Input callbacks are set in ImGUI.
-        glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
+        try (GLFWWindowSizeCallback ignored = glfwSetWindowSizeCallback(glfwWindow, (window, width, height) -> {
             this.width = width;
             this.height = height;
-        });
+        })) {
+            Debug.log("Setting window size callbacks");
+        } catch (Exception ignored) {}
 
         // Set position callbacks.
-        glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
+        try (GLFWWindowPosCallback ignored = glfwSetWindowPosCallback(glfwWindow, (window, x, y) -> {
             this.winPosX = x;
             this.winPosY = y;
-        });
+        })) {
+            Debug.log("Setting window position callbacks");
+        } catch (Exception ignored) {}
 
-        glfwSetWindowFocusCallback(glfwWindow, (window, focused) -> {
+        try (GLFWWindowFocusCallback ignored = glfwSetWindowFocusCallback(glfwWindow, (window, focused) -> {
             this.focused = focused;
             eventHandler.call(new WindowFocusEvent(focused));
-        });
+        })) {
+            Debug.log("Setting window focus callbacks");
+        } catch (Exception ignored) {}
 
         // Create audio handler
         final String defaultDeviceName = alcGetString(0, ALC_DEFAULT_DEVICE_SPECIFIER);
@@ -379,6 +376,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         Graphics.get().glEnable(GL_BLEND);
         Graphics.get().glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+        // Set Java UI scheme
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -444,11 +442,11 @@ public final class ApplicationImpl extends Application implements Runnable {
         for (final String data : lastScenes) {
             SceneImpl loaded = null;
             if (EDITOR_MODE) {
-                File file = new File(data);
+                final File file = new File(data);
                 loaded = loadScene(file);
             } else {
                 try {
-                    String contents = FileIO.readUTFFromZip(source, data);
+                    final String contents = FileIO.readUTFFromZip(source, data);
                     loaded = sceneLoader.loadScene(contents);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -508,6 +506,10 @@ public final class ApplicationImpl extends Application implements Runnable {
         task.runThenCancel();
 
         running = false;
+    }
+
+    public JsonObject getSettings() {
+        return settings;
     }
 
     private boolean process() {
@@ -581,20 +583,19 @@ public final class ApplicationImpl extends Application implements Runnable {
 
     private void destroy() {
         // Save settings
+        final File settings = new File("settings.json");
+        this.settings = new JsonObject();
         if (EDITOR_MODE) {
-            final File settings = new File("settings.json");
-            final JsonObject object = new JsonObject();
-            object.addProperty("width", width);
-            object.addProperty("height", height);
-            object.addProperty("windowPosX", winPosX);
-            object.addProperty("windowPosY", winPosY);
-            object.addProperty("fullscreen", fullscreen);
-            JsonArray sceneData = new JsonArray();
-            for (SceneImpl scene : sceneLoader.getScenes()) {
+            this.settings.addProperty("width", width);
+            this.settings.addProperty("height", height);
+            this.settings.addProperty("windowPosX", winPosX);
+            this.settings.addProperty("windowPosY", winPosY);
+            this.settings.addProperty("fullscreen", fullscreen);
+            final JsonArray sceneData = new JsonArray();
+            for (final SceneImpl scene : sceneLoader.getScenes()) {
                 sceneData.add(FileIO.relativize(scene.getFile()));
             }
-            object.add("lastScene", sceneData);
-            FileIO.writeData(settings, serializer.toJson(object));
+            this.settings.add("lastScene", sceneData);
         }
 
         // Destroy and clean up any remaining objects
@@ -612,8 +613,12 @@ public final class ApplicationImpl extends Application implements Runnable {
             eventHandler.unregisterListener(listener);
         }
 
-        // Destroy ImGUI
-        imGui.destroy();
+        // Destroy && saved ImGUI
+        final String save = imGui.destroy();
+        if (EDITOR_MODE) {
+            this.settings.addProperty("imgui", save);
+            FileIO.writeData(settings, serializer.toJson(this.settings));
+        }
 
         // Free ALC context and close device
         alcDestroyContext(audioContext);
@@ -621,7 +626,11 @@ public final class ApplicationImpl extends Application implements Runnable {
 
         // Free GLFW callbacks and destroy the window (if not yet destroyed)
         glfwFreeCallbacks(glfwWindow);
-        glfwSetErrorCallback(null).free();
+        try (GLFWErrorCallback errorCallback = glfwSetErrorCallback(null)) {
+            if (errorCallback != null) {
+                errorCallback.free();
+            }
+        } catch (Exception ignored) {}
         glfwDestroyWindow(glfwWindow);
 
         // Terminate the window
@@ -648,7 +657,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     @Override
-    public void setTitle(String title) {
+    public void setTitle(final String title) {
         this.title = title;
         glfwSetWindowTitle(glfwWindow, (EDITOR_MODE ? "Caramel | " : "") + title + " | FPS: " + (int) (Time.getFPS()));
     }
@@ -677,12 +686,12 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     @Override
-    public SceneImpl loadScene(File file) {
+    public SceneImpl loadScene(final File file) {
         return sceneLoader.loadScene(file);
     }
 
     @Override
-    public SceneImpl loadScene(int index) {
+    public SceneImpl loadScene(final int index) {
         return sceneLoader.loadScene(index);
     }
 
@@ -692,7 +701,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     @Override
-    public void saveScene(Scene scene, File file) {
+    public void saveScene(final Scene scene, final File file) {
         sceneLoader.saveScene(scene, file);
     }
 
@@ -707,7 +716,7 @@ public final class ApplicationImpl extends Application implements Runnable {
     }
 
     @Override
-    public void setRunning(boolean run) {
+    public void setRunning(final boolean run) {
         this.running = run;
     }
 

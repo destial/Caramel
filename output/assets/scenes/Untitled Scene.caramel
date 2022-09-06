@@ -176,15 +176,91 @@
           "enabled": true
         },
         {
-          "file": {
-            "path": "assets/sounds/oof.mp3"
+          "jumpForce": 100.0,
+          "clazz": "scripts.CharacterController2D",
+          "id": 16,
+          "enabled": true
+        },
+        {
+          "velocity": {
+            "joml": {
+              "x": 3.5325332,
+              "y": 0.0
+            },
+            "jbox2d": {
+              "x": 3.5325332,
+              "y": 0.0
+            },
+            "imgui": {
+              "x": 3.5325332,
+              "y": 0.0
+            }
           },
-          "loop": false,
-          "volume": 0.1,
-          "playOnStart": true,
-          "updatePosition": true,
-          "clazz": "caramel.api.audio.AudioPlayer",
-          "id": 10,
+          "angularDamping": 0.8,
+          "linearDamping": 0.9,
+          "mass": 1.0,
+          "friction": 1.0,
+          "fixedRotation": true,
+          "continuousCollision": true,
+          "isTrigger": false,
+          "gravity": true,
+          "bounce": false,
+          "bodyType": "DYNAMIC",
+          "clazz": "caramel.api.components.RigidBody2D",
+          "id": 17,
+          "enabled": true
+        },
+        {
+          "bounds": {
+            "joml": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "jbox2d": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "imgui": {
+              "x": 1.0,
+              "y": 1.0
+            }
+          },
+          "useScale": true,
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "collisionRender": false,
+          "clazz": "caramel.api.physics.components.Box2DCollider",
+          "id": 21,
+          "enabled": true
+        },
+        {
+          "target": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "rotate": false,
+          "isEditor": false,
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "fov": 60.0,
+          "near": 0.01,
+          "far": 1000.0,
+          "perspective": false,
+          "zoom": 1.0,
+          "clazz": "caramel.api.components.Camera",
+          "id": 34,
           "enabled": true
         }
       ],
@@ -192,6 +268,241 @@
       "tags": [],
       "name": "GameObject",
       "id": 8
+    },
+    {
+      "components": [
+        {
+          "position": {
+            "x": 0.87013006,
+            "y": -2.6684299,
+            "z": -1.0
+          },
+          "localPosition": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "rotation": {
+            "x": 0.0,
+            "y": -0.0,
+            "z": 0.0
+          },
+          "scale": {
+            "x": 14.629807,
+            "y": 1.0,
+            "z": 1.0
+          },
+          "forward": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": -1.0
+          },
+          "up": {
+            "x": 0.0,
+            "y": 1.0,
+            "z": 0.0
+          },
+          "clazz": "caramel.api.components.Transform",
+          "id": 11,
+          "enabled": true
+        },
+        {
+          "color": {
+            "r": 1.0,
+            "g": 1.0,
+            "b": 1.0,
+            "a": 1.0
+          },
+          "mesh": {
+            "vertexArray": [
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "texSlot": 0.0,
+                "height": 0.0
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "texSlot": 0.0,
+                "height": 0.0
+              },
+              {
+                "position": {
+                  "x": 0.5,
+                  "y": 0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 1.0,
+                  "y": 0.0
+                },
+                "color": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "texSlot": 0.0,
+                "height": 0.0
+              },
+              {
+                "position": {
+                  "x": -0.5,
+                  "y": -0.5,
+                  "z": 0.0
+                },
+                "texCoords": {
+                  "x": 0.0,
+                  "y": 1.0
+                },
+                "color": {
+                  "r": 1.0,
+                  "g": 1.0,
+                  "b": 1.0,
+                  "a": 1.0
+                },
+                "normal": {
+                  "x": 0.0,
+                  "y": 0.0,
+                  "z": 0.0
+                },
+                "texSlot": 0.0,
+                "height": 0.0
+              }
+            ],
+            "elementArray": [
+              2,
+              1,
+              0,
+              0,
+              1,
+              3
+            ],
+            "shader": "color",
+            "color": {
+              "r": 1.0,
+              "g": 1.0,
+              "b": 1.0,
+              "a": 1.0
+            },
+            "dirty": false,
+            "drawArrays": false,
+            "withIndices": true,
+            "material": {
+              "diffuse": 0.0,
+              "specular": 0.0,
+              "shininess": 0.0
+            },
+            "name": "Quad",
+            "type": 4
+          },
+          "renderState": "WORLD",
+          "clazz": "caramel.api.render.MeshRenderer",
+          "id": 13,
+          "enabled": true
+        },
+        {
+          "velocity": {
+            "joml": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "jbox2d": {
+              "x": 0.0,
+              "y": 0.0
+            },
+            "imgui": {
+              "x": 0.0,
+              "y": 0.0
+            }
+          },
+          "angularDamping": 0.8,
+          "linearDamping": 0.9,
+          "mass": 1.0,
+          "friction": 1.0,
+          "fixedRotation": false,
+          "continuousCollision": true,
+          "isTrigger": false,
+          "gravity": false,
+          "bounce": false,
+          "bodyType": "STATIC",
+          "clazz": "caramel.api.components.RigidBody2D",
+          "id": 14,
+          "enabled": true
+        },
+        {
+          "bounds": {
+            "joml": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "jbox2d": {
+              "x": 1.0,
+              "y": 1.0
+            },
+            "imgui": {
+              "x": 1.0,
+              "y": 1.0
+            }
+          },
+          "useScale": true,
+          "offset": {
+            "x": 0.0,
+            "y": 0.0,
+            "z": 0.0
+          },
+          "collisionRender": false,
+          "clazz": "caramel.api.physics.components.Box2DCollider",
+          "id": 15,
+          "enabled": true
+        }
+      ],
+      "children": [],
+      "tags": [],
+      "name": "Quad",
+      "id": 12
     }
   ],
   "editorCamera": {

@@ -9,7 +9,7 @@ import java.util.List;
 public final class DeleteGameObjects extends EditorAction {
     public final List<GameObject> deleted;
 
-    public DeleteGameObjects(Scene scene) {
+    public DeleteGameObjects(final Scene scene) {
         super(scene);
         this.deleted = new ArrayList<>();
     }

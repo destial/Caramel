@@ -8,7 +8,7 @@ public final class Crc16 {
         crc = (short)0xFFFF;
     }
 
-    public void add_bits(int bitstring, int length) {
+    public void add_bits(final int bitstring, final int length) {
         int bitmask = 1 << length - 1;
         do
             if ((crc & 0x8000) == 0 ^ (bitstring & bitmask) == 0) {
@@ -20,7 +20,7 @@ public final class Crc16 {
     }
 
     public short checksum() {
-        short sum = crc;
+        final short sum = crc;
         crc = (short)0xFFFF;
         return sum;
     }

@@ -76,11 +76,10 @@ public final class Header {
 
     private int _headerstring = -1;
 
-    Header () {
-    }
+    Header () {}
 
     public String toString () {
-        StringBuilder buffer = new StringBuilder(200);
+        final StringBuilder buffer = new StringBuilder(200);
         buffer.append("Layer ");
         buffer.append(layer_string());
         buffer.append(" frame ");
@@ -101,7 +100,7 @@ public final class Header {
     /**
      * Read a 32-bit header from the bitstream.
      */
-    void read_header (Bitstream stream, Crc16[] crcp) throws BitstreamException {
+    void read_header(final Bitstream stream, final Crc16[] crcp) throws BitstreamException {
         int headerstring;
         int channel_bitrate;
         boolean sync = false;
@@ -153,7 +152,7 @@ public final class Header {
             // calculate framesize and nSlots
             calculate_framesize();
             // read framedata:
-            int framesizeloaded = stream.read_frame_data(framesize);
+            final int framesizeloaded = stream.read_frame_data(framesize);
             if (framesize >= 0 && framesizeloaded != framesize) // Data loaded does not match to expected framesize,
                 // it might be an ID3v1 TAG. (Fix 11/17/04).
                 throw stream.newBitstreamException(Bitstream.INVALIDFRAME);
@@ -182,10 +181,10 @@ public final class Header {
          */
     }
 
-    void parseVBR (byte[] firstframe) throws BitstreamException {
+    void parseVBR(final byte[] firstframe) throws BitstreamException {
         // Trying Xing header.
-        String xing = "Xing";
-        byte[] tmp = new byte[4];
+        final String xing = "Xing";
+        final byte[] tmp = new byte[4];
         int offset = 0;
         // Compute "Xing" offset depending on MPEG version and channels.
         if (h_version == MPEG1) {
@@ -210,7 +209,7 @@ public final class Header {
 
                 int length = 4;
                 // Read flags.
-                byte[] flags = new byte[4];
+                final byte[] flags = new byte[4];
                 System.arraycopy(firstframe, offset + length, flags, 0, flags.length);
                 length += flags.length;
                 // Read number of frames (if available).
@@ -277,63 +276,63 @@ public final class Header {
     /**
      * Returns version.
      */
-    public int version () {
+    public int version() {
         return h_version;
     }
 
     /**
      * Returns Layer ID.
      */
-    public int layer () {
+    public int layer() {
         return h_layer;
     }
 
     /**
      * Returns bitrate index.
      */
-    public int bitrate_index () {
+    public int bitrate_index() {
         return h_bitrate_index;
     }
 
     /**
      * Returns Sample Frequency.
      */
-    public int sample_frequency () {
+    public int sample_frequency() {
         return h_sample_frequency;
     }
 
     /**
      * Returns Frequency.
      */
-    public int frequency () {
+    public int frequency() {
         return frequencies[h_version][h_sample_frequency];
     }
 
     /**
      * Returns Mode.
      */
-    public int mode () {
+    public int mode() {
         return h_mode;
     }
 
     /**
      * Returns Protection bit.
      */
-    public boolean checksums () {
+    public boolean checksums() {
         return h_protection_bit == 0;
     }
 
     /**
      * Returns Copyright.
      */
-    public boolean copyright () {
+    public boolean copyright() {
         return h_copyright;
     }
 
     /**
      * Returns Original.
      */
-    public boolean original () {
+    public boolean original() {
         return h_original;
     }
 
@@ -341,7 +340,7 @@ public final class Header {
      * Return VBR.
      * @return true if VBR header is found
      */
-    public boolean vbr () {
+    public boolean vbr() {
         return h_vbr;
     }
 
@@ -349,7 +348,7 @@ public final class Header {
      * Return VBR scale.
      * @return scale of -1 if not available
      */
-    public int vbr_scale () {
+    public int vbr_scale() {
         return h_vbr_scale;
     }
 
@@ -357,14 +356,14 @@ public final class Header {
      * Return VBR TOC.
      * @return vbr toc ot null if not available
      */
-    public byte[] vbr_toc () {
+    public byte[] vbr_toc() {
         return h_vbr_toc;
     }
 
     /**
      * Returns Checksum flag. Compares computed checksum with stream checksum.
      */
-    public boolean checksum_ok () {
+    public boolean checksum_ok() {
         return checksum == crc.checksum();
     }
 
@@ -373,23 +372,20 @@ public final class Header {
      * Returns Layer III Padding bit.
      */
     public boolean padding () {
-        if (h_padding_bit == 0)
-            return false;
-        else
-            return true;
+        return h_padding_bit != 0;
     }
 
     /**
      * Returns Slots.
      */
-    public int slots () {
+    public int slots() {
         return nSlots;
     }
 
     /**
      * Returns Mode Extension.
      */
-    public int mode_extension () {
+    public int mode_extension() {
         return h_mode_extension;
     }
 
@@ -424,7 +420,7 @@ public final class Header {
     /**
      * Calculate Frame size. Calculates framesize in bytes excluding header size.
      */
-    public int calculate_framesize () {
+    public int calculate_framesize() {
 
         if (h_layer == 1) {
             framesize = 12 * bitrates[h_version][0][h_bitrate_index] / frequencies[h_version][h_sample_frequency];
@@ -457,9 +453,9 @@ public final class Header {
      * @param streamsize
      * @return number of frames
      */
-    public int max_number_of_frames (int streamsize) // E.B
+    public int max_number_of_frames(final int streamsize) // E.B
     {
-        if (h_vbr == true)
+        if (h_vbr)
             return h_vbr_frames;
         else if (framesize + 4 - h_padding_bit == 0)
             return 0;
@@ -472,9 +468,9 @@ public final class Header {
      * @param streamsize
      * @return number of frames
      */
-    public int min_number_of_frames (int streamsize) // E.B
+    public int min_number_of_frames(final int streamsize) // E.B
     {
-        if (h_vbr == true)
+        if (h_vbr)
             return h_vbr_frames;
         else if (framesize + 5 - h_padding_bit == 0)
             return 0;
@@ -486,14 +482,14 @@ public final class Header {
      * Returns ms/frame.
      * @return milliseconds per frame
      */
-    public float ms_per_frame () // E.B
+    public float ms_per_frame() // E.B
     {
-        if (h_vbr == true) {
+        if (h_vbr) {
             double tpf = h_vbr_time_per_frame[layer()] / frequency();
             if (h_version == MPEG2_LSF || h_version == MPEG25_LSF) tpf /= 2;
             return (float)(tpf * 1000);
         } else {
-            float ms_per_frame_array[][] = { {8.707483f, 8.0f, 12.0f}, {26.12245f, 24.0f, 36.0f}, {26.12245f, 24.0f, 36.0f}};
+            final float[][] ms_per_frame_array = { {8.707483f, 8.0f, 12.0f}, {26.12245f, 24.0f, 36.0f}, {26.12245f, 24.0f, 36.0f}};
             return ms_per_frame_array[h_layer - 1][h_sample_frequency];
         }
     }
@@ -503,7 +499,7 @@ public final class Header {
      * @param streamsize
      * @return total milliseconds
      */
-    public float total_ms (int streamsize) // E.B
+    public float total_ms(final int streamsize) // E.B
     {
         return max_number_of_frames(streamsize) * ms_per_frame();
     }
@@ -511,7 +507,7 @@ public final class Header {
     /**
      * Returns synchronized header.
      */
-    public int getSyncHeader () // E.B
+    public int getSyncHeader() // E.B
     {
         return _headerstring;
     }
@@ -520,7 +516,7 @@ public final class Header {
     /**
      * Return Layer version.
      */
-    public String layer_string () {
+    public String layer_string() {
         switch (h_layer) {
             case 1:
                 return "I";
@@ -533,7 +529,7 @@ public final class Header {
     }
 
     // E.B -> private to public
-    private static final String bitrate_str[][][] = {
+    private static final String[][][] bitrate_str = {
             {
                     {"free format", "32 kbit/s", "48 kbit/s", "56 kbit/s", "64 kbit/s", "80 kbit/s", "96 kbit/s", "112 kbit/s",
                             "128 kbit/s", "144 kbit/s", "160 kbit/s", "176 kbit/s", "192 kbit/s", "224 kbit/s", "256 kbit/s", "forbidden"},
@@ -562,9 +558,9 @@ public final class Header {
      * Return Bitrate.
      * @return bitrate in bps
      */
-    public String bitrate_string () {
-        if (h_vbr == true)
-            return Integer.toString(bitrate() / 1000) + " kb/s";
+    public String bitrate_string() {
+        if (h_vbr)
+            return bitrate() / 1000 + " kb/s";
         else
             return bitrate_str[h_version][h_layer - 1][h_bitrate_index];
     }
@@ -573,8 +569,8 @@ public final class Header {
      * Return Bitrate.
      * @return bitrate in bps and average bitrate for VBR header
      */
-    public int bitrate () {
-        if (h_vbr == true)
+    public int bitrate() {
+        if (h_vbr)
             return (int)(h_vbr_bytes * 8 / (ms_per_frame() * h_vbr_frames)) * 1000;
         else
             return bitrates[h_version][h_layer - 1][h_bitrate_index];
@@ -584,7 +580,7 @@ public final class Header {
      * Return Instant Bitrate. Bitrate for VBR is not constant.
      * @return bitrate in bps
      */
-    public int bitrate_instant () {
+    public int bitrate_instant() {
         return bitrates[h_version][h_layer - 1][h_bitrate_index];
     }
 
@@ -622,7 +618,7 @@ public final class Header {
         return null;
     }
 
-    public int getSampleRate () {
+    public int getSampleRate() {
         switch (h_sample_frequency) {
             case THIRTYTWO:
                 if (h_version == MPEG1)
@@ -655,7 +651,7 @@ public final class Header {
     /**
      * Returns Mode.
      */
-    public String mode_string () {
+    public String mode_string() {
         switch (h_mode) {
             case STEREO:
                 return "Stereo";
@@ -673,7 +669,7 @@ public final class Header {
      * Returns Version.
      * @return MPEG-1 or MPEG-2 LSF or MPEG-2.5 LSF
      */
-    public String version_string () {
+    public String version_string() {
         switch (h_version) {
             case MPEG1:
                 return "MPEG-1";
@@ -689,7 +685,7 @@ public final class Header {
      * Returns the number of subbands in the current frame.
      * @return number of subbands
      */
-    public int number_of_subbands () {
+    public int number_of_subbands() {
         return h_number_of_subbands;
     }
 
@@ -698,7 +694,7 @@ public final class Header {
      * above that limit are in intensity stereo mode.
      * @return intensity
      */
-    public int intensity_stereo_bound () {
+    public int intensity_stereo_bound() {
         return h_intensity_stereo_bound;
     }
 }

@@ -16,7 +16,6 @@ final class BitReserve {
     private final int[] buf = new int[BUFSIZE];
 
     BitReserve () {
-
         offset = 0;
         totbit = 0;
         buf_byte_idx = 0;
@@ -65,7 +64,7 @@ final class BitReserve {
      */
     public int hget1bit () {
         totbit++;
-        int val = buf[buf_byte_idx];
+        final int val = buf[buf_byte_idx];
         buf_byte_idx = buf_byte_idx + 1 & BUFSIZE_MASK;
         return val;
     }
@@ -119,7 +118,7 @@ final class BitReserve {
      * Rewind N bytes in Stream.
      */
     public void rewindNbytes (int N) {
-        int bits = N << 3;
+        final int bits = N << 3;
         totbit -= bits;
         buf_byte_idx -= bits;
         if (buf_byte_idx < 0) buf_byte_idx += BUFSIZE;

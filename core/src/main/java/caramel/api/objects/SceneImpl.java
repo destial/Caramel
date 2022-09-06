@@ -7,6 +7,7 @@ import caramel.api.components.Camera;
 import caramel.api.components.EditorCamera;
 import caramel.api.components.Light;
 import caramel.api.components.UICamera;
+import caramel.api.debug.Debug;
 import caramel.api.debug.DebugImpl;
 import caramel.api.events.ScenePlayEvent;
 import caramel.api.events.SceneStopEvent;
@@ -268,7 +269,11 @@ public final class SceneImpl extends Scene {
                 selectedGameObject.add(clone);
             }
             for (final Physics world : physics.values()) {
-                world.addGameObject(clone);
+                try {
+                    world.addGameObject(clone);
+                } catch (Exception e) {
+                    Debug.log(e.getMessage());
+                }
             }
         }
 
@@ -297,6 +302,7 @@ public final class SceneImpl extends Scene {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        Debug.log(e.getMessage());
                     }
                 }
             }
@@ -328,7 +334,11 @@ public final class SceneImpl extends Scene {
 
     public void __imguiLayer() {
         for (final Panel panel : panels.values()) {
-            panel.__imguiLayer();
+            try {
+                panel.__imguiLayer();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
