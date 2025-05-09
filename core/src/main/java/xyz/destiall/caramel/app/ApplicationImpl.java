@@ -527,6 +527,7 @@ public final class ApplicationImpl extends Application implements Runnable {
         if (EDITOR_MODE) scene.editorUpdate();
         else scene.update();
 
+        // Press F11 to maximize preview scene screen
         if (EDITOR_MODE && ImGui.isKeyPressed(Input.Key.F11)) {
             fullscreen = !fullscreen;
             eventHandler.call(new FullscreenEvent(fullscreen));

@@ -3,6 +3,6 @@
   "height": 837,
   "windowPosX": 431,
   "windowPosY": 64,
-  "fullscreen": true,
+  "fullscreen": false,
   "lastScene": "output/assets/scenes/Untitled Scene.caramel"
 }

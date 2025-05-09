@@ -208,7 +208,7 @@ public final class Shader {
     static {
         getShader("default");
         getShader("color");
-        getShader("light");
+        //getShader("light");
         getShader("line");
         getShader("text");
     }
